@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "leafbridge"
+version = "0.1.0"
+description = "A remote MCP server for editing Overleaf projects from Claude and ChatGPT."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "AGPL-3.0-or-later" }
+authors = [{ name = "LeafBridge" }]
+keywords = ["overleaf", "latex", "mcp", "claude", "chatgpt", "git"]
+dependencies = [
+    "fastmcp>=3.4,<4",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23"]
+
+[project.scripts]
+leafbridge = "leafbridge.__main__:main"
+
+[tool.setuptools]
+packages = ["leafbridge"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

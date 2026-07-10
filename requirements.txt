@@ -1,0 +1,4 @@
+# LeafBridge Phase 1 runtime dependencies.
+# Pin the FastMCP major line; uvicorn/starlette come in as FastMCP deps.
+fastmcp>=3.4,<4
+python-dotenv>=1.0

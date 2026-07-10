@@ -1,0 +1,10 @@
+{
+  "_comment": "Copy this file to projects.json (which is gitignored) and fill in your real values. projects.json holds your Overleaf project links and Git tokens locally; it is never committed and never sent anywhere except to git.overleaf.com over HTTPS.",
+  "projects": [
+    {
+      "name": "thesis",
+      "url": "https://www.overleaf.com/project/PASTE_YOUR_PROJECT_ID_HERE",
+      "token": "PASTE_YOUR_OVERLEAF_GIT_TOKEN_HERE"
+    }
+  ]
+}

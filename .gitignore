@@ -1,0 +1,26 @@
+# --- LeafBridge secrets & local state (NEVER commit) ---
+projects.json          # your Overleaf project links + git tokens live here
+.env
+*.token
+
+# git clone cache (disposable; may also live in LocalAppData)
+.cache/
+data/
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
