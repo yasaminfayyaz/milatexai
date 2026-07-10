@@ -1,9 +1,13 @@
 # --- LeafBridge secrets & local state (NEVER commit) ---
-projects.json          # your Overleaf project links + git tokens live here
+# NOTE: git does NOT support inline "# ..." comments after a pattern, so every
+# pattern below is on its own line. projects.json holds your Overleaf project
+# links and git tokens; keep it out of the repo.
+projects.json
+projects.local.json
 .env
 *.token
 
-# git clone cache (disposable; may also live in LocalAppData)
+# git clone cache (disposable; may also live under %LOCALAPPDATA%)
 .cache/
 data/
 
