@@ -102,11 +102,7 @@ class GitWorker:
             await self._clone(project)
             return
         branch = await self._get_branch(project)
-        await self._git(
-            project,
-            ["fetch", "--depth", str(CLONE_DEPTH), project.authed_url(), branch],
-            authed=True,
-        )
+        await self._fetch(project, branch)
         await self._git(project, ["reset", "--hard", "FETCH_HEAD"])
         await self._git(project, ["clean", "-fd"])
         self._last_sync[pid] = time.monotonic()
@@ -143,11 +139,7 @@ class GitWorker:
         except PushConflict:
             # Remote moved between our sync and our push. Replay our single
             # commit on top of the new remote tip, then push once more.
-            await self._git(
-                project,
-                ["fetch", "--depth", str(CLONE_DEPTH), project.authed_url(), branch],
-                authed=True,
-            )
+            await self._fetch(project, branch)
             try:
                 await self._git(project, ["rebase", "FETCH_HEAD"])
             except GitError as exc:
@@ -185,22 +177,43 @@ class GitWorker:
         if path.exists():
             # Stale/partial dir — remove and re-clone.
             await asyncio.to_thread(_rmtree, path)
-        await self._git(
-            project,
-            [
-                "clone",
-                "--depth",
-                str(CLONE_DEPTH),
-                project.authed_url(),
-                str(path),
-            ],
-            cwd=self.data_dir,
-            authed=True,
-        )
+        # Prefer a shallow clone (polite), but fall back to a full clone if the
+        # server doesn't support shallow fetch (Overleaf's Git bridge is custom).
+        try:
+            await self._git(
+                project,
+                ["clone", "--depth", str(CLONE_DEPTH), project.authed_url(), str(path)],
+                cwd=self.data_dir,
+                authed=True,
+            )
+        except GitError:
+            if path.exists():
+                await asyncio.to_thread(_rmtree, path)
+            await self._git(
+                project,
+                ["clone", project.authed_url(), str(path)],
+                cwd=self.data_dir,
+                authed=True,
+            )
         # Drop the token: point origin at the clean URL. We always pass the
         # authed URL explicitly on fetch/push instead.
         await self._git(project, ["remote", "set-url", "origin", project.clone_url])
         self._last_sync[project.project_id] = time.monotonic()
+
+    async def _fetch(self, project: ProjectConfig, branch: str) -> None:
+        """Fetch the branch tip into FETCH_HEAD, falling back from shallow to full."""
+        try:
+            await self._git(
+                project,
+                ["fetch", "--depth", str(CLONE_DEPTH), project.authed_url(), branch],
+                authed=True,
+            )
+        except GitError:
+            await self._git(
+                project,
+                ["fetch", project.authed_url(), branch],
+                authed=True,
+            )
 
     async def _push(self, project: ProjectConfig, branch: str) -> None:
         try:
