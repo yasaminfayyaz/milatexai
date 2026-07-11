@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import base64
 import difflib
+import os
 from pathlib import Path
 
 from fastmcp import FastMCP
@@ -62,13 +63,20 @@ class _State:
         self._worker: GitWorker | None = None
 
     def load(self) -> tuple[Settings, GitWorker]:
-        if self._settings is None:
+        if self._worker is None:
             try:
-                self._settings = load_settings()
+                settings = load_settings()
+                worker = GitWorker(settings.data_dir)
             except ConfigError as exc:
                 raise ToolError(f"LeafBridge is not configured yet: {exc}") from exc
-            self._worker = GitWorker(self._settings.data_dir)
-        assert self._worker is not None
+            except OSError as exc:
+                raise ToolError(
+                    f"LeafBridge could not initialize its cache directory: {exc}"
+                ) from exc
+            # Assign both only on full success, so a failed init never leaves a
+            # half-constructed singleton that bricks the session.
+            self._settings, self._worker = settings, worker
+        assert self._settings is not None
         return self._settings, self._worker
 
     def resolve(self, project: str | None) -> tuple[ProjectConfig, GitWorker]:
@@ -105,6 +113,8 @@ def _mini_diff(old: str, new: str, path: str, max_lines: int = 40) -> str:
 
 
 def _wrap_fs_errors(exc: Exception) -> ToolError:
+    if isinstance(exc, ToolError):
+        return exc  # already a clean, user-facing message — don't re-wrap
     if isinstance(exc, (PathError, ConfigError)):
         return ToolError(str(exc))
     if isinstance(exc, PushConflict):
@@ -141,8 +151,8 @@ async def list_files(project: str | None = None, all_files: bool = False) -> str
     """
     try:
         proj, worker = STATE.resolve(project)
-        repo = await worker.ensure_repo(proj)
-        entries = list_source_files(repo, all_files=all_files)
+        async with worker.open_repo(proj) as repo:
+            entries = list_source_files(repo, all_files=all_files)
     except Exception as exc:
         raise _wrap_fs_errors(exc)
     if not entries:
@@ -166,9 +176,8 @@ async def read_file(
     """
     try:
         proj, worker = STATE.resolve(project)
-        repo = await worker.ensure_repo(proj)
-        target = safe_join(repo, path)
-        content = read_text(target)
+        async with worker.open_repo(proj) as repo:
+            content = read_text(safe_join(repo, path))
     except Exception as exc:
         raise _wrap_fs_errors(exc)
     return number_lines(content) if with_line_numbers else content
@@ -184,8 +193,8 @@ async def get_sections(path: str, project: str | None = None) -> str:
     """
     try:
         proj, worker = STATE.resolve(project)
-        repo = await worker.ensure_repo(proj)
-        content = read_text(safe_join(repo, path))
+        async with worker.open_repo(proj) as repo:
+            content = read_text(safe_join(repo, path))
     except Exception as exc:
         raise _wrap_fs_errors(exc)
     sections = latex.find_sections(content)
@@ -203,8 +212,8 @@ async def read_section(path: str, title: str, project: str | None = None) -> str
     """
     try:
         proj, worker = STATE.resolve(project)
-        repo = await worker.ensure_repo(proj)
-        content = read_text(safe_join(repo, path))
+        async with worker.open_repo(proj) as repo:
+            content = read_text(safe_join(repo, path))
     except Exception as exc:
         raise _wrap_fs_errors(exc)
     found = latex.find_section(content, title)
@@ -228,7 +237,8 @@ async def get_history(project: str | None = None, limit: int = 10) -> str:
     """
     try:
         proj, worker = STATE.resolve(project)
-        return await worker.log(proj, limit=max(1, min(limit, 50)))
+        async with worker.lock_for(proj):
+            return await worker.log(proj, limit=max(1, min(limit, 50)))
     except Exception as exc:
         raise _wrap_fs_errors(exc)
 
@@ -246,16 +256,16 @@ async def check_compile(project: str | None = None) -> str:
     """
     try:
         proj, worker = STATE.resolve(project)
-        repo = await worker.ensure_repo(proj)
+        async with worker.open_repo(proj) as repo:
+            main = texcompile.find_main_tex(repo)
+            if not main:
+                raise ToolError(
+                    "Could not find a root .tex file (one with \\documentclass and "
+                    "\\begin{document}) to compile."
+                )
+            res = await texcompile.compile_project(repo, main)
     except Exception as exc:
         raise _wrap_fs_errors(exc)
-    main = texcompile.find_main_tex(repo)
-    if not main:
-        raise ToolError(
-            "Could not find a root .tex file (one with \\documentclass and "
-            "\\begin{document}) to compile."
-        )
-    res = await texcompile.compile_project(repo, main)
     if not res.available:
         return (
             f"Compile check unavailable: {res.message} "
@@ -277,14 +287,41 @@ async def check_compile(project: str | None = None) -> str:
 # --------------------------------------------------------------------------- #
 
 async def _apply_and_push(
-    proj: ProjectConfig, worker: GitWorker, mutate, commit_message: str
+    proj: ProjectConfig,
+    worker: GitWorker,
+    mutate,
+    commit_message: str,
+    *,
+    guard_path: str | None = None,
+    allow_shrink: bool = False,
 ) -> str:
-    """Serialize per project: sync to remote, mutate on disk, commit + push."""
+    """Serialize per project: sync to remote, mutate on disk, commit + push.
+
+    If ``guard_path`` is given, refuse (before committing) a mutation that shrinks
+    that file by more than half — a safety net against accidental large content
+    loss (e.g. a too-greedy replacement). The caller can pass ``allow_shrink`` to
+    override when the reduction is intentional.
+    """
     async with worker.lock_for(proj):
         try:
             repo = await worker.ensure_repo(proj, sync=False)
             await worker.sync(proj, force=True)
+            before = None
+            if guard_path is not None:
+                gp = safe_join(repo, guard_path)
+                before = gp.stat().st_size if gp.is_file() else None
             mutate(repo)
+            if before is not None and not allow_shrink:
+                gp = safe_join(repo, guard_path)
+                after = gp.stat().st_size if gp.is_file() else 0
+                if after * 2 < before and (before - after) > 200:
+                    pct = round(100 * (before - after) / before)
+                    raise PathError(
+                        f"Refusing to apply: this change removes {pct}% of "
+                        f"{guard_path} ({before} -> {after} bytes), which looks like "
+                        f"accidental content loss. If the large reduction is truly "
+                        f"intended, retry with allow_shrink=true."
+                    )
             result = await worker.commit_and_push(proj, commit_message)
         except Exception as exc:
             raise _wrap_fs_errors(exc)
@@ -302,6 +339,7 @@ async def edit_file(
     old_string: str,
     new_string: str,
     project: str | None = None,
+    allow_shrink: bool = False,
 ) -> str:
     """Replace one exact, unique occurrence of old_string with new_string, then
     commit and push to Overleaf.
@@ -313,6 +351,9 @@ async def edit_file(
             line-number prefixes shown by read_file.
         new_string: Replacement text.
         project: Project name or id. Optional if only one project is connected.
+        allow_shrink: Set true only if this edit is intentionally removing a large
+            portion of the file; otherwise the tool refuses a >50% reduction as a
+            guard against accidental content loss.
     """
     if old_string == new_string:
         raise ToolError("old_string and new_string are identical; nothing to change.")
@@ -320,7 +361,7 @@ async def edit_file(
 
     def mutate(repo: Path) -> None:
         target = safe_join(repo, path)
-        content = read_text(target)
+        content = read_text(target, strict=True)
         count = content.count(old_string)
         if count == 0:
             raise PathError(
@@ -334,7 +375,10 @@ async def edit_file(
             )
         write_text_exact(target, content.replace(old_string, new_string, 1))
 
-    result = await _apply_and_push(proj, worker, mutate, f"Edit {path} (via LeafBridge)")
+    result = await _apply_and_push(
+        proj, worker, mutate, f"Edit {path} (via LeafBridge)",
+        guard_path=path, allow_shrink=allow_shrink,
+    )
     if result.startswith("Done"):
         diff = _mini_diff(old_string, new_string, path)
         if diff:
@@ -343,13 +387,17 @@ async def edit_file(
 
 
 @mcp.tool
-async def write_file(path: str, content: str, project: str | None = None) -> str:
+async def write_file(
+    path: str, content: str, project: str | None = None, allow_shrink: bool = False
+) -> str:
     """Create a new file or overwrite an existing one, then commit and push.
 
     Args:
         path: Project-relative path to write.
         content: Full file content.
         project: Project name or id. Optional if only one project is connected.
+        allow_shrink: Set true only if intentionally shrinking an existing file by
+            more than half; otherwise the tool refuses it as a content-loss guard.
     """
     proj, worker = STATE.resolve(project)
 
@@ -358,7 +406,10 @@ async def write_file(path: str, content: str, project: str | None = None) -> str
         target.parent.mkdir(parents=True, exist_ok=True)
         write_text_exact(target, content)
 
-    return await _apply_and_push(proj, worker, mutate, f"Write {path} (via LeafBridge)")
+    return await _apply_and_push(
+        proj, worker, mutate, f"Write {path} (via LeafBridge)",
+        guard_path=path, allow_shrink=allow_shrink,
+    )
 
 
 @mcp.tool
@@ -382,6 +433,44 @@ async def delete_file(path: str, project: str | None = None) -> str:
     return await _apply_and_push(proj, worker, mutate, f"Delete {path} (via LeafBridge)")
 
 
+# Cap on how many bytes upload_file will accept, from either source.
+MAX_UPLOAD_BYTES = 50 * 1024 * 1024
+
+
+def _read_local_upload(source_path: str) -> bytes:
+    """Read upload bytes from a local file path — HARDENED.
+
+    Reading an arbitrary local path and pushing it to Overleaf is an
+    exfiltration vector (a prompt-injected call could push projects.json / SSH
+    keys). So this is OFF by default; enabling it confines reads to one folder.
+    """
+    if os.environ.get("LEAFBRIDGE_ALLOW_LOCAL_UPLOAD", "").lower() not in ("1", "true", "yes"):
+        raise ToolError(
+            "Reading from a local file path is disabled for safety (it could be "
+            "abused to read secrets and push them to Overleaf). Pass the bytes as "
+            "content_base64 instead. To allow local paths in local mode, set "
+            "LEAFBRIDGE_ALLOW_LOCAL_UPLOAD=1 and LEAFBRIDGE_UPLOAD_DIR=<folder>."
+        )
+    allow_dir = os.environ.get("LEAFBRIDGE_UPLOAD_DIR")
+    if not allow_dir:
+        raise ToolError(
+            "LEAFBRIDGE_ALLOW_LOCAL_UPLOAD is on but LEAFBRIDGE_UPLOAD_DIR is not set; "
+            "refusing to read an unconstrained path."
+        )
+    base = Path(allow_dir).expanduser().resolve()
+    src = Path(source_path)
+    if src.is_symlink():
+        raise ToolError("Refusing to read a symlink as an upload source.")
+    resolved = src.resolve()
+    try:
+        resolved.relative_to(base)
+    except ValueError:
+        raise ToolError(f"source_path must be inside the allowed folder {base}.")
+    if not resolved.is_file():
+        raise ToolError(f"source_path not found in the allowed folder: {source_path}")
+    return resolved.read_bytes()
+
+
 @mcp.tool
 async def upload_file(
     path: str,
@@ -398,8 +487,9 @@ async def upload_file(
     Args:
         path: Project-relative destination, e.g. "figures/diagram.png".
         content_base64: The file's bytes, base64-encoded.
-        source_path: Absolute path to a local file to read the bytes from
-            (local-mode convenience only; ignored in a hosted deployment).
+        source_path: Local file to read the bytes from. DISABLED by default for
+            safety; usable only in local mode with LEAFBRIDGE_ALLOW_LOCAL_UPLOAD=1
+            and a path inside LEAFBRIDGE_UPLOAD_DIR. Prefer content_base64.
         project: Project name or id. Optional if only one project is connected.
     """
     if bool(content_base64) == bool(source_path):
@@ -408,14 +498,15 @@ async def upload_file(
         if content_base64:
             data = base64.b64decode(content_base64, validate=True)
         else:
-            src = Path(source_path)  # type: ignore[arg-type]
-            if not src.is_file():
-                raise ToolError(f"source_path not found: {source_path}")
-            data = src.read_bytes()
+            data = _read_local_upload(source_path)  # type: ignore[arg-type]
     except ToolError:
         raise
     except Exception as exc:  # noqa: BLE001
         raise ToolError(f"Could not read the file data: {exc}")
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise ToolError(
+            f"File too large to upload ({len(data)} bytes; limit {MAX_UPLOAD_BYTES})."
+        )
 
     proj, worker = STATE.resolve(project)
 
@@ -450,8 +541,8 @@ async def search(query: str) -> dict:
     seen: set[str] = set()
     for proj in settings.projects:
         try:
-            repo = await worker.ensure_repo(proj)
-            hits = search_files(repo, query, max_hits=50)
+            async with worker.open_repo(proj) as repo:
+                hits = search_files(repo, query, max_hits=50)
         except Exception:
             continue
         for hit in hits:
@@ -481,8 +572,8 @@ async def fetch(id: str) -> dict:
     project_id, _, rel_path = id.partition("::")
     try:
         proj, worker = STATE.resolve(project_id)
-        repo = await worker.ensure_repo(proj)
-        content = read_text(safe_join(repo, rel_path))
+        async with worker.open_repo(proj) as repo:
+            content = read_text(safe_join(repo, rel_path))
     except Exception as exc:
         raise _wrap_fs_errors(exc)
     return {

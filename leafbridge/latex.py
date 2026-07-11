@@ -24,9 +24,19 @@ SECTION_LEVELS: dict[str, int] = {
     "subparagraph": 5,
 }
 
+# The trailing (?![A-Za-z]) is a LaTeX control-word boundary: it stops
+# \partial / \sectionmark / \subsectionfoo from being read as \part / \section /
+# \subsection. \section, \section*, and \subparagraph{ still match.
 _CMD_RE = re.compile(
-    r"\\(" + "|".join(SECTION_LEVELS) + r")(\*)?",
+    r"\\(" + "|".join(SECTION_LEVELS) + r")(\*)?(?![A-Za-z])",
 )
+
+# Sectioning commands inside these environments are code samples, not real
+# sections, and must be ignored.
+_VERBATIM_ENVS = {
+    "verbatim", "verbatim*", "lstlisting", "minted", "Verbatim", "comment", "alltt",
+}
+_BEGIN_RE = re.compile(r"\\begin\{([^}]*)\}")
 
 
 @dataclass(frozen=True)
@@ -107,9 +117,22 @@ def find_sections(text: str) -> list[Section]:
     code_lines = [strip_comment(ln) for ln in lines]
 
     headers: list[tuple[int, str, bool, str]] = []  # (line_idx, kind, starred, title)
+    in_verbatim: str | None = None
 
     for idx, code in enumerate(code_lines):
-        for m in _CMD_RE.finditer(code):
+        if in_verbatim is not None:
+            # Inside a code listing — ignore everything until it closes.
+            if f"\\end{{{in_verbatim}}}" in lines[idx]:
+                in_verbatim = None
+            continue
+        # If a verbatim-like environment opens on this line, scan only the code
+        # before it and suppress detection until it closes (unless it's a one-liner).
+        _bm = _BEGIN_RE.search(code)
+        _opened = _bm.group(1) if (_bm and _bm.group(1) in _VERBATIM_ENVS) else None
+        if _opened is not None and f"\\end{{{_opened}}}" not in lines[idx]:
+            in_verbatim = _opened
+        scan = code[: _bm.start()] if _opened is not None else code
+        for m in _CMD_RE.finditer(scan):
             kind = m.group(1)
             starred = m.group(2) == "*"
             pos = m.end()

@@ -7,8 +7,10 @@ Design rules (from the plan + Overleaf's documented behavior):
 * A per-project async lock so two edits never race.
 * Always **pull then push**; never force-push (Overleaf rejects history
   rewrites, and the web editor auto-commits so the remote moves independently).
-* The auth token is passed on the URL only for the network call and is never
-  written into ``.git/config`` or surfaced in error text.
+* The auth token is passed on the URL only for the network call. It is briefly
+  present in ``.git/config`` during the initial clone, then stripped immediately
+  (origin is reset to the tokenless URL); fetch/push pass the authed URL
+  explicitly. The token is never surfaced in error/log text (see ``_scrub``).
 * Git runs in a worker thread (``asyncio.to_thread``) so it works regardless of
   the host event loop, and per-project serialization keeps that safe.
 """
@@ -20,6 +22,7 @@ import os
 import subprocess
 import time
 from collections import defaultdict
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -85,6 +88,15 @@ class GitWorker:
         elif sync:
             await self.sync(project, force=False)
         return path
+
+    @asynccontextmanager
+    async def open_repo(self, project: ProjectConfig, *, sync: bool = True):
+        """Acquire the per-project lock for the WHOLE duration of a read, then
+        yield the clone path. This serializes reads with writes so a concurrent
+        write's ``reset --hard`` / ``clean -fd`` can never wipe the working tree
+        while a read is in progress (and two reads never collide on index.lock)."""
+        async with self.lock_for(project):
+            yield await self.ensure_repo(project, sync=sync)
 
     async def sync(self, project: ProjectConfig, *, force: bool) -> None:
         """Fast-forward the local clone to match the Overleaf remote.
@@ -283,6 +295,14 @@ class GitWorker:
             "core.autocrlf=false",
             "-c",
             "core.eol=lf",
+            # A committer identity for EVERY command (not just commit) so the
+            # conflict-recovery `rebase` can replay a commit on hosts/containers
+            # with no global git identity, instead of aborting and misreporting a
+            # mergeable edit as an unresolvable conflict.
+            "-c",
+            f"user.name={_COMMIT_NAME}",
+            "-c",
+            f"user.email={_COMMIT_EMAIL}",
             *args,
         ]
         try:

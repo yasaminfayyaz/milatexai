@@ -238,9 +238,15 @@ def load_settings() -> Settings:
             )
         )
 
+    port_raw = os.environ.get("LEAFBRIDGE_PORT", "8000")
+    try:
+        port = int(port_raw)
+    except ValueError as exc:
+        raise ConfigError(f"LEAFBRIDGE_PORT must be a number, got {port_raw!r}.") from exc
+
     return Settings(
         projects=projects,
         data_dir=default_data_dir(),
         host=os.environ.get("LEAFBRIDGE_HOST", "127.0.0.1"),
-        port=int(os.environ.get("LEAFBRIDGE_PORT", "8000")),
+        port=port,
     )

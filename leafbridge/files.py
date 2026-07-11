@@ -84,20 +84,42 @@ def list_source_files(repo_root: Path, all_files: bool = False) -> list[FileEntr
     return entries
 
 
-def read_text(path: Path) -> str:
-    """Read a text file, raising PathError for missing/binary/oversized files."""
+def read_text(path: Path, *, strict: bool = False) -> str:
+    """Read a text file, raising PathError for missing/binary/oversized files.
+
+    With ``strict=True`` (used by the edit path) a non-UTF-8 file raises PathError
+    instead of being lossily decoded: ``edit_file`` rewrites the whole buffer, so a
+    lossy decode->encode round trip would replace every non-ASCII byte with U+FFFD
+    across the entire file (e.g. a Latin-1 .bib with accented names).
+    """
     if not path.exists():
-        raise PathError(f"File not found: does not exist in the project.")
+        raise PathError("File not found: does not exist in the project.")
     if not path.is_file():
         raise PathError("Path is a directory, not a file.")
-    size = path.stat().st_size
+    try:
+        size = path.stat().st_size
+    except OSError as exc:
+        raise PathError(f"Could not stat file: {exc}") from exc
     if size > MAX_READ_BYTES:
         raise PathError(
             f"File is too large to read ({size} bytes; limit {MAX_READ_BYTES})."
         )
-    data = path.read_bytes()
+    try:
+        data = path.read_bytes()
+    except OSError as exc:
+        raise PathError(f"Could not read file: {exc}") from exc
     if b"\x00" in data:
         raise PathError("File appears to be binary; refusing to read as text.")
+    if strict:
+        try:
+            return data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise PathError(
+                "File is not valid UTF-8 (it may be Latin-1/Windows-1252). Refusing "
+                "to edit it as text, because rewriting the file would corrupt the "
+                "other non-ASCII characters. Convert it to UTF-8 first, or replace "
+                "the whole file with write_file/upload_file."
+            ) from exc
     return data.decode("utf-8", errors="replace")
 
 
@@ -149,7 +171,7 @@ def search_files(
         path = safe_join(repo_root, entry.path)
         try:
             content = read_text(path)
-        except PathError:
+        except (PathError, OSError):
             continue
         for lineno, line in enumerate(content.splitlines(), start=1):
             if q in line.lower():

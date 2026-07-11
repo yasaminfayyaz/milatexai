@@ -3,6 +3,8 @@ extraction, and path-traversal safety."""
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from leafbridge import latex
@@ -10,6 +12,7 @@ from leafbridge.config import ConfigError, extract_project_id
 from leafbridge.files import (
     PathError,
     number_lines,
+    read_text,
     safe_join,
     search_files,
     write_text_exact,
@@ -150,3 +153,48 @@ def test_search_files(tmp_path):
     assert len(hits) == 1
     assert hits[0].path == "a.tex"
     assert hits[0].line == 2
+
+
+# --- review fixes ----------------------------------------------------------
+
+def test_read_text_strict_rejects_non_utf8(tmp_path):
+    # Regression: editing a Latin-1 .bib must NOT lossily round-trip through the
+    # write path and corrupt every accented byte file-wide.
+    p = tmp_path / "refs.bib"
+    p.write_bytes("Müller, café".encode("latin-1"))  # invalid UTF-8, no null byte
+    assert read_text(p)  # non-strict (viewing) still works, lossily
+    with pytest.raises(PathError):
+        read_text(p, strict=True)  # edit path refuses
+
+
+def test_partial_is_not_a_section():
+    # \partial must not be misread as \part (control-word boundary).
+    text = "\\section{Intro}\nThe gradient \\partial f governs flow.\n\\section{Methods}\nx\n"
+    titles = [(s.kind, s.title) for s in latex.find_sections(text)]
+    assert titles == [("section", "Intro"), ("section", "Methods")]
+
+
+def test_section_inside_verbatim_is_ignored():
+    text = (
+        "\\section{Real}\n"
+        "\\begin{lstlisting}\n"
+        "\\section{FakeInCode}\n"
+        "\\end{lstlisting}\n"
+        "\\section{AlsoReal}\n"
+    )
+    titles = [s.title for s in latex.find_sections(text)]
+    assert titles == ["Real", "AlsoReal"]
+
+
+def test_invalid_port_raises_configerror(tmp_path, monkeypatch):
+    from leafbridge.config import load_settings
+
+    cfg = tmp_path / "projects.json"
+    cfg.write_text(
+        json.dumps({"projects": [{"name": "t", "url": f"https://www.overleaf.com/project/{HEX}", "token": "x"}]}),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("LEAFBRIDGE_CONFIG", str(cfg))
+    monkeypatch.setenv("LEAFBRIDGE_PORT", "not-a-number")
+    with pytest.raises(ConfigError):
+        load_settings()

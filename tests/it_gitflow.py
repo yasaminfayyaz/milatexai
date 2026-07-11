@@ -194,6 +194,33 @@ async def run() -> None:
         )
         check("Committed" in r, "upload_file pushes a binary file")
 
+        # Large-deletion guard: a >50% shrink is refused unless allow_shrink=true.
+        big = "".join(f"line {i} with some filler text here\n" for i in range(40))
+        await client.call_tool("write_file", {"path": "big.tex", "content": big})
+        try:
+            await client.call_tool(
+                "edit_file", {"path": "big.tex", "old_string": big, "new_string": "tiny\n"}
+            )
+            check(False, "large-deletion guard should have blocked the edit")
+        except Exception as e:  # noqa: BLE001
+            check("accidental content loss" in str(e), "edit_file blocks a >50% deletion")
+        r = text_of(
+            await client.call_tool(
+                "edit_file",
+                {"path": "big.tex", "old_string": big, "new_string": "tiny\n", "allow_shrink": True},
+            )
+        )
+        check("Committed" in r, "edit_file allows a large deletion with allow_shrink=true")
+
+        # upload_file source_path is gated OFF by default (exfiltration guard).
+        try:
+            await client.call_tool(
+                "upload_file", {"path": "x.png", "source_path": str(_WORK / "anything.png")}
+            )
+            check(False, "source_path should be rejected by default")
+        except Exception as e:  # noqa: BLE001
+            check("disabled for safety" in str(e), "upload_file source_path gated off by default")
+
         # Compile check — only if a LaTeX engine is available on this machine.
         from leafbridge import texcompile
 
