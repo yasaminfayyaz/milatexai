@@ -11,6 +11,7 @@ ChatGPT developer mode at the same URL.
 
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 from fastmcp import FastMCP
@@ -25,6 +26,7 @@ from .files import (
     read_text,
     safe_join,
     search_files,
+    write_bytes_exact,
     write_text_exact,
 )
 from .git_worker import GitError, GitWorker, PushConflict
@@ -314,6 +316,53 @@ async def delete_file(path: str, project: str | None = None) -> str:
         target.unlink()
 
     return await _apply_and_push(proj, worker, mutate, f"Delete {path} (via LeafBridge)")
+
+
+@mcp.tool
+async def upload_file(
+    path: str,
+    content_base64: str | None = None,
+    source_path: str | None = None,
+    project: str | None = None,
+) -> str:
+    """Add or replace a BINARY file (image, PDF, …) in the project, then commit
+    and push. Use this for figures such as PNGs that the text-only read_file /
+    write_file tools cannot handle safely.
+
+    Provide the bytes exactly one of two ways:
+
+    Args:
+        path: Project-relative destination, e.g. "figures/diagram.png".
+        content_base64: The file's bytes, base64-encoded.
+        source_path: Absolute path to a local file to read the bytes from
+            (local-mode convenience only; ignored in a hosted deployment).
+        project: Project name or id. Optional if only one project is connected.
+    """
+    if bool(content_base64) == bool(source_path):
+        raise ToolError("Provide exactly one of content_base64 or source_path.")
+    try:
+        if content_base64:
+            data = base64.b64decode(content_base64, validate=True)
+        else:
+            src = Path(source_path)  # type: ignore[arg-type]
+            if not src.is_file():
+                raise ToolError(f"source_path not found: {source_path}")
+            data = src.read_bytes()
+    except ToolError:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        raise ToolError(f"Could not read the file data: {exc}")
+
+    proj, worker = STATE.resolve(project)
+
+    def mutate(repo: Path) -> None:
+        target = safe_join(repo, path)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        write_bytes_exact(target, data)
+
+    return await _apply_and_push(
+        proj, worker, mutate, f"Upload {path} ({len(data)} bytes, via LeafBridge)"
+    )
 
 
 # --------------------------------------------------------------------------- #

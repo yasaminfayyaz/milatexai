@@ -113,6 +113,12 @@ def write_text_exact(path: Path, text: str) -> None:
     path.write_bytes(text.encode("utf-8"))
 
 
+def write_bytes_exact(path: Path, data: bytes) -> None:
+    """Write raw bytes verbatim — for binary files (images, PDFs). No encoding
+    or newline handling of any kind."""
+    path.write_bytes(data)
+
+
 def number_lines(text: str, start: int = 1) -> str:
     """Render text with right-aligned line numbers (like ``cat -n``)."""
     lines = text.splitlines()

@@ -46,6 +46,10 @@ We did science.
 \end{document}
 """
 
+# Every byte value, incl. 0x0d (CR), 0x0a (LF), 0x00 — a binary upload must
+# survive the git round-trip byte-for-byte.
+BLOB = bytes(range(256)) * 4
+
 _failures: list[str] = []
 
 
@@ -111,7 +115,7 @@ async def run() -> None:
         expected = {
             "list_projects", "list_files", "read_file", "get_sections",
             "read_section", "edit_file", "write_file", "delete_file",
-            "get_history", "search", "fetch",
+            "upload_file", "get_history", "search", "fetch",
         }
         check(expected <= tools, f"all {len(expected)} tools registered")
 
@@ -175,11 +179,33 @@ async def run() -> None:
         r = text_of(await client.call_tool("delete_file", {"path": "notes/todo.tex"}))
         check("Committed" in r, "delete_file removes + pushes")
 
+        # Binary upload (image-style) must round-trip byte-exact.
+        import base64 as _b64
+
+        r = text_of(
+            await client.call_tool(
+                "upload_file",
+                {"path": "figures/blob.bin", "content_base64": _b64.b64encode(BLOB).decode()},
+            )
+        )
+        check("Committed" in r, "upload_file pushes a binary file")
+
     # Independent verification: the push really reached the "remote".
     git(["clone", _REMOTE.as_uri(), str(_VERIFY)], cwd=_WORK)
-    landed = (_VERIFY / "main.tex").read_text(encoding="utf-8")
+    landed = (_VERIFY / "main.tex").read_bytes().decode("utf-8")
     check("Rewritten intro paragraph." in landed, "commit landed on the remote")
     check(not (_VERIFY / "notes" / "todo.tex").exists(), "deleted file gone on remote")
+    check(
+        (_VERIFY / "figures" / "blob.bin").read_bytes() == BLOB,
+        "binary file is byte-identical on the remote",
+    )
+    # Line-ending integrity: the STORED file (blob) is what Overleaf compiles and
+    # must have NO stray CRs. (A plain clone's working copy may gain CRLF from the
+    # system autocrlf=true, so we check the blob, not the checkout.)
+    stored = subprocess.run(
+        ["git", "-C", str(_VERIFY), "show", "HEAD:main.tex"], capture_output=True
+    ).stdout
+    check(b"\r" not in stored, "stored file has no stray CRs (no line-ending doubling)")
 
 
 def main() -> int:

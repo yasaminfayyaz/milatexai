@@ -27,7 +27,7 @@ async def run() -> int:
                     msg = str(e)
                     ok = "not configured" in msg or "projects.json" in msg
                     print(f"list_projects error is graceful: {ok} :: {msg[:120]}")
-                return 0 if len(tools) == 11 else 2
+                return 0 if len(tools) == 12 else 2
         except Exception as e:  # noqa: BLE001 - server may not be up yet
             last_err = e
             await asyncio.sleep(0.4)
