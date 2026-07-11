@@ -115,7 +115,7 @@ async def run() -> None:
         expected = {
             "list_projects", "list_files", "read_file", "get_sections",
             "read_section", "edit_file", "write_file", "delete_file",
-            "upload_file", "get_history", "search", "fetch",
+            "upload_file", "check_compile", "get_history", "search", "fetch",
         }
         check(expected <= tools, f"all {len(expected)} tools registered")
 
@@ -151,6 +151,10 @@ async def run() -> None:
             )
         )
         check("Committed" in r and "pushed" in r, "edit_file commits and pushes")
+        check(
+            "+Rewritten intro paragraph." in r and "-Intro text here." in r,
+            "edit_file response includes a diff of the change",
+        )
 
         r = text_of(await client.call_tool("get_history", {"limit": 5}))
         check("Edit main.tex" in r, "get_history shows the new commit")
@@ -189,6 +193,15 @@ async def run() -> None:
             )
         )
         check("Committed" in r, "upload_file pushes a binary file")
+
+        # Compile check — only if a LaTeX engine is available on this machine.
+        from leafbridge import texcompile
+
+        if texcompile.tectonic_path():
+            r = text_of(await client.call_tool("check_compile", {}))
+            check("Compiles cleanly" in r, f"check_compile builds the sample doc :: {r[:80]}")
+        else:
+            print("  [skip] check_compile (tectonic not installed)")
 
     # Independent verification: the push really reached the "remote".
     git(["clone", _REMOTE.as_uri(), str(_VERIFY)], cwd=_WORK)

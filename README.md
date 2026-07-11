@@ -84,6 +84,7 @@ Then just talk to the assistant about your paper.
 | `write_file` | Create/overwrite a file → commit + push | **Yes** |
 | `delete_file` | Delete a file → commit + push | **Yes** |
 | `upload_file` | Add/replace a **binary** file (image, PDF) → commit + push | **Yes** |
+| `check_compile` | Build the project with a local LaTeX engine and report errors (optional; needs Tectonic) | No |
 | `get_history` | Recent commits from Overleaf's history | No |
 | `search` | Keyword search across project files | No |
 | `fetch` | Return a file's full text by id (ChatGPT contract) | No |

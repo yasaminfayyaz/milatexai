@@ -12,6 +12,7 @@ ChatGPT developer mode at the same URL.
 from __future__ import annotations
 
 import base64
+import difflib
 from pathlib import Path
 
 from fastmcp import FastMCP
@@ -31,6 +32,7 @@ from .files import (
 )
 from .git_worker import GitError, GitWorker, PushConflict
 from . import latex
+from . import texcompile
 
 INSTRUCTIONS = """\
 LeafBridge edits the user's real Overleaf projects over Overleaf's Git bridge.
@@ -82,6 +84,24 @@ STATE = _State()
 
 def _overleaf_url(project: ProjectConfig) -> str:
     return f"https://www.overleaf.com/project/{project.project_id}"
+
+
+def _mini_diff(old: str, new: str, path: str, max_lines: int = 40) -> str:
+    """A compact unified diff of a single edit, for the tool response."""
+    diff = list(
+        difflib.unified_diff(
+            old.splitlines(),
+            new.splitlines(),
+            fromfile=f"a/{path}",
+            tofile=f"b/{path}",
+            lineterm="",
+        )
+    )
+    if not diff:
+        return ""
+    if len(diff) > max_lines:
+        diff = diff[:max_lines] + [f"… ({len(diff) - max_lines} more diff lines)"]
+    return "Change applied:\n" + "\n".join(diff)
 
 
 def _wrap_fs_errors(exc: Exception) -> ToolError:
@@ -213,6 +233,45 @@ async def get_history(project: str | None = None, limit: int = 10) -> str:
         raise _wrap_fs_errors(exc)
 
 
+@mcp.tool
+async def check_compile(project: str | None = None) -> str:
+    """Build the project with a local LaTeX engine and report whether it compiles.
+
+    Read-only: this does NOT push anything. Use it to confirm a paper still
+    builds (e.g. after edits) and to see any hard LaTeX errors. Requires a
+    Tectonic engine on the server; if none is installed it says so.
+
+    Args:
+        project: Project name or id. Optional if only one project is connected.
+    """
+    try:
+        proj, worker = STATE.resolve(project)
+        repo = await worker.ensure_repo(proj)
+    except Exception as exc:
+        raise _wrap_fs_errors(exc)
+    main = texcompile.find_main_tex(repo)
+    if not main:
+        raise ToolError(
+            "Could not find a root .tex file (one with \\documentclass and "
+            "\\begin{document}) to compile."
+        )
+    res = await texcompile.compile_project(repo, main)
+    if not res.available:
+        return (
+            f"Compile check unavailable: {res.message} "
+            "(Install Tectonic to enable build verification.)"
+        )
+    lines = [f"{main}: {res.message}"]
+    if res.warning_count:
+        lines.append(f"{res.warning_count} warning(s) (typically cosmetic).")
+    if not res.ok and res.errors:
+        lines.append("Errors:")
+        lines.extend(f"  {e}" for e in res.errors)
+    elif not res.ok:
+        lines.append("(No explicit error lines captured; check the full log.)")
+    return "\n".join(lines)
+
+
 # --------------------------------------------------------------------------- #
 # Write tools (these are the ones a paid plan would meter in Phase 3)
 # --------------------------------------------------------------------------- #
@@ -275,7 +334,12 @@ async def edit_file(
             )
         write_text_exact(target, content.replace(old_string, new_string, 1))
 
-    return await _apply_and_push(proj, worker, mutate, f"Edit {path} (via LeafBridge)")
+    result = await _apply_and_push(proj, worker, mutate, f"Edit {path} (via LeafBridge)")
+    if result.startswith("Done"):
+        diff = _mini_diff(old_string, new_string, path)
+        if diff:
+            result = f"{result}\n\n{diff}"
+    return result
 
 
 @mcp.tool
