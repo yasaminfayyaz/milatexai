@@ -81,6 +81,7 @@ class Project:
     name: str
     token_encrypted: str  # ciphertext from TokenCipher.encrypt
     git_username: str = "git"
+    git_url: str | None = None  # override for self-hosted Overleaf / testing
 
 
 def monthly_commit_limit(user: User) -> int | None:

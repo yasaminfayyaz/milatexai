@@ -58,7 +58,12 @@ class AccountService:
     # -- onboarding: connect a project -------------------------------------
 
     async def connect_project(
-        self, user_id: str, overleaf_url_or_id: str, token: str, name: str | None = None
+        self,
+        user_id: str,
+        overleaf_url_or_id: str,
+        token: str,
+        name: str | None = None,
+        git_url: str | None = None,
     ) -> Project:
         """Store a user's Overleaf project with its token ENCRYPTED. Enforces the
         per-plan project limit (updating an already-connected project is free)."""
@@ -86,6 +91,7 @@ class AccountService:
             project_id=pid,
             name=(name or pid[:8]),
             token_encrypted=self.cipher.encrypt(token),
+            git_url=git_url,
         )
         await self.store.put_project(project)
         return project
@@ -114,6 +120,7 @@ class AccountService:
             project_id=chosen.project_id,
             token=token,
             git_username=chosen.git_username,
+            git_url=chosen.git_url,
         )
 
     # -- usage metering (writes only) --------------------------------------
