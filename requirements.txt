@@ -2,4 +2,7 @@
 # Pin the FastMCP major line; uvicorn/starlette come in as FastMCP deps.
 fastmcp>=3.4,<4
 python-dotenv>=1.0
-cryptography>=42   # Phase 2: encrypt stored Overleaf tokens at rest
+cryptography>=42          # Phase 2: encrypt stored Overleaf tokens at rest
+azure-data-tables>=12.5   # Phase 2: persistent multi-tenant store
+azure-identity>=1.19      # Phase 2: managed identity / Key Vault
+aiohttp>=3.10             # async transport for the Azure SDK

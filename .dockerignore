@@ -1,0 +1,15 @@
+.venv/
+.git/
+.env
+projects.json
+projects.local.json
+*.token
+tests/
+docs/
+.cache/
+data/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

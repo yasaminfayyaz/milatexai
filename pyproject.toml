@@ -15,6 +15,9 @@ dependencies = [
     "fastmcp>=3.4,<4",
     "python-dotenv>=1.0",
     "cryptography>=42",
+    "azure-data-tables>=12.5",
+    "azure-identity>=1.19",
+    "aiohttp>=3.10",
 ]
 
 [project.optional-dependencies]
