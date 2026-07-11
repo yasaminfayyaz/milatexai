@@ -22,14 +22,18 @@ import difflib
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import parse_qs, quote
 
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 from fastmcp.server.auth.providers.workos import AuthKitProvider
 from fastmcp.server.dependencies import get_access_token
+from starlette.requests import Request
+from starlette.responses import HTMLResponse, Response
 
-from . import __version__, latex, texcompile
+from . import __version__, latex, texcompile, web
 from .config import ProjectConfig, default_data_dir
+from .connect_link import ConnectCodeError, mint_connect_code, verify_connect_code
 from .files import (
     PathError,
     list_source_files,
@@ -116,11 +120,17 @@ class HostedApp:
         data_dir: Path,
         admin_emails: tuple[str, ...] = (),
         identity_provider=_identity_from_token,
+        base_url: str = "http://localhost:8000",
     ):
         self.service = AccountService(store, cipher)
+        self.cipher = cipher
         self.worker = GitWorker(data_dir)
         self.admin_emails = admin_emails
         self._identity = identity_provider
+        self.base_url = base_url.rstrip("/")
+        # Best-effort single-use tracking for connect codes (TTL is the real
+        # control; this just stops a link being replayed within its window).
+        self._consumed_codes: set[str] = set()
 
     async def user(self) -> User:
         user_id, email = self._identity()
@@ -178,19 +188,21 @@ def create_hosted_server(
     store = store if store is not None else InMemoryStore()
     if cipher is None:
         cipher, _ = TokenCipher.from_env()
+    resolved_base = base_url or os.environ.get("BASE_URL", "http://localhost:8000")
     app = HostedApp(
         store=store,
         cipher=cipher,
         data_dir=Path(data_dir) if data_dir else default_data_dir(),
         admin_emails=admin_emails or _admin_emails_from_env(),
         identity_provider=identity_provider,
+        base_url=resolved_base,
     )
 
     auth_provider = None
     if auth:
         auth_provider = AuthKitProvider(
             authkit_domain=os.environ["WORKOS_AUTHKIT_DOMAIN"],
-            base_url=base_url or os.environ.get("BASE_URL", "http://localhost:8000"),
+            base_url=resolved_base,
         )
     mcp = FastMCP(
         name="MiLatexAI", instructions=INSTRUCTIONS, version=__version__, auth=auth_provider
@@ -199,11 +211,32 @@ def create_hosted_server(
     # -- account management ------------------------------------------------
 
     @mcp.tool
+    async def start_connect() -> str:
+        """Get a secure link to connect an Overleaf project WITHOUT pasting your
+        Git token into this chat. Recommended over connect_project. Returns a
+        one-time link (valid 15 minutes) where you enter your token in a web form;
+        the token is encrypted and never appears in the conversation."""
+        try:
+            user = await app.user()
+            code = mint_connect_code(app.cipher, user.user_id, user.email)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        url = f"{app.base_url}/connect?code={quote(code, safe='')}"
+        return (
+            "Open this link in your browser to connect an Overleaf project "
+            "securely — your Git token stays out of this chat:\n\n"
+            f"{url}\n\n"
+            "The link works once and expires in 15 minutes. After connecting, come "
+            "back here and ask me to list your files or edit your paper."
+        )
+
+    @mcp.tool
     async def connect_project(
         overleaf_url: str, token: str, name: str | None = None
     ) -> str:
         """Connect one of your Overleaf projects (run once per project). The Git
-        token is stored ENCRYPTED and never shown again.
+        token is stored ENCRYPTED and never shown again. Prefer start_connect,
+        which keeps your token out of the chat.
 
         Args:
             overleaf_url: Your project URL, https://www.overleaf.com/project/<id>.
@@ -441,6 +474,98 @@ def create_hosted_server(
             )
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
+
+    # -- web surface: token-out-of-chat onboarding -------------------------
+    # These routes live OUTSIDE the MCP bearer auth. They self-authenticate via
+    # the one-time connect code minted by start_connect, so the Overleaf token is
+    # typed into a browser form (over HTTPS) instead of the chat transcript.
+
+    @mcp.custom_route("/", methods=["GET"])
+    async def landing(request: Request) -> Response:
+        return HTMLResponse(web.render_landing())
+
+    @mcp.custom_route("/connect", methods=["GET"])
+    async def connect_page(request: Request) -> Response:
+        code = request.query_params.get("code", "")
+        try:
+            _uid, email = verify_connect_code(app.cipher, code)
+        except ConnectCodeError as exc:
+            return HTMLResponse(
+                web.render_notice("Link expired", str(exc), icon="⏰"),
+                status_code=400,
+            )
+        if code in app._consumed_codes:
+            return HTMLResponse(
+                web.render_notice(
+                    "Already used",
+                    "This connect link has already been used. Run start_connect "
+                    "in Claude to get a fresh one.",
+                    icon="🔁",
+                ),
+                status_code=409,
+            )
+        return HTMLResponse(web.render_connect_form(code, email=email))
+
+    @mcp.custom_route("/connect", methods=["POST"])
+    async def connect_submit(request: Request) -> Response:
+        # Parse the urlencoded body ourselves (no python-multipart dependency).
+        body = (await request.body()).decode("utf-8", "replace")
+        fields = parse_qs(body, keep_blank_values=True)
+
+        def field(key: str) -> str:
+            return (fields.get(key) or [""])[0].strip()
+
+        code = field("code")
+        overleaf_url = field("overleaf_url")
+        token = field("token")
+        name = field("name") or None
+
+        try:
+            user_id, email = verify_connect_code(app.cipher, code)
+        except ConnectCodeError as exc:
+            return HTMLResponse(
+                web.render_notice("Link expired", str(exc), icon="⏰"),
+                status_code=400,
+            )
+        if code in app._consumed_codes:
+            return HTMLResponse(
+                web.render_notice(
+                    "Already used",
+                    "This connect link has already been used. Run start_connect "
+                    "in Claude to get a fresh one.",
+                    icon="🔁",
+                ),
+                status_code=409,
+            )
+
+        def form_error(msg: str, status: int = 400) -> Response:
+            # Re-render with the token field cleared; never echo the token back.
+            return HTMLResponse(
+                web.render_connect_form(
+                    code, overleaf_url=overleaf_url, name=name or "",
+                    email=email, error=msg,
+                ),
+                status_code=status,
+            )
+
+        if not overleaf_url or not token:
+            return form_error("Please provide both your project link and Git token.")
+        try:
+            await app.service.get_or_create_user(
+                user_id, email, admin_emails=app.admin_emails
+            )
+            proj = await app.service.connect_project(
+                user_id, overleaf_url, token, name
+            )
+        except (LimitExceeded, ProjectNotConnected, ServiceError) as exc:
+            return form_error(str(exc))
+        except Exception:  # noqa: BLE001
+            return form_error(
+                "Something went wrong connecting the project. Please try again.",
+                status=500,
+            )
+        app._consumed_codes.add(code)
+        return HTMLResponse(web.render_success(proj.name, proj.project_id))
 
     return mcp
 

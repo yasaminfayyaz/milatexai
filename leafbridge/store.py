@@ -58,9 +58,12 @@ class TokenCipher:
     def encrypt(self, plaintext: str) -> str:
         return self._fernet.encrypt(plaintext.encode()).decode()
 
-    def decrypt(self, token: str) -> str:
+    def decrypt(self, token: str, ttl: int | None = None) -> str:
+        """Decrypt ciphertext. If ``ttl`` (seconds) is given, tokens older than
+        that are rejected (Fernet embeds a timestamp) — used for expiring
+        capability codes, not for tokens at rest."""
         try:
-            return self._fernet.decrypt(token.encode()).decode()
+            return self._fernet.decrypt(token.encode(), ttl=ttl).decode()
         except InvalidToken as exc:
             raise TokenDecryptError("Could not decrypt the stored token.") from exc
 
