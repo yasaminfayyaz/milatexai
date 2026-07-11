@@ -2,3 +2,4 @@
 # Pin the FastMCP major line; uvicorn/starlette come in as FastMCP deps.
 fastmcp>=3.4,<4
 python-dotenv>=1.0
+cryptography>=42   # Phase 2: encrypt stored Overleaf tokens at rest
