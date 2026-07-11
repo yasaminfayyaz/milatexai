@@ -25,6 +25,7 @@ from .files import (
     read_text,
     safe_join,
     search_files,
+    write_text_exact,
 )
 from .git_worker import GitError, GitWorker, PushConflict
 from . import latex
@@ -270,7 +271,7 @@ async def edit_file(
                 f"old_string appears {count} times in {path}; it must be unique. "
                 "Include more surrounding context."
             )
-        target.write_text(content.replace(old_string, new_string, 1), encoding="utf-8")
+        write_text_exact(target, content.replace(old_string, new_string, 1))
 
     return await _apply_and_push(proj, worker, mutate, f"Edit {path} (via LeafBridge)")
 
@@ -289,7 +290,7 @@ async def write_file(path: str, content: str, project: str | None = None) -> str
     def mutate(repo: Path) -> None:
         target = safe_join(repo, path)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content, encoding="utf-8")
+        write_text_exact(target, content)
 
     return await _apply_and_push(proj, worker, mutate, f"Write {path} (via LeafBridge)")
 

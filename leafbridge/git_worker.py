@@ -275,6 +275,14 @@ class GitWorker:
             f"http.postBuffer={_POST_BUFFER}",
             "-c",
             "credential.helper=",
+            # Never translate line endings. Git for Windows defaults autocrlf=true
+            # at the system level, which would rewrite the working copy to CRLF and
+            # cause line-ending churn / corruption on write. Keep the working tree
+            # byte-identical to the repo (LF), matching Overleaf.
+            "-c",
+            "core.autocrlf=false",
+            "-c",
+            "core.eol=lf",
             *args,
         ]
         try:

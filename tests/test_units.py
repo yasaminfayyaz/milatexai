@@ -12,6 +12,7 @@ from leafbridge.files import (
     number_lines,
     safe_join,
     search_files,
+    write_text_exact,
 )
 
 HEX = "0123456789abcdef01234567"  # 24-char ObjectId
@@ -126,6 +127,20 @@ def test_number_lines():
     out = number_lines("a\nb\nc")
     assert out.splitlines()[0].endswith("\ta")
     assert "3\tc" in out
+
+
+def test_write_text_exact_preserves_newlines(tmp_path):
+    # Regression: Path.write_text on Windows translates \n -> \r\n, which turns
+    # existing \r\n into \r\r\n and corrupts a whole file's line endings. The
+    # exact writer must store bytes verbatim.
+    p = tmp_path / "f.tex"
+
+    write_text_exact(p, "a\nb\nc\n")
+    assert p.read_bytes() == b"a\nb\nc\n"  # LF stays LF, no CR added
+
+    write_text_exact(p, "x\r\ny\r\n")
+    assert p.read_bytes() == b"x\r\ny\r\n"  # CRLF preserved, NOT doubled to \r\r\n
+    assert b"\r\r" not in p.read_bytes()
 
 
 def test_search_files(tmp_path):

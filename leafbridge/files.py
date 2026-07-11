@@ -101,6 +101,18 @@ def read_text(path: Path) -> str:
     return data.decode("utf-8", errors="replace")
 
 
+def write_text_exact(path: Path, text: str) -> None:
+    """Write ``text`` as UTF-8 bytes with NO newline translation.
+
+    Critical on Windows: ``Path.write_text`` / ``open(mode="w")`` translate
+    ``\\n`` -> ``os.linesep`` (``\\r\\n``). For content already containing
+    ``\\r\\n`` that yields ``\\r\\r\\n`` and corrupts the whole file's line
+    endings (Overleaf then expands each into a blank line). Writing bytes
+    preserves exactly the string we intend to store.
+    """
+    path.write_bytes(text.encode("utf-8"))
+
+
 def number_lines(text: str, start: int = 1) -> str:
     """Render text with right-aligned line numbers (like ``cat -n``)."""
     lines = text.splitlines()
