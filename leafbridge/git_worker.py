@@ -42,6 +42,14 @@ _POST_BUFFER = str(20 * 1024 * 1024)
 _COMMIT_NAME = "LeafBridge"
 _COMMIT_EMAIL = "leafbridge@users.noreflect"
 
+# Overleaf's Git bridge throttles rapid pushes. Absorb it: space pushes out, and
+# back off + retry when a network op is rate-limited (rather than failing the edit).
+_RATE_LIMIT_MARKERS = (
+    "429", "too many requests", "rate limit", "rate-limit", "slow down", "throttl",
+)
+RETRY_DELAYS = (3.0, 8.0, 20.0)  # waits after successive rate-limited attempts
+MIN_PUSH_INTERVAL_SECONDS = 1.5  # minimum spacing between pushes to one project
+
 
 class GitError(Exception):
     """A git operation failed. The message is already token-scrubbed."""
@@ -67,6 +75,7 @@ class GitWorker:
         self._locks: dict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._branch: dict[str, str] = {}
         self._last_sync: dict[str, float] = {}
+        self._last_push: dict[str, float] = {}
 
     # -- public API ---------------------------------------------------------
 
@@ -184,6 +193,24 @@ class GitWorker:
 
     # -- internals ----------------------------------------------------------
 
+    async def _git_networked(
+        self, project: ProjectConfig, args: list[str], *, cwd: Path | None = None
+    ) -> str:
+        """Run a networked git op, backing off and retrying when Overleaf's Git
+        bridge rate-limits us (429 / 'too many requests'), rather than failing
+        the edit. Non-rate-limit errors (e.g. conflicts) propagate immediately."""
+        attempt = 0
+        while True:
+            try:
+                return await self._git(project, args, cwd=cwd, authed=True)
+            except GitError as exc:
+                rate_limited = any(m in str(exc).lower() for m in _RATE_LIMIT_MARKERS)
+                if rate_limited and attempt < len(RETRY_DELAYS):
+                    await asyncio.sleep(RETRY_DELAYS[attempt])
+                    attempt += 1
+                    continue
+                raise
+
     async def _clone(self, project: ProjectConfig) -> None:
         path = self.repo_path(project)
         if path.exists():
@@ -192,20 +219,18 @@ class GitWorker:
         # Prefer a shallow clone (polite), but fall back to a full clone if the
         # server doesn't support shallow fetch (Overleaf's Git bridge is custom).
         try:
-            await self._git(
+            await self._git_networked(
                 project,
                 ["clone", "--depth", str(CLONE_DEPTH), project.authed_url(), str(path)],
                 cwd=self.data_dir,
-                authed=True,
             )
         except GitError:
             if path.exists():
                 await asyncio.to_thread(_rmtree, path)
-            await self._git(
+            await self._git_networked(
                 project,
                 ["clone", project.authed_url(), str(path)],
                 cwd=self.data_dir,
-                authed=True,
             )
         # Drop the token: point origin at the clean URL. We always pass the
         # authed URL explicitly on fetch/push instead.
@@ -215,30 +240,33 @@ class GitWorker:
     async def _fetch(self, project: ProjectConfig, branch: str) -> None:
         """Fetch the branch tip into FETCH_HEAD, falling back from shallow to full."""
         try:
-            await self._git(
+            await self._git_networked(
                 project,
                 ["fetch", "--depth", str(CLONE_DEPTH), project.authed_url(), branch],
-                authed=True,
             )
         except GitError:
-            await self._git(
-                project,
-                ["fetch", project.authed_url(), branch],
-                authed=True,
+            await self._git_networked(
+                project, ["fetch", project.authed_url(), branch]
             )
 
     async def _push(self, project: ProjectConfig, branch: str) -> None:
+        # Proactively space pushes so we don't trip Overleaf's rate limiter.
+        pid = project.project_id
+        last = self._last_push.get(pid)
+        if last is not None:
+            gap = time.monotonic() - last
+            if gap < MIN_PUSH_INTERVAL_SECONDS:
+                await asyncio.sleep(MIN_PUSH_INTERVAL_SECONDS - gap)
         try:
-            await self._git(
-                project,
-                ["push", project.authed_url(), f"HEAD:{branch}"],
-                authed=True,
+            await self._git_networked(
+                project, ["push", project.authed_url(), f"HEAD:{branch}"]
             )
         except GitError as exc:
             msg = str(exc).lower()
             if "non-fast-forward" in msg or "fetch first" in msg or "rejected" in msg:
                 raise PushConflict(str(exc)) from exc
             raise
+        self._last_push[pid] = time.monotonic()
 
     async def _get_branch(self, project: ProjectConfig) -> str:
         pid = project.project_id
