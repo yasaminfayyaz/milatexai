@@ -72,6 +72,17 @@ def test_account_route():
     assert r.status_code == 200
 
 
+def test_health_capacity_route():
+    with TestClient(_server().http_app()) as client:
+        r = client.get("/health/capacity")
+    assert r.status_code == 200
+    body = r.json()
+    # Default server has a disabled gate (no Azure sub) -> free stays open.
+    assert body["gating_enabled"] is False
+    assert body["free_open"] is True
+    assert set(body) == {"gating_enabled", "free_open", "signals_fresh"}
+
+
 # --- ChatGPT compatibility -------------------------------------------------
 
 def test_stateless_http_app_builds_and_serves():

@@ -84,7 +84,8 @@
      "Works with Claude and ChatGPT",
      "Encrypted token storage"
     ],
-    "cta": "Get started free"
+    "cta": "Get started free",
+    "availability": "Best-effort · subject to capacity"
    },
    "pro": {
     "name": "Pro",
@@ -98,9 +99,11 @@
      "Works with Claude and ChatGPT",
      "Encrypted token storage"
     ],
-    "cta": "Get started"
+    "cta": "Get started",
+    "availability": "Guaranteed · always on"
    },
-   "note": "The Pro price isn't set yet. Leave your email and we'll let you know when it launches."
+   "note": "The Pro price isn't set yet. Leave your email and we'll let you know when it launches.",
+   "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access — you are never turned away."
   },
   "faq": {
    "title": "Questions researchers ask",
@@ -337,7 +340,8 @@
      "支持 Claude 与 ChatGPT",
      "加密存储令牌"
     ],
-    "cta": "免费开始使用"
+    "cta": "免费开始使用",
+    "availability": "尽力而为 · 视容量而定"
    },
    "pro": {
     "name": "专业版",
@@ -351,9 +355,11 @@
      "支持 Claude 与 ChatGPT",
      "加密存储令牌"
     ],
-    "cta": "开始使用"
+    "cta": "开始使用",
+    "availability": "保证可用 · 始终在线"
    },
-   "note": "专业版价格尚未确定。留下你的邮箱，上线时我们会通知你。"
+   "note": "专业版价格尚未确定。留下你的邮箱，上线时我们会通知你。",
+   "capacity_note": "免费套餐依托闲置容量运行，在需求高峰期可能会短暂暂停。Pro 保证不间断访问——您永远不会被拒之门外。"
   },
   "faq": {
    "title": "研究者常问的问题",
@@ -590,7 +596,8 @@
      "Compatible avec Claude et ChatGPT",
      "Stockage du jeton chiffré"
     ],
-    "cta": "Commencer gratuitement"
+    "cta": "Commencer gratuitement",
+    "availability": "Au mieux · sous réserve de capacité"
    },
    "pro": {
     "name": "Pro",
@@ -604,9 +611,11 @@
      "Compatible avec Claude et ChatGPT",
      "Stockage du jeton chiffré"
     ],
-    "cta": "Commencer"
+    "cta": "Commencer",
+    "availability": "Garanti · toujours actif"
    },
-   "note": "Le tarif Pro n'est pas encore fixé. Laissez votre e-mail et nous vous préviendrons de son lancement."
+   "note": "Le tarif Pro n'est pas encore fixé. Laissez votre e-mail et nous vous préviendrons de son lancement.",
+   "capacity_note": "L'offre gratuite fonctionne sur les capacités disponibles et peut être suspendue brièvement en cas de forte demande. Pro garantit un accès ininterrompu — vous n'êtes jamais refusé."
   },
   "faq": {
    "title": "Les questions que se posent les chercheurs",
@@ -843,7 +852,8 @@
      "Compatible con Claude y ChatGPT",
      "Almacenamiento de token cifrado"
     ],
-    "cta": "Empieza gratis"
+    "cta": "Empieza gratis",
+    "availability": "Según disponibilidad · sujeto a capacidad"
    },
    "pro": {
     "name": "Pro",
@@ -857,9 +867,11 @@
      "Compatible con Claude y ChatGPT",
      "Almacenamiento de token cifrado"
     ],
-    "cta": "Empieza ahora"
+    "cta": "Empieza ahora",
+    "availability": "Garantizado · siempre activo"
    },
-   "note": "El precio de Pro aún no está fijado. Déjanos tu correo y te avisaremos cuando se lance."
+   "note": "El precio de Pro aún no está fijado. Déjanos tu correo y te avisaremos cuando se lance.",
+   "capacity_note": "El plan gratuito funciona con capacidad sobrante y puede pausarse brevemente cuando la demanda es alta. Pro garantiza acceso ininterrumpido: nunca se te rechaza."
   },
   "faq": {
    "title": "Preguntas que hacen los investigadores",
@@ -1096,7 +1108,8 @@
      "Funktioniert mit Claude und ChatGPT",
      "Verschlüsselte Token-Speicherung"
     ],
-    "cta": "Kostenlos starten"
+    "cta": "Kostenlos starten",
+    "availability": "Bestmöglich · je nach Kapazität"
    },
    "pro": {
     "name": "Pro",
@@ -1110,9 +1123,11 @@
      "Funktioniert mit Claude und ChatGPT",
      "Verschlüsselte Token-Speicherung"
     ],
-    "cta": "Loslegen"
+    "cta": "Loslegen",
+    "availability": "Garantiert · immer verfügbar"
    },
-   "note": "Der Pro-Preis steht noch nicht fest. Hinterlasse deine E-Mail-Adresse, und wir informieren dich zum Start."
+   "note": "Der Pro-Preis steht noch nicht fest. Hinterlasse deine E-Mail-Adresse, und wir informieren dich zum Start.",
+   "capacity_note": "Der kostenlose Tarif nutzt freie Kapazitäten und kann bei hoher Nachfrage kurz pausieren. Pro garantiert ununterbrochenen Zugriff — Sie werden niemals abgewiesen."
   },
   "faq": {
    "title": "Fragen, die Forschende stellen",
@@ -1349,7 +1364,8 @@
      "ClaudeとChatGPTに対応",
      "トークンの暗号化保存"
     ],
-    "cta": "無料で始める"
+    "cta": "無料で始める",
+    "availability": "ベストエフォート · 空き容量次第"
    },
    "pro": {
     "name": "Pro",
@@ -1363,9 +1379,11 @@
      "ClaudeとChatGPTに対応",
      "トークンの暗号化保存"
     ],
-    "cta": "始める"
+    "cta": "始める",
+    "availability": "保証付き · 常時稼働"
    },
-   "note": "Proの価格はまだ決まっていません。メールアドレスを登録いただければ、公開時にお知らせします。"
+   "note": "Proの価格はまだ決まっていません。メールアドレスを登録いただければ、公開時にお知らせします。",
+   "capacity_note": "無料プランは余剰容量で稼働しているため、需要が高いときは短時間停止する場合があります。Pro なら中断のないアクセスが保証され、締め出されることは決してありません。"
   },
   "faq": {
    "title": "研究者からよくある質問",
@@ -1602,7 +1620,8 @@
      "Funciona com Claude e ChatGPT",
      "Armazenamento de token criptografado"
     ],
-    "cta": "Comece grátis"
+    "cta": "Comece grátis",
+    "availability": "Melhor esforço · sujeito à capacidade"
    },
    "pro": {
     "name": "Pro",
@@ -1616,9 +1635,11 @@
      "Funciona com Claude e ChatGPT",
      "Armazenamento de token criptografado"
     ],
-    "cta": "Começar"
+    "cta": "Começar",
+    "availability": "Garantido · sempre ativo"
    },
-   "note": "O preço do Pro ainda não foi definido. Deixe seu e-mail e avisaremos quando ele for lançado."
+   "note": "O preço do Pro ainda não foi definido. Deixe seu e-mail e avisaremos quando ele for lançado.",
+   "capacity_note": "O plano gratuito funciona com capacidade ociosa e pode pausar brevemente quando a demanda está alta. O Pro garante acesso ininterrupto — você nunca fica sem acesso."
   },
   "faq": {
    "title": "Perguntas que os pesquisadores fazem",
@@ -1855,7 +1876,8 @@
      "يعمل مع Claude و ChatGPT",
      "تخزين مشفّر للرمز"
     ],
-    "cta": "ابدأ مجاناً"
+    "cta": "ابدأ مجاناً",
+    "availability": "أفضل جهد ممكن · رهناً بالسعة المتاحة"
    },
    "pro": {
     "name": "احترافي",
@@ -1869,9 +1891,11 @@
      "يعمل مع Claude و ChatGPT",
      "تخزين مشفّر للرمز"
     ],
-    "cta": "ابدأ الآن"
+    "cta": "ابدأ الآن",
+    "availability": "مضمون · متاح دائماً"
    },
-   "note": "لم يُحدَّد سعر الخطة الاحترافية بعد. اترك بريدك الإلكتروني وسنعلمك عند إطلاقها."
+   "note": "لم يُحدَّد سعر الخطة الاحترافية بعد. اترك بريدك الإلكتروني وسنعلمك عند إطلاقها.",
+   "capacity_note": "تعمل الخطة المجانية على السعة الفائضة وقد تتوقف مؤقتاً لفترة وجيزة عند ارتفاع الطلب. تضمن Pro وصولاً متواصلاً دون انقطاع — فلن تُحرم من الوصول أبداً."
   },
   "faq": {
    "title": "أسئلة يطرحها الباحثون",
@@ -2108,7 +2132,8 @@
      "Claude और ChatGPT के साथ काम करता है",
      "एन्क्रिप्टेड टोकन संग्रहण"
     ],
-    "cta": "मुफ़्त में शुरू करें"
+    "cta": "मुफ़्त में शुरू करें",
+    "availability": "यथासंभव प्रयास · क्षमता के अधीन"
    },
    "pro": {
     "name": "Pro",
@@ -2122,9 +2147,11 @@
      "Claude और ChatGPT के साथ काम करता है",
      "एन्क्रिप्टेड टोकन संग्रहण"
     ],
-    "cta": "शुरू करें"
+    "cta": "शुरू करें",
+    "availability": "सुनिश्चित · हमेशा उपलब्ध"
    },
-   "note": "Pro की कीमत अभी तय नहीं हुई है। अपना ईमेल छोड़ें और लॉन्च होने पर हम आपको बताएँगे।"
+   "note": "Pro की कीमत अभी तय नहीं हुई है। अपना ईमेल छोड़ें और लॉन्च होने पर हम आपको बताएँगे।",
+   "capacity_note": "फ्री टियर अतिरिक्त क्षमता पर चलता है और मांग अधिक होने पर कुछ देर के लिए रुक सकता है। Pro निर्बाध पहुँच की गारंटी देता है — आपको कभी मना नहीं किया जाता।"
   },
   "faq": {
    "title": "शोधकर्ताओं के सवाल",
@@ -2361,7 +2388,8 @@
      "Claude 및 ChatGPT와 함께 작동",
      "암호화된 토큰 저장"
     ],
-    "cta": "무료로 시작하기"
+    "cta": "무료로 시작하기",
+    "availability": "최선의 노력 제공 · 용량 상황에 따라 달라짐"
    },
    "pro": {
     "name": "Pro",
@@ -2375,9 +2403,11 @@
      "Claude 및 ChatGPT와 함께 작동",
      "암호화된 토큰 저장"
     ],
-    "cta": "시작하기"
+    "cta": "시작하기",
+    "availability": "보장 · 항상 이용 가능"
    },
-   "note": "Pro 가격은 아직 정해지지 않았습니다. 이메일을 남겨 주시면 출시 시 알려드리겠습니다."
+   "note": "Pro 가격은 아직 정해지지 않았습니다. 이메일을 남겨 주시면 출시 시 알려드리겠습니다.",
+   "capacity_note": "무료 요금제는 여유 용량으로 운영되며 수요가 많을 때 잠시 중단될 수 있습니다. Pro는 끊김 없는 이용을 보장하므로 언제든 이용이 거부되지 않습니다."
   },
   "faq": {
    "title": "연구자들이 묻는 질문",
@@ -2614,7 +2644,8 @@
      "Работает с Claude и ChatGPT",
      "Зашифрованное хранение токена"
     ],
-    "cta": "Начать бесплатно"
+    "cta": "Начать бесплатно",
+    "availability": "По мере возможности · при наличии ресурсов"
    },
    "pro": {
     "name": "Pro",
@@ -2628,9 +2659,11 @@
      "Работает с Claude и ChatGPT",
      "Зашифрованное хранение токена"
     ],
-    "cta": "Начать"
+    "cta": "Начать",
+    "availability": "Гарантированно · всегда доступно"
    },
-   "note": "Цена Pro пока не установлена. Оставьте свой email, и мы сообщим вам о запуске."
+   "note": "Цена Pro пока не установлена. Оставьте свой email, и мы сообщим вам о запуске.",
+   "capacity_note": "Бесплатный тариф работает на свободных ресурсах и может ненадолго приостанавливаться при высокой нагрузке. Pro гарантирует бесперебойный доступ — вам никогда не откажут."
   },
   "faq": {
    "title": "Вопросы, которые задают исследователи",
@@ -2867,7 +2900,8 @@
      "Compatibile con Claude e ChatGPT",
      "Archiviazione del token cifrata"
     ],
-    "cta": "Inizia gratis"
+    "cta": "Inizia gratis",
+    "availability": "Al meglio possibile · soggetto alla capacità disponibile"
    },
    "pro": {
     "name": "Pro",
@@ -2881,9 +2915,11 @@
      "Compatibile con Claude e ChatGPT",
      "Archiviazione del token cifrata"
     ],
-    "cta": "Inizia ora"
+    "cta": "Inizia ora",
+    "availability": "Garantito · sempre attivo"
    },
-   "note": "Il prezzo del piano Pro non è ancora definito. Lascia la tua email e ti avviseremo al lancio."
+   "note": "Il prezzo del piano Pro non è ancora definito. Lascia la tua email e ti avviseremo al lancio.",
+   "capacity_note": "Il piano gratuito funziona sulla capacità in eccesso e può sospendersi brevemente nei momenti di forte domanda. Pro garantisce un accesso senza interruzioni: non ti viene mai negato l'accesso."
   },
   "faq": {
    "title": "Le domande dei ricercatori",

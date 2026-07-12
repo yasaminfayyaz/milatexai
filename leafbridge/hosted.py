@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import base64
 import difflib
+import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -33,6 +34,7 @@ from starlette.responses import HTMLResponse, Response
 
 from . import __version__, latex, site, texcompile, web
 from .billing import Billing, plan_change_from_event
+from .capacity import CapacityGate
 from .config import ProjectConfig, default_data_dir
 from .connect_link import ConnectCodeError, mint_connect_code, verify_connect_code
 from .files import (
@@ -123,6 +125,7 @@ class HostedApp:
         identity_provider=_identity_from_token,
         base_url: str = "http://localhost:8000",
         billing: Billing | None = None,
+        capacity: CapacityGate | None = None,
     ):
         self.service = AccountService(store, cipher)
         self.cipher = cipher
@@ -135,9 +138,25 @@ class HostedApp:
             api_key="", price_id="", webhook_secret="",
             success_url="", cancel_url="", portal_return_url="",
         )
+        # No capacity gate given (e.g. tests) -> a disabled gate (free always ok).
+        self.capacity = capacity if capacity is not None else CapacityGate(
+            subscription_id="", resource_group="", stripe_api_key="",
+        )
         # Best-effort single-use tracking for connect codes (TTL is the real
         # control; this just stops a link being replayed within its window).
         self._consumed_codes: set[str] = set()
+
+    async def ensure_capacity(self, user: User) -> None:
+        """Admission control for the git-backed tools. Paid users and admins are
+        never gated; free users are refused when we're over free capacity."""
+        if user.is_admin or user.plan == "pro":
+            return
+        if not await self.capacity.free_allowed():
+            raise ToolError(
+                "MiLatexAI's free tier is at capacity right now. Reads and edits "
+                "resume automatically once capacity frees up. For guaranteed, "
+                "uninterrupted access, upgrade to Pro (run `upgrade`)."
+            )
 
     async def user(self) -> User:
         user_id, email = self._identity()
@@ -149,6 +168,8 @@ class HostedApp:
         self, user: User, proj: ProjectConfig, mutate, message: str,
         *, guard_path: str | None = None, allow_shrink: bool = False,
     ) -> str:
+        # Free users are refused when we're over capacity; paid/admin never are.
+        await self.ensure_capacity(user)
         month = _month()
         # Enforce the metered limit BEFORE doing any work.
         await self.service.check_commit_allowed(user.user_id, month)
@@ -190,6 +211,7 @@ def create_hosted_server(
     identity_provider=_identity_from_token,
     base_url: str | None = None,
     billing: Billing | None = None,
+    capacity: CapacityGate | None = None,
 ) -> FastMCP:
     """Build the hosted server. Tests pass ``auth=False`` + a fake
     ``identity_provider`` + an ``InMemoryStore`` to drive it without WorkOS."""
@@ -205,6 +227,7 @@ def create_hosted_server(
         identity_provider=identity_provider,
         base_url=resolved_base,
         billing=billing if billing is not None else Billing.from_env(resolved_base),
+        capacity=capacity if capacity is not None else CapacityGate.from_env(),
     )
 
     auth_provider = None
@@ -333,6 +356,7 @@ def create_hosted_server(
         """List files in one of your projects."""
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
             async with app.worker.open_repo(proj) as repo:
                 entries = list_source_files(repo, all_files=all_files)
@@ -348,6 +372,7 @@ def create_hosted_server(
         """Read a file's content from one of your projects."""
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
             async with app.worker.open_repo(proj) as repo:
                 content = read_text(safe_join(repo, path))
@@ -360,6 +385,7 @@ def create_hosted_server(
         """Return the LaTeX section outline of a .tex file."""
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
             async with app.worker.open_repo(proj) as repo:
                 content = read_text(safe_join(repo, path))
@@ -372,6 +398,7 @@ def create_hosted_server(
         """Return one section of a .tex file by title."""
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
             async with app.worker.open_repo(proj) as repo:
                 content = read_text(safe_join(repo, path))
@@ -391,6 +418,7 @@ def create_hosted_server(
         """Recent commits for one of your projects."""
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
             async with app.worker.lock_for(proj):
                 return await app.worker.log(proj, limit=max(1, min(limit, 50)))
@@ -402,6 +430,7 @@ def create_hosted_server(
         """Build one of your projects with a local LaTeX engine (read-only)."""
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
             async with app.worker.open_repo(proj) as repo:
                 main = texcompile.find_main_tex(repo)
@@ -429,6 +458,7 @@ def create_hosted_server(
             raise ToolError("old_string and new_string are identical.")
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
@@ -463,6 +493,7 @@ def create_hosted_server(
         """Create or overwrite a file, then commit+push."""
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
@@ -485,6 +516,7 @@ def create_hosted_server(
         """Delete a file, then commit+push."""
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
@@ -513,6 +545,7 @@ def create_hosted_server(
             raise ToolError(f"File too large ({len(data)} bytes; limit {MAX_UPLOAD_BYTES}).")
         try:
             user = await app.user()
+            await app.ensure_capacity(user)
             proj = await app.service.resolve_project(user.user_id, project)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
@@ -547,6 +580,18 @@ def create_hosted_server(
     async def account(request: Request) -> Response:
         status = request.query_params.get("status")
         return HTMLResponse(site.render_account(status=status))
+
+    @mcp.custom_route("/health/capacity", methods=["GET"])
+    async def health_capacity(request: Request) -> Response:
+        # Non-sensitive: booleans only, no dollar figures. `fresh` confirms the
+        # live cost/revenue signals were fetched (i.e. the managed identity works).
+        snap = await app.capacity.snapshot()
+        payload = {
+            "gating_enabled": app.capacity.enabled,
+            "free_open": snap.free_open,
+            "signals_fresh": snap.fresh,
+        }
+        return Response(json.dumps(payload), media_type="application/json")
 
     @mcp.custom_route("/stripe/webhook", methods=["POST"])
     async def stripe_webhook(request: Request) -> Response:

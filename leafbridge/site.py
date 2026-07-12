@@ -62,13 +62,16 @@ _FALLBACK_EN = {
                   "claude": "Add as a custom connector in Claude.",
                   "chatgpt": "Add as a custom connector in ChatGPT."},
     "pricing": {"title": "Simple pricing", "subtitle": "Start free. Upgrade when you need more.",
-                "free": {"name": "Free", "price": "$0", "period": "/month",
+                "free": {"name": "Free", "price": "$0", "period": "/mo",
                          "features": ["1 connected project", "25 write-commits / month", "Unlimited reads & compile checks"],
-                         "cta": "Get started"},
-                "pro": {"name": "Pro", "price": "Coming soon", "period": "", "badge": "Most popular",
+                         "cta": "Get started",
+                         "availability": "Best-effort · subject to capacity"},
+                "pro": {"name": "Pro", "price": "$4.99", "period": "/mo", "badge": "Unlimited",
                         "features": ["Unlimited projects", "Unlimited commits", "Priority support"],
-                        "cta": "Get notified"},
-                "note": "Reads are always free on every plan."},
+                        "cta": "Get started",
+                        "availability": "Guaranteed · always on"},
+                "note": "Reads are always free on every plan.",
+                "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access — you are never turned away."},
     "faq": {"title": "Frequently asked questions", "items": [
         {"q": "Is my Overleaf token safe?", "a": "You enter it on a secure web page, not in the chat. It's encrypted at rest and only used to sync your connected projects over Git."},
         {"q": "Do you see my documents?", "a": "We don't store your document contents. Edits flow through Overleaf's Git integration; we keep only your account email, your encrypted token, and a commit counter."},
@@ -240,6 +243,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <div class='grid two plans'>
     <div class='plan'>
       {_node(en,'h3','pricing.free.name')}
+      {_node(en,'p','pricing.free.availability','avail')}
       <div class='price'><span data-i18n='pricing.free.price'>{_t(en,'pricing.free.price')}</span><small data-i18n='pricing.free.period'>{_t(en,'pricing.free.period')}</small></div>
       <ul>{free_feats}</ul>
       <a class='btn' href='#get-started' data-i18n='pricing.free.cta'>{_t(en,'pricing.free.cta')}</a>
@@ -247,12 +251,14 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     <div class='plan featured'>
       <span class='ribbon' data-i18n='pricing.pro.badge'>{_t(en,'pricing.pro.badge')}</span>
       {_node(en,'h3','pricing.pro.name')}
+      {_node(en,'p','pricing.pro.availability','avail pro')}
       <div class='price'><span data-i18n='pricing.pro.price'>{_t(en,'pricing.pro.price')}</span><small data-i18n='pricing.pro.period'>{_t(en,'pricing.pro.period')}</small></div>
       <ul>{pro_feats}</ul>
       <a class='btn' href='/account' data-i18n='pricing.pro.cta'>{_t(en,'pricing.pro.cta')}</a>
     </div>
   </div>
-  {_node(en,'p','pricing.note','sub center')}
+  {_node(en,'p','pricing.capacity_note','sub center small')}
+  {_node(en,'p','pricing.note','sub center small')}
 </section>"""
 
     sec_points = "".join(
@@ -455,6 +461,8 @@ a{color:inherit;text-decoration:none}
 .plan.featured{border-color:var(--accent);box-shadow:0 8px 40px color-mix(in srgb,var(--accent) 18%,transparent)}
 .ribbon{position:absolute;top:-11px;inset-inline-end:20px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px}
 .plan h3{font-size:18px;margin:0 0 6px}
+.avail{font-size:12px;font-weight:600;color:var(--muted);margin:0 0 10px;letter-spacing:.01em}
+.avail.pro{color:var(--accent)}
 .price{font-size:30px;font-weight:800;margin:6px 0 14px}
 .price small{font-size:14px;font-weight:500;color:var(--muted)}
 .plan ul{list-style:none;padding:0;margin:0 0 20px;display:grid;gap:9px;flex:1}
