@@ -100,6 +100,35 @@ class AccountService:
         proj = self._select(await self.store.list_projects(user_id), project_ref)
         return await self.store.delete_project(user_id, proj.project_id)
 
+    # -- billing ------------------------------------------------------------
+
+    async def set_stripe_customer(self, user_id: str, customer_id: str | None) -> None:
+        """Remember a user's Stripe customer id (set when they first check out)."""
+        user = await self.store.get_user(user_id)
+        if user is None or not customer_id or user.stripe_customer_id == customer_id:
+            return
+        user.stripe_customer_id = customer_id
+        await self.store.upsert_user(user)
+
+    async def apply_subscription(
+        self, user_id: str, plan: str, customer_id: str | None = None
+    ) -> bool:
+        """Flip a user's plan (free<->pro) from a Stripe webhook. Idempotent.
+        Returns True if anything changed. Never downgrades an admin."""
+        user = await self.store.get_user(user_id)
+        if user is None:
+            return False
+        changed = False
+        if customer_id and user.stripe_customer_id != customer_id:
+            user.stripe_customer_id = customer_id
+            changed = True
+        if not user.is_admin and plan in ("free", "pro") and user.plan != plan:
+            user.plan = plan
+            changed = True
+        if changed:
+            await self.store.upsert_user(user)
+        return changed
+
     # -- resolution: project -> git-ready config ---------------------------
 
     async def resolve_project(

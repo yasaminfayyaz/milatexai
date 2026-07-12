@@ -32,6 +32,7 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, Response
 
 from . import __version__, latex, site, texcompile, web
+from .billing import Billing, plan_change_from_event
 from .config import ProjectConfig, default_data_dir
 from .connect_link import ConnectCodeError, mint_connect_code, verify_connect_code
 from .files import (
@@ -121,6 +122,7 @@ class HostedApp:
         admin_emails: tuple[str, ...] = (),
         identity_provider=_identity_from_token,
         base_url: str = "http://localhost:8000",
+        billing: Billing | None = None,
     ):
         self.service = AccountService(store, cipher)
         self.cipher = cipher
@@ -128,6 +130,11 @@ class HostedApp:
         self.admin_emails = admin_emails
         self._identity = identity_provider
         self.base_url = base_url.rstrip("/")
+        # Disabled billing (no Stripe env) is a valid state — the tools just say so.
+        self.billing = billing if billing is not None else Billing(
+            api_key="", price_id="", webhook_secret="",
+            success_url="", cancel_url="", portal_return_url="",
+        )
         # Best-effort single-use tracking for connect codes (TTL is the real
         # control; this just stops a link being replayed within its window).
         self._consumed_codes: set[str] = set()
@@ -182,6 +189,7 @@ def create_hosted_server(
     auth: bool = True,
     identity_provider=_identity_from_token,
     base_url: str | None = None,
+    billing: Billing | None = None,
 ) -> FastMCP:
     """Build the hosted server. Tests pass ``auth=False`` + a fake
     ``identity_provider`` + an ``InMemoryStore`` to drive it without WorkOS."""
@@ -196,6 +204,7 @@ def create_hosted_server(
         admin_emails=admin_emails or _admin_emails_from_env(),
         identity_provider=identity_provider,
         base_url=resolved_base,
+        billing=billing if billing is not None else Billing.from_env(resolved_base),
     )
 
     auth_provider = None
@@ -271,6 +280,51 @@ def create_hosted_server(
         if not projects:
             return "No projects connected yet. Use connect_project with your Overleaf link + Git token."
         return "\n".join(f"- {p.name}  (id {p.project_id})" for p in projects)
+
+    # -- billing -----------------------------------------------------------
+
+    @mcp.tool
+    async def upgrade() -> str:
+        """Upgrade to MiLatexAI Pro (unlimited projects + unlimited write-commits,
+        $4.99/mo, local currency where available). Returns a secure Stripe checkout
+        link; your plan updates automatically once payment completes."""
+        try:
+            user = await app.user()
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        if user.is_admin:
+            return "You're an admin — you already have unlimited access."
+        if user.plan == "pro":
+            return "You're already on Pro. Use manage_subscription to view or cancel."
+        if not app.billing.enabled:
+            raise ToolError("Billing isn't configured yet. Please try again later.")
+        try:
+            url, cid = await app.billing.create_checkout(user, user.stripe_customer_id)
+            await app.service.set_stripe_customer(user.user_id, cid)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return (
+            "Complete your upgrade to Pro here (secure Stripe checkout — your card "
+            "never touches this chat):\n\n"
+            f"{url}\n\n"
+            "Your plan switches to Pro automatically once payment goes through."
+        )
+
+    @mcp.tool
+    async def manage_subscription() -> str:
+        """Open the Stripe billing portal to view, update, or cancel your Pro
+        subscription. Returns a secure link."""
+        try:
+            user = await app.user()
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        if not user.stripe_customer_id or not app.billing.enabled:
+            return "You don't have a subscription yet. Use `upgrade` to go Pro."
+        try:
+            url = await app.billing.create_portal(user.stripe_customer_id)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return f"Manage your subscription (view invoices, update card, or cancel):\n\n{url}"
 
     # -- reads (unmetered) -------------------------------------------------
 
@@ -491,9 +545,27 @@ def create_hosted_server(
 
     @mcp.custom_route("/account", methods=["GET"])
     async def account(request: Request) -> Response:
-        if "account" not in _pages:
-            _pages["account"] = site.render_account_placeholder()
-        return HTMLResponse(_pages["account"])
+        status = request.query_params.get("status")
+        return HTMLResponse(site.render_account(status=status))
+
+    @mcp.custom_route("/stripe/webhook", methods=["POST"])
+    async def stripe_webhook(request: Request) -> Response:
+        if not app.billing.enabled:
+            return Response("billing disabled", status_code=503)
+        payload = await request.body()
+        sig = request.headers.get("stripe-signature", "")
+        try:
+            event = app.billing.parse_event(payload, sig)
+        except Exception:  # noqa: BLE001  (bad signature / malformed)
+            return Response("invalid signature", status_code=400)
+        user_id, plan, customer_id = plan_change_from_event(event)
+        if user_id and plan:
+            try:
+                await app.service.apply_subscription(user_id, plan, customer_id)
+            except Exception:  # noqa: BLE001
+                # 500 tells Stripe to retry the delivery later.
+                return Response("apply failed", status_code=500)
+        return Response("ok", status_code=200)
 
     @mcp.custom_route("/connect", methods=["GET"])
     async def connect_page(request: Request) -> Response:

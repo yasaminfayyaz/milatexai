@@ -88,8 +88,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "Coming soon",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "Unlimited",
     "features": [
      "Unlimited connected projects",
@@ -98,7 +98,7 @@
      "Works with Claude and ChatGPT",
      "Encrypted token storage"
     ],
-    "cta": "Get notified"
+    "cta": "Get started"
    },
    "note": "The Pro price isn't set yet. Leave your email and we'll let you know when it launches."
   },
@@ -341,8 +341,8 @@
    },
    "pro": {
     "name": "专业版",
-    "price": "即将推出",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "无限制",
     "features": [
      "无限个已连接项目",
@@ -351,7 +351,7 @@
      "支持 Claude 与 ChatGPT",
      "加密存储令牌"
     ],
-    "cta": "获取上线通知"
+    "cta": "开始使用"
    },
    "note": "专业版价格尚未确定。留下你的邮箱，上线时我们会通知你。"
   },
@@ -594,8 +594,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "Bientôt disponible",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "Illimité",
     "features": [
      "Projets connectés illimités",
@@ -604,7 +604,7 @@
      "Compatible avec Claude et ChatGPT",
      "Stockage du jeton chiffré"
     ],
-    "cta": "Être prévenu"
+    "cta": "Commencer"
    },
    "note": "Le tarif Pro n'est pas encore fixé. Laissez votre e-mail et nous vous préviendrons de son lancement."
   },
@@ -847,8 +847,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "Muy pronto",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "Ilimitado",
     "features": [
      "Proyectos conectados ilimitados",
@@ -857,7 +857,7 @@
      "Compatible con Claude y ChatGPT",
      "Almacenamiento de token cifrado"
     ],
-    "cta": "Avísame"
+    "cta": "Empieza ahora"
    },
    "note": "El precio de Pro aún no está fijado. Déjanos tu correo y te avisaremos cuando se lance."
   },
@@ -1100,8 +1100,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "Demnächst verfügbar",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "Unbegrenzt",
     "features": [
      "Unbegrenzt verbundene Projekte",
@@ -1110,7 +1110,7 @@
      "Funktioniert mit Claude und ChatGPT",
      "Verschlüsselte Token-Speicherung"
     ],
-    "cta": "Benachrichtigen lassen"
+    "cta": "Loslegen"
    },
    "note": "Der Pro-Preis steht noch nicht fest. Hinterlasse deine E-Mail-Adresse, und wir informieren dich zum Start."
   },
@@ -1353,8 +1353,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "近日公開",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "無制限",
     "features": [
      "接続できるプロジェクト無制限",
@@ -1363,7 +1363,7 @@
      "ClaudeとChatGPTに対応",
      "トークンの暗号化保存"
     ],
-    "cta": "通知を受け取る"
+    "cta": "始める"
    },
    "note": "Proの価格はまだ決まっていません。メールアドレスを登録いただければ、公開時にお知らせします。"
   },
@@ -1606,8 +1606,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "Em breve",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "Ilimitado",
     "features": [
      "Projetos conectados ilimitados",
@@ -1616,7 +1616,7 @@
      "Funciona com Claude e ChatGPT",
      "Armazenamento de token criptografado"
     ],
-    "cta": "Quero ser avisado"
+    "cta": "Começar"
    },
    "note": "O preço do Pro ainda não foi definido. Deixe seu e-mail e avisaremos quando ele for lançado."
   },
@@ -1859,8 +1859,8 @@
    },
    "pro": {
     "name": "احترافي",
-    "price": "قريباً",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "غير محدود",
     "features": [
      "مشاريع متصلة غير محدودة",
@@ -1869,7 +1869,7 @@
      "يعمل مع Claude و ChatGPT",
      "تخزين مشفّر للرمز"
     ],
-    "cta": "أعلمني عند الإطلاق"
+    "cta": "ابدأ الآن"
    },
    "note": "لم يُحدَّد سعر الخطة الاحترافية بعد. اترك بريدك الإلكتروني وسنعلمك عند إطلاقها."
   },
@@ -2112,8 +2112,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "जल्द आ रहा है",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "असीमित",
     "features": [
      "असीमित जुड़े हुए प्रोजेक्ट्स",
@@ -2122,7 +2122,7 @@
      "Claude और ChatGPT के साथ काम करता है",
      "एन्क्रिप्टेड टोकन संग्रहण"
     ],
-    "cta": "सूचना पाएँ"
+    "cta": "शुरू करें"
    },
    "note": "Pro की कीमत अभी तय नहीं हुई है। अपना ईमेल छोड़ें और लॉन्च होने पर हम आपको बताएँगे।"
   },
@@ -2365,8 +2365,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "출시 예정",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "무제한",
     "features": [
      "무제한 연결 프로젝트",
@@ -2375,7 +2375,7 @@
      "Claude 및 ChatGPT와 함께 작동",
      "암호화된 토큰 저장"
     ],
-    "cta": "알림 받기"
+    "cta": "시작하기"
    },
    "note": "Pro 가격은 아직 정해지지 않았습니다. 이메일을 남겨 주시면 출시 시 알려드리겠습니다."
   },
@@ -2618,8 +2618,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "Скоро",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "Без ограничений",
     "features": [
      "Неограниченное число подключённых проектов",
@@ -2628,7 +2628,7 @@
      "Работает с Claude и ChatGPT",
      "Зашифрованное хранение токена"
     ],
-    "cta": "Уведомить меня"
+    "cta": "Начать"
    },
    "note": "Цена Pro пока не установлена. Оставьте свой email, и мы сообщим вам о запуске."
   },
@@ -2871,8 +2871,8 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "Presto disponibile",
-    "period": "",
+    "price": "$4.99",
+    "period": "/mo",
     "badge": "Illimitato",
     "features": [
      "Progetti collegati illimitati",
@@ -2881,7 +2881,7 @@
      "Compatibile con Claude e ChatGPT",
      "Archiviazione del token cifrata"
     ],
-    "cta": "Ricevi una notifica"
+    "cta": "Inizia ora"
    },
    "note": "Il prezzo del piano Pro non è ancora definito. Lascia la tua email e ti avviseremo al lancio."
   },

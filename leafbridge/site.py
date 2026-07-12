@@ -249,7 +249,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
       {_node(en,'h3','pricing.pro.name')}
       <div class='price'><span data-i18n='pricing.pro.price'>{_t(en,'pricing.pro.price')}</span><small data-i18n='pricing.pro.period'>{_t(en,'pricing.pro.period')}</small></div>
       <ul>{pro_feats}</ul>
-      <a class='btn' href='mailto:support@milatexai.com?subject=MiLatexAI%20Pro' data-i18n='pricing.pro.cta'>{_t(en,'pricing.pro.cta')}</a>
+      <a class='btn' href='/account' data-i18n='pricing.pro.cta'>{_t(en,'pricing.pro.cta')}</a>
     </div>
   </div>
   {_node(en,'p','pricing.note','sub center')}
@@ -366,19 +366,39 @@ function applyLang(lang) {{
 </body></html>"""
 
 
-def render_account_placeholder() -> str:
-    """A minimal /account page until Stripe billing lands."""
-    return """<!doctype html><html lang='en'><head><meta charset='utf-8'>
+def render_account(status: str | None = None) -> str:
+    """The /account page. ``status`` reflects a Checkout return
+    (``success`` / ``cancelled``); otherwise it explains how to upgrade/manage."""
+    if status == "success":
+        icon, heading, body = (
+            "🎉", "You're on Pro!",
+            "Thanks for upgrading. Your plan is now Pro — unlimited projects and "
+            "commits. It may take a few seconds to reflect in your assistant.",
+        )
+    elif status == "cancelled":
+        icon, heading, body = (
+            "↩️", "Checkout cancelled",
+            "No charge was made. You can upgrade any time by asking MiLatexAI to "
+            "“upgrade my plan”.",
+        )
+    else:
+        icon, heading, body = (
+            "💳", "Manage your subscription",
+            "Billing is handled inside your assistant, so it stays tied to your "
+            "account. In Claude or ChatGPT, ask MiLatexAI to “upgrade my plan” for a "
+            "secure Stripe checkout link, or “manage my subscription” to view "
+            "invoices, change your card, or cancel.",
+        )
+    return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<title>Manage subscription · MiLatexAI</title><style>""" + _CSS + """</style></head>
-<body><main class='section' style='max-width:640px;margin:0 auto;text-align:center;min-height:70vh;display:flex;flex-direction:column;justify-content:center'>
-<a class='brand' href='/'>Mi<span>LaTeX</span>AI</a>
-<h2 class='h2'>Manage your subscription</h2>
-<p class='muted'>Billing is on the way. Right now everyone is on the free plan
-(1 project, 25 commits/month, unlimited reads). When Pro launches you'll manage
-your plan and payment here.</p>
-<p class='muted'>Questions? <a href='mailto:support@milatexai.com'>support@milatexai.com</a></p>
-<p><a class='btn' href='/'>Back to home</a></p>
+<title>{html.escape(heading)} · MiLatexAI</title><style>{_CSS}</style></head>
+<body><main class='section' style='max-width:620px;margin:0 auto;text-align:center;min-height:72vh;display:flex;flex-direction:column;justify-content:center;gap:6px'>
+<a class='brand' href='/' style='margin-bottom:10px'>Mi<span>LaTeX</span>AI</a>
+<div style='font-size:44px'>{icon}</div>
+<h2 class='h2'>{html.escape(heading)}</h2>
+<p class='muted'>{html.escape(body)}</p>
+<p class='muted' style='margin-top:10px'>Questions? <a href='mailto:support@milatexai.com'>support@milatexai.com</a></p>
+<p style='margin-top:14px'><a class='btn' href='/'>Back to home</a></p>
 </main></body></html>"""
 
 

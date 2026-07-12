@@ -53,9 +53,10 @@ def test_site_content_has_all_languages_complete():
             assert key in c, f"{lang} missing {key}"
 
 
-def test_account_placeholder_renders():
-    html = site.render_account_placeholder()
-    assert "subscription" in html.lower()
+def test_account_page_renders_and_reacts_to_status():
+    assert "subscription" in site.render_account().lower()
+    assert "pro" in site.render_account(status="success").lower()
+    assert "cancel" in site.render_account(status="cancelled").lower()
 
 
 def test_landing_route_serves_marketing_site():
