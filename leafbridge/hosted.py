@@ -31,7 +31,7 @@ from fastmcp.server.dependencies import get_access_token
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, Response
 
-from . import __version__, latex, texcompile, web
+from . import __version__, latex, site, texcompile, web
 from .config import ProjectConfig, default_data_dir
 from .connect_link import ConnectCodeError, mint_connect_code, verify_connect_code
 from .files import (
@@ -260,7 +260,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return "Disconnected." if ok else "No such project."
 
-    @mcp.tool
+    @mcp.tool(annotations={"readOnlyHint": True})
     async def list_projects() -> str:
         """List your connected Overleaf projects."""
         try:
@@ -274,7 +274,7 @@ def create_hosted_server(
 
     # -- reads (unmetered) -------------------------------------------------
 
-    @mcp.tool
+    @mcp.tool(annotations={"readOnlyHint": True})
     async def list_files(project: str | None = None, all_files: bool = False) -> str:
         """List files in one of your projects."""
         try:
@@ -289,7 +289,7 @@ def create_hosted_server(
         return "\n".join([f"{len(entries)} file(s) in {proj.name!r}:"]
                          + [f"- {e.path}  ({e.size} bytes)" for e in entries])
 
-    @mcp.tool
+    @mcp.tool(annotations={"readOnlyHint": True})
     async def read_file(path: str, project: str | None = None, with_line_numbers: bool = True) -> str:
         """Read a file's content from one of your projects."""
         try:
@@ -301,7 +301,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return number_lines(content) if with_line_numbers else content
 
-    @mcp.tool
+    @mcp.tool(annotations={"readOnlyHint": True})
     async def get_sections(path: str, project: str | None = None) -> str:
         """Return the LaTeX section outline of a .tex file."""
         try:
@@ -313,7 +313,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return f"Sections in {path}:\n{latex.outline(latex.find_sections(content))}"
 
-    @mcp.tool
+    @mcp.tool(annotations={"readOnlyHint": True})
     async def read_section(path: str, title: str, project: str | None = None) -> str:
         """Return one section of a .tex file by title."""
         try:
@@ -332,7 +332,7 @@ def create_hosted_server(
         return (f"# {section.command}: {section.title}  (lines {section.line}-{section.end_line})\n"
                 f"{number_lines(body, start=section.line)}")
 
-    @mcp.tool
+    @mcp.tool(annotations={"readOnlyHint": True})
     async def get_history(project: str | None = None, limit: int = 10) -> str:
         """Recent commits for one of your projects."""
         try:
@@ -343,7 +343,7 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
-    @mcp.tool
+    @mcp.tool(annotations={"readOnlyHint": True})
     async def check_compile(project: str | None = None) -> str:
         """Build one of your projects with a local LaTeX engine (read-only)."""
         try:
@@ -480,9 +480,20 @@ def create_hosted_server(
     # the one-time connect code minted by start_connect, so the Overleaf token is
     # typed into a browser form (over HTTPS) instead of the chat transcript.
 
+    # The marketing site + /account are static per process — render once, cache.
+    _pages: dict[str, str] = {}
+
     @mcp.custom_route("/", methods=["GET"])
     async def landing(request: Request) -> Response:
-        return HTMLResponse(web.render_landing())
+        if "home" not in _pages:
+            _pages["home"] = site.render_site()
+        return HTMLResponse(_pages["home"])
+
+    @mcp.custom_route("/account", methods=["GET"])
+    async def account(request: Request) -> Response:
+        if "account" not in _pages:
+            _pages["account"] = site.render_account_placeholder()
+        return HTMLResponse(_pages["account"])
 
     @mcp.custom_route("/connect", methods=["GET"])
     async def connect_page(request: Request) -> Response:

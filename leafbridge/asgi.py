@@ -11,8 +11,27 @@ from __future__ import annotations
 
 import os
 
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+
 from .hosted import create_hosted_server
 from .store import InMemoryStore, Store
+
+# The OAuth authorization flow and the /.well-known/* discovery documents are
+# fetched from the assistant's *browser* origin (notably chatgpt.com); the MCP
+# tool traffic itself is server-to-server and unaffected by CORS. Allow the
+# OpenAI/ChatGPT origins so the connect flow works there as it does for Claude.
+_CORS = Middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://chatgpt.com",
+        "https://chat.openai.com",
+        "https://platform.openai.com",
+    ],
+    allow_methods=["GET", "POST", "OPTIONS", "DELETE"],
+    allow_headers=["Content-Type", "Authorization", "MCP-Protocol-Version", "Mcp-Session-Id"],
+    max_age=3600,
+)
 
 
 def store_from_env() -> Store:
@@ -29,7 +48,12 @@ def build_app():
         auth=True,
         base_url=os.environ.get("BASE_URL", "https://milatexai.com"),
     )
-    return mcp.http_app()
+    # stateless_http=True: ChatGPT's Streamable HTTP client issues DELETE /mcp
+    # after a tool call, which makes a *stateful* FastMCP session 404 with
+    # "Session terminated" (the single most common FastMCP<->ChatGPT failure).
+    # This server holds no per-session memory — all state is per-user in the
+    # store — so stateless mode is safe here and keeps Claude working too.
+    return mcp.http_app(stateless_http=True, middleware=[_CORS])
 
 
 app = build_app()

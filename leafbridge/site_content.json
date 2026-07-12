@@ -1,0 +1,3038 @@
+{
+ "en": {
+  "brand_tagline": "Talk to your AI. Edit your real Overleaf paper.",
+  "nav": {
+   "features": "Features",
+   "how": "How it works",
+   "pricing": "Pricing",
+   "faq": "FAQ",
+   "privacy": "Privacy",
+   "terms": "Terms",
+   "get_started": "Get started",
+   "manage_subscription": "Manage subscription"
+  },
+  "hero": {
+   "badge": "Works with Claude and ChatGPT",
+   "title": "Edit your Overleaf LaTeX by talking to your AI",
+   "subtitle": "MiLatexAI connects Claude or ChatGPT to your real Overleaf projects over Git. Ask in plain language to read a section, rewrite the LaTeX, drop in a figure, or check that it still compiles — every change lands in Overleaf as a real Git commit you can see and revert.",
+   "cta_primary": "Get started free",
+   "cta_secondary": "See how it works",
+   "note": "Free plan: 1 project and 25 write-commits per month. Reads are always free."
+  },
+  "trust": "Your Overleaf Git token is entered on a secure web form, encrypted at rest, and never appears in the chat. The full connector is open source on GitHub under the AGPL license, so you can audit exactly what it does.",
+  "features": [
+   {
+    "title": "Edit by conversation",
+    "desc": "Ask your AI to tighten an abstract, rewrite a paragraph, or clean up a proof. It reads and edits the actual LaTeX in your Overleaf project, not a copy."
+   },
+   {
+    "title": "Changes go straight to Overleaf",
+    "desc": "Edits are pushed to your project over Overleaf's Git integration, so your paper updates in place. No copy-pasting between a chat window and your editor."
+   },
+   {
+    "title": "Every write is a real Git commit",
+    "desc": "Each change is a genuine commit in your Overleaf history. You can see it, review the diff, and roll it back exactly like any other commit. Nothing happens silently."
+   },
+   {
+    "title": "Check that it compiles",
+    "desc": "Ask the AI to confirm your LaTeX still builds before you trust an edit, so you catch a broken \\\\begin or a missing brace now instead of at deadline."
+   },
+   {
+    "title": "Your token stays out of the chat",
+    "desc": "You paste your Overleaf Git token into a secure web form, never into the conversation. It is encrypted at rest and never written to the transcript."
+   },
+   {
+    "title": "Open source and auditable",
+    "desc": "The entire connector is public on GitHub under the AGPL license, so you can read precisely how it handles your token and your projects before trusting it."
+   }
+  ],
+  "how": {
+   "title": "From chat to committed in three steps",
+   "subtitle": "Connect once, then just talk to your AI.",
+   "steps": [
+    {
+     "title": "Add the connector and sign in",
+     "desc": "Add MiLatexAI as a connector in Claude or ChatGPT and sign in with single sign-on, handled by WorkOS."
+    },
+    {
+     "title": "Paste your Overleaf token securely",
+     "desc": "Run start_connect to get a one-time link to milatexai.com/connect, then paste your Overleaf Git token into the web form. It is encrypted immediately and never appears in the chat."
+    },
+    {
+     "title": "Ask the AI to edit your paper",
+     "desc": "In plain language, ask it to list files, read sections, rewrite LaTeX, add figures, or check that it compiles. Your changes are committed live to Overleaf."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "Bring your own AI",
+   "subtitle": "MiLatexAI is a Model Context Protocol connector, so it works with the assistant you already use.",
+   "claude": "Add MiLatexAI as a connector in Anthropic's Claude and edit your Overleaf projects from any Claude conversation.",
+   "chatgpt": "Add MiLatexAI as a connector in OpenAI's ChatGPT and do the same there — same projects, same commits, same Overleaf history."
+  },
+  "pricing": {
+   "title": "Simple pricing",
+   "subtitle": "Reads are always free and unlimited. You only ever count write-commits.",
+   "free": {
+    "name": "Free",
+    "price": "$0",
+    "period": "forever",
+    "features": [
+     "1 connected Overleaf project",
+     "25 write-commits per month",
+     "Unlimited reads",
+     "Works with Claude and ChatGPT",
+     "Encrypted token storage"
+    ],
+    "cta": "Get started free"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "Coming soon",
+    "period": "",
+    "badge": "Unlimited",
+    "features": [
+     "Unlimited connected projects",
+     "Unlimited write-commits",
+     "Unlimited reads",
+     "Works with Claude and ChatGPT",
+     "Encrypted token storage"
+    ],
+    "cta": "Get notified"
+   },
+   "note": "The Pro price isn't set yet. Leave your email and we'll let you know when it launches."
+  },
+  "faq": {
+   "title": "Questions researchers ask",
+   "items": [
+    {
+     "q": "Is my Overleaf token safe?",
+     "a": "You paste your token into a secure web form at milatexai.com/connect, never into the chat. It is encrypted at rest with authenticated encryption and is never written into the conversation transcript."
+    },
+    {
+     "q": "Can you see my documents?",
+     "a": "We don't store your document contents. MiLatexAI reads and edits your files in the moment to carry out a request, but the only things we keep are your account email, your encrypted Overleaf token, and a monthly commit counter."
+    },
+    {
+     "q": "Which AI assistants does it work with?",
+     "a": "Both Anthropic's Claude and OpenAI's ChatGPT. MiLatexAI is a Model Context Protocol connector, so you add it in whichever assistant you already use."
+    },
+    {
+     "q": "What happens if I hit the 25-commit limit?",
+     "a": "Reads always stay free and unlimited. Once you reach 25 write-commits in a month on the Free plan, you can wait for the counter to reset next month or move to Pro when it launches for unlimited commits."
+    },
+    {
+     "q": "Is it really open source?",
+     "a": "Yes. The full source code is public on GitHub under the AGPL license, so you can audit exactly what the connector does before you trust it with your projects."
+    },
+    {
+     "q": "Can I disconnect or delete my data?",
+     "a": "Yes. You can disconnect a project at any time, and you can ask us to delete your stored token and account details. Because we don't store your documents, disconnecting stops all access immediately."
+    },
+    {
+     "q": "Does it touch projects I didn't connect?",
+     "a": "No. MiLatexAI only accesses the specific Overleaf projects you connect with the token you provide. It has no visibility into anything else in your Overleaf account."
+    },
+    {
+     "q": "Will my changes show up in Overleaf history?",
+     "a": "Yes. Every write is a real Git commit pushed over Overleaf's Git integration, so it appears in your project history where you can review the diff or revert it."
+    }
+   ]
+  },
+  "security": {
+   "title": "Built to touch as little as possible",
+   "subtitle": "Exactly what MiLatexAI stores, and what it deliberately doesn't.",
+   "points": [
+    {
+     "title": "Your token is encrypted",
+     "desc": "Overleaf Git tokens are encrypted at rest with authenticated encryption, and are entered on a web form rather than in the chat."
+    },
+    {
+     "title": "We don't store your documents",
+     "desc": "MiLatexAI keeps only your account email, your encrypted token, and a monthly commit counter — never the contents of your LaTeX files."
+    },
+    {
+     "title": "Only the projects you connect",
+     "desc": "Access is limited to the specific Overleaf projects you choose to connect. Nothing else in your account is reachable."
+    },
+    {
+     "title": "Open source, run on Azure",
+     "desc": "The code is public on GitHub under the AGPL license, sign-in runs through WorkOS AuthKit, and the service is hosted on Microsoft Azure in the Canada region."
+    }
+   ]
+  },
+  "cta": {
+   "title": "Start editing your paper by talking to your AI",
+   "subtitle": "Add MiLatexAI to Claude or ChatGPT, connect one Overleaf project, and try it free. Reads are always free.",
+   "button": "Get started free"
+  },
+  "footer": {
+   "blurb": "MiLatexAI connects Claude and ChatGPT to your real Overleaf projects over Git, so you can read, edit, and compile your LaTeX just by talking to your AI. Open source under the AGPL license.",
+   "rights": "© 2026 MiLatexAI. All rights reserved.",
+   "language_label": "Language",
+   "contact_label": "Support",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "Privacy Policy",
+   "updated_label": "Last updated: July 2026",
+   "intro": "This policy explains, in plain language, what MiLatexAI collects, what it deliberately does not collect, and how your Overleaf token is protected. MiLatexAI is a small, independent product, and we try to touch as little of your data as possible.",
+   "sections": [
+    {
+     "heading": "What we collect",
+     "body": "We collect only three things: your account email address (provided through single sign-on), your Overleaf Git token in encrypted form, and a counter of how many write-commits you've made in the current month. That is the complete list."
+    },
+    {
+     "heading": "What we do NOT collect",
+     "body": "We do not store the contents of your LaTeX documents, your figures, your compiled PDFs, or your project history. Files are read and edited in the moment to carry out your requests and are not retained by us afterward."
+    },
+    {
+     "heading": "How your token is secured",
+     "body": "Your Overleaf Git token is entered into a web form at milatexai.com/connect, never into the chat, and is encrypted at rest using authenticated encryption. It is used only to access the specific projects you connect, and is never shown in the conversation transcript."
+    },
+    {
+     "heading": "Third parties we rely on",
+     "body": "Sign-in is handled by WorkOS AuthKit, which authenticates you and provides your email. Hosting is on Microsoft Azure in the Canada region. Your projects live on Overleaf, and MiLatexAI communicates with them over Overleaf's Git integration. We do not sell your data or share it beyond what these providers require to run the service."
+    },
+    {
+     "heading": "Data retention and deletion",
+     "body": "We keep your email, encrypted token, and commit counter only while your account is active. You can disconnect a project or ask us to delete your stored data at any time. Because we don't store your documents, disconnecting immediately ends our access to your projects."
+    },
+    {
+     "heading": "Your rights",
+     "body": "You may request access to the limited data we hold about you, ask for it to be corrected, or ask for it to be deleted. To make a request, contact us at the address below."
+    },
+    {
+     "heading": "Contact",
+     "body": "Questions about privacy can be sent to support@milatexai.com. This is a placeholder support address for an early-stage product, and we'll respond as soon as we can."
+    }
+   ]
+  },
+  "terms": {
+   "title": "Terms of Service",
+   "updated_label": "Last updated: July 2026",
+   "intro": "These terms explain what MiLatexAI provides and the basis on which you may use it. MiLatexAI is a small, independent, open-source product, so please read the availability and liability sections carefully.",
+   "sections": [
+    {
+     "heading": "The service",
+     "body": "MiLatexAI is a connector that lets AI assistants such as Anthropic's Claude and OpenAI's ChatGPT read, edit, and compile your Overleaf LaTeX projects over Overleaf's Git integration, through the Model Context Protocol. You direct the AI in plain language, and your changes are pushed to your Overleaf project as Git commits."
+    },
+    {
+     "heading": "Acceptable use",
+     "body": "Use MiLatexAI only with Overleaf projects and accounts you are authorized to access. Do not use it to break Overleaf's terms, to infringe others' rights, or to attempt to disrupt or defeat the security of the service. You are responsible for reviewing the changes your AI assistant makes before relying on them."
+    },
+    {
+     "heading": "Your Overleaf account and tokens",
+     "body": "You are responsible for keeping your Overleaf Git token valid and for the actions taken under it through the connector. We encrypt the token you provide and use it only to access the projects you connect, but you remain in control of your own Overleaf account and its permissions."
+    },
+    {
+     "heading": "Availability and \"as is\"",
+     "body": "The service is provided \"as is\" and \"as available,\" without warranties of any kind. As an early-stage indie product, MiLatexAI may have downtime, bugs, or changes, and we do not guarantee that it will be uninterrupted, error-free, or that every edit will compile correctly."
+    },
+    {
+     "heading": "Limitation of liability",
+     "body": "To the maximum extent permitted by law, MiLatexAI and its maintainers are not liable for any indirect, incidental, or consequential damages, or for lost data or lost work, arising from your use of the service. Always keep your own copies and rely on Overleaf's Git history to review and revert changes."
+    },
+    {
+     "heading": "Open-source code",
+     "body": "The MiLatexAI source code is released under the GNU AGPL license. Your use of the hosted service is governed by these terms, while your use of the source code is additionally governed by the AGPL. You are welcome to read, audit, and self-host the code in accordance with that license."
+    },
+    {
+     "heading": "Termination",
+     "body": "You may stop using MiLatexAI and disconnect your projects at any time. We may suspend or end access if these terms are breached or if we need to discontinue the service, and we will make reasonable efforts to let you know."
+    },
+    {
+     "heading": "Changes to these terms",
+     "body": "We may update these terms as the product evolves. When we make material changes, we'll update the date above, and continued use of the service means you accept the revised terms."
+    },
+    {
+     "heading": "Contact",
+     "body": "Questions about these terms can be sent to support@milatexai.com, a placeholder support address for this early-stage product."
+    }
+   ]
+  }
+ },
+ "zh": {
+  "brand_tagline": "与你的 AI 对话，直接编辑你真实的 Overleaf 论文。",
+  "nav": {
+   "features": "功能特性",
+   "how": "工作原理",
+   "pricing": "价格方案",
+   "faq": "常见问题",
+   "privacy": "隐私政策",
+   "terms": "服务条款",
+   "get_started": "开始使用",
+   "manage_subscription": "管理订阅"
+  },
+  "hero": {
+   "badge": "支持 Claude 与 ChatGPT",
+   "title": "用对话的方式编辑你的 Overleaf LaTeX",
+   "subtitle": "MiLatexAI 通过 Git 将 Claude 或 ChatGPT 连接到你真实的 Overleaf 项目。用日常语言就能让它阅读某个章节、改写 LaTeX、插入图表，或检查是否仍能顺利编译——每一处改动都会以真实的 Git 提交落到 Overleaf 中，你随时可以查看和撤销。",
+   "cta_primary": "免费开始使用",
+   "cta_secondary": "了解工作原理",
+   "note": "免费方案：1 个项目，每月 25 次写入提交。阅读始终免费。"
+  },
+  "trust": "你的 Overleaf Git 令牌在一个安全的网页表单中输入，静态加密存储，绝不会出现在对话中。整个连接器在 GitHub 上以 AGPL 许可证开源，你可以完整审查它究竟做了什么。",
+  "features": [
+   {
+    "title": "用对话完成编辑",
+    "desc": "让你的 AI 精简摘要、改写段落，或整理一段证明。它读取并编辑的是你 Overleaf 项目中真实的 LaTeX，而不是一份副本。"
+   },
+   {
+    "title": "改动直达 Overleaf",
+    "desc": "编辑通过 Overleaf 的 Git 集成推送到你的项目，论文就地更新。无需在聊天窗口和编辑器之间来回复制粘贴。"
+   },
+   {
+    "title": "每次写入都是真实的 Git 提交",
+    "desc": "每处改动都是 Overleaf 历史中一次真正的提交。你可以查看它、审阅差异、随时回滚，与其他任何提交别无二致。绝不会有暗中操作。"
+   },
+   {
+    "title": "检查是否能编译",
+    "desc": "在信任一处编辑之前，让 AI 确认你的 LaTeX 仍能成功构建，这样就能当下发现漏写的 \\\\begin 或缺失的括号，而不是等到截稿前才发现。"
+   },
+   {
+    "title": "令牌不进入对话",
+    "desc": "你把 Overleaf Git 令牌粘贴到安全的网页表单中，而非对话里。它以静态加密方式存储，绝不会写入对话记录。"
+   },
+   {
+    "title": "开源且可审计",
+    "desc": "整个连接器在 GitHub 上以 AGPL 许可证公开，在你信任它之前，就能精确了解它如何处理你的令牌和项目。"
+   }
+  ],
+  "how": {
+   "title": "从对话到提交，只需三步",
+   "subtitle": "连接一次，之后只管与你的 AI 对话。",
+   "steps": [
+    {
+     "title": "添加连接器并登录",
+     "desc": "在 Claude 或 ChatGPT 中将 MiLatexAI 添加为连接器，并通过单点登录（由 WorkOS 提供）登录。"
+    },
+    {
+     "title": "安全地粘贴你的 Overleaf 令牌",
+     "desc": "运行 start_connect 获取一个前往 milatexai.com/connect 的一次性链接，然后把你的 Overleaf Git 令牌粘贴到网页表单中。它会被立即加密，绝不会出现在对话里。"
+    },
+    {
+     "title": "让 AI 编辑你的论文",
+     "desc": "用日常语言，让它列出文件、阅读章节、改写 LaTeX、添加图表，或检查能否编译。你的改动会实时提交到 Overleaf。"
+    }
+   ]
+  },
+  "platforms": {
+   "title": "自带你惯用的 AI",
+   "subtitle": "MiLatexAI 是一个 Model Context Protocol 连接器，因此可以搭配你已经在用的助手。",
+   "claude": "在 Anthropic 的 Claude 中将 MiLatexAI 添加为连接器，从任意 Claude 对话中编辑你的 Overleaf 项目。",
+   "chatgpt": "在 OpenAI 的 ChatGPT 中将 MiLatexAI 添加为连接器，同样如此——相同的项目、相同的提交、相同的 Overleaf 历史记录。"
+  },
+  "pricing": {
+   "title": "简单透明的价格",
+   "subtitle": "阅读始终免费且无限制。你只需为写入提交计数。",
+   "free": {
+    "name": "免费版",
+    "price": "$0",
+    "period": "永久",
+    "features": [
+     "1 个已连接的 Overleaf 项目",
+     "每月 25 次写入提交",
+     "无限次阅读",
+     "支持 Claude 与 ChatGPT",
+     "加密存储令牌"
+    ],
+    "cta": "免费开始使用"
+   },
+   "pro": {
+    "name": "专业版",
+    "price": "即将推出",
+    "period": "",
+    "badge": "无限制",
+    "features": [
+     "无限个已连接项目",
+     "无限次写入提交",
+     "无限次阅读",
+     "支持 Claude 与 ChatGPT",
+     "加密存储令牌"
+    ],
+    "cta": "获取上线通知"
+   },
+   "note": "专业版价格尚未确定。留下你的邮箱，上线时我们会通知你。"
+  },
+  "faq": {
+   "title": "研究者常问的问题",
+   "items": [
+    {
+     "q": "我的 Overleaf 令牌安全吗？",
+     "a": "你在 milatexai.com/connect 的安全网页表单中粘贴令牌，而非在对话里。它以带认证的加密方式静态存储，绝不会写入对话记录中。"
+    },
+    {
+     "q": "你们能看到我的文档吗？",
+     "a": "我们不存储你的文档内容。MiLatexAI 只在执行请求的当下读取和编辑你的文件，我们唯一保留的只有你的账户邮箱、加密后的 Overleaf 令牌，以及一个每月提交计数器。"
+    },
+    {
+     "q": "它支持哪些 AI 助手？",
+     "a": "同时支持 Anthropic 的 Claude 和 OpenAI 的 ChatGPT。MiLatexAI 是一个 Model Context Protocol 连接器，你可以在自己已经在用的那个助手中添加它。"
+    },
+    {
+     "q": "如果我达到 25 次提交的上限会怎样？",
+     "a": "阅读始终免费且无限制。在免费方案下，一旦某个月内达到 25 次写入提交，你可以等待计数器在下个月重置，或在专业版上线后升级以获得无限次提交。"
+    },
+    {
+     "q": "它真的是开源的吗？",
+     "a": "是的。完整源代码在 GitHub 上以 AGPL 许可证公开，在你把项目托付给它之前，可以完整审查这个连接器究竟做了什么。"
+    },
+    {
+     "q": "我可以断开连接或删除我的数据吗？",
+     "a": "可以。你随时可以断开某个项目的连接，也可以要求我们删除已存储的令牌和账户信息。由于我们不存储你的文档，断开连接会立即终止所有访问。"
+    },
+    {
+     "q": "它会碰到我未连接的项目吗？",
+     "a": "不会。MiLatexAI 只访问你用所提供令牌连接的特定 Overleaf 项目，无法看到你 Overleaf 账户中的其他任何内容。"
+    },
+    {
+     "q": "我的改动会显示在 Overleaf 历史记录中吗？",
+     "a": "会。每次写入都是通过 Overleaf 的 Git 集成推送的真实 Git 提交，因此会出现在你的项目历史中，你可以在那里审阅差异或回滚。"
+    }
+   ]
+  },
+  "security": {
+   "title": "以最小接触为原则打造",
+   "subtitle": "MiLatexAI 究竟存储什么，又刻意不存储什么。",
+   "points": [
+    {
+     "title": "你的令牌已加密",
+     "desc": "Overleaf Git 令牌以带认证的加密方式静态存储，且在网页表单中输入，而非在对话里。"
+    },
+    {
+     "title": "我们不存储你的文档",
+     "desc": "MiLatexAI 仅保留你的账户邮箱、加密令牌和一个每月提交计数器——绝不保留你 LaTeX 文件的内容。"
+    },
+    {
+     "title": "只限你连接的项目",
+     "desc": "访问权限仅限于你选择连接的特定 Overleaf 项目。你账户中的其他内容一概无法触及。"
+    },
+    {
+     "title": "开源，运行于 Azure",
+     "desc": "代码在 GitHub 上以 AGPL 许可证公开，登录通过 WorkOS AuthKit 完成，服务托管于微软 Azure 的加拿大区域。"
+    }
+   ]
+  },
+  "cta": {
+   "title": "用对话的方式开始编辑你的论文",
+   "subtitle": "将 MiLatexAI 添加到 Claude 或 ChatGPT，连接一个 Overleaf 项目，免费体验。阅读始终免费。",
+   "button": "免费开始使用"
+  },
+  "footer": {
+   "blurb": "MiLatexAI 通过 Git 将 Claude 和 ChatGPT 连接到你真实的 Overleaf 项目，让你只需与 AI 对话就能阅读、编辑和编译你的 LaTeX。以 AGPL 许可证开源。",
+   "rights": "© 2026 MiLatexAI。保留所有权利。",
+   "language_label": "语言",
+   "contact_label": "支持",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "隐私政策",
+   "updated_label": "最后更新：2026 年 7 月",
+   "intro": "本政策以通俗的语言说明 MiLatexAI 收集哪些信息、刻意不收集哪些信息，以及你的 Overleaf 令牌如何受到保护。MiLatexAI 是一款小型独立产品，我们尽力以最少的程度接触你的数据。",
+   "sections": [
+    {
+     "heading": "我们收集什么",
+     "body": "我们只收集三样东西：你的账户邮箱地址（通过单点登录提供）、加密形式的 Overleaf Git 令牌，以及你当月已完成的写入提交次数计数。这就是全部清单。"
+    },
+    {
+     "heading": "我们不收集什么",
+     "body": "我们不存储你的 LaTeX 文档内容、图表、编译后的 PDF 或项目历史。文件只在执行你请求的当下被读取和编辑，之后我们不会保留。"
+    },
+    {
+     "heading": "你的令牌如何得到保护",
+     "body": "你的 Overleaf Git 令牌在 milatexai.com/connect 的网页表单中输入，而非在对话里，并以带认证的加密方式静态存储。它仅用于访问你连接的特定项目，绝不会显示在对话记录中。"
+    },
+    {
+     "heading": "我们依赖的第三方",
+     "body": "登录由 WorkOS AuthKit 处理，负责对你进行身份验证并提供你的邮箱。托管在微软 Azure 的加拿大区域。你的项目存放在 Overleaf 上，MiLatexAI 通过 Overleaf 的 Git 集成与其通信。我们不会出售你的数据，也不会在这些服务商运行服务所必需的范围之外共享数据。"
+    },
+    {
+     "heading": "数据保留与删除",
+     "body": "我们仅在你的账户处于活跃状态期间保留你的邮箱、加密令牌和提交计数器。你随时可以断开某个项目的连接，或要求我们删除已存储的数据。由于我们不存储你的文档，断开连接会立即终止我们对你项目的访问。"
+    },
+    {
+     "heading": "你的权利",
+     "body": "你可以要求访问我们持有的关于你的有限数据、要求更正，或要求删除。如需提出请求，请通过下方地址联系我们。"
+    },
+    {
+     "heading": "联系方式",
+     "body": "有关隐私的问题可发送至 support@milatexai.com。这是一款早期产品的临时支持邮箱，我们会尽快回复。"
+    }
+   ]
+  },
+  "terms": {
+   "title": "服务条款",
+   "updated_label": "最后更新：2026 年 7 月",
+   "intro": "本条款说明 MiLatexAI 提供什么，以及你在何种基础上可以使用它。MiLatexAI 是一款小型、独立、开源的产品，请仔细阅读关于可用性和责任的章节。",
+   "sections": [
+    {
+     "heading": "本服务",
+     "body": "MiLatexAI 是一个连接器，让 Anthropic 的 Claude、OpenAI 的 ChatGPT 等 AI 助手通过 Model Context Protocol，经由 Overleaf 的 Git 集成来阅读、编辑和编译你的 Overleaf LaTeX 项目。你用日常语言指挥 AI，你的改动会以 Git 提交的形式推送到你的 Overleaf 项目。"
+    },
+    {
+     "heading": "可接受的使用",
+     "body": "仅将 MiLatexAI 用于你有权访问的 Overleaf 项目和账户。不得用它违反 Overleaf 的条款、侵犯他人权利，或试图扰乱或攻破本服务的安全性。在依赖 AI 助手所做的改动之前，你有责任对其进行审阅。"
+    },
+    {
+     "heading": "你的 Overleaf 账户与令牌",
+     "body": "你有责任保持你的 Overleaf Git 令牌有效，并对通过连接器以该令牌进行的操作负责。我们会加密你提供的令牌，并仅用它访问你连接的项目，但你始终掌控自己的 Overleaf 账户及其权限。"
+    },
+    {
+     "heading": "可用性与\"按现状\"提供",
+     "body": "本服务\"按现状\"和\"按可用状态\"提供，不作任何形式的保证。作为一款早期的独立产品，MiLatexAI 可能出现停机、漏洞或变更，我们不保证它不间断、无错误，也不保证每一处编辑都能正确编译。"
+    },
+    {
+     "heading": "责任限制",
+     "body": "在法律允许的最大范围内，对于因你使用本服务而产生的任何间接、附带或后果性损害，或数据丢失、工作成果丢失，MiLatexAI 及其维护者概不负责。请务必自行保留副本，并依靠 Overleaf 的 Git 历史来审阅和撤销改动。"
+    },
+    {
+     "heading": "开源代码",
+     "body": "MiLatexAI 源代码以 GNU AGPL 许可证发布。你对托管服务的使用受本条款约束，而你对源代码的使用还额外受 AGPL 约束。欢迎你在遵守该许可证的前提下阅读、审计和自行托管代码。"
+    },
+    {
+     "heading": "终止",
+     "body": "你随时可以停止使用 MiLatexAI 并断开你的项目连接。如果本条款遭到违反，或我们需要停止提供服务，我们可能会暂停或终止访问，并会尽合理努力提前告知你。"
+    },
+    {
+     "heading": "条款变更",
+     "body": "随着产品的发展，我们可能会更新本条款。当我们做出重大变更时，会更新上方的日期，继续使用本服务即表示你接受修订后的条款。"
+    },
+    {
+     "heading": "联系方式",
+     "body": "有关本条款的问题可发送至 support@milatexai.com，这是这款早期产品的临时支持邮箱。"
+    }
+   ]
+  }
+ },
+ "fr": {
+  "brand_tagline": "Parlez à votre IA. Modifiez votre véritable article Overleaf.",
+  "nav": {
+   "features": "Fonctionnalités",
+   "how": "Fonctionnement",
+   "pricing": "Tarifs",
+   "faq": "FAQ",
+   "privacy": "Confidentialité",
+   "terms": "Conditions",
+   "get_started": "Commencer",
+   "manage_subscription": "Gérer l'abonnement"
+  },
+  "hero": {
+   "badge": "Compatible avec Claude et ChatGPT",
+   "title": "Modifiez votre LaTeX Overleaf en parlant à votre IA",
+   "subtitle": "MiLatexAI relie Claude ou ChatGPT à vos véritables projets Overleaf via Git. Demandez en langage naturel de lire une section, de réécrire le LaTeX, d'insérer une figure ou de vérifier que le document compile toujours — chaque modification arrive dans Overleaf sous la forme d'un véritable commit Git que vous pouvez consulter et annuler.",
+   "cta_primary": "Commencer gratuitement",
+   "cta_secondary": "Voir le fonctionnement",
+   "note": "Formule gratuite : 1 projet et 25 commits d'écriture par mois. Les lectures sont toujours gratuites."
+  },
+  "trust": "Votre jeton Git Overleaf est saisi dans un formulaire web sécurisé, chiffré au repos et n'apparaît jamais dans la conversation. Le connecteur complet est open source sur GitHub sous licence AGPL, vous pouvez donc vérifier précisément ce qu'il fait.",
+  "features": [
+   {
+    "title": "Modifiez par la conversation",
+    "desc": "Demandez à votre IA de resserrer un résumé, de réécrire un paragraphe ou de clarifier une démonstration. Elle lit et modifie le LaTeX réel de votre projet Overleaf, et non une copie."
+   },
+   {
+    "title": "Les modifications vont directement dans Overleaf",
+    "desc": "Les modifications sont poussées vers votre projet via l'intégration Git d'Overleaf, votre article est donc mis à jour sur place. Fini les copier-coller entre une fenêtre de discussion et votre éditeur."
+   },
+   {
+    "title": "Chaque écriture est un véritable commit Git",
+    "desc": "Chaque modification est un authentique commit dans votre historique Overleaf. Vous pouvez le consulter, examiner le diff et le revenir en arrière exactement comme n'importe quel autre commit. Rien ne se produit en silence."
+   },
+   {
+    "title": "Vérifiez que ça compile",
+    "desc": "Demandez à l'IA de confirmer que votre LaTeX se compile toujours avant de vous fier à une modification, afin de repérer un \\\\begin cassé ou une accolade manquante dès maintenant plutôt qu'à l'échéance."
+   },
+   {
+    "title": "Votre jeton reste hors de la conversation",
+    "desc": "Vous collez votre jeton Git Overleaf dans un formulaire web sécurisé, jamais dans la conversation. Il est chiffré au repos et n'est jamais consigné dans la transcription."
+   },
+   {
+    "title": "Open source et vérifiable",
+    "desc": "L'intégralité du connecteur est publique sur GitHub sous licence AGPL, vous pouvez donc lire précisément comment il gère votre jeton et vos projets avant de lui faire confiance."
+   }
+  ],
+  "how": {
+   "title": "De la conversation au commit en trois étapes",
+   "subtitle": "Connectez-vous une fois, puis contentez-vous de parler à votre IA.",
+   "steps": [
+    {
+     "title": "Ajoutez le connecteur et connectez-vous",
+     "desc": "Ajoutez MiLatexAI comme connecteur dans Claude ou ChatGPT et connectez-vous par authentification unique, gérée par WorkOS."
+    },
+    {
+     "title": "Collez votre jeton Overleaf en toute sécurité",
+     "desc": "Lancez start_connect pour obtenir un lien à usage unique vers milatexai.com/connect, puis collez votre jeton Git Overleaf dans le formulaire web. Il est chiffré immédiatement et n'apparaît jamais dans la conversation."
+    },
+    {
+     "title": "Demandez à l'IA de modifier votre article",
+     "desc": "En langage naturel, demandez-lui de lister les fichiers, de lire des sections, de réécrire du LaTeX, d'ajouter des figures ou de vérifier que le document compile. Vos modifications sont validées en direct dans Overleaf."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "Apportez votre propre IA",
+   "subtitle": "MiLatexAI est un connecteur Model Context Protocol, il fonctionne donc avec l'assistant que vous utilisez déjà.",
+   "claude": "Ajoutez MiLatexAI comme connecteur dans Claude d'Anthropic et modifiez vos projets Overleaf depuis n'importe quelle conversation Claude.",
+   "chatgpt": "Ajoutez MiLatexAI comme connecteur dans ChatGPT d'OpenAI et faites de même — mêmes projets, mêmes commits, même historique Overleaf."
+  },
+  "pricing": {
+   "title": "Une tarification simple",
+   "subtitle": "Les lectures sont toujours gratuites et illimitées. Vous ne comptez jamais que les commits d'écriture.",
+   "free": {
+    "name": "Gratuit",
+    "price": "$0",
+    "period": "pour toujours",
+    "features": [
+     "1 projet Overleaf connecté",
+     "25 commits d'écriture par mois",
+     "Lectures illimitées",
+     "Compatible avec Claude et ChatGPT",
+     "Stockage du jeton chiffré"
+    ],
+    "cta": "Commencer gratuitement"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "Bientôt disponible",
+    "period": "",
+    "badge": "Illimité",
+    "features": [
+     "Projets connectés illimités",
+     "Commits d'écriture illimités",
+     "Lectures illimitées",
+     "Compatible avec Claude et ChatGPT",
+     "Stockage du jeton chiffré"
+    ],
+    "cta": "Être prévenu"
+   },
+   "note": "Le tarif Pro n'est pas encore fixé. Laissez votre e-mail et nous vous préviendrons de son lancement."
+  },
+  "faq": {
+   "title": "Les questions que se posent les chercheurs",
+   "items": [
+    {
+     "q": "Mon jeton Overleaf est-il en sécurité ?",
+     "a": "Vous collez votre jeton dans un formulaire web sécurisé sur milatexai.com/connect, jamais dans la conversation. Il est chiffré au repos avec un chiffrement authentifié et n'est jamais consigné dans la transcription de la conversation."
+    },
+    {
+     "q": "Pouvez-vous voir mes documents ?",
+     "a": "Nous ne stockons pas le contenu de vos documents. MiLatexAI lit et modifie vos fichiers sur le moment pour exécuter une demande, mais les seules choses que nous conservons sont l'e-mail de votre compte, votre jeton Overleaf chiffré et un compteur mensuel de commits."
+    },
+    {
+     "q": "Avec quels assistants d'IA fonctionne-t-il ?",
+     "a": "Aussi bien Claude d'Anthropic que ChatGPT d'OpenAI. MiLatexAI est un connecteur Model Context Protocol, vous l'ajoutez donc dans l'assistant que vous utilisez déjà."
+    },
+    {
+     "q": "Que se passe-t-il si j'atteins la limite de 25 commits ?",
+     "a": "Les lectures restent toujours gratuites et illimitées. Une fois atteints les 25 commits d'écriture dans un mois sur la formule gratuite, vous pouvez attendre la réinitialisation du compteur le mois suivant ou passer à Pro à son lancement pour des commits illimités."
+    },
+    {
+     "q": "Est-ce vraiment open source ?",
+     "a": "Oui. L'intégralité du code source est publique sur GitHub sous licence AGPL, vous pouvez donc vérifier précisément ce que fait le connecteur avant de lui confier vos projets."
+    },
+    {
+     "q": "Puis-je me déconnecter ou supprimer mes données ?",
+     "a": "Oui. Vous pouvez déconnecter un projet à tout moment, et vous pouvez nous demander de supprimer votre jeton stocké et les détails de votre compte. Comme nous ne stockons pas vos documents, la déconnexion met immédiatement fin à tout accès."
+    },
+    {
+     "q": "Touche-t-il à des projets que je n'ai pas connectés ?",
+     "a": "Non. MiLatexAI n'accède qu'aux projets Overleaf spécifiques que vous connectez avec le jeton que vous fournissez. Il n'a aucune visibilité sur quoi que ce soit d'autre dans votre compte Overleaf."
+    },
+    {
+     "q": "Mes modifications apparaîtront-elles dans l'historique Overleaf ?",
+     "a": "Oui. Chaque écriture est un véritable commit Git poussé via l'intégration Git d'Overleaf, il apparaît donc dans l'historique de votre projet où vous pouvez examiner le diff ou l'annuler."
+    }
+   ]
+  },
+  "security": {
+   "title": "Conçu pour toucher le moins de choses possible",
+   "subtitle": "Exactement ce que MiLatexAI stocke, et ce qu'il ne stocke délibérément pas.",
+   "points": [
+    {
+     "title": "Votre jeton est chiffré",
+     "desc": "Les jetons Git Overleaf sont chiffrés au repos avec un chiffrement authentifié, et sont saisis dans un formulaire web plutôt que dans la conversation."
+    },
+    {
+     "title": "Nous ne stockons pas vos documents",
+     "desc": "MiLatexAI ne conserve que l'e-mail de votre compte, votre jeton chiffré et un compteur mensuel de commits — jamais le contenu de vos fichiers LaTeX."
+    },
+    {
+     "title": "Uniquement les projets que vous connectez",
+     "desc": "L'accès est limité aux projets Overleaf spécifiques que vous choisissez de connecter. Rien d'autre dans votre compte n'est accessible."
+    },
+    {
+     "title": "Open source, hébergé sur Azure",
+     "desc": "Le code est public sur GitHub sous licence AGPL, la connexion passe par WorkOS AuthKit et le service est hébergé sur Microsoft Azure dans la région du Canada."
+    }
+   ]
+  },
+  "cta": {
+   "title": "Commencez à modifier votre article en parlant à votre IA",
+   "subtitle": "Ajoutez MiLatexAI à Claude ou ChatGPT, connectez un projet Overleaf et essayez gratuitement. Les lectures sont toujours gratuites.",
+   "button": "Commencer gratuitement"
+  },
+  "footer": {
+   "blurb": "MiLatexAI relie Claude et ChatGPT à vos véritables projets Overleaf via Git, pour que vous puissiez lire, modifier et compiler votre LaTeX simplement en parlant à votre IA. Open source sous licence AGPL.",
+   "rights": "© 2026 MiLatexAI. Tous droits réservés.",
+   "language_label": "Langue",
+   "contact_label": "Assistance",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "Politique de confidentialité",
+   "updated_label": "Dernière mise à jour : juillet 2026",
+   "intro": "Cette politique explique, en langage clair, ce que MiLatexAI collecte, ce qu'il ne collecte délibérément pas et comment votre jeton Overleaf est protégé. MiLatexAI est un produit modeste et indépendant, et nous nous efforçons de toucher le moins possible à vos données.",
+   "sections": [
+    {
+     "heading": "Ce que nous collectons",
+     "body": "Nous ne collectons que trois choses : l'adresse e-mail de votre compte (fournie via l'authentification unique), votre jeton Git Overleaf sous forme chiffrée, et un compteur du nombre de commits d'écriture que vous avez effectués au cours du mois en cours. C'est la liste complète."
+    },
+    {
+     "heading": "Ce que nous NE collectons PAS",
+     "body": "Nous ne stockons pas le contenu de vos documents LaTeX, vos figures, vos PDF compilés ni l'historique de vos projets. Les fichiers sont lus et modifiés sur le moment pour exécuter vos demandes et ne sont pas conservés par nous ensuite."
+    },
+    {
+     "heading": "Comment votre jeton est sécurisé",
+     "body": "Votre jeton Git Overleaf est saisi dans un formulaire web sur milatexai.com/connect, jamais dans la conversation, et est chiffré au repos à l'aide d'un chiffrement authentifié. Il n'est utilisé que pour accéder aux projets spécifiques que vous connectez, et n'est jamais affiché dans la transcription de la conversation."
+    },
+    {
+     "heading": "Les tiers auxquels nous faisons appel",
+     "body": "La connexion est gérée par WorkOS AuthKit, qui vous authentifie et fournit votre e-mail. L'hébergement se fait sur Microsoft Azure dans la région du Canada. Vos projets résident sur Overleaf, et MiLatexAI communique avec eux via l'intégration Git d'Overleaf. Nous ne vendons pas vos données et ne les partageons pas au-delà de ce que ces prestataires exigent pour faire fonctionner le service."
+    },
+    {
+     "heading": "Conservation et suppression des données",
+     "body": "Nous conservons votre e-mail, votre jeton chiffré et votre compteur de commits uniquement tant que votre compte est actif. Vous pouvez déconnecter un projet ou nous demander de supprimer vos données stockées à tout moment. Comme nous ne stockons pas vos documents, la déconnexion met immédiatement fin à notre accès à vos projets."
+    },
+    {
+     "heading": "Vos droits",
+     "body": "Vous pouvez demander l'accès aux données limitées que nous détenons à votre sujet, en demander la rectification ou la suppression. Pour faire une demande, contactez-nous à l'adresse ci-dessous."
+    },
+    {
+     "heading": "Contact",
+     "body": "Les questions relatives à la confidentialité peuvent être envoyées à support@milatexai.com. Il s'agit d'une adresse d'assistance provisoire pour un produit à ses débuts, et nous répondrons dès que possible."
+    }
+   ]
+  },
+  "terms": {
+   "title": "Conditions d'utilisation",
+   "updated_label": "Dernière mise à jour : juillet 2026",
+   "intro": "Ces conditions expliquent ce que MiLatexAI fournit et les conditions dans lesquelles vous pouvez l'utiliser. MiLatexAI est un produit modeste, indépendant et open source, veuillez donc lire attentivement les sections sur la disponibilité et la responsabilité.",
+   "sections": [
+    {
+     "heading": "Le service",
+     "body": "MiLatexAI est un connecteur qui permet à des assistants d'IA tels que Claude d'Anthropic et ChatGPT d'OpenAI de lire, modifier et compiler vos projets LaTeX Overleaf via l'intégration Git d'Overleaf, à travers le Model Context Protocol. Vous dirigez l'IA en langage naturel, et vos modifications sont poussées vers votre projet Overleaf sous forme de commits Git."
+    },
+    {
+     "heading": "Utilisation acceptable",
+     "body": "N'utilisez MiLatexAI qu'avec des projets et des comptes Overleaf auxquels vous êtes autorisé à accéder. Ne l'utilisez pas pour enfreindre les conditions d'Overleaf, pour porter atteinte aux droits d'autrui, ni pour tenter de perturber ou de contourner la sécurité du service. Il vous incombe d'examiner les modifications apportées par votre assistant d'IA avant de vous y fier."
+    },
+    {
+     "heading": "Votre compte et vos jetons Overleaf",
+     "body": "Il vous incombe de maintenir votre jeton Git Overleaf valide et de répondre des actions effectuées sous ce jeton via le connecteur. Nous chiffrons le jeton que vous fournissez et ne l'utilisons que pour accéder aux projets que vous connectez, mais vous restez maître de votre propre compte Overleaf et de ses permissions."
+    },
+    {
+     "heading": "Disponibilité et « en l'état »",
+     "body": "Le service est fourni « en l'état » et « selon disponibilité », sans garantie d'aucune sorte. En tant que produit indépendant à ses débuts, MiLatexAI peut connaître des interruptions, des bugs ou des évolutions, et nous ne garantissons pas qu'il sera ininterrompu, exempt d'erreurs, ni que chaque modification se compilera correctement."
+    },
+    {
+     "heading": "Limitation de responsabilité",
+     "body": "Dans toute la mesure permise par la loi, MiLatexAI et ses mainteneurs ne sont pas responsables des dommages indirects, accessoires ou consécutifs, ni des données ou du travail perdus, résultant de votre utilisation du service. Conservez toujours vos propres copies et appuyez-vous sur l'historique Git d'Overleaf pour examiner et annuler les modifications."
+    },
+    {
+     "heading": "Code open source",
+     "body": "Le code source de MiLatexAI est publié sous licence GNU AGPL. Votre utilisation du service hébergé est régie par les présentes conditions, tandis que votre utilisation du code source est en outre régie par l'AGPL. Vous êtes libre de lire, d'auditer et d'auto-héberger le code conformément à cette licence."
+    },
+    {
+     "heading": "Résiliation",
+     "body": "Vous pouvez cesser d'utiliser MiLatexAI et déconnecter vos projets à tout moment. Nous pouvons suspendre ou mettre fin à l'accès en cas de violation des présentes conditions ou si nous devons interrompre le service, et nous nous efforcerons raisonnablement de vous en informer."
+    },
+    {
+     "heading": "Modifications des présentes conditions",
+     "body": "Nous pouvons mettre à jour ces conditions à mesure que le produit évolue. Lorsque nous apportons des modifications importantes, nous mettrons à jour la date ci-dessus, et la poursuite de l'utilisation du service vaut acceptation des conditions révisées."
+    },
+    {
+     "heading": "Contact",
+     "body": "Les questions relatives aux présentes conditions peuvent être envoyées à support@milatexai.com, une adresse d'assistance provisoire pour ce produit à ses débuts."
+    }
+   ]
+  }
+ },
+ "es": {
+  "brand_tagline": "Habla con tu IA. Edita tu artículo real de Overleaf.",
+  "nav": {
+   "features": "Funciones",
+   "how": "Cómo funciona",
+   "pricing": "Precios",
+   "faq": "Preguntas frecuentes",
+   "privacy": "Privacidad",
+   "terms": "Términos",
+   "get_started": "Empieza ahora",
+   "manage_subscription": "Gestionar suscripción"
+  },
+  "hero": {
+   "badge": "Compatible con Claude y ChatGPT",
+   "title": "Edita tu LaTeX de Overleaf hablando con tu IA",
+   "subtitle": "MiLatexAI conecta Claude o ChatGPT con tus proyectos reales de Overleaf a través de Git. Pide en lenguaje natural que lea una sección, reescriba el LaTeX, inserte una figura o compruebe que sigue compilando: cada cambio llega a Overleaf como un commit de Git real que puedes ver y revertir.",
+   "cta_primary": "Empieza gratis",
+   "cta_secondary": "Descubre cómo funciona",
+   "note": "Plan gratuito: 1 proyecto y 25 commits de escritura al mes. Las lecturas son siempre gratuitas."
+  },
+  "trust": "Tu token de Git de Overleaf se introduce en un formulario web seguro, se cifra en reposo y nunca aparece en el chat. El conector completo es de código abierto en GitHub bajo la licencia AGPL, así que puedes auditar exactamente lo que hace.",
+  "features": [
+   {
+    "title": "Edita conversando",
+    "desc": "Pídele a tu IA que ajuste un resumen, reescriba un párrafo o depure una demostración. Lee y edita el LaTeX real de tu proyecto de Overleaf, no una copia."
+   },
+   {
+    "title": "Los cambios van directos a Overleaf",
+    "desc": "Las ediciones se envían a tu proyecto mediante la integración de Git de Overleaf, de modo que tu artículo se actualiza en su sitio. Sin copiar y pegar entre la ventana de chat y tu editor."
+   },
+   {
+    "title": "Cada escritura es un commit de Git real",
+    "desc": "Cada cambio es un commit genuino en tu historial de Overleaf. Puedes verlo, revisar el diff y revertirlo igual que cualquier otro commit. Nada ocurre en silencio."
+   },
+   {
+    "title": "Comprueba que compila",
+    "desc": "Pídele a la IA que confirme que tu LaTeX sigue compilando antes de fiarte de una edición, para detectar un \\\\begin roto o una llave que falta ahora y no en plena fecha límite."
+   },
+   {
+    "title": "Tu token queda fuera del chat",
+    "desc": "Pegas tu token de Git de Overleaf en un formulario web seguro, nunca en la conversación. Se cifra en reposo y jamás se escribe en la transcripción."
+   },
+   {
+    "title": "Código abierto y auditable",
+    "desc": "Todo el conector es público en GitHub bajo la licencia AGPL, así que puedes leer con precisión cómo maneja tu token y tus proyectos antes de confiar en él."
+   }
+  ],
+  "how": {
+   "title": "Del chat al commit en tres pasos",
+   "subtitle": "Conéctalo una vez y luego solo habla con tu IA.",
+   "steps": [
+    {
+     "title": "Añade el conector e inicia sesión",
+     "desc": "Añade MiLatexAI como conector en Claude o ChatGPT e inicia sesión con inicio de sesión único, gestionado por WorkOS."
+    },
+    {
+     "title": "Pega tu token de Overleaf de forma segura",
+     "desc": "Ejecuta start_connect para obtener un enlace de un solo uso a milatexai.com/connect y luego pega tu token de Git de Overleaf en el formulario web. Se cifra de inmediato y nunca aparece en el chat."
+    },
+    {
+     "title": "Pídele a la IA que edite tu artículo",
+     "desc": "En lenguaje natural, pídele que enumere archivos, lea secciones, reescriba LaTeX, añada figuras o compruebe que compila. Tus cambios se registran en directo en Overleaf."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "Usa tu propia IA",
+   "subtitle": "MiLatexAI es un conector del Model Context Protocol, así que funciona con el asistente que ya utilizas.",
+   "claude": "Añade MiLatexAI como conector en Claude de Anthropic y edita tus proyectos de Overleaf desde cualquier conversación de Claude.",
+   "chatgpt": "Añade MiLatexAI como conector en ChatGPT de OpenAI y haz lo mismo allí: los mismos proyectos, los mismos commits, el mismo historial de Overleaf."
+  },
+  "pricing": {
+   "title": "Precios sencillos",
+   "subtitle": "Las lecturas son siempre gratuitas e ilimitadas. Solo cuentan los commits de escritura.",
+   "free": {
+    "name": "Gratis",
+    "price": "$0",
+    "period": "para siempre",
+    "features": [
+     "1 proyecto de Overleaf conectado",
+     "25 commits de escritura al mes",
+     "Lecturas ilimitadas",
+     "Compatible con Claude y ChatGPT",
+     "Almacenamiento de token cifrado"
+    ],
+    "cta": "Empieza gratis"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "Muy pronto",
+    "period": "",
+    "badge": "Ilimitado",
+    "features": [
+     "Proyectos conectados ilimitados",
+     "Commits de escritura ilimitados",
+     "Lecturas ilimitadas",
+     "Compatible con Claude y ChatGPT",
+     "Almacenamiento de token cifrado"
+    ],
+    "cta": "Avísame"
+   },
+   "note": "El precio de Pro aún no está fijado. Déjanos tu correo y te avisaremos cuando se lance."
+  },
+  "faq": {
+   "title": "Preguntas que hacen los investigadores",
+   "items": [
+    {
+     "q": "¿Está seguro mi token de Overleaf?",
+     "a": "Pegas tu token en un formulario web seguro en milatexai.com/connect, nunca en el chat. Se cifra en reposo con cifrado autenticado y jamás se escribe en la transcripción de la conversación."
+    },
+    {
+     "q": "¿Podéis ver mis documentos?",
+     "a": "No almacenamos el contenido de tus documentos. MiLatexAI lee y edita tus archivos en el momento para llevar a cabo una petición, pero lo único que conservamos es el correo de tu cuenta, tu token de Overleaf cifrado y un contador mensual de commits."
+    },
+    {
+     "q": "¿Con qué asistentes de IA funciona?",
+     "a": "Tanto con Claude de Anthropic como con ChatGPT de OpenAI. MiLatexAI es un conector del Model Context Protocol, así que lo añades en el asistente que ya utilices."
+    },
+    {
+     "q": "¿Qué ocurre si alcanzo el límite de 25 commits?",
+     "a": "Las lecturas siempre son gratuitas e ilimitadas. Una vez que llegas a 25 commits de escritura en un mes en el plan gratuito, puedes esperar a que el contador se reinicie el mes siguiente o pasarte a Pro cuando se lance para tener commits ilimitados."
+    },
+    {
+     "q": "¿Es realmente de código abierto?",
+     "a": "Sí. Todo el código fuente es público en GitHub bajo la licencia AGPL, así que puedes auditar exactamente lo que hace el conector antes de confiarle tus proyectos."
+    },
+    {
+     "q": "¿Puedo desconectarme o eliminar mis datos?",
+     "a": "Sí. Puedes desconectar un proyecto en cualquier momento y puedes pedirnos que eliminemos tu token almacenado y los datos de tu cuenta. Como no almacenamos tus documentos, desconectarte detiene todo acceso de inmediato."
+    },
+    {
+     "q": "¿Accede a proyectos que no he conectado?",
+     "a": "No. MiLatexAI solo accede a los proyectos concretos de Overleaf que conectas con el token que proporcionas. No tiene visibilidad de nada más en tu cuenta de Overleaf."
+    },
+    {
+     "q": "¿Aparecerán mis cambios en el historial de Overleaf?",
+     "a": "Sí. Cada escritura es un commit de Git real enviado mediante la integración de Git de Overleaf, así que aparece en el historial de tu proyecto, donde puedes revisar el diff o revertirlo."
+    }
+   ]
+  },
+  "security": {
+   "title": "Diseñado para tocar lo mínimo posible",
+   "subtitle": "Exactamente lo que MiLatexAI almacena y lo que deliberadamente no almacena.",
+   "points": [
+    {
+     "title": "Tu token está cifrado",
+     "desc": "Los tokens de Git de Overleaf se cifran en reposo con cifrado autenticado y se introducen en un formulario web en lugar de en el chat."
+    },
+    {
+     "title": "No almacenamos tus documentos",
+     "desc": "MiLatexAI conserva únicamente el correo de tu cuenta, tu token cifrado y un contador mensual de commits, nunca el contenido de tus archivos LaTeX."
+    },
+    {
+     "title": "Solo los proyectos que conectas",
+     "desc": "El acceso se limita a los proyectos concretos de Overleaf que decides conectar. Nada más de tu cuenta es accesible."
+    },
+    {
+     "title": "Código abierto, ejecutado en Azure",
+     "desc": "El código es público en GitHub bajo la licencia AGPL, el inicio de sesión funciona a través de WorkOS AuthKit y el servicio está alojado en Microsoft Azure en la región de Canadá."
+    }
+   ]
+  },
+  "cta": {
+   "title": "Empieza a editar tu artículo hablando con tu IA",
+   "subtitle": "Añade MiLatexAI a Claude o ChatGPT, conecta un proyecto de Overleaf y pruébalo gratis. Las lecturas son siempre gratuitas.",
+   "button": "Empieza gratis"
+  },
+  "footer": {
+   "blurb": "MiLatexAI conecta Claude y ChatGPT con tus proyectos reales de Overleaf a través de Git, para que puedas leer, editar y compilar tu LaTeX con solo hablar con tu IA. Código abierto bajo la licencia AGPL.",
+   "rights": "© 2026 MiLatexAI. Todos los derechos reservados.",
+   "language_label": "Idioma",
+   "contact_label": "Soporte",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "Política de Privacidad",
+   "updated_label": "Última actualización: julio de 2026",
+   "intro": "Esta política explica, en lenguaje sencillo, qué recopila MiLatexAI, qué decide deliberadamente no recopilar y cómo se protege tu token de Overleaf. MiLatexAI es un producto pequeño e independiente, y procuramos tocar la menor cantidad posible de tus datos.",
+   "sections": [
+    {
+     "heading": "Qué recopilamos",
+     "body": "Recopilamos solo tres cosas: la dirección de correo de tu cuenta (proporcionada mediante inicio de sesión único), tu token de Git de Overleaf en forma cifrada y un contador de cuántos commits de escritura has realizado en el mes en curso. Esa es la lista completa."
+    },
+    {
+     "heading": "Qué NO recopilamos",
+     "body": "No almacenamos el contenido de tus documentos LaTeX, tus figuras, tus PDF compilados ni el historial de tu proyecto. Los archivos se leen y editan en el momento para atender tus peticiones y no los conservamos después."
+    },
+    {
+     "heading": "Cómo se protege tu token",
+     "body": "Tu token de Git de Overleaf se introduce en un formulario web en milatexai.com/connect, nunca en el chat, y se cifra en reposo con cifrado autenticado. Se usa únicamente para acceder a los proyectos concretos que conectas y nunca se muestra en la transcripción de la conversación."
+    },
+    {
+     "heading": "Terceros de los que dependemos",
+     "body": "El inicio de sesión lo gestiona WorkOS AuthKit, que te autentica y proporciona tu correo. El alojamiento está en Microsoft Azure en la región de Canadá. Tus proyectos residen en Overleaf, y MiLatexAI se comunica con ellos mediante la integración de Git de Overleaf. No vendemos tus datos ni los compartimos más allá de lo que estos proveedores requieren para operar el servicio."
+    },
+    {
+     "heading": "Conservación y eliminación de datos",
+     "body": "Conservamos tu correo, tu token cifrado y el contador de commits solo mientras tu cuenta esté activa. Puedes desconectar un proyecto o pedirnos que eliminemos tus datos almacenados en cualquier momento. Como no almacenamos tus documentos, desconectarte pone fin de inmediato a nuestro acceso a tus proyectos."
+    },
+    {
+     "heading": "Tus derechos",
+     "body": "Puedes solicitar acceso a los datos limitados que conservamos sobre ti, pedir que se corrijan o pedir que se eliminen. Para hacer una solicitud, contáctanos en la dirección indicada más abajo."
+    },
+    {
+     "heading": "Contacto",
+     "body": "Las preguntas sobre privacidad pueden enviarse a support@milatexai.com. Esta es una dirección de soporte provisional para un producto en fase inicial, y responderemos tan pronto como podamos."
+    }
+   ]
+  },
+  "terms": {
+   "title": "Términos del Servicio",
+   "updated_label": "Última actualización: julio de 2026",
+   "intro": "Estos términos explican qué ofrece MiLatexAI y sobre qué base puedes utilizarlo. MiLatexAI es un producto pequeño, independiente y de código abierto, así que lee con atención las secciones de disponibilidad y responsabilidad.",
+   "sections": [
+    {
+     "heading": "El servicio",
+     "body": "MiLatexAI es un conector que permite a asistentes de IA como Claude de Anthropic y ChatGPT de OpenAI leer, editar y compilar tus proyectos LaTeX de Overleaf mediante la integración de Git de Overleaf, a través del Model Context Protocol. Tú diriges a la IA en lenguaje natural y tus cambios se envían a tu proyecto de Overleaf como commits de Git."
+    },
+    {
+     "heading": "Uso aceptable",
+     "body": "Usa MiLatexAI únicamente con proyectos y cuentas de Overleaf a los que estés autorizado a acceder. No lo uses para infringir los términos de Overleaf, para vulnerar los derechos de terceros ni para intentar interrumpir o burlar la seguridad del servicio. Eres responsable de revisar los cambios que realiza tu asistente de IA antes de fiarte de ellos."
+    },
+    {
+     "heading": "Tu cuenta y tokens de Overleaf",
+     "body": "Eres responsable de mantener válido tu token de Git de Overleaf y de las acciones realizadas con él a través del conector. Ciframos el token que proporcionas y lo usamos únicamente para acceder a los proyectos que conectas, pero tú mantienes el control de tu propia cuenta de Overleaf y sus permisos."
+    },
+    {
+     "heading": "Disponibilidad y \"tal cual\"",
+     "body": "El servicio se proporciona \"tal cual\" y \"según disponibilidad\", sin garantías de ningún tipo. Al ser un producto independiente en fase inicial, MiLatexAI puede tener caídas, errores o cambios, y no garantizamos que sea ininterrumpido, esté libre de errores ni que cada edición compile correctamente."
+    },
+    {
+     "heading": "Limitación de responsabilidad",
+     "body": "En la máxima medida permitida por la ley, MiLatexAI y sus responsables no se hacen responsables de daños indirectos, incidentales o consecuentes, ni de la pérdida de datos o de trabajo, derivados de tu uso del servicio. Mantén siempre tus propias copias y apóyate en el historial de Git de Overleaf para revisar y revertir cambios."
+    },
+    {
+     "heading": "Código abierto",
+     "body": "El código fuente de MiLatexAI se publica bajo la licencia GNU AGPL. Tu uso del servicio alojado se rige por estos términos, mientras que tu uso del código fuente se rige además por la AGPL. Puedes leer, auditar y autoalojar el código conforme a esa licencia."
+    },
+    {
+     "heading": "Cancelación",
+     "body": "Puedes dejar de usar MiLatexAI y desconectar tus proyectos en cualquier momento. Podemos suspender o poner fin al acceso si se incumplen estos términos o si necesitamos descontinuar el servicio, y haremos esfuerzos razonables por avisarte."
+    },
+    {
+     "heading": "Cambios en estos términos",
+     "body": "Podemos actualizar estos términos a medida que el producto evoluciona. Cuando hagamos cambios sustanciales, actualizaremos la fecha indicada arriba, y el uso continuado del servicio significa que aceptas los términos revisados."
+    },
+    {
+     "heading": "Contacto",
+     "body": "Las preguntas sobre estos términos pueden enviarse a support@milatexai.com, una dirección de soporte provisional para este producto en fase inicial."
+    }
+   ]
+  }
+ },
+ "de": {
+  "brand_tagline": "Sprich mit deiner KI. Bearbeite dein echtes Overleaf-Paper.",
+  "nav": {
+   "features": "Funktionen",
+   "how": "So funktioniert's",
+   "pricing": "Preise",
+   "faq": "FAQ",
+   "privacy": "Datenschutz",
+   "terms": "AGB",
+   "get_started": "Loslegen",
+   "manage_subscription": "Abo verwalten"
+  },
+  "hero": {
+   "badge": "Funktioniert mit Claude und ChatGPT",
+   "title": "Bearbeite dein Overleaf-LaTeX im Gespräch mit deiner KI",
+   "subtitle": "MiLatexAI verbindet Claude oder ChatGPT über Git mit deinen echten Overleaf-Projekten. Bitte einfach in normaler Sprache darum, einen Abschnitt zu lesen, das LaTeX umzuschreiben, eine Abbildung einzufügen oder zu prüfen, ob es noch kompiliert – jede Änderung landet als echter Git-Commit in Overleaf, den du einsehen und rückgängig machen kannst.",
+   "cta_primary": "Kostenlos starten",
+   "cta_secondary": "So funktioniert's",
+   "note": "Kostenloser Plan: 1 Projekt und 25 Schreib-Commits pro Monat. Lesen ist immer kostenlos."
+  },
+  "trust": "Dein Overleaf-Git-Token wird über ein sicheres Webformular eingegeben, verschlüsselt gespeichert und erscheint nie im Chat. Der vollständige Connector ist auf GitHub unter der AGPL-Lizenz quelloffen, sodass du genau prüfen kannst, was er tut.",
+  "features": [
+   {
+    "title": "Bearbeiten im Gespräch",
+    "desc": "Bitte deine KI, ein Abstract zu straffen, einen Absatz umzuschreiben oder einen Beweis aufzuräumen. Sie liest und bearbeitet das echte LaTeX in deinem Overleaf-Projekt, nicht eine Kopie."
+   },
+   {
+    "title": "Änderungen gehen direkt nach Overleaf",
+    "desc": "Bearbeitungen werden über Overleafs Git-Integration in dein Projekt gepusht, sodass dein Paper direkt aktualisiert wird. Kein Kopieren und Einfügen zwischen Chatfenster und Editor."
+   },
+   {
+    "title": "Jeder Schreibvorgang ist ein echter Git-Commit",
+    "desc": "Jede Änderung ist ein echter Commit in deiner Overleaf-Historie. Du kannst ihn einsehen, das Diff prüfen und ihn genau wie jeden anderen Commit rückgängig machen. Nichts passiert im Verborgenen."
+   },
+   {
+    "title": "Prüfen, ob es kompiliert",
+    "desc": "Bitte die KI zu bestätigen, dass dein LaTeX noch baut, bevor du einer Bearbeitung vertraust – so fängst du ein kaputtes \\\\begin oder eine fehlende Klammer jetzt ab und nicht erst zur Deadline."
+   },
+   {
+    "title": "Dein Token bleibt aus dem Chat heraus",
+    "desc": "Du fügst dein Overleaf-Git-Token in ein sicheres Webformular ein, nie in die Unterhaltung. Es wird verschlüsselt gespeichert und nie ins Protokoll geschrieben."
+   },
+   {
+    "title": "Quelloffen und überprüfbar",
+    "desc": "Der gesamte Connector ist auf GitHub unter der AGPL-Lizenz öffentlich, sodass du genau nachlesen kannst, wie er mit deinem Token und deinen Projekten umgeht, bevor du ihm vertraust."
+   }
+  ],
+  "how": {
+   "title": "Vom Chat zum Commit in drei Schritten",
+   "subtitle": "Einmal verbinden, dann einfach mit deiner KI sprechen.",
+   "steps": [
+    {
+     "title": "Connector hinzufügen und anmelden",
+     "desc": "Füge MiLatexAI als Connector in Claude oder ChatGPT hinzu und melde dich per Single Sign-on an, abgewickelt über WorkOS."
+    },
+    {
+     "title": "Overleaf-Token sicher einfügen",
+     "desc": "Führe start_connect aus, um einen einmaligen Link zu milatexai.com/connect zu erhalten, und füge dann dein Overleaf-Git-Token in das Webformular ein. Es wird sofort verschlüsselt und erscheint nie im Chat."
+    },
+    {
+     "title": "Bitte die KI, dein Paper zu bearbeiten",
+     "desc": "Bitte sie in normaler Sprache, Dateien aufzulisten, Abschnitte zu lesen, LaTeX umzuschreiben, Abbildungen hinzuzufügen oder zu prüfen, ob es kompiliert. Deine Änderungen werden live nach Overleaf committet."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "Nutze deine eigene KI",
+   "subtitle": "MiLatexAI ist ein Connector für das Model Context Protocol und funktioniert daher mit dem Assistenten, den du bereits nutzt.",
+   "claude": "Füge MiLatexAI als Connector in Anthropics Claude hinzu und bearbeite deine Overleaf-Projekte aus jeder Claude-Unterhaltung heraus.",
+   "chatgpt": "Füge MiLatexAI als Connector in OpenAIs ChatGPT hinzu und mach dort dasselbe – dieselben Projekte, dieselben Commits, dieselbe Overleaf-Historie."
+  },
+  "pricing": {
+   "title": "Einfache Preise",
+   "subtitle": "Lesen ist immer kostenlos und unbegrenzt. Gezählt werden nur Schreib-Commits.",
+   "free": {
+    "name": "Kostenlos",
+    "price": "$0",
+    "period": "für immer",
+    "features": [
+     "1 verbundenes Overleaf-Projekt",
+     "25 Schreib-Commits pro Monat",
+     "Unbegrenztes Lesen",
+     "Funktioniert mit Claude und ChatGPT",
+     "Verschlüsselte Token-Speicherung"
+    ],
+    "cta": "Kostenlos starten"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "Demnächst verfügbar",
+    "period": "",
+    "badge": "Unbegrenzt",
+    "features": [
+     "Unbegrenzt verbundene Projekte",
+     "Unbegrenzte Schreib-Commits",
+     "Unbegrenztes Lesen",
+     "Funktioniert mit Claude und ChatGPT",
+     "Verschlüsselte Token-Speicherung"
+    ],
+    "cta": "Benachrichtigen lassen"
+   },
+   "note": "Der Pro-Preis steht noch nicht fest. Hinterlasse deine E-Mail-Adresse, und wir informieren dich zum Start."
+  },
+  "faq": {
+   "title": "Fragen, die Forschende stellen",
+   "items": [
+    {
+     "q": "Ist mein Overleaf-Token sicher?",
+     "a": "Du fügst dein Token in ein sicheres Webformular unter milatexai.com/connect ein, nie in den Chat. Es wird mit authentifizierter Verschlüsselung gespeichert und nie in das Gesprächsprotokoll geschrieben."
+    },
+    {
+     "q": "Könnt ihr meine Dokumente sehen?",
+     "a": "Wir speichern die Inhalte deiner Dokumente nicht. MiLatexAI liest und bearbeitet deine Dateien im Moment der Anfrage, aber das Einzige, was wir behalten, sind deine Konto-E-Mail, dein verschlüsseltes Overleaf-Token und ein monatlicher Commit-Zähler."
+    },
+    {
+     "q": "Mit welchen KI-Assistenten funktioniert es?",
+     "a": "Sowohl mit Anthropics Claude als auch mit OpenAIs ChatGPT. MiLatexAI ist ein Connector für das Model Context Protocol, du fügst ihn also in dem Assistenten hinzu, den du bereits nutzt."
+    },
+    {
+     "q": "Was passiert, wenn ich das Limit von 25 Commits erreiche?",
+     "a": "Lesen bleibt immer kostenlos und unbegrenzt. Sobald du im kostenlosen Plan 25 Schreib-Commits pro Monat erreicht hast, kannst du auf das Zurücksetzen des Zählers im nächsten Monat warten oder zu Pro wechseln, sobald es für unbegrenzte Commits verfügbar ist."
+    },
+    {
+     "q": "Ist es wirklich quelloffen?",
+     "a": "Ja. Der vollständige Quellcode ist auf GitHub unter der AGPL-Lizenz öffentlich, sodass du genau prüfen kannst, was der Connector tut, bevor du ihm deine Projekte anvertraust."
+    },
+    {
+     "q": "Kann ich die Verbindung trennen oder meine Daten löschen?",
+     "a": "Ja. Du kannst ein Projekt jederzeit trennen und uns bitten, dein gespeichertes Token und deine Kontodaten zu löschen. Da wir deine Dokumente nicht speichern, beendet das Trennen jeglichen Zugriff sofort."
+    },
+    {
+     "q": "Greift es auf Projekte zu, die ich nicht verbunden habe?",
+     "a": "Nein. MiLatexAI greift nur auf die konkreten Overleaf-Projekte zu, die du mit dem von dir bereitgestellten Token verbindest. Es hat keinerlei Einblick in irgendetwas anderes in deinem Overleaf-Konto."
+    },
+    {
+     "q": "Erscheinen meine Änderungen in der Overleaf-Historie?",
+     "a": "Ja. Jeder Schreibvorgang ist ein echter Git-Commit, der über Overleafs Git-Integration gepusht wird, sodass er in deiner Projekthistorie erscheint, wo du das Diff prüfen oder ihn rückgängig machen kannst."
+    }
+   ]
+  },
+  "security": {
+   "title": "Entwickelt, um so wenig wie möglich zu berühren",
+   "subtitle": "Genau das, was MiLatexAI speichert – und was es bewusst nicht speichert.",
+   "points": [
+    {
+     "title": "Dein Token ist verschlüsselt",
+     "desc": "Overleaf-Git-Tokens werden mit authentifizierter Verschlüsselung gespeichert und über ein Webformular statt im Chat eingegeben."
+    },
+    {
+     "title": "Wir speichern deine Dokumente nicht",
+     "desc": "MiLatexAI behält nur deine Konto-E-Mail, dein verschlüsseltes Token und einen monatlichen Commit-Zähler – niemals die Inhalte deiner LaTeX-Dateien."
+    },
+    {
+     "title": "Nur die Projekte, die du verbindest",
+     "desc": "Der Zugriff beschränkt sich auf die konkreten Overleaf-Projekte, die du verbinden möchtest. Nichts anderes in deinem Konto ist erreichbar."
+    },
+    {
+     "title": "Quelloffen, betrieben auf Azure",
+     "desc": "Der Code ist auf GitHub unter der AGPL-Lizenz öffentlich, die Anmeldung läuft über WorkOS AuthKit, und der Dienst wird auf Microsoft Azure in der Region Kanada gehostet."
+    }
+   ]
+  },
+  "cta": {
+   "title": "Beginne, dein Paper im Gespräch mit deiner KI zu bearbeiten",
+   "subtitle": "Füge MiLatexAI zu Claude oder ChatGPT hinzu, verbinde ein Overleaf-Projekt und teste es kostenlos. Lesen ist immer kostenlos.",
+   "button": "Kostenlos starten"
+  },
+  "footer": {
+   "blurb": "MiLatexAI verbindet Claude und ChatGPT über Git mit deinen echten Overleaf-Projekten, sodass du dein LaTeX einfach im Gespräch mit deiner KI lesen, bearbeiten und kompilieren kannst. Quelloffen unter der AGPL-Lizenz.",
+   "rights": "© 2026 MiLatexAI. Alle Rechte vorbehalten.",
+   "language_label": "Sprache",
+   "contact_label": "Support",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "Datenschutzerklärung",
+   "updated_label": "Zuletzt aktualisiert: Juli 2026",
+   "intro": "Diese Erklärung beschreibt in verständlicher Sprache, was MiLatexAI erhebt, was es bewusst nicht erhebt und wie dein Overleaf-Token geschützt wird. MiLatexAI ist ein kleines, unabhängiges Produkt, und wir versuchen, so wenig wie möglich von deinen Daten zu berühren.",
+   "sections": [
+    {
+     "heading": "Was wir erheben",
+     "body": "Wir erheben nur drei Dinge: deine Konto-E-Mail-Adresse (über Single Sign-on bereitgestellt), dein Overleaf-Git-Token in verschlüsselter Form und einen Zähler, wie viele Schreib-Commits du im aktuellen Monat vorgenommen hast. Das ist die vollständige Liste."
+    },
+    {
+     "heading": "Was wir NICHT erheben",
+     "body": "Wir speichern nicht die Inhalte deiner LaTeX-Dokumente, deine Abbildungen, deine kompilierten PDFs oder deine Projekthistorie. Dateien werden im Moment gelesen und bearbeitet, um deine Anfragen auszuführen, und danach nicht von uns aufbewahrt."
+    },
+    {
+     "heading": "Wie dein Token gesichert wird",
+     "body": "Dein Overleaf-Git-Token wird in ein Webformular unter milatexai.com/connect eingegeben, nie in den Chat, und mit authentifizierter Verschlüsselung gespeichert. Es wird nur verwendet, um auf die konkreten Projekte zuzugreifen, die du verbindest, und wird nie im Gesprächsprotokoll angezeigt."
+    },
+    {
+     "heading": "Dritte, auf die wir uns stützen",
+     "body": "Die Anmeldung wird von WorkOS AuthKit abgewickelt, das dich authentifiziert und deine E-Mail-Adresse bereitstellt. Das Hosting läuft auf Microsoft Azure in der Region Kanada. Deine Projekte liegen auf Overleaf, und MiLatexAI kommuniziert mit ihnen über Overleafs Git-Integration. Wir verkaufen deine Daten nicht und geben sie nicht über das hinaus weiter, was diese Anbieter zum Betrieb des Dienstes benötigen."
+    },
+    {
+     "heading": "Datenspeicherung und Löschung",
+     "body": "Wir bewahren deine E-Mail-Adresse, dein verschlüsseltes Token und deinen Commit-Zähler nur auf, solange dein Konto aktiv ist. Du kannst jederzeit ein Projekt trennen oder uns bitten, deine gespeicherten Daten zu löschen. Da wir deine Dokumente nicht speichern, beendet das Trennen unseren Zugriff auf deine Projekte sofort."
+    },
+    {
+     "heading": "Deine Rechte",
+     "body": "Du kannst Auskunft über die begrenzten Daten verlangen, die wir über dich speichern, ihre Berichtigung oder ihre Löschung fordern. Um eine Anfrage zu stellen, kontaktiere uns unter der unten stehenden Adresse."
+    },
+    {
+     "heading": "Kontakt",
+     "body": "Fragen zum Datenschutz können an support@milatexai.com gesendet werden. Dies ist eine vorläufige Support-Adresse für ein Produkt in einem frühen Stadium, und wir antworten, so schnell wir können."
+    }
+   ]
+  },
+  "terms": {
+   "title": "Nutzungsbedingungen",
+   "updated_label": "Zuletzt aktualisiert: Juli 2026",
+   "intro": "Diese Bedingungen erläutern, was MiLatexAI bereitstellt und auf welcher Grundlage du es nutzen darfst. MiLatexAI ist ein kleines, unabhängiges, quelloffenes Produkt, lies daher bitte die Abschnitte zu Verfügbarkeit und Haftung sorgfältig.",
+   "sections": [
+    {
+     "heading": "Der Dienst",
+     "body": "MiLatexAI ist ein Connector, der es KI-Assistenten wie Anthropics Claude und OpenAIs ChatGPT ermöglicht, deine Overleaf-LaTeX-Projekte über Overleafs Git-Integration mithilfe des Model Context Protocol zu lesen, zu bearbeiten und zu kompilieren. Du steuerst die KI in normaler Sprache, und deine Änderungen werden als Git-Commits in dein Overleaf-Projekt gepusht."
+    },
+    {
+     "heading": "Zulässige Nutzung",
+     "body": "Nutze MiLatexAI nur mit Overleaf-Projekten und -Konten, für deren Zugriff du berechtigt bist. Verwende es nicht, um gegen Overleafs Bedingungen zu verstoßen, Rechte Dritter zu verletzen oder die Sicherheit des Dienstes zu stören oder auszuhebeln. Du bist dafür verantwortlich, die Änderungen deines KI-Assistenten zu prüfen, bevor du dich auf sie verlässt."
+    },
+    {
+     "heading": "Dein Overleaf-Konto und deine Tokens",
+     "body": "Du bist dafür verantwortlich, dein Overleaf-Git-Token gültig zu halten, sowie für die über den Connector damit vorgenommenen Handlungen. Wir verschlüsseln das von dir bereitgestellte Token und verwenden es nur für den Zugriff auf die Projekte, die du verbindest, aber du behältst die Kontrolle über dein eigenes Overleaf-Konto und dessen Berechtigungen."
+    },
+    {
+     "heading": "Verfügbarkeit und „wie besehen“",
+     "body": "Der Dienst wird „wie besehen“ und „wie verfügbar“ bereitgestellt, ohne jegliche Gewährleistungen. Als Indie-Produkt in einem frühen Stadium kann MiLatexAI Ausfallzeiten, Fehler oder Änderungen aufweisen, und wir garantieren nicht, dass es unterbrechungsfrei oder fehlerfrei ist oder dass jede Bearbeitung korrekt kompiliert."
+    },
+    {
+     "heading": "Haftungsbeschränkung",
+     "body": "Soweit gesetzlich zulässig, haften MiLatexAI und seine Betreiber nicht für indirekte, zufällige oder Folgeschäden oder für Datenverlust oder verlorene Arbeit, die aus deiner Nutzung des Dienstes entstehen. Bewahre stets eigene Kopien auf und verlasse dich auf Overleafs Git-Historie, um Änderungen zu prüfen und rückgängig zu machen."
+    },
+    {
+     "heading": "Quelloffener Code",
+     "body": "Der Quellcode von MiLatexAI wird unter der GNU-AGPL-Lizenz veröffentlicht. Deine Nutzung des gehosteten Dienstes unterliegt diesen Bedingungen, während deine Nutzung des Quellcodes zusätzlich der AGPL unterliegt. Du darfst den Code gerne im Einklang mit dieser Lizenz lesen, prüfen und selbst hosten."
+    },
+    {
+     "heading": "Kündigung",
+     "body": "Du kannst die Nutzung von MiLatexAI jederzeit einstellen und deine Projekte trennen. Wir können den Zugriff aussetzen oder beenden, wenn gegen diese Bedingungen verstoßen wird oder wenn wir den Dienst einstellen müssen, und wir werden uns in angemessenem Umfang bemühen, dich zu informieren."
+    },
+    {
+     "heading": "Änderungen an diesen Bedingungen",
+     "body": "Wir können diese Bedingungen im Zuge der Weiterentwicklung des Produkts aktualisieren. Bei wesentlichen Änderungen aktualisieren wir das oben stehende Datum, und die fortgesetzte Nutzung des Dienstes bedeutet, dass du die überarbeiteten Bedingungen akzeptierst."
+    },
+    {
+     "heading": "Kontakt",
+     "body": "Fragen zu diesen Bedingungen können an support@milatexai.com gesendet werden, eine vorläufige Support-Adresse für dieses Produkt in einem frühen Stadium."
+    }
+   ]
+  }
+ },
+ "ja": {
+  "brand_tagline": "AIと話すだけ。あなたの実際のOverleaf論文を編集できます。",
+  "nav": {
+   "features": "機能",
+   "how": "仕組み",
+   "pricing": "料金",
+   "faq": "よくある質問",
+   "privacy": "プライバシー",
+   "terms": "利用規約",
+   "get_started": "始める",
+   "manage_subscription": "サブスクリプションの管理"
+  },
+  "hero": {
+   "badge": "ClaudeとChatGPTに対応",
+   "title": "AIと話すだけで、OverleafのLaTeXを編集",
+   "subtitle": "MiLatexAIは、ClaudeまたはChatGPTを、Git経由であなたの実際のOverleafプロジェクトに接続します。セクションを読む、LaTeXを書き直す、図を挿入する、コンパイルが通るか確認する——こうした操作を普段の言葉で頼むだけ。すべての変更は、あなたが確認・取り消しできる本物のGitコミットとしてOverleafに反映されます。",
+   "cta_primary": "無料で始める",
+   "cta_secondary": "仕組みを見る",
+   "note": "無料プラン：プロジェクト1件、書き込みコミットは月25回まで。読み取りは常に無料です。"
+  },
+  "trust": "あなたのOverleaf Gitトークンは、安全なWebフォームから入力され、保存時に暗号化されます。チャット上に表示されることは一切ありません。コネクター全体はAGPLライセンスのもとGitHubでオープンソースとして公開されているため、実際の動作を正確に監査できます。",
+  "features": [
+   {
+    "title": "会話で編集",
+    "desc": "アブストラクトを引き締める、段落を書き直す、証明を整理する——AIにそう頼むだけ。コピーではなく、Overleafプロジェクト内の実際のLaTeXを読み書きします。"
+   },
+   {
+    "title": "変更はそのままOverleafへ",
+    "desc": "編集内容はOverleafのGit連携を通じてプロジェクトへプッシュされ、論文がその場で更新されます。チャット画面とエディターの間でコピー＆ペーストする必要はありません。"
+   },
+   {
+    "title": "すべての書き込みが本物のGitコミット",
+    "desc": "各変更はOverleafの履歴に残る正真正銘のコミットです。確認し、差分をレビューし、他のコミットとまったく同じように取り消せます。何かがひそかに行われることはありません。"
+   },
+   {
+    "title": "コンパイルの確認",
+    "desc": "編集を信頼する前に、AIにLaTeXがまだビルドできるか確認するよう頼めます。壊れた\\\\beginや閉じ忘れた波かっこを、締め切り間際ではなく今のうちに見つけられます。"
+   },
+   {
+    "title": "トークンはチャットに残らない",
+    "desc": "Overleaf Gitトークンは会話ではなく安全なWebフォームに貼り付けます。保存時に暗号化され、記録に書き込まれることはありません。"
+   },
+   {
+    "title": "オープンソースで監査可能",
+    "desc": "コネクター全体がAGPLライセンスのもとGitHubで公開されています。信頼する前に、トークンやプロジェクトがどう扱われるかを正確に読み取れます。"
+   }
+  ],
+  "how": {
+   "title": "チャットからコミットまで、3ステップ",
+   "subtitle": "一度接続すれば、あとはAIに話しかけるだけ。",
+   "steps": [
+    {
+     "title": "コネクターを追加してサインイン",
+     "desc": "ClaudeまたはChatGPTにMiLatexAIをコネクターとして追加し、WorkOSが処理するシングルサインオンでサインインします。"
+    },
+    {
+     "title": "Overleafトークンを安全に貼り付け",
+     "desc": "start_connectを実行してmilatexai.com/connectへのワンタイムリンクを取得し、Overleaf GitトークンをWebフォームに貼り付けます。トークンは即座に暗号化され、チャットに表示されることはありません。"
+    },
+    {
+     "title": "AIに論文の編集を依頼",
+     "desc": "普段の言葉で、ファイル一覧の表示、セクションの読み取り、LaTeXの書き直し、図の追加、コンパイル確認を頼むだけ。変更はOverleafにライブでコミットされます。"
+    }
+   ]
+  },
+  "platforms": {
+   "title": "使い慣れたAIをそのまま",
+   "subtitle": "MiLatexAIはModel Context Protocolのコネクターなので、すでにお使いのアシスタントで動作します。",
+   "claude": "AnthropicのClaudeにMiLatexAIをコネクターとして追加すれば、どのClaudeの会話からでもOverleafプロジェクトを編集できます。",
+   "chatgpt": "OpenAIのChatGPTにMiLatexAIをコネクターとして追加すれば、同じことができます——同じプロジェクト、同じコミット、同じOverleafの履歴。"
+  },
+  "pricing": {
+   "title": "シンプルな料金",
+   "subtitle": "読み取りは常に無料・無制限。カウントされるのは書き込みコミットだけです。",
+   "free": {
+    "name": "無料",
+    "price": "$0",
+    "period": "ずっと無料",
+    "features": [
+     "接続できるOverleafプロジェクト1件",
+     "書き込みコミット月25回",
+     "読み取り無制限",
+     "ClaudeとChatGPTに対応",
+     "トークンの暗号化保存"
+    ],
+    "cta": "無料で始める"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "近日公開",
+    "period": "",
+    "badge": "無制限",
+    "features": [
+     "接続できるプロジェクト無制限",
+     "書き込みコミット無制限",
+     "読み取り無制限",
+     "ClaudeとChatGPTに対応",
+     "トークンの暗号化保存"
+    ],
+    "cta": "通知を受け取る"
+   },
+   "note": "Proの価格はまだ決まっていません。メールアドレスを登録いただければ、公開時にお知らせします。"
+  },
+  "faq": {
+   "title": "研究者からよくある質問",
+   "items": [
+    {
+     "q": "Overleafトークンは安全ですか？",
+     "a": "トークンはチャットではなく、milatexai.com/connectの安全なWebフォームに貼り付けます。認証付き暗号化により保存時に暗号化され、会話の記録に書き込まれることはありません。"
+    },
+    {
+     "q": "私のドキュメントは見えるのですか？",
+     "a": "ドキュメントの内容は保存しません。MiLatexAIはリクエストを実行するその場でファイルを読み書きしますが、保持するのはアカウントのメールアドレス、暗号化されたOverleafトークン、月間コミット数のカウンターのみです。"
+    },
+    {
+     "q": "どのAIアシスタントに対応していますか？",
+     "a": "AnthropicのClaudeとOpenAIのChatGPTの両方です。MiLatexAIはModel Context Protocolのコネクターなので、すでにお使いのアシスタントに追加できます。"
+    },
+    {
+     "q": "月25コミットの上限に達したらどうなりますか？",
+     "a": "読み取りは常に無料・無制限のままです。無料プランで月に書き込みコミット25回に達した場合は、翌月のカウンターのリセットを待つか、公開後にProへ移行すれば無制限にコミットできます。"
+    },
+    {
+     "q": "本当にオープンソースですか？",
+     "a": "はい。全ソースコードがAGPLライセンスのもとGitHubで公開されています。プロジェクトを任せる前に、コネクターの動作を正確に監査できます。"
+    },
+    {
+     "q": "接続を解除したりデータを削除したりできますか？",
+     "a": "はい。いつでもプロジェクトの接続を解除でき、保存されたトークンやアカウント情報の削除を依頼できます。ドキュメントを保存していないため、接続を解除すればすべてのアクセスが直ちに停止します。"
+    },
+    {
+     "q": "接続していないプロジェクトにも触れますか？",
+     "a": "いいえ。MiLatexAIは、あなたが提供したトークンで接続した特定のOverleafプロジェクトにのみアクセスします。Overleafアカウント内のそれ以外の情報は一切見えません。"
+    },
+    {
+     "q": "変更はOverleafの履歴に表示されますか？",
+     "a": "はい。すべての書き込みはOverleafのGit連携を通じてプッシュされる本物のGitコミットなので、プロジェクト履歴に表示され、差分のレビューや取り消しができます。"
+    }
+   ]
+  },
+  "security": {
+   "title": "できるだけ触れないように設計",
+   "subtitle": "MiLatexAIが保存するもの、そして意図的に保存しないもの。",
+   "points": [
+    {
+     "title": "トークンは暗号化されます",
+     "desc": "Overleaf Gitトークンは認証付き暗号化により保存時に暗号化され、チャットではなくWebフォームから入力されます。"
+    },
+    {
+     "title": "ドキュメントは保存しません",
+     "desc": "MiLatexAIが保持するのはアカウントのメールアドレス、暗号化されたトークン、月間コミット数のカウンターのみで、LaTeXファイルの内容は一切保存しません。"
+    },
+    {
+     "title": "接続したプロジェクトのみ",
+     "desc": "アクセスは、あなたが接続を選んだ特定のOverleafプロジェクトに限定されます。アカウント内のそれ以外には一切到達できません。"
+    },
+    {
+     "title": "オープンソース、Azure上で稼働",
+     "desc": "コードはAGPLライセンスのもとGitHubで公開され、サインインはWorkOS AuthKitを通じて行われ、サービスはMicrosoft Azureのカナダリージョンでホストされています。"
+    }
+   ]
+  },
+  "cta": {
+   "title": "AIと話すだけで論文の編集を始めよう",
+   "subtitle": "MiLatexAIをClaudeまたはChatGPTに追加し、Overleafプロジェクトを1件接続して、無料でお試しください。読み取りは常に無料です。",
+   "button": "無料で始める"
+  },
+  "footer": {
+   "blurb": "MiLatexAIは、ClaudeとChatGPTをGit経由であなたの実際のOverleafプロジェクトに接続します。AIに話しかけるだけで、LaTeXの読み取り・編集・コンパイルができます。AGPLライセンスのもとオープンソースで公開。",
+   "rights": "© 2026 MiLatexAI. All rights reserved.",
+   "language_label": "言語",
+   "contact_label": "サポート",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "プライバシーポリシー",
+   "updated_label": "最終更新：2026年7月",
+   "intro": "このポリシーは、MiLatexAIが何を収集し、何を意図的に収集しないか、そしてあなたのOverleafトークンがどのように保護されるかを、平易な言葉で説明します。MiLatexAIは小規模で独立したプロダクトであり、あなたのデータにできるだけ触れないよう努めています。",
+   "sections": [
+    {
+     "heading": "収集する情報",
+     "body": "収集するのは次の3つだけです：アカウントのメールアドレス（シングルサインオンを通じて提供）、暗号化された形式のOverleaf Gitトークン、そして当月に行った書き込みコミット数のカウンター。これがすべてのリストです。"
+    },
+    {
+     "heading": "収集しない情報",
+     "body": "LaTeXドキュメントの内容、図、コンパイル済みPDF、プロジェクト履歴は保存しません。ファイルはリクエストを実行するその場で読み書きされ、その後当社が保持することはありません。"
+    },
+    {
+     "heading": "トークンの保護方法",
+     "body": "Overleaf Gitトークンは、チャットではなくmilatexai.com/connectのWebフォームに入力され、認証付き暗号化により保存時に暗号化されます。トークンは接続した特定のプロジェクトへのアクセスにのみ使用され、会話の記録に表示されることはありません。"
+    },
+    {
+     "heading": "利用する第三者",
+     "body": "サインインはWorkOS AuthKitが処理し、認証を行いメールアドレスを提供します。ホスティングはMicrosoft Azureのカナダリージョンです。あなたのプロジェクトはOverleaf上にあり、MiLatexAIはOverleafのGit連携を通じて通信します。当社はデータを販売せず、サービス運営に必要な範囲を超えてこれらのプロバイダーと共有することはありません。"
+    },
+    {
+     "heading": "データの保持と削除",
+     "body": "メールアドレス、暗号化されたトークン、コミットカウンターは、アカウントが有効な間のみ保持します。いつでもプロジェクトの接続を解除したり、保存データの削除を依頼したりできます。ドキュメントを保存していないため、接続を解除すれば当社によるプロジェクトへのアクセスは直ちに終了します。"
+    },
+    {
+     "heading": "あなたの権利",
+     "body": "当社が保有するあなたに関する限られたデータへのアクセスを求めたり、訂正や削除を依頼したりできます。ご依頼は下記のアドレスまでご連絡ください。"
+    },
+    {
+     "heading": "お問い合わせ",
+     "body": "プライバシーに関するご質問はsupport@milatexai.comまでお送りください。これは初期段階のプロダクトの仮のサポートアドレスであり、できる限り速やかに対応いたします。"
+    }
+   ]
+  },
+  "terms": {
+   "title": "利用規約",
+   "updated_label": "最終更新：2026年7月",
+   "intro": "本規約は、MiLatexAIが提供するものと、それをご利用いただく際の条件を説明します。MiLatexAIは小規模で独立したオープンソースのプロダクトですので、可用性および責任に関する条項を注意深くお読みください。",
+   "sections": [
+    {
+     "heading": "本サービス",
+     "body": "MiLatexAIは、AnthropicのClaudeやOpenAIのChatGPTといったAIアシスタントが、Model Context Protocolを通じ、OverleafのGit連携経由であなたのOverleaf LaTeXプロジェクトを読み取り・編集・コンパイルできるようにするコネクターです。あなたが普段の言葉でAIに指示すると、変更はGitコミットとしてOverleafプロジェクトにプッシュされます。"
+    },
+    {
+     "heading": "許容される利用",
+     "body": "MiLatexAIは、あなたがアクセスを許可されているOverleafプロジェクトおよびアカウントでのみ利用してください。Overleafの規約に違反する、他者の権利を侵害する、またはサービスのセキュリティを妨害・突破しようとする目的での利用は禁止します。AIアシスタントが行った変更を信頼する前に、その内容を確認する責任はあなたにあります。"
+    },
+    {
+     "heading": "Overleafアカウントとトークン",
+     "body": "Overleaf Gitトークンを有効に保つこと、およびコネクターを通じてそのトークンで行われる操作について、あなたが責任を負います。当社は提供されたトークンを暗号化し、接続したプロジェクトへのアクセスにのみ使用しますが、あなた自身のOverleafアカウントとその権限の管理はあなたに委ねられています。"
+    },
+    {
+     "heading": "可用性および「現状有姿」",
+     "body": "本サービスは、いかなる種類の保証もなく「現状有姿」かつ「提供可能な範囲」で提供されます。初期段階の個人プロダクトとして、MiLatexAIにはダウンタイム、バグ、変更が生じる可能性があり、無中断であること、エラーがないこと、すべての編集が正しくコンパイルされることを保証しません。"
+    },
+    {
+     "heading": "責任の制限",
+     "body": "法律で認められる最大限の範囲において、MiLatexAIおよびその保守担当者は、本サービスの利用に起因する間接的・付随的・結果的損害、またはデータの損失や作業の損失について、一切責任を負いません。常にご自身でコピーを保管し、OverleafのGit履歴を用いて変更のレビューや取り消しを行ってください。"
+    },
+    {
+     "heading": "オープンソースコード",
+     "body": "MiLatexAIのソースコードはGNU AGPLライセンスのもとで公開されています。ホスティングされたサービスの利用は本規約に準拠し、ソースコードの利用はさらにAGPLに準拠します。当該ライセンスに従い、コードの閲覧・監査・セルフホストを自由に行っていただけます。"
+    },
+    {
+     "heading": "利用の終了",
+     "body": "いつでもMiLatexAIの利用を停止し、プロジェクトの接続を解除できます。本規約に違反があった場合、またはサービスを終了する必要がある場合、当社はアクセスを停止または終了することがあり、その際は合理的な努力をもってお知らせします。"
+    },
+    {
+     "heading": "本規約の変更",
+     "body": "プロダクトの進化に伴い、本規約を更新することがあります。重要な変更を行う場合は上記の日付を更新し、サービスの継続利用をもって改訂後の規約に同意いただいたものとみなします。"
+    },
+    {
+     "heading": "お問い合わせ",
+     "body": "本規約に関するご質問は、この初期段階のプロダクトの仮のサポートアドレスであるsupport@milatexai.comまでお送りください。"
+    }
+   ]
+  }
+ },
+ "pt": {
+  "brand_tagline": "Converse com sua IA. Edite seu artigo real no Overleaf.",
+  "nav": {
+   "features": "Recursos",
+   "how": "Como funciona",
+   "pricing": "Preços",
+   "faq": "Perguntas frequentes",
+   "privacy": "Privacidade",
+   "terms": "Termos",
+   "get_started": "Começar",
+   "manage_subscription": "Gerenciar assinatura"
+  },
+  "hero": {
+   "badge": "Funciona com Claude e ChatGPT",
+   "title": "Edite seu LaTeX no Overleaf conversando com sua IA",
+   "subtitle": "O MiLatexAI conecta o Claude ou o ChatGPT aos seus projetos reais do Overleaf via Git. Peça em linguagem natural para ler uma seção, reescrever o LaTeX, inserir uma figura ou verificar se ainda compila — cada alteração chega ao Overleaf como um commit Git real que você pode ver e reverter.",
+   "cta_primary": "Comece grátis",
+   "cta_secondary": "Veja como funciona",
+   "note": "Plano gratuito: 1 projeto e 25 commits de escrita por mês. As leituras são sempre gratuitas."
+  },
+  "trust": "Seu token Git do Overleaf é inserido em um formulário web seguro, criptografado em repouso e nunca aparece no chat. O conector completo é de código aberto no GitHub sob a licença AGPL, então você pode auditar exatamente o que ele faz.",
+  "features": [
+   {
+    "title": "Edite conversando",
+    "desc": "Peça à sua IA para enxugar um resumo, reescrever um parágrafo ou organizar uma demonstração. Ela lê e edita o LaTeX real do seu projeto no Overleaf, não uma cópia."
+   },
+   {
+    "title": "As alterações vão direto para o Overleaf",
+    "desc": "As edições são enviadas ao seu projeto pela integração Git do Overleaf, então seu artigo é atualizado no lugar. Sem copiar e colar entre a janela do chat e seu editor."
+   },
+   {
+    "title": "Cada escrita é um commit Git real",
+    "desc": "Cada alteração é um commit genuíno no seu histórico do Overleaf. Você pode vê-lo, revisar o diff e revertê-lo exatamente como qualquer outro commit. Nada acontece silenciosamente."
+   },
+   {
+    "title": "Verifique se compila",
+    "desc": "Peça à IA para confirmar que seu LaTeX ainda compila antes de confiar em uma edição, para que você identifique um \\\\begin quebrado ou uma chave faltando agora, e não na hora do prazo."
+   },
+   {
+    "title": "Seu token fica fora do chat",
+    "desc": "Você cola seu token Git do Overleaf em um formulário web seguro, nunca na conversa. Ele é criptografado em repouso e nunca é registrado na transcrição."
+   },
+   {
+    "title": "Código aberto e auditável",
+    "desc": "O conector inteiro é público no GitHub sob a licença AGPL, então você pode ler exatamente como ele lida com seu token e seus projetos antes de confiar nele."
+   }
+  ],
+  "how": {
+   "title": "Do chat ao commit em três passos",
+   "subtitle": "Conecte uma vez e depois basta conversar com sua IA.",
+   "steps": [
+    {
+     "title": "Adicione o conector e faça login",
+     "desc": "Adicione o MiLatexAI como conector no Claude ou no ChatGPT e faça login com single sign-on, gerenciado pelo WorkOS."
+    },
+    {
+     "title": "Cole seu token do Overleaf com segurança",
+     "desc": "Execute start_connect para obter um link de uso único para milatexai.com/connect e então cole seu token Git do Overleaf no formulário web. Ele é criptografado imediatamente e nunca aparece no chat."
+    },
+    {
+     "title": "Peça à IA para editar seu artigo",
+     "desc": "Em linguagem natural, peça para listar arquivos, ler seções, reescrever LaTeX, adicionar figuras ou verificar se compila. Suas alterações são enviadas em tempo real ao Overleaf como commits."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "Use a IA que você já tem",
+   "subtitle": "O MiLatexAI é um conector do Model Context Protocol, então funciona com o assistente que você já usa.",
+   "claude": "Adicione o MiLatexAI como conector no Claude, da Anthropic, e edite seus projetos do Overleaf a partir de qualquer conversa no Claude.",
+   "chatgpt": "Adicione o MiLatexAI como conector no ChatGPT, da OpenAI, e faça o mesmo por lá — os mesmos projetos, os mesmos commits, o mesmo histórico do Overleaf."
+  },
+  "pricing": {
+   "title": "Preços simples",
+   "subtitle": "As leituras são sempre gratuitas e ilimitadas. Você só conta os commits de escrita.",
+   "free": {
+    "name": "Gratuito",
+    "price": "$0",
+    "period": "para sempre",
+    "features": [
+     "1 projeto do Overleaf conectado",
+     "25 commits de escrita por mês",
+     "Leituras ilimitadas",
+     "Funciona com Claude e ChatGPT",
+     "Armazenamento de token criptografado"
+    ],
+    "cta": "Comece grátis"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "Em breve",
+    "period": "",
+    "badge": "Ilimitado",
+    "features": [
+     "Projetos conectados ilimitados",
+     "Commits de escrita ilimitados",
+     "Leituras ilimitadas",
+     "Funciona com Claude e ChatGPT",
+     "Armazenamento de token criptografado"
+    ],
+    "cta": "Quero ser avisado"
+   },
+   "note": "O preço do Pro ainda não foi definido. Deixe seu e-mail e avisaremos quando ele for lançado."
+  },
+  "faq": {
+   "title": "Perguntas que os pesquisadores fazem",
+   "items": [
+    {
+     "q": "Meu token do Overleaf está seguro?",
+     "a": "Você cola seu token em um formulário web seguro em milatexai.com/connect, nunca no chat. Ele é criptografado em repouso com criptografia autenticada e nunca é registrado na transcrição da conversa."
+    },
+    {
+     "q": "Vocês conseguem ver meus documentos?",
+     "a": "Não armazenamos o conteúdo dos seus documentos. O MiLatexAI lê e edita seus arquivos no momento para atender a uma solicitação, mas as únicas coisas que guardamos são o e-mail da sua conta, seu token do Overleaf criptografado e um contador mensal de commits."
+    },
+    {
+     "q": "Com quais assistentes de IA ele funciona?",
+     "a": "Tanto o Claude, da Anthropic, quanto o ChatGPT, da OpenAI. O MiLatexAI é um conector do Model Context Protocol, então você o adiciona no assistente que já usa."
+    },
+    {
+     "q": "O que acontece se eu atingir o limite de 25 commits?",
+     "a": "As leituras permanecem sempre gratuitas e ilimitadas. Assim que você atingir 25 commits de escrita em um mês no plano Gratuito, pode esperar o contador reiniciar no mês seguinte ou migrar para o Pro quando ele for lançado, para ter commits ilimitados."
+    },
+    {
+     "q": "É realmente de código aberto?",
+     "a": "Sim. O código-fonte completo é público no GitHub sob a licença AGPL, então você pode auditar exatamente o que o conector faz antes de confiar seus projetos a ele."
+    },
+    {
+     "q": "Posso me desconectar ou excluir meus dados?",
+     "a": "Sim. Você pode desconectar um projeto a qualquer momento e pode nos pedir para excluir seu token armazenado e os detalhes da sua conta. Como não armazenamos seus documentos, a desconexão interrompe todo o acesso imediatamente."
+    },
+    {
+     "q": "Ele acessa projetos que eu não conectei?",
+     "a": "Não. O MiLatexAI acessa apenas os projetos específicos do Overleaf que você conecta com o token fornecido. Ele não tem visibilidade de nada mais na sua conta do Overleaf."
+    },
+    {
+     "q": "Minhas alterações vão aparecer no histórico do Overleaf?",
+     "a": "Sim. Cada escrita é um commit Git real enviado pela integração Git do Overleaf, então ela aparece no histórico do seu projeto, onde você pode revisar o diff ou revertê-la."
+    }
+   ]
+  },
+  "security": {
+   "title": "Feito para acessar o mínimo possível",
+   "subtitle": "Exatamente o que o MiLatexAI armazena e o que ele deliberadamente não armazena.",
+   "points": [
+    {
+     "title": "Seu token é criptografado",
+     "desc": "Os tokens Git do Overleaf são criptografados em repouso com criptografia autenticada e são inseridos em um formulário web, não no chat."
+    },
+    {
+     "title": "Não armazenamos seus documentos",
+     "desc": "O MiLatexAI guarda apenas o e-mail da sua conta, seu token criptografado e um contador mensal de commits — nunca o conteúdo dos seus arquivos LaTeX."
+    },
+    {
+     "title": "Apenas os projetos que você conecta",
+     "desc": "O acesso é limitado aos projetos específicos do Overleaf que você escolhe conectar. Nada mais na sua conta é acessível."
+    },
+    {
+     "title": "Código aberto, executado no Azure",
+     "desc": "O código é público no GitHub sob a licença AGPL, o login funciona pelo WorkOS AuthKit e o serviço é hospedado no Microsoft Azure na região do Canadá."
+    }
+   ]
+  },
+  "cta": {
+   "title": "Comece a editar seu artigo conversando com sua IA",
+   "subtitle": "Adicione o MiLatexAI ao Claude ou ao ChatGPT, conecte um projeto do Overleaf e experimente grátis. As leituras são sempre gratuitas.",
+   "button": "Comece grátis"
+  },
+  "footer": {
+   "blurb": "O MiLatexAI conecta o Claude e o ChatGPT aos seus projetos reais do Overleaf via Git, para que você possa ler, editar e compilar seu LaTeX apenas conversando com sua IA. Código aberto sob a licença AGPL.",
+   "rights": "© 2026 MiLatexAI. Todos os direitos reservados.",
+   "language_label": "Idioma",
+   "contact_label": "Suporte",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "Política de Privacidade",
+   "updated_label": "Última atualização: julho de 2026",
+   "intro": "Esta política explica, em linguagem simples, o que o MiLatexAI coleta, o que ele deliberadamente não coleta e como seu token do Overleaf é protegido. O MiLatexAI é um produto pequeno e independente, e procuramos acessar o mínimo possível dos seus dados.",
+   "sections": [
+    {
+     "heading": "O que coletamos",
+     "body": "Coletamos apenas três coisas: o endereço de e-mail da sua conta (fornecido via single sign-on), seu token Git do Overleaf de forma criptografada e um contador de quantos commits de escrita você fez no mês atual. Essa é a lista completa."
+    },
+    {
+     "heading": "O que NÃO coletamos",
+     "body": "Não armazenamos o conteúdo dos seus documentos LaTeX, suas figuras, seus PDFs compilados ou o histórico do seu projeto. Os arquivos são lidos e editados no momento para atender às suas solicitações e não são retidos por nós depois."
+    },
+    {
+     "heading": "Como seu token é protegido",
+     "body": "Seu token Git do Overleaf é inserido em um formulário web em milatexai.com/connect, nunca no chat, e é criptografado em repouso usando criptografia autenticada. Ele é usado apenas para acessar os projetos específicos que você conecta e nunca é exibido na transcrição da conversa."
+    },
+    {
+     "heading": "Terceiros dos quais dependemos",
+     "body": "O login é gerenciado pelo WorkOS AuthKit, que autentica você e fornece seu e-mail. A hospedagem é no Microsoft Azure na região do Canadá. Seus projetos ficam no Overleaf, e o MiLatexAI se comunica com eles pela integração Git do Overleaf. Não vendemos seus dados nem os compartilhamos além do que esses provedores exigem para operar o serviço."
+    },
+    {
+     "heading": "Retenção e exclusão de dados",
+     "body": "Mantemos seu e-mail, token criptografado e contador de commits apenas enquanto sua conta estiver ativa. Você pode desconectar um projeto ou nos pedir para excluir seus dados armazenados a qualquer momento. Como não armazenamos seus documentos, a desconexão encerra imediatamente nosso acesso aos seus projetos."
+    },
+    {
+     "heading": "Seus direitos",
+     "body": "Você pode solicitar acesso aos dados limitados que mantemos sobre você, pedir que sejam corrigidos ou pedir que sejam excluídos. Para fazer uma solicitação, entre em contato conosco no endereço abaixo."
+    },
+    {
+     "heading": "Contato",
+     "body": "Dúvidas sobre privacidade podem ser enviadas para support@milatexai.com. Este é um endereço de suporte provisório para um produto em estágio inicial, e responderemos assim que possível."
+    }
+   ]
+  },
+  "terms": {
+   "title": "Termos de Serviço",
+   "updated_label": "Última atualização: julho de 2026",
+   "intro": "Estes termos explicam o que o MiLatexAI oferece e as condições sob as quais você pode usá-lo. O MiLatexAI é um produto pequeno, independente e de código aberto, então leia com atenção as seções de disponibilidade e responsabilidade.",
+   "sections": [
+    {
+     "heading": "O serviço",
+     "body": "O MiLatexAI é um conector que permite que assistentes de IA como o Claude, da Anthropic, e o ChatGPT, da OpenAI, leiam, editem e compilem seus projetos LaTeX do Overleaf pela integração Git do Overleaf, por meio do Model Context Protocol. Você orienta a IA em linguagem natural, e suas alterações são enviadas ao seu projeto do Overleaf como commits Git."
+    },
+    {
+     "heading": "Uso aceitável",
+     "body": "Use o MiLatexAI apenas com projetos e contas do Overleaf que você está autorizado a acessar. Não o utilize para violar os termos do Overleaf, infringir direitos de terceiros ou tentar interromper ou burlar a segurança do serviço. Você é responsável por revisar as alterações que seu assistente de IA faz antes de confiar nelas."
+    },
+    {
+     "heading": "Sua conta e tokens do Overleaf",
+     "body": "Você é responsável por manter seu token Git do Overleaf válido e pelas ações realizadas com ele por meio do conector. Criptografamos o token que você fornece e o usamos apenas para acessar os projetos que você conecta, mas você continua no controle da sua própria conta do Overleaf e de suas permissões."
+    },
+    {
+     "heading": "Disponibilidade e \"no estado em que se encontra\"",
+     "body": "O serviço é fornecido \"no estado em que se encontra\" e \"conforme disponível\", sem garantias de qualquer tipo. Por ser um produto indie em estágio inicial, o MiLatexAI pode ter indisponibilidade, bugs ou alterações, e não garantimos que será ininterrupto, livre de erros ou que toda edição compilará corretamente."
+    },
+    {
+     "heading": "Limitação de responsabilidade",
+     "body": "Na máxima extensão permitida por lei, o MiLatexAI e seus mantenedores não são responsáveis por quaisquer danos indiretos, incidentais ou consequenciais, nem por perda de dados ou de trabalho, decorrentes do seu uso do serviço. Mantenha sempre suas próprias cópias e conte com o histórico Git do Overleaf para revisar e reverter alterações."
+    },
+    {
+     "heading": "Código aberto",
+     "body": "O código-fonte do MiLatexAI é disponibilizado sob a licença GNU AGPL. Seu uso do serviço hospedado é regido por estes termos, enquanto seu uso do código-fonte é regido adicionalmente pela AGPL. Você pode ler, auditar e hospedar por conta própria o código de acordo com essa licença."
+    },
+    {
+     "heading": "Encerramento",
+     "body": "Você pode parar de usar o MiLatexAI e desconectar seus projetos a qualquer momento. Podemos suspender ou encerrar o acesso caso estes termos sejam violados ou caso precisemos descontinuar o serviço, e faremos esforços razoáveis para avisá-lo."
+    },
+    {
+     "heading": "Alterações nestes termos",
+     "body": "Podemos atualizar estes termos conforme o produto evolui. Quando fizermos alterações relevantes, atualizaremos a data acima, e o uso continuado do serviço significa que você aceita os termos revisados."
+    },
+    {
+     "heading": "Contato",
+     "body": "Dúvidas sobre estes termos podem ser enviadas para support@milatexai.com, um endereço de suporte provisório para este produto em estágio inicial."
+    }
+   ]
+  }
+ },
+ "ar": {
+  "brand_tagline": "تحدّث إلى الذكاء الاصطناعي. حرّر ورقتك البحثية الحقيقية على Overleaf.",
+  "nav": {
+   "features": "المزايا",
+   "how": "كيف يعمل",
+   "pricing": "الأسعار",
+   "faq": "الأسئلة الشائعة",
+   "privacy": "الخصوصية",
+   "terms": "الشروط",
+   "get_started": "ابدأ الآن",
+   "manage_subscription": "إدارة الاشتراك"
+  },
+  "hero": {
+   "badge": "يعمل مع Claude و ChatGPT",
+   "title": "حرّر مستندات Overleaf LaTeX الخاصة بك بمجرد التحدث إلى الذكاء الاصطناعي",
+   "subtitle": "يربط MiLatexAI بين Claude أو ChatGPT ومشاريعك الحقيقية على Overleaf عبر Git. اطلب بلغة طبيعية قراءة قسم معيّن، أو إعادة صياغة كود LaTeX، أو إدراج شكل توضيحي، أو التحقق من أن المستند لا يزال قابلاً للترجمة البرمجية — وكل تغيير يصل إلى Overleaf كالتزام Git حقيقي يمكنك رؤيته والتراجع عنه.",
+   "cta_primary": "ابدأ مجاناً",
+   "cta_secondary": "شاهد كيف يعمل",
+   "note": "الخطة المجانية: مشروع واحد و25 التزام كتابة شهرياً. القراءة مجانية دائماً."
+  },
+  "trust": "يُدخَل رمز Git الخاص بـ Overleaf عبر نموذج ويب آمن، ويُشفَّر أثناء التخزين، ولا يظهر أبداً في المحادثة. الموصّل بالكامل مفتوح المصدر على GitHub بموجب رخصة AGPL، بحيث يمكنك مراجعة ما يفعله بالضبط.",
+  "features": [
+   {
+    "title": "التحرير بالمحادثة",
+    "desc": "اطلب من الذكاء الاصطناعي تحسين ملخص، أو إعادة صياغة فقرة، أو تنقيح برهان. فهو يقرأ ويحرّر كود LaTeX الفعلي في مشروعك على Overleaf، وليس نسخة منه."
+   },
+   {
+    "title": "التغييرات تذهب مباشرة إلى Overleaf",
+    "desc": "تُدفَع التعديلات إلى مشروعك عبر تكامل Git في Overleaf، فتتحدّث ورقتك في مكانها. لا حاجة للنسخ واللصق بين نافذة المحادثة ومحرّرك."
+   },
+   {
+    "title": "كل عملية كتابة هي التزام Git حقيقي",
+    "desc": "كل تغيير هو التزام فعلي في سجل Overleaf الخاص بك. يمكنك رؤيته ومراجعة الفروقات والتراجع عنه تماماً مثل أي التزام آخر. لا شيء يحدث في الخفاء."
+   },
+   {
+    "title": "تحقّق من قابلية الترجمة البرمجية",
+    "desc": "اطلب من الذكاء الاصطناعي التأكّد من أن كود LaTeX لا يزال يُبنى قبل أن تثق بأي تعديل، لتكتشف \\\\begin مكسوراً أو قوساً مفقوداً الآن بدلاً من موعد التسليم."
+   },
+   {
+    "title": "يبقى رمزك خارج المحادثة",
+    "desc": "تلصق رمز Git الخاص بـ Overleaf في نموذج ويب آمن، وليس في المحادثة أبداً. وهو مشفّر أثناء التخزين ولا يُكتب في نص المحادثة."
+   },
+   {
+    "title": "مفتوح المصدر وقابل للمراجعة",
+    "desc": "الموصّل بالكامل متاح للعموم على GitHub بموجب رخصة AGPL، بحيث يمكنك أن تقرأ بدقة كيف يتعامل مع رمزك ومشاريعك قبل أن تثق به."
+   }
+  ],
+  "how": {
+   "title": "من المحادثة إلى الالتزام في ثلاث خطوات",
+   "subtitle": "اربط مرة واحدة، ثم تحدّث إلى الذكاء الاصطناعي فحسب.",
+   "steps": [
+    {
+     "title": "أضف الموصّل وسجّل الدخول",
+     "desc": "أضف MiLatexAI كموصّل في Claude أو ChatGPT وسجّل الدخول عبر الدخول الموحّد، الذي يديره WorkOS."
+    },
+    {
+     "title": "الصق رمز Overleaf بأمان",
+     "desc": "شغّل start_connect للحصول على رابط لمرة واحدة إلى milatexai.com/connect، ثم الصق رمز Git الخاص بـ Overleaf في نموذج الويب. يُشفّر فوراً ولا يظهر أبداً في المحادثة."
+    },
+    {
+     "title": "اطلب من الذكاء الاصطناعي تحرير ورقتك",
+     "desc": "بلغة طبيعية، اطلب منه عرض الملفات، أو قراءة الأقسام، أو إعادة صياغة LaTeX، أو إضافة أشكال، أو التحقق من قابلية الترجمة البرمجية. تُلتزَم تغييراتك مباشرة إلى Overleaf."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "استخدم الذكاء الاصطناعي الذي تفضّله",
+   "subtitle": "MiLatexAI موصّل يعتمد على بروتوكول MCP، لذا فهو يعمل مع المساعد الذي تستخدمه بالفعل.",
+   "claude": "أضف MiLatexAI كموصّل في Claude من Anthropic وحرّر مشاريعك على Overleaf من أي محادثة في Claude.",
+   "chatgpt": "أضف MiLatexAI كموصّل في ChatGPT من OpenAI وافعل الشيء نفسه هناك — المشاريع ذاتها، والالتزامات ذاتها، وسجل Overleaf ذاته."
+  },
+  "pricing": {
+   "title": "أسعار بسيطة",
+   "subtitle": "القراءة مجانية وغير محدودة دائماً. لا تُحتسب عليك سوى التزامات الكتابة.",
+   "free": {
+    "name": "مجاني",
+    "price": "$0",
+    "period": "إلى الأبد",
+    "features": [
+     "مشروع Overleaf واحد متصل",
+     "25 التزام كتابة شهرياً",
+     "قراءات غير محدودة",
+     "يعمل مع Claude و ChatGPT",
+     "تخزين مشفّر للرمز"
+    ],
+    "cta": "ابدأ مجاناً"
+   },
+   "pro": {
+    "name": "احترافي",
+    "price": "قريباً",
+    "period": "",
+    "badge": "غير محدود",
+    "features": [
+     "مشاريع متصلة غير محدودة",
+     "التزامات كتابة غير محدودة",
+     "قراءات غير محدودة",
+     "يعمل مع Claude و ChatGPT",
+     "تخزين مشفّر للرمز"
+    ],
+    "cta": "أعلمني عند الإطلاق"
+   },
+   "note": "لم يُحدَّد سعر الخطة الاحترافية بعد. اترك بريدك الإلكتروني وسنعلمك عند إطلاقها."
+  },
+  "faq": {
+   "title": "أسئلة يطرحها الباحثون",
+   "items": [
+    {
+     "q": "هل رمز Overleaf الخاص بي آمن؟",
+     "a": "تلصق رمزك في نموذج ويب آمن على milatexai.com/connect، وليس في المحادثة أبداً. وهو مشفّر أثناء التخزين بتشفير موثّق ولا يُكتب أبداً في نص المحادثة."
+    },
+    {
+     "q": "هل يمكنكم الاطلاع على مستنداتي؟",
+     "a": "نحن لا نخزّن محتويات مستنداتك. يقرأ MiLatexAI ويحرّر ملفاتك في اللحظة لتنفيذ الطلب، لكن الأشياء الوحيدة التي نحتفظ بها هي بريد حسابك الإلكتروني، ورمز Overleaf المشفّر، وعدّاد الالتزامات الشهري."
+    },
+    {
+     "q": "مع أي مساعدات الذكاء الاصطناعي يعمل؟",
+     "a": "مع كل من Claude من Anthropic و ChatGPT من OpenAI. MiLatexAI موصّل يعتمد على بروتوكول MCP، لذا تضيفه في أي مساعد تستخدمه بالفعل."
+    },
+    {
+     "q": "ماذا يحدث إذا بلغت حدّ 25 التزاماً؟",
+     "a": "تبقى القراءة مجانية وغير محدودة دائماً. بمجرد أن تصل إلى 25 التزام كتابة في الشهر ضمن الخطة المجانية، يمكنك انتظار إعادة ضبط العدّاد الشهر التالي أو الانتقال إلى الخطة الاحترافية عند إطلاقها للحصول على التزامات غير محدودة."
+    },
+    {
+     "q": "هل هو فعلاً مفتوح المصدر؟",
+     "a": "نعم. الكود المصدري بالكامل متاح للعموم على GitHub بموجب رخصة AGPL، بحيث يمكنك مراجعة ما يفعله الموصّل بالضبط قبل أن تأتمنه على مشاريعك."
+    },
+    {
+     "q": "هل يمكنني قطع الاتصال أو حذف بياناتي؟",
+     "a": "نعم. يمكنك قطع اتصال مشروع في أي وقت، ويمكنك أن تطلب منا حذف رمزك المخزّن وتفاصيل حسابك. ولأننا لا نخزّن مستنداتك، فإن قطع الاتصال يوقف كل وصول فوراً."
+    },
+    {
+     "q": "هل يصل إلى مشاريع لم أوصّلها؟",
+     "a": "لا. يصل MiLatexAI فقط إلى مشاريع Overleaf المحددة التي توصّلها بالرمز الذي تقدّمه. وليس لديه أي اطلاع على أي شيء آخر في حساب Overleaf الخاص بك."
+    },
+    {
+     "q": "هل ستظهر تغييراتي في سجل Overleaf؟",
+     "a": "نعم. كل عملية كتابة هي التزام Git حقيقي يُدفَع عبر تكامل Git في Overleaf، فيظهر في سجل مشروعك حيث يمكنك مراجعة الفروقات أو التراجع عنه."
+    }
+   ]
+  },
+  "security": {
+   "title": "مصمَّم ليمسّ أقل قدر ممكن",
+   "subtitle": "ما يخزّنه MiLatexAI بالضبط، وما يتعمّد عدم تخزينه.",
+   "points": [
+    {
+     "title": "رمزك مشفّر",
+     "desc": "تُشفَّر رموز Git الخاصة بـ Overleaf أثناء التخزين بتشفير موثّق، وتُدخَل عبر نموذج ويب بدلاً من المحادثة."
+    },
+    {
+     "title": "نحن لا نخزّن مستنداتك",
+     "desc": "يحتفظ MiLatexAI فقط ببريد حسابك الإلكتروني، ورمزك المشفّر، وعدّاد الالتزامات الشهري — وليس محتويات ملفات LaTeX الخاصة بك أبداً."
+    },
+    {
+     "title": "المشاريع التي توصّلها فقط",
+     "desc": "يقتصر الوصول على مشاريع Overleaf المحددة التي تختار توصيلها. ولا يمكن الوصول إلى أي شيء آخر في حسابك."
+    },
+    {
+     "title": "مفتوح المصدر، ويعمل على Azure",
+     "desc": "الكود متاح للعموم على GitHub بموجب رخصة AGPL، ويجري تسجيل الدخول عبر WorkOS AuthKit، والخدمة مستضافة على Microsoft Azure في منطقة كندا."
+    }
+   ]
+  },
+  "cta": {
+   "title": "ابدأ تحرير ورقتك بمجرد التحدث إلى الذكاء الاصطناعي",
+   "subtitle": "أضف MiLatexAI إلى Claude أو ChatGPT، ووصّل مشروع Overleaf واحداً، وجرّبه مجاناً. القراءة مجانية دائماً.",
+   "button": "ابدأ مجاناً"
+  },
+  "footer": {
+   "blurb": "يربط MiLatexAI بين Claude و ChatGPT ومشاريعك الحقيقية على Overleaf عبر Git، لتتمكن من قراءة كود LaTeX وتحريره وترجمته برمجياً بمجرد التحدث إلى الذكاء الاصطناعي. مفتوح المصدر بموجب رخصة AGPL.",
+   "rights": "© 2026 MiLatexAI. جميع الحقوق محفوظة.",
+   "language_label": "اللغة",
+   "contact_label": "الدعم",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "سياسة الخصوصية",
+   "updated_label": "آخر تحديث: يوليو 2026",
+   "intro": "توضّح هذه السياسة، بلغة بسيطة، ما يجمعه MiLatexAI، وما يتعمّد عدم جمعه، وكيف يُحمى رمز Overleaf الخاص بك. MiLatexAI منتج صغير ومستقل، ونحاول أن نمسّ أقل قدر ممكن من بياناتك.",
+   "sections": [
+    {
+     "heading": "ما الذي نجمعه",
+     "body": "نجمع ثلاثة أشياء فقط: عنوان بريد حسابك الإلكتروني (المقدَّم عبر الدخول الموحّد)، ورمز Git الخاص بـ Overleaf في صورة مشفّرة، وعدّاداً لعدد التزامات الكتابة التي قمت بها في الشهر الحالي. هذه هي القائمة الكاملة."
+    },
+    {
+     "heading": "ما الذي لا نجمعه",
+     "body": "نحن لا نخزّن محتويات مستندات LaTeX الخاصة بك، ولا أشكالك التوضيحية، ولا ملفات PDF المترجمة، ولا سجل مشروعك. تُقرأ الملفات وتُحرَّر في اللحظة لتنفيذ طلباتك ولا نحتفظ بها بعد ذلك."
+    },
+    {
+     "heading": "كيف يُؤمَّن رمزك",
+     "body": "يُدخَل رمز Git الخاص بـ Overleaf في نموذج ويب على milatexai.com/connect، وليس في المحادثة أبداً، ويُشفَّر أثناء التخزين باستخدام تشفير موثّق. يُستخدم فقط للوصول إلى المشاريع المحددة التي توصّلها، ولا يُعرَض أبداً في نص المحادثة."
+    },
+    {
+     "heading": "الأطراف الخارجية التي نعتمد عليها",
+     "body": "يتولّى تسجيل الدخول WorkOS AuthKit، الذي يتحقق من هويتك ويوفّر بريدك الإلكتروني. الاستضافة على Microsoft Azure في منطقة كندا. مشاريعك موجودة على Overleaf، ويتواصل MiLatexAI معها عبر تكامل Git في Overleaf. نحن لا نبيع بياناتك ولا نشاركها بما يتجاوز ما يتطلبه هؤلاء المزوّدون لتشغيل الخدمة."
+    },
+    {
+     "heading": "الاحتفاظ بالبيانات وحذفها",
+     "body": "نحتفظ ببريدك الإلكتروني ورمزك المشفّر وعدّاد الالتزامات فقط ما دام حسابك نشطاً. يمكنك قطع اتصال مشروع أو الطلب منا حذف بياناتك المخزّنة في أي وقت. ولأننا لا نخزّن مستنداتك، فإن قطع الاتصال ينهي وصولنا إلى مشاريعك فوراً."
+    },
+    {
+     "heading": "حقوقك",
+     "body": "يمكنك طلب الاطلاع على البيانات المحدودة التي نحتفظ بها عنك، أو طلب تصحيحها، أو طلب حذفها. لتقديم طلب، تواصل معنا على العنوان أدناه."
+    },
+    {
+     "heading": "التواصل",
+     "body": "يمكن إرسال الأسئلة المتعلقة بالخصوصية إلى support@milatexai.com. هذا عنوان دعم مؤقت لمنتج في مرحلة مبكرة، وسنردّ في أقرب وقت ممكن."
+    }
+   ]
+  },
+  "terms": {
+   "title": "شروط الخدمة",
+   "updated_label": "آخر تحديث: يوليو 2026",
+   "intro": "توضّح هذه الشروط ما يقدّمه MiLatexAI والأساس الذي يمكنك بموجبه استخدامه. MiLatexAI منتج صغير ومستقل ومفتوح المصدر، لذا يُرجى قراءة قسمَي التوفّر والمسؤولية بعناية.",
+   "sections": [
+    {
+     "heading": "الخدمة",
+     "body": "MiLatexAI موصّل يتيح لمساعدات الذكاء الاصطناعي مثل Claude من Anthropic و ChatGPT من OpenAI قراءة مشاريع Overleaf LaTeX الخاصة بك وتحريرها وترجمتها برمجياً عبر تكامل Git في Overleaf، من خلال بروتوكول MCP. توجّه أنت الذكاء الاصطناعي بلغة طبيعية، وتُدفَع تغييراتك إلى مشروعك على Overleaf على شكل التزامات Git."
+    },
+    {
+     "heading": "الاستخدام المقبول",
+     "body": "استخدم MiLatexAI فقط مع مشاريع وحسابات Overleaf المصرّح لك بالوصول إليها. لا تستخدمه لمخالفة شروط Overleaf، أو انتهاك حقوق الآخرين، أو محاولة تعطيل أمن الخدمة أو اختراقه. أنت مسؤول عن مراجعة التغييرات التي يجريها مساعد الذكاء الاصطناعي قبل الاعتماد عليها."
+    },
+    {
+     "heading": "حساب Overleaf ورموزك",
+     "body": "أنت مسؤول عن إبقاء رمز Git الخاص بـ Overleaf صالحاً وعن الإجراءات المتخذة بموجبه من خلال الموصّل. نحن نشفّر الرمز الذي تقدّمه ونستخدمه فقط للوصول إلى المشاريع التي توصّلها، لكن تبقى أنت متحكّماً في حساب Overleaf الخاص بك وأذوناته."
+    },
+    {
+     "heading": "التوفّر و\"كما هي\"",
+     "body": "تُقدَّم الخدمة \"كما هي\" و\"حسب توفّرها\"، دون أي ضمانات من أي نوع. وبصفته منتجاً مستقلاً في مرحلة مبكرة، قد يشهد MiLatexAI فترات تعطّل أو أخطاء أو تغييرات، ولا نضمن أن يكون خالياً من الانقطاع أو الأخطاء، أو أن كل تعديل سيُترجَم برمجياً بشكل صحيح."
+    },
+    {
+     "heading": "حدود المسؤولية",
+     "body": "إلى أقصى حد يسمح به القانون، لا يتحمّل MiLatexAI والقائمون على صيانته أي مسؤولية عن أي أضرار غير مباشرة أو عرضية أو تبعية، أو عن فقدان البيانات أو فقدان العمل، الناجمة عن استخدامك للخدمة. احتفظ دائماً بنسخك الخاصة واعتمد على سجل Git في Overleaf لمراجعة التغييرات والتراجع عنها."
+    },
+    {
+     "heading": "الكود مفتوح المصدر",
+     "body": "يُصدَر الكود المصدري لـ MiLatexAI بموجب رخصة GNU AGPL. يخضع استخدامك للخدمة المستضافة لهذه الشروط، بينما يخضع استخدامك للكود المصدري إضافةً إلى ذلك لرخصة AGPL. ونرحّب بأن تقرأ الكود وتراجعه وتستضيفه ذاتياً وفقاً لتلك الرخصة."
+    },
+    {
+     "heading": "إنهاء الخدمة",
+     "body": "يمكنك التوقف عن استخدام MiLatexAI وقطع اتصال مشاريعك في أي وقت. وقد نعلّق الوصول أو ننهيه في حال مخالفة هذه الشروط أو إذا احتجنا إلى إيقاف الخدمة، وسنبذل جهوداً معقولة لإعلامك بذلك."
+    },
+    {
+     "heading": "التغييرات على هذه الشروط",
+     "body": "قد نحدّث هذه الشروط مع تطوّر المنتج. وعندما نُجري تغييرات جوهرية، سنحدّث التاريخ أعلاه، ويعني استمرارك في استخدام الخدمة أنك تقبل الشروط المنقّحة."
+    },
+    {
+     "heading": "التواصل",
+     "body": "يمكن إرسال الأسئلة المتعلقة بهذه الشروط إلى support@milatexai.com، وهو عنوان دعم مؤقت لهذا المنتج في مرحلته المبكرة."
+    }
+   ]
+  }
+ },
+ "hi": {
+  "brand_tagline": "अपने AI से बात करें। अपना असली Overleaf पेपर एडिट करें।",
+  "nav": {
+   "features": "विशेषताएँ",
+   "how": "यह कैसे काम करता है",
+   "pricing": "मूल्य निर्धारण",
+   "faq": "सामान्य प्रश्न",
+   "privacy": "गोपनीयता",
+   "terms": "नियम",
+   "get_started": "शुरू करें",
+   "manage_subscription": "सदस्यता प्रबंधित करें"
+  },
+  "hero": {
+   "badge": "Claude और ChatGPT के साथ काम करता है",
+   "title": "अपने AI से बात करके अपना Overleaf LaTeX एडिट करें",
+   "subtitle": "MiLatexAI आपके Claude या ChatGPT को Git के ज़रिए आपके असली Overleaf प्रोजेक्ट्स से जोड़ता है। सामान्य भाषा में कहें कि कोई सेक्शन पढ़े, LaTeX फिर से लिखे, कोई figure जोड़े, या जाँचे कि यह अब भी कंपाइल होता है — हर बदलाव Overleaf में एक असली Git commit के रूप में दर्ज होता है, जिसे आप देख और वापस ले सकते हैं।",
+   "cta_primary": "मुफ़्त में शुरू करें",
+   "cta_secondary": "देखें यह कैसे काम करता है",
+   "note": "मुफ़्त प्लान: प्रति माह 1 प्रोजेक्ट और 25 write-commits। पढ़ना हमेशा मुफ़्त है।"
+  },
+  "trust": "आपका Overleaf Git टोकन एक सुरक्षित वेब फ़ॉर्म पर दर्ज किया जाता है, संग्रहण के समय एन्क्रिप्ट किया जाता है, और चैट में कभी दिखाई नहीं देता। पूरा कनेक्टर GitHub पर AGPL लाइसेंस के तहत ओपन सोर्स है, इसलिए आप ठीक-ठीक जाँच सकते हैं कि यह क्या करता है।",
+  "features": [
+   {
+    "title": "बातचीत से एडिट करें",
+    "desc": "अपने AI से कहें कि किसी abstract को कसे, कोई पैराग्राफ फिर से लिखे, या किसी proof को साफ़ करे। यह आपके Overleaf प्रोजेक्ट के असली LaTeX को पढ़ता और एडिट करता है, किसी कॉपी को नहीं।"
+   },
+   {
+    "title": "बदलाव सीधे Overleaf में जाते हैं",
+    "desc": "एडिट्स Overleaf के Git इंटीग्रेशन के ज़रिए आपके प्रोजेक्ट में पुश किए जाते हैं, इसलिए आपका पेपर जगह पर ही अपडेट होता है। चैट विंडो और आपके एडिटर के बीच कॉपी-पेस्ट की ज़रूरत नहीं।"
+   },
+   {
+    "title": "हर write एक असली Git commit है",
+    "desc": "हर बदलाव आपके Overleaf इतिहास में एक वास्तविक commit होता है। आप इसे देख सकते हैं, diff की समीक्षा कर सकते हैं, और किसी भी अन्य commit की तरह इसे वापस ले सकते हैं। कुछ भी चुपचाप नहीं होता।"
+   },
+   {
+    "title": "जाँचें कि यह कंपाइल होता है",
+    "desc": "किसी एडिट पर भरोसा करने से पहले AI से पुष्टि करवाएँ कि आपका LaTeX अब भी बनता है, ताकि टूटा हुआ \\\\begin या छूटा हुआ ब्रेस आप डेडलाइन के बजाय अभी पकड़ लें।"
+   },
+   {
+    "title": "आपका टोकन चैट से बाहर रहता है",
+    "desc": "आप अपना Overleaf Git टोकन एक सुरक्षित वेब फ़ॉर्म में पेस्ट करते हैं, कभी बातचीत में नहीं। यह संग्रहण के समय एन्क्रिप्ट किया जाता है और ट्रांसक्रिप्ट में कभी नहीं लिखा जाता।"
+   },
+   {
+    "title": "ओपन सोर्स और जाँच-योग्य",
+    "desc": "पूरा कनेक्टर GitHub पर AGPL लाइसेंस के तहत सार्वजनिक है, इसलिए भरोसा करने से पहले आप ठीक-ठीक पढ़ सकते हैं कि यह आपके टोकन और आपके प्रोजेक्ट्स को कैसे संभालता है।"
+   }
+  ],
+  "how": {
+   "title": "चैट से commit तक, तीन चरणों में",
+   "subtitle": "एक बार कनेक्ट करें, फिर बस अपने AI से बात करें।",
+   "steps": [
+    {
+     "title": "कनेक्टर जोड़ें और साइन इन करें",
+     "desc": "Claude या ChatGPT में MiLatexAI को एक कनेक्टर के रूप में जोड़ें और सिंगल साइन-ऑन से साइन इन करें, जिसे WorkOS संभालता है।"
+    },
+    {
+     "title": "अपना Overleaf टोकन सुरक्षित रूप से पेस्ट करें",
+     "desc": "milatexai.com/connect का एक बार का लिंक पाने के लिए start_connect चलाएँ, फिर अपना Overleaf Git टोकन वेब फ़ॉर्म में पेस्ट करें। यह तुरंत एन्क्रिप्ट हो जाता है और चैट में कभी दिखाई नहीं देता।"
+    },
+    {
+     "title": "AI से अपना पेपर एडिट करवाएँ",
+     "desc": "सामान्य भाषा में इससे कहें कि फ़ाइलें सूचीबद्ध करे, सेक्शन पढ़े, LaTeX फिर से लिखे, figures जोड़े, या जाँचे कि यह कंपाइल होता है। आपके बदलाव लाइव Overleaf में commit हो जाते हैं।"
+    }
+   ]
+  },
+  "platforms": {
+   "title": "अपना खुद का AI लाएँ",
+   "subtitle": "MiLatexAI एक Model Context Protocol कनेक्टर है, इसलिए यह उसी असिस्टेंट के साथ काम करता है जिसे आप पहले से इस्तेमाल करते हैं।",
+   "claude": "Anthropic के Claude में MiLatexAI को एक कनेक्टर के रूप में जोड़ें और किसी भी Claude बातचीत से अपने Overleaf प्रोजेक्ट्स एडिट करें।",
+   "chatgpt": "OpenAI के ChatGPT में MiLatexAI को एक कनेक्टर के रूप में जोड़ें और वहीं भी वही करें — वही प्रोजेक्ट्स, वही commits, वही Overleaf इतिहास।"
+  },
+  "pricing": {
+   "title": "सरल मूल्य निर्धारण",
+   "subtitle": "पढ़ना हमेशा मुफ़्त और असीमित है। आप केवल write-commits ही गिनते हैं।",
+   "free": {
+    "name": "मुफ़्त",
+    "price": "$0",
+    "period": "हमेशा के लिए",
+    "features": [
+     "1 जुड़ा हुआ Overleaf प्रोजेक्ट",
+     "प्रति माह 25 write-commits",
+     "असीमित पढ़ना",
+     "Claude और ChatGPT के साथ काम करता है",
+     "एन्क्रिप्टेड टोकन संग्रहण"
+    ],
+    "cta": "मुफ़्त में शुरू करें"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "जल्द आ रहा है",
+    "period": "",
+    "badge": "असीमित",
+    "features": [
+     "असीमित जुड़े हुए प्रोजेक्ट्स",
+     "असीमित write-commits",
+     "असीमित पढ़ना",
+     "Claude और ChatGPT के साथ काम करता है",
+     "एन्क्रिप्टेड टोकन संग्रहण"
+    ],
+    "cta": "सूचना पाएँ"
+   },
+   "note": "Pro की कीमत अभी तय नहीं हुई है। अपना ईमेल छोड़ें और लॉन्च होने पर हम आपको बताएँगे।"
+  },
+  "faq": {
+   "title": "शोधकर्ताओं के सवाल",
+   "items": [
+    {
+     "q": "क्या मेरा Overleaf टोकन सुरक्षित है?",
+     "a": "आप अपना टोकन milatexai.com/connect पर एक सुरक्षित वेब फ़ॉर्म में पेस्ट करते हैं, कभी चैट में नहीं। इसे प्रमाणीकृत एन्क्रिप्शन के साथ संग्रहण के समय एन्क्रिप्ट किया जाता है और बातचीत के ट्रांसक्रिप्ट में कभी नहीं लिखा जाता।"
+    },
+    {
+     "q": "क्या आप मेरे दस्तावेज़ देख सकते हैं?",
+     "a": "हम आपके दस्तावेज़ों की सामग्री संग्रहीत नहीं करते। MiLatexAI किसी अनुरोध को पूरा करने के लिए उसी क्षण आपकी फ़ाइलें पढ़ता और एडिट करता है, लेकिन हम केवल आपका खाता ईमेल, आपका एन्क्रिप्टेड Overleaf टोकन, और एक मासिक commit काउंटर ही रखते हैं।"
+    },
+    {
+     "q": "यह किन AI असिस्टेंट्स के साथ काम करता है?",
+     "a": "Anthropic के Claude और OpenAI के ChatGPT दोनों के साथ। MiLatexAI एक Model Context Protocol कनेक्टर है, इसलिए आप इसे उसी असिस्टेंट में जोड़ते हैं जिसे आप पहले से इस्तेमाल करते हैं।"
+    },
+    {
+     "q": "अगर मैं 25-commit की सीमा तक पहुँच जाऊँ तो क्या होगा?",
+     "a": "पढ़ना हमेशा मुफ़्त और असीमित रहता है। मुफ़्त प्लान पर एक महीने में 25 write-commits तक पहुँचने के बाद, आप अगले महीने काउंटर के रीसेट होने का इंतज़ार कर सकते हैं या असीमित commits के लिए Pro के लॉन्च होने पर उस पर जा सकते हैं।"
+    },
+    {
+     "q": "क्या यह सचमुच ओपन सोर्स है?",
+     "a": "हाँ। पूरा सोर्स कोड GitHub पर AGPL लाइसेंस के तहत सार्वजनिक है, इसलिए अपने प्रोजेक्ट्स को इस पर भरोसा करने से पहले आप ठीक-ठीक जाँच सकते हैं कि कनेक्टर क्या करता है।"
+    },
+    {
+     "q": "क्या मैं डिस्कनेक्ट कर सकता हूँ या अपना डेटा हटा सकता हूँ?",
+     "a": "हाँ। आप किसी भी समय किसी प्रोजेक्ट को डिस्कनेक्ट कर सकते हैं, और हमसे अपना संग्रहीत टोकन और खाता विवरण हटाने के लिए कह सकते हैं। चूँकि हम आपके दस्तावेज़ संग्रहीत नहीं करते, डिस्कनेक्ट करने से सारी पहुँच तुरंत रुक जाती है।"
+    },
+    {
+     "q": "क्या यह उन प्रोजेक्ट्स को छूता है जिन्हें मैंने कनेक्ट नहीं किया?",
+     "a": "नहीं। MiLatexAI केवल उन्हीं विशिष्ट Overleaf प्रोजेक्ट्स तक पहुँचता है जिन्हें आप अपने दिए गए टोकन से कनेक्ट करते हैं। आपके Overleaf खाते में और किसी चीज़ की इसे कोई जानकारी नहीं होती।"
+    },
+    {
+     "q": "क्या मेरे बदलाव Overleaf इतिहास में दिखेंगे?",
+     "a": "हाँ। हर write एक असली Git commit है जो Overleaf के Git इंटीग्रेशन के ज़रिए पुश किया जाता है, इसलिए यह आपके प्रोजेक्ट इतिहास में दिखता है जहाँ आप diff की समीक्षा या इसे वापस ले सकते हैं।"
+    }
+   ]
+  },
+  "security": {
+   "title": "जितना कम संभव हो, उतना ही छूने के लिए बनाया गया",
+   "subtitle": "MiLatexAI ठीक-ठीक क्या संग्रहीत करता है, और जानबूझकर क्या नहीं।",
+   "points": [
+    {
+     "title": "आपका टोकन एन्क्रिप्टेड है",
+     "desc": "Overleaf Git टोकन प्रमाणीकृत एन्क्रिप्शन के साथ संग्रहण के समय एन्क्रिप्ट किए जाते हैं, और चैट के बजाय एक वेब फ़ॉर्म पर दर्ज किए जाते हैं।"
+    },
+    {
+     "title": "हम आपके दस्तावेज़ संग्रहीत नहीं करते",
+     "desc": "MiLatexAI केवल आपका खाता ईमेल, आपका एन्क्रिप्टेड टोकन, और एक मासिक commit काउंटर रखता है — आपकी LaTeX फ़ाइलों की सामग्री कभी नहीं।"
+    },
+    {
+     "title": "केवल वही प्रोजेक्ट्स जिन्हें आप कनेक्ट करते हैं",
+     "desc": "पहुँच उन्हीं विशिष्ट Overleaf प्रोजेक्ट्स तक सीमित है जिन्हें आप कनेक्ट करना चुनते हैं। आपके खाते में और कुछ भी पहुँच योग्य नहीं है।"
+    },
+    {
+     "title": "ओपन सोर्स, Azure पर चलता है",
+     "desc": "कोड GitHub पर AGPL लाइसेंस के तहत सार्वजनिक है, साइन-इन WorkOS AuthKit के ज़रिए चलता है, और सेवा Microsoft Azure पर Canada रीजन में होस्ट की गई है।"
+    }
+   ]
+  },
+  "cta": {
+   "title": "अपने AI से बात करके अपना पेपर एडिट करना शुरू करें",
+   "subtitle": "MiLatexAI को Claude या ChatGPT में जोड़ें, एक Overleaf प्रोजेक्ट कनेक्ट करें, और मुफ़्त में आज़माएँ। पढ़ना हमेशा मुफ़्त है।",
+   "button": "मुफ़्त में शुरू करें"
+  },
+  "footer": {
+   "blurb": "MiLatexAI आपके Claude और ChatGPT को Git के ज़रिए आपके असली Overleaf प्रोजेक्ट्स से जोड़ता है, ताकि आप सिर्फ़ अपने AI से बात करके अपना LaTeX पढ़, एडिट, और कंपाइल कर सकें। AGPL लाइसेंस के तहत ओपन सोर्स।",
+   "rights": "© 2026 MiLatexAI. सर्वाधिकार सुरक्षित।",
+   "language_label": "भाषा",
+   "contact_label": "सहायता",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "गोपनीयता नीति",
+   "updated_label": "अंतिम बार अपडेट किया गया: जुलाई 2026",
+   "intro": "यह नीति सरल भाषा में बताती है कि MiLatexAI क्या एकत्र करता है, जानबूझकर क्या एकत्र नहीं करता, और आपका Overleaf टोकन कैसे सुरक्षित रखा जाता है। MiLatexAI एक छोटा, स्वतंत्र उत्पाद है, और हम आपके डेटा को जितना कम संभव हो उतना ही छूने की कोशिश करते हैं।",
+   "sections": [
+    {
+     "heading": "हम क्या एकत्र करते हैं",
+     "body": "हम केवल तीन चीज़ें एकत्र करते हैं: आपका खाता ईमेल पता (सिंगल साइन-ऑन के ज़रिए प्रदान किया गया), एन्क्रिप्टेड रूप में आपका Overleaf Git टोकन, और इस बात का काउंटर कि आपने चालू महीने में कितने write-commits किए हैं। बस इतनी ही पूरी सूची है।"
+    },
+    {
+     "heading": "हम क्या एकत्र नहीं करते",
+     "body": "हम आपके LaTeX दस्तावेज़ों की सामग्री, आपकी figures, आपकी कंपाइल की गई PDFs, या आपके प्रोजेक्ट इतिहास को संग्रहीत नहीं करते। फ़ाइलें आपके अनुरोधों को पूरा करने के लिए उसी क्षण पढ़ी और एडिट की जाती हैं और बाद में हमारे पास नहीं रखी जातीं।"
+    },
+    {
+     "heading": "आपका टोकन कैसे सुरक्षित किया जाता है",
+     "body": "आपका Overleaf Git टोकन milatexai.com/connect पर एक वेब फ़ॉर्म में दर्ज किया जाता है, कभी चैट में नहीं, और प्रमाणीकृत एन्क्रिप्शन का उपयोग करके संग्रहण के समय एन्क्रिप्ट किया जाता है। इसका उपयोग केवल उन विशिष्ट प्रोजेक्ट्स तक पहुँचने के लिए किया जाता है जिन्हें आप कनेक्ट करते हैं, और यह बातचीत के ट्रांसक्रिप्ट में कभी नहीं दिखाया जाता।"
+    },
+    {
+     "heading": "जिन तीसरे पक्षों पर हम निर्भर हैं",
+     "body": "साइन-इन WorkOS AuthKit द्वारा संभाला जाता है, जो आपको प्रमाणित करता है और आपका ईमेल प्रदान करता है। होस्टिंग Microsoft Azure पर Canada रीजन में है। आपके प्रोजेक्ट्स Overleaf पर रहते हैं, और MiLatexAI Overleaf के Git इंटीग्रेशन के ज़रिए उनसे संवाद करता है। हम आपका डेटा न बेचते हैं और न ही सेवा चलाने के लिए इन प्रदाताओं की आवश्यकता से आगे साझा करते हैं।"
+    },
+    {
+     "heading": "डेटा प्रतिधारण और विलोपन",
+     "body": "हम आपका ईमेल, एन्क्रिप्टेड टोकन, और commit काउंटर केवल तब तक रखते हैं जब तक आपका खाता सक्रिय रहता है। आप किसी भी समय किसी प्रोजेक्ट को डिस्कनेक्ट कर सकते हैं या हमसे अपना संग्रहीत डेटा हटाने के लिए कह सकते हैं। चूँकि हम आपके दस्तावेज़ संग्रहीत नहीं करते, डिस्कनेक्ट करने से आपके प्रोजेक्ट्स तक हमारी पहुँच तुरंत समाप्त हो जाती है।"
+    },
+    {
+     "heading": "आपके अधिकार",
+     "body": "आप हमारे पास मौजूद आपके बारे में सीमित डेटा तक पहुँच का अनुरोध कर सकते हैं, इसे सुधारने के लिए कह सकते हैं, या इसे हटाने के लिए कह सकते हैं। अनुरोध करने के लिए, नीचे दिए गए पते पर हमसे संपर्क करें।"
+    },
+    {
+     "heading": "संपर्क",
+     "body": "गोपनीयता से संबंधित प्रश्न support@milatexai.com पर भेजे जा सकते हैं। यह एक प्रारंभिक-चरण उत्पाद के लिए एक अस्थायी सहायता पता है, और हम जितनी जल्दी हो सके उत्तर देंगे।"
+    }
+   ]
+  },
+  "terms": {
+   "title": "सेवा की शर्तें",
+   "updated_label": "अंतिम बार अपडेट किया गया: जुलाई 2026",
+   "intro": "ये शर्तें बताती हैं कि MiLatexAI क्या प्रदान करता है और किस आधार पर आप इसका उपयोग कर सकते हैं। MiLatexAI एक छोटा, स्वतंत्र, ओपन-सोर्स उत्पाद है, इसलिए कृपया उपलब्धता और दायित्व वाले सेक्शन ध्यान से पढ़ें।",
+   "sections": [
+    {
+     "heading": "सेवा",
+     "body": "MiLatexAI एक कनेक्टर है जो Anthropic के Claude और OpenAI के ChatGPT जैसे AI असिस्टेंट्स को Overleaf के Git इंटीग्रेशन के ज़रिए, Model Context Protocol के माध्यम से आपके Overleaf LaTeX प्रोजेक्ट्स को पढ़ने, एडिट करने और कंपाइल करने देता है। आप सामान्य भाषा में AI को निर्देश देते हैं, और आपके बदलाव Git commits के रूप में आपके Overleaf प्रोजेक्ट में पुश किए जाते हैं।"
+    },
+    {
+     "heading": "स्वीकार्य उपयोग",
+     "body": "MiLatexAI का उपयोग केवल उन Overleaf प्रोजेक्ट्स और खातों के साथ करें जिन तक पहुँचने के लिए आप अधिकृत हैं। इसका उपयोग Overleaf की शर्तें तोड़ने, दूसरों के अधिकारों का उल्लंघन करने, या सेवा की सुरक्षा को बाधित या भंग करने की कोशिश करने के लिए न करें। अपने AI असिस्टेंट द्वारा किए गए बदलावों पर भरोसा करने से पहले उनकी समीक्षा करना आपकी ज़िम्मेदारी है।"
+    },
+    {
+     "heading": "आपका Overleaf खाता और टोकन",
+     "body": "आपके Overleaf Git टोकन को वैध रखना और कनेक्टर के ज़रिए उसके तहत की गई कार्रवाइयों के लिए आप ज़िम्मेदार हैं। हम आपके दिए गए टोकन को एन्क्रिप्ट करते हैं और इसका उपयोग केवल उन प्रोजेक्ट्स तक पहुँचने के लिए करते हैं जिन्हें आप कनेक्ट करते हैं, लेकिन अपने Overleaf खाते और उसकी अनुमतियों पर नियंत्रण आपके पास ही रहता है।"
+    },
+    {
+     "heading": "उपलब्धता और \"जैसा है\"",
+     "body": "सेवा \"जैसी है\" और \"जैसी उपलब्ध है\" के आधार पर प्रदान की जाती है, बिना किसी प्रकार की वारंटी के। एक प्रारंभिक-चरण के indie उत्पाद के रूप में, MiLatexAI में डाउनटाइम, बग, या बदलाव हो सकते हैं, और हम गारंटी नहीं देते कि यह निर्बाध, त्रुटि-रहित होगा, या हर एडिट सही ढंग से कंपाइल होगी।"
+    },
+    {
+     "heading": "दायित्व की सीमा",
+     "body": "कानून द्वारा अनुमत अधिकतम सीमा तक, MiLatexAI और इसके अनुरक्षक सेवा के आपके उपयोग से उत्पन्न किसी भी अप्रत्यक्ष, आकस्मिक, या परिणामी क्षति, या खोए हुए डेटा या खोए हुए काम के लिए ज़िम्मेदार नहीं हैं। हमेशा अपनी खुद की प्रतियाँ रखें और बदलावों की समीक्षा और उन्हें वापस लेने के लिए Overleaf के Git इतिहास पर भरोसा करें।"
+    },
+    {
+     "heading": "ओपन-सोर्स कोड",
+     "body": "MiLatexAI का सोर्स कोड GNU AGPL लाइसेंस के तहत जारी किया गया है। होस्ट की गई सेवा का आपका उपयोग इन शर्तों द्वारा नियंत्रित होता है, जबकि सोर्स कोड का आपका उपयोग अतिरिक्त रूप से AGPL द्वारा नियंत्रित होता है। आप उस लाइसेंस के अनुसार कोड पढ़ने, जाँचने, और स्वयं-होस्ट करने के लिए स्वागत हैं।"
+    },
+    {
+     "heading": "समाप्ति",
+     "body": "आप किसी भी समय MiLatexAI का उपयोग बंद कर सकते हैं और अपने प्रोजेक्ट्स डिस्कनेक्ट कर सकते हैं। यदि इन शर्तों का उल्लंघन होता है या यदि हमें सेवा बंद करने की आवश्यकता होती है तो हम पहुँच को निलंबित या समाप्त कर सकते हैं, और हम आपको बताने के लिए उचित प्रयास करेंगे।"
+    },
+    {
+     "heading": "इन शर्तों में बदलाव",
+     "body": "जैसे-जैसे उत्पाद विकसित होता है, हम इन शर्तों को अपडेट कर सकते हैं। जब हम महत्वपूर्ण बदलाव करते हैं, तो हम ऊपर दी गई तारीख अपडेट करेंगे, और सेवा का निरंतर उपयोग यह दर्शाता है कि आप संशोधित शर्तें स्वीकार करते हैं।"
+    },
+    {
+     "heading": "संपर्क",
+     "body": "इन शर्तों से संबंधित प्रश्न support@milatexai.com पर भेजे जा सकते हैं, जो इस प्रारंभिक-चरण उत्पाद के लिए एक अस्थायी सहायता पता है।"
+    }
+   ]
+  }
+ },
+ "ko": {
+  "brand_tagline": "AI와 대화하세요. 실제 Overleaf 논문을 편집하세요.",
+  "nav": {
+   "features": "기능",
+   "how": "작동 방식",
+   "pricing": "요금제",
+   "faq": "자주 묻는 질문",
+   "privacy": "개인정보처리방침",
+   "terms": "이용약관",
+   "get_started": "시작하기",
+   "manage_subscription": "구독 관리"
+  },
+  "hero": {
+   "badge": "Claude 및 ChatGPT와 함께 작동",
+   "title": "AI와 대화하며 Overleaf LaTeX를 편집하세요",
+   "subtitle": "MiLatexAI는 Git을 통해 Claude 또는 ChatGPT를 실제 Overleaf 프로젝트에 연결합니다. 일상적인 언어로 섹션을 읽거나, LaTeX를 다시 쓰거나, 그림을 삽입하거나, 여전히 컴파일되는지 확인하도록 요청하세요. 모든 변경 사항은 확인하고 되돌릴 수 있는 실제 Git 커밋으로 Overleaf에 반영됩니다.",
+   "cta_primary": "무료로 시작하기",
+   "cta_secondary": "작동 방식 보기",
+   "note": "무료 요금제: 프로젝트 1개, 월 25회 쓰기 커밋. 읽기는 항상 무료입니다."
+  },
+  "trust": "Overleaf Git 토큰은 안전한 웹 양식에 입력되어 저장 시 암호화되며, 채팅에는 절대 나타나지 않습니다. 전체 커넥터는 AGPL 라이선스로 GitHub에 오픈 소스로 공개되어 있어, 정확히 어떻게 작동하는지 직접 검증할 수 있습니다.",
+  "features": [
+   {
+    "title": "대화로 편집하기",
+    "desc": "AI에게 초록을 다듬거나, 문단을 다시 쓰거나, 증명을 정리하도록 요청하세요. AI는 사본이 아닌 Overleaf 프로젝트의 실제 LaTeX를 읽고 편집합니다."
+   },
+   {
+    "title": "변경 사항이 곧바로 Overleaf에 반영",
+    "desc": "편집 내용은 Overleaf의 Git 통합을 통해 프로젝트에 푸시되므로, 논문이 그 자리에서 업데이트됩니다. 채팅 창과 에디터 사이를 복사·붙여넣기 할 필요가 없습니다."
+   },
+   {
+    "title": "모든 쓰기는 실제 Git 커밋",
+    "desc": "각 변경 사항은 Overleaf 히스토리에 남는 진짜 커밋입니다. 다른 커밋과 똑같이 확인하고, 차이를 검토하고, 되돌릴 수 있습니다. 아무것도 조용히 일어나지 않습니다."
+   },
+   {
+    "title": "컴파일 여부 확인",
+    "desc": "편집 내용을 신뢰하기 전에 LaTeX가 여전히 빌드되는지 AI에게 확인하도록 요청하세요. 그러면 마감이 아니라 지금, 잘못된 \\\\begin이나 누락된 중괄호를 잡아낼 수 있습니다."
+   },
+   {
+    "title": "토큰은 채팅 밖에 보관",
+    "desc": "Overleaf Git 토큰은 대화가 아니라 안전한 웹 양식에 붙여 넣습니다. 토큰은 저장 시 암호화되며 대화 기록에 절대 기록되지 않습니다."
+   },
+   {
+    "title": "오픈 소스이며 감사 가능",
+    "desc": "전체 커넥터는 AGPL 라이선스로 GitHub에 공개되어 있어, 신뢰하기 전에 토큰과 프로젝트를 어떻게 처리하는지 정확히 읽어볼 수 있습니다."
+   }
+  ],
+  "how": {
+   "title": "채팅에서 커밋까지 세 단계",
+   "subtitle": "한 번만 연결하면, 그다음엔 AI와 대화만 하면 됩니다.",
+   "steps": [
+    {
+     "title": "커넥터 추가 후 로그인",
+     "desc": "Claude 또는 ChatGPT에 MiLatexAI를 커넥터로 추가하고, WorkOS가 처리하는 싱글 사인온으로 로그인하세요."
+    },
+    {
+     "title": "Overleaf 토큰을 안전하게 붙여넣기",
+     "desc": "start_connect를 실행해 milatexai.com/connect로 연결되는 일회성 링크를 받은 뒤, Overleaf Git 토큰을 웹 양식에 붙여 넣으세요. 토큰은 즉시 암호화되며 채팅에는 절대 나타나지 않습니다."
+    },
+    {
+     "title": "AI에게 논문 편집 요청하기",
+     "desc": "일상적인 언어로 파일 목록을 보여주거나, 섹션을 읽거나, LaTeX를 다시 쓰거나, 그림을 추가하거나, 컴파일 여부를 확인하도록 요청하세요. 변경 사항은 실시간으로 Overleaf에 커밋됩니다."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "사용하던 AI를 그대로",
+   "subtitle": "MiLatexAI는 Model Context Protocol 커넥터이므로, 이미 사용 중인 어시스턴트와 함께 작동합니다.",
+   "claude": "Anthropic의 Claude에 MiLatexAI를 커넥터로 추가하고, 어떤 Claude 대화에서든 Overleaf 프로젝트를 편집하세요.",
+   "chatgpt": "OpenAI의 ChatGPT에 MiLatexAI를 커넥터로 추가하면 그곳에서도 동일하게 작업할 수 있습니다. 같은 프로젝트, 같은 커밋, 같은 Overleaf 히스토리입니다."
+  },
+  "pricing": {
+   "title": "간단한 요금제",
+   "subtitle": "읽기는 항상 무료이며 무제한입니다. 계산되는 것은 오직 쓰기 커밋뿐입니다.",
+   "free": {
+    "name": "무료",
+    "price": "$0",
+    "period": "영구",
+    "features": [
+     "연결된 Overleaf 프로젝트 1개",
+     "월 25회 쓰기 커밋",
+     "무제한 읽기",
+     "Claude 및 ChatGPT와 함께 작동",
+     "암호화된 토큰 저장"
+    ],
+    "cta": "무료로 시작하기"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "출시 예정",
+    "period": "",
+    "badge": "무제한",
+    "features": [
+     "무제한 연결 프로젝트",
+     "무제한 쓰기 커밋",
+     "무제한 읽기",
+     "Claude 및 ChatGPT와 함께 작동",
+     "암호화된 토큰 저장"
+    ],
+    "cta": "알림 받기"
+   },
+   "note": "Pro 가격은 아직 정해지지 않았습니다. 이메일을 남겨 주시면 출시 시 알려드리겠습니다."
+  },
+  "faq": {
+   "title": "연구자들이 묻는 질문",
+   "items": [
+    {
+     "q": "제 Overleaf 토큰은 안전한가요?",
+     "a": "토큰은 채팅이 아니라 milatexai.com/connect의 안전한 웹 양식에 붙여 넣습니다. 토큰은 인증 암호화로 저장 시 암호화되며, 대화 기록에 절대 기록되지 않습니다."
+    },
+    {
+     "q": "제 문서를 볼 수 있나요?",
+     "a": "저희는 문서 내용을 저장하지 않습니다. MiLatexAI는 요청을 처리하기 위해 그 순간에 파일을 읽고 편집할 뿐이며, 저희가 보관하는 것은 계정 이메일, 암호화된 Overleaf 토큰, 그리고 월별 커밋 카운터뿐입니다."
+    },
+    {
+     "q": "어떤 AI 어시스턴트와 함께 작동하나요?",
+     "a": "Anthropic의 Claude와 OpenAI의 ChatGPT 모두와 작동합니다. MiLatexAI는 Model Context Protocol 커넥터이므로, 이미 사용 중인 어시스턴트에 추가하면 됩니다."
+    },
+    {
+     "q": "25회 커밋 한도에 도달하면 어떻게 되나요?",
+     "a": "읽기는 항상 무료이며 무제한입니다. 무료 요금제에서 한 달에 25회 쓰기 커밋에 도달하면, 다음 달 카운터가 초기화될 때까지 기다리거나, 무제한 커밋을 위한 Pro가 출시될 때 이용하실 수 있습니다."
+    },
+    {
+     "q": "정말로 오픈 소스인가요?",
+     "a": "네. 전체 소스 코드는 AGPL 라이선스로 GitHub에 공개되어 있어, 프로젝트를 맡기기 전에 커넥터가 정확히 무엇을 하는지 감사할 수 있습니다."
+    },
+    {
+     "q": "연결을 해제하거나 제 데이터를 삭제할 수 있나요?",
+     "a": "네. 언제든지 프로젝트 연결을 해제할 수 있으며, 저장된 토큰과 계정 정보의 삭제를 요청할 수 있습니다. 저희는 문서를 저장하지 않으므로, 연결을 해제하면 모든 접근이 즉시 중단됩니다."
+    },
+    {
+     "q": "연결하지 않은 프로젝트에도 접근하나요?",
+     "a": "아니요. MiLatexAI는 제공하신 토큰으로 연결한 특정 Overleaf 프로젝트에만 접근합니다. Overleaf 계정의 다른 어떤 것도 볼 수 없습니다."
+    },
+    {
+     "q": "제 변경 사항이 Overleaf 히스토리에 표시되나요?",
+     "a": "네. 모든 쓰기는 Overleaf의 Git 통합을 통해 푸시되는 실제 Git 커밋이므로, 프로젝트 히스토리에 나타나며 그곳에서 차이를 검토하거나 되돌릴 수 있습니다."
+    }
+   ]
+  },
+  "security": {
+   "title": "최소한만 건드리도록 설계",
+   "subtitle": "MiLatexAI가 정확히 무엇을 저장하고, 무엇을 의도적으로 저장하지 않는지.",
+   "points": [
+    {
+     "title": "토큰은 암호화됩니다",
+     "desc": "Overleaf Git 토큰은 인증 암호화로 저장 시 암호화되며, 채팅이 아니라 웹 양식에 입력됩니다."
+    },
+    {
+     "title": "문서를 저장하지 않습니다",
+     "desc": "MiLatexAI는 계정 이메일, 암호화된 토큰, 월별 커밋 카운터만 보관하며, LaTeX 파일의 내용은 절대 보관하지 않습니다."
+    },
+    {
+     "title": "연결한 프로젝트에만 접근",
+     "desc": "접근은 연결하기로 선택한 특정 Overleaf 프로젝트로 제한됩니다. 계정의 다른 어떤 것에도 접근할 수 없습니다."
+    },
+    {
+     "title": "오픈 소스, Azure에서 운영",
+     "desc": "코드는 AGPL 라이선스로 GitHub에 공개되어 있고, 로그인은 WorkOS AuthKit을 통해 이루어지며, 서비스는 캐나다 지역의 Microsoft Azure에서 호스팅됩니다."
+    }
+   ]
+  },
+  "cta": {
+   "title": "AI와 대화하며 논문 편집을 시작하세요",
+   "subtitle": "Claude 또는 ChatGPT에 MiLatexAI를 추가하고, Overleaf 프로젝트 하나를 연결해 무료로 사용해 보세요. 읽기는 항상 무료입니다.",
+   "button": "무료로 시작하기"
+  },
+  "footer": {
+   "blurb": "MiLatexAI는 Git을 통해 Claude와 ChatGPT를 실제 Overleaf 프로젝트에 연결하여, AI와 대화하는 것만으로 LaTeX를 읽고, 편집하고, 컴파일할 수 있게 합니다. AGPL 라이선스 하의 오픈 소스입니다.",
+   "rights": "© 2026 MiLatexAI. 모든 권리 보유.",
+   "language_label": "언어",
+   "contact_label": "지원",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "개인정보처리방침",
+   "updated_label": "최종 업데이트: 2026년 7월",
+   "intro": "본 방침은 MiLatexAI가 무엇을 수집하고, 무엇을 의도적으로 수집하지 않으며, Overleaf 토큰을 어떻게 보호하는지를 쉬운 언어로 설명합니다. MiLatexAI는 작고 독립적인 제품이며, 저희는 여러분의 데이터를 최소한으로만 다루려고 합니다.",
+   "sections": [
+    {
+     "heading": "수집하는 정보",
+     "body": "저희는 단 세 가지만 수집합니다. 싱글 사인온을 통해 제공되는 계정 이메일 주소, 암호화된 형태의 Overleaf Git 토큰, 그리고 이번 달에 만든 쓰기 커밋 수를 세는 카운터입니다. 이것이 전체 목록입니다."
+    },
+    {
+     "heading": "수집하지 않는 정보",
+     "body": "저희는 LaTeX 문서의 내용, 그림, 컴파일된 PDF, 프로젝트 히스토리를 저장하지 않습니다. 파일은 요청을 처리하기 위해 그 순간에 읽고 편집될 뿐이며, 이후 저희가 보관하지 않습니다."
+    },
+    {
+     "heading": "토큰 보호 방식",
+     "body": "Overleaf Git 토큰은 채팅이 아니라 milatexai.com/connect의 웹 양식에 입력되며, 인증 암호화를 사용해 저장 시 암호화됩니다. 토큰은 연결한 특정 프로젝트에 접근하는 데에만 사용되며, 대화 기록에 절대 표시되지 않습니다."
+    },
+    {
+     "heading": "저희가 의존하는 제3자",
+     "body": "로그인은 WorkOS AuthKit이 처리하며, 이를 통해 인증하고 이메일을 제공받습니다. 호스팅은 캐나다 지역의 Microsoft Azure에서 이루어집니다. 여러분의 프로젝트는 Overleaf에 있으며, MiLatexAI는 Overleaf의 Git 통합을 통해 이와 통신합니다. 저희는 여러분의 데이터를 판매하지 않으며, 서비스를 운영하는 데 이 제공업체들이 요구하는 범위를 넘어 공유하지 않습니다."
+    },
+    {
+     "heading": "데이터 보관 및 삭제",
+     "body": "저희는 계정이 활성 상태인 동안에만 이메일, 암호화된 토큰, 커밋 카운터를 보관합니다. 언제든지 프로젝트 연결을 해제하거나 저장된 데이터의 삭제를 요청할 수 있습니다. 저희는 문서를 저장하지 않으므로, 연결을 해제하면 프로젝트에 대한 저희의 접근이 즉시 종료됩니다."
+    },
+    {
+     "heading": "이용자의 권리",
+     "body": "저희가 보유한 제한된 데이터에 대한 접근을 요청하거나, 정정을 요청하거나, 삭제를 요청할 수 있습니다. 요청하시려면 아래 주소로 연락해 주세요."
+    },
+    {
+     "heading": "문의",
+     "body": "개인정보에 관한 질문은 support@milatexai.com으로 보내실 수 있습니다. 이는 초기 단계 제품을 위한 임시 지원 주소이며, 가능한 한 빨리 답변드리겠습니다."
+    }
+   ]
+  },
+  "terms": {
+   "title": "이용약관",
+   "updated_label": "최종 업데이트: 2026년 7월",
+   "intro": "본 약관은 MiLatexAI가 제공하는 것과 여러분이 이를 사용할 수 있는 기준을 설명합니다. MiLatexAI는 작고 독립적인 오픈 소스 제품이므로, 가용성 및 책임 관련 조항을 주의 깊게 읽어 주시기 바랍니다.",
+   "sections": [
+    {
+     "heading": "서비스",
+     "body": "MiLatexAI는 Anthropic의 Claude, OpenAI의 ChatGPT와 같은 AI 어시스턴트가 Model Context Protocol을 통해, 그리고 Overleaf의 Git 통합을 통해 여러분의 Overleaf LaTeX 프로젝트를 읽고, 편집하고, 컴파일할 수 있게 하는 커넥터입니다. 여러분이 일상적인 언어로 AI를 지시하면, 변경 사항이 Git 커밋으로 Overleaf 프로젝트에 푸시됩니다."
+    },
+    {
+     "heading": "허용되는 사용",
+     "body": "MiLatexAI는 여러분이 접근 권한을 가진 Overleaf 프로젝트 및 계정에서만 사용하세요. Overleaf의 약관을 위반하거나, 타인의 권리를 침해하거나, 서비스의 보안을 방해하거나 무력화하려는 목적으로 사용하지 마세요. AI 어시스턴트가 만든 변경 사항에 의존하기 전에 이를 검토하는 것은 여러분의 책임입니다."
+    },
+    {
+     "heading": "여러분의 Overleaf 계정 및 토큰",
+     "body": "Overleaf Git 토큰을 유효하게 유지하고, 커넥터를 통해 그 토큰으로 수행되는 행위에 대한 책임은 여러분에게 있습니다. 저희는 여러분이 제공한 토큰을 암호화하여 연결한 프로젝트에 접근하는 데에만 사용하지만, 여러분의 Overleaf 계정과 그 권한에 대한 통제권은 여러분에게 있습니다."
+    },
+    {
+     "heading": "가용성 및 \"있는 그대로\"",
+     "body": "본 서비스는 어떠한 종류의 보증 없이 \"있는 그대로\" 그리고 \"이용 가능한 대로\" 제공됩니다. 초기 단계의 인디 제품으로서 MiLatexAI는 다운타임, 버그 또는 변경이 있을 수 있으며, 저희는 서비스가 중단되지 않거나, 오류가 없거나, 모든 편집이 올바르게 컴파일된다는 것을 보증하지 않습니다."
+    },
+    {
+     "heading": "책임의 제한",
+     "body": "법이 허용하는 최대 범위 내에서, MiLatexAI와 그 유지관리자는 서비스 사용으로 인해 발생하는 간접적, 부수적 또는 결과적 손해, 또는 데이터 손실이나 작업물 손실에 대해 책임지지 않습니다. 항상 여러분 자신의 사본을 보관하고, Overleaf의 Git 히스토리에 의존하여 변경 사항을 검토하고 되돌리세요."
+    },
+    {
+     "heading": "오픈 소스 코드",
+     "body": "MiLatexAI 소스 코드는 GNU AGPL 라이선스로 배포됩니다. 호스팅 서비스의 사용은 본 약관의 적용을 받으며, 소스 코드의 사용은 추가로 AGPL의 적용을 받습니다. 해당 라이선스에 따라 코드를 읽고, 감사하고, 직접 호스팅하셔도 됩니다."
+    },
+    {
+     "heading": "해지",
+     "body": "언제든지 MiLatexAI 사용을 중단하고 프로젝트 연결을 해제할 수 있습니다. 본 약관이 위반되거나 서비스를 중단해야 할 경우 저희가 접근을 정지하거나 종료할 수 있으며, 이를 알리기 위해 합리적인 노력을 기울이겠습니다."
+    },
+    {
+     "heading": "본 약관의 변경",
+     "body": "제품이 발전함에 따라 본 약관을 업데이트할 수 있습니다. 중대한 변경이 있을 경우 위의 날짜를 갱신하며, 서비스를 계속 사용하는 것은 개정된 약관에 동의하는 것을 의미합니다."
+    },
+    {
+     "heading": "문의",
+     "body": "본 약관에 관한 질문은 초기 단계 제품을 위한 임시 지원 주소인 support@milatexai.com으로 보내실 수 있습니다."
+    }
+   ]
+  }
+ },
+ "ru": {
+  "brand_tagline": "Общайтесь со своим ИИ. Редактируйте настоящую статью в Overleaf.",
+  "nav": {
+   "features": "Возможности",
+   "how": "Как это работает",
+   "pricing": "Тарифы",
+   "faq": "Частые вопросы",
+   "privacy": "Конфиденциальность",
+   "terms": "Условия",
+   "get_started": "Начать",
+   "manage_subscription": "Управление подпиской"
+  },
+  "hero": {
+   "badge": "Работает с Claude и ChatGPT",
+   "title": "Редактируйте LaTeX в Overleaf, просто общаясь со своим ИИ",
+   "subtitle": "MiLatexAI связывает Claude или ChatGPT с вашими реальными проектами в Overleaf через Git. Просите обычными словами прочитать раздел, переписать LaTeX, вставить рисунок или проверить, что всё по-прежнему компилируется, — и каждое изменение попадает в Overleaf как настоящий коммит Git, который вы можете увидеть и откатить.",
+   "cta_primary": "Начать бесплатно",
+   "cta_secondary": "Посмотреть, как это работает",
+   "note": "Бесплатный тариф: 1 проект и 25 коммитов с изменениями в месяц. Чтение всегда бесплатно."
+  },
+  "trust": "Ваш Git-токен Overleaf вводится в защищённой веб-форме, хранится в зашифрованном виде и никогда не появляется в чате. Полный код коннектора открыт на GitHub под лицензией AGPL, поэтому вы можете точно проверить, что именно он делает.",
+  "features": [
+   {
+    "title": "Редактирование через диалог",
+    "desc": "Попросите свой ИИ подтянуть аннотацию, переписать абзац или привести в порядок доказательство. Он читает и редактирует реальный LaTeX в вашем проекте Overleaf, а не его копию."
+   },
+   {
+    "title": "Изменения сразу попадают в Overleaf",
+    "desc": "Правки отправляются в ваш проект через Git-интеграцию Overleaf, поэтому статья обновляется прямо на месте. Никакого копирования между окном чата и вашим редактором."
+   },
+   {
+    "title": "Каждая запись — настоящий коммит Git",
+    "desc": "Каждое изменение — это полноценный коммит в истории вашего Overleaf. Вы можете увидеть его, просмотреть diff и откатить точно так же, как любой другой коммит. Ничего не происходит незаметно."
+   },
+   {
+    "title": "Проверка компиляции",
+    "desc": "Попросите ИИ убедиться, что ваш LaTeX всё ещё собирается, прежде чем доверять правке, — так вы поймаете сломанный \\\\begin или пропущенную скобку сейчас, а не в день дедлайна."
+   },
+   {
+    "title": "Ваш токен остаётся вне чата",
+    "desc": "Вы вставляете свой Git-токен Overleaf в защищённую веб-форму, а не в разговор. Он хранится в зашифрованном виде и никогда не записывается в стенограмму."
+   },
+   {
+    "title": "Открытый код и возможность аудита",
+    "desc": "Весь коннектор публично доступен на GitHub под лицензией AGPL, поэтому вы можете точно прочитать, как он обращается с вашим токеном и проектами, прежде чем довериться ему."
+   }
+  ],
+  "how": {
+   "title": "От чата до коммита за три шага",
+   "subtitle": "Подключитесь один раз, а дальше просто общайтесь со своим ИИ.",
+   "steps": [
+    {
+     "title": "Добавьте коннектор и войдите",
+     "desc": "Добавьте MiLatexAI как коннектор в Claude или ChatGPT и войдите через единый вход (SSO), который обеспечивает WorkOS."
+    },
+    {
+     "title": "Безопасно вставьте токен Overleaf",
+     "desc": "Запустите start_connect, чтобы получить одноразовую ссылку на milatexai.com/connect, затем вставьте свой Git-токен Overleaf в веб-форму. Он сразу шифруется и никогда не появляется в чате."
+    },
+    {
+     "title": "Попросите ИИ отредактировать статью",
+     "desc": "Обычными словами попросите вывести список файлов, прочитать разделы, переписать LaTeX, добавить рисунки или проверить компиляцию. Ваши изменения коммитятся в Overleaf в реальном времени."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "Используйте свой ИИ",
+   "subtitle": "MiLatexAI — это коннектор Model Context Protocol, поэтому он работает с тем ассистентом, которым вы уже пользуетесь.",
+   "claude": "Добавьте MiLatexAI как коннектор в Claude от Anthropic и редактируйте свои проекты Overleaf из любого разговора с Claude.",
+   "chatgpt": "Добавьте MiLatexAI как коннектор в ChatGPT от OpenAI и делайте то же самое там — те же проекты, те же коммиты, та же история Overleaf."
+  },
+  "pricing": {
+   "title": "Простые тарифы",
+   "subtitle": "Чтение всегда бесплатно и без ограничений. Учитываются только коммиты с изменениями.",
+   "free": {
+    "name": "Бесплатный",
+    "price": "$0",
+    "period": "навсегда",
+    "features": [
+     "1 подключённый проект Overleaf",
+     "25 коммитов с изменениями в месяц",
+     "Неограниченное чтение",
+     "Работает с Claude и ChatGPT",
+     "Зашифрованное хранение токена"
+    ],
+    "cta": "Начать бесплатно"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "Скоро",
+    "period": "",
+    "badge": "Без ограничений",
+    "features": [
+     "Неограниченное число подключённых проектов",
+     "Неограниченное число коммитов с изменениями",
+     "Неограниченное чтение",
+     "Работает с Claude и ChatGPT",
+     "Зашифрованное хранение токена"
+    ],
+    "cta": "Уведомить меня"
+   },
+   "note": "Цена Pro пока не установлена. Оставьте свой email, и мы сообщим вам о запуске."
+  },
+  "faq": {
+   "title": "Вопросы, которые задают исследователи",
+   "items": [
+    {
+     "q": "Безопасен ли мой токен Overleaf?",
+     "a": "Вы вставляете токен в защищённую веб-форму на milatexai.com/connect, а не в чат. Он хранится в зашифрованном виде с аутентифицированным шифрованием и никогда не записывается в стенограмму разговора."
+    },
+    {
+     "q": "Видите ли вы мои документы?",
+     "a": "Мы не храним содержимое ваших документов. MiLatexAI читает и редактирует ваши файлы в момент выполнения запроса, но единственное, что мы сохраняем, — это email вашей учётной записи, зашифрованный токен Overleaf и месячный счётчик коммитов."
+    },
+    {
+     "q": "С какими ИИ-ассистентами это работает?",
+     "a": "И с Claude от Anthropic, и с ChatGPT от OpenAI. MiLatexAI — это коннектор Model Context Protocol, поэтому вы добавляете его в тот ассистент, которым уже пользуетесь."
+    },
+    {
+     "q": "Что произойдёт, если я достигну лимита в 25 коммитов?",
+     "a": "Чтение всегда остаётся бесплатным и безлимитным. Как только вы достигнете 25 коммитов с изменениями за месяц на бесплатном тарифе, вы можете дождаться сброса счётчика в следующем месяце или перейти на Pro после его запуска для неограниченного числа коммитов."
+    },
+    {
+     "q": "Это действительно открытый код?",
+     "a": "Да. Полный исходный код публично доступен на GitHub под лицензией AGPL, поэтому вы можете точно проверить, что делает коннектор, прежде чем доверить ему свои проекты."
+    },
+    {
+     "q": "Могу ли я отключиться или удалить свои данные?",
+     "a": "Да. Вы можете отключить проект в любой момент и попросить нас удалить сохранённый токен и данные учётной записи. Поскольку мы не храним ваши документы, отключение немедленно прекращает любой доступ."
+    },
+    {
+     "q": "Затрагивает ли это проекты, которые я не подключал?",
+     "a": "Нет. MiLatexAI обращается только к тем конкретным проектам Overleaf, которые вы подключаете с помощью предоставленного токена. Ему не видно ничего другого в вашей учётной записи Overleaf."
+    },
+    {
+     "q": "Будут ли мои изменения отображаться в истории Overleaf?",
+     "a": "Да. Каждая запись — это настоящий коммит Git, отправленный через Git-интеграцию Overleaf, поэтому он появляется в истории вашего проекта, где вы можете просмотреть diff или откатить его."
+    }
+   ]
+  },
+  "security": {
+   "title": "Создано так, чтобы затрагивать как можно меньше",
+   "subtitle": "Что именно хранит MiLatexAI и что он намеренно не хранит.",
+   "points": [
+    {
+     "title": "Ваш токен зашифрован",
+     "desc": "Git-токены Overleaf хранятся в зашифрованном виде с аутентифицированным шифрованием и вводятся в веб-форме, а не в чате."
+    },
+    {
+     "title": "Мы не храним ваши документы",
+     "desc": "MiLatexAI хранит только email вашей учётной записи, зашифрованный токен и месячный счётчик коммитов — никогда содержимое ваших файлов LaTeX."
+    },
+    {
+     "title": "Только подключённые вами проекты",
+     "desc": "Доступ ограничен теми конкретными проектами Overleaf, которые вы решили подключить. Ничто другое в вашей учётной записи недоступно."
+    },
+    {
+     "title": "Открытый код, работает на Azure",
+     "desc": "Код публично доступен на GitHub под лицензией AGPL, вход выполняется через WorkOS AuthKit, а сервис размещён на Microsoft Azure в регионе Канады."
+    }
+   ]
+  },
+  "cta": {
+   "title": "Начните редактировать статью, просто общаясь со своим ИИ",
+   "subtitle": "Добавьте MiLatexAI в Claude или ChatGPT, подключите один проект Overleaf и попробуйте бесплатно. Чтение всегда бесплатно.",
+   "button": "Начать бесплатно"
+  },
+  "footer": {
+   "blurb": "MiLatexAI связывает Claude и ChatGPT с вашими реальными проектами Overleaf через Git, чтобы вы могли читать, редактировать и компилировать свой LaTeX, просто общаясь со своим ИИ. Открытый код под лицензией AGPL.",
+   "rights": "© 2026 MiLatexAI. Все права защищены.",
+   "language_label": "Язык",
+   "contact_label": "Поддержка",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "Политика конфиденциальности",
+   "updated_label": "Последнее обновление: июль 2026",
+   "intro": "Эта политика простыми словами объясняет, что собирает MiLatexAI, что он намеренно не собирает и как защищается ваш токен Overleaf. MiLatexAI — небольшой независимый продукт, и мы стараемся затрагивать как можно меньше ваших данных.",
+   "sections": [
+    {
+     "heading": "Что мы собираем",
+     "body": "Мы собираем всего три вещи: email вашей учётной записи (предоставленный через единый вход), ваш Git-токен Overleaf в зашифрованном виде и счётчик того, сколько коммитов с изменениями вы сделали в текущем месяце. Это полный список."
+    },
+    {
+     "heading": "Что мы НЕ собираем",
+     "body": "Мы не храним содержимое ваших документов LaTeX, ваши рисунки, скомпилированные PDF или историю ваших проектов. Файлы читаются и редактируются в момент выполнения ваших запросов и после этого нами не сохраняются."
+    },
+    {
+     "heading": "Как защищён ваш токен",
+     "body": "Ваш Git-токен Overleaf вводится в веб-форму на milatexai.com/connect, а не в чат, и хранится в зашифрованном виде с использованием аутентифицированного шифрования. Он используется только для доступа к подключённым вами проектам и никогда не отображается в стенограмме разговора."
+    },
+    {
+     "heading": "Сторонние сервисы, на которые мы полагаемся",
+     "body": "Вход обрабатывается WorkOS AuthKit, который аутентифицирует вас и предоставляет ваш email. Хостинг — на Microsoft Azure в регионе Канады. Ваши проекты находятся на Overleaf, и MiLatexAI взаимодействует с ними через Git-интеграцию Overleaf. Мы не продаём ваши данные и не передаём их за пределы того, что необходимо этим поставщикам для работы сервиса."
+    },
+    {
+     "heading": "Хранение и удаление данных",
+     "body": "Мы храним ваш email, зашифрованный токен и счётчик коммитов только пока ваша учётная запись активна. Вы можете отключить проект или попросить нас удалить сохранённые данные в любой момент. Поскольку мы не храним ваши документы, отключение немедленно прекращает наш доступ к вашим проектам."
+    },
+    {
+     "heading": "Ваши права",
+     "body": "Вы можете запросить доступ к тем ограниченным данным, которые мы о вас храним, попросить исправить их или удалить. Чтобы отправить запрос, свяжитесь с нами по адресу ниже."
+    },
+    {
+     "heading": "Контакты",
+     "body": "Вопросы о конфиденциальности можно направлять на support@milatexai.com. Это временный адрес поддержки для продукта на раннем этапе, и мы ответим, как только сможем."
+    }
+   ]
+  },
+  "terms": {
+   "title": "Условия использования",
+   "updated_label": "Последнее обновление: июль 2026",
+   "intro": "Эти условия объясняют, что предоставляет MiLatexAI и на каких основаниях вы можете его использовать. MiLatexAI — небольшой независимый продукт с открытым кодом, поэтому, пожалуйста, внимательно прочитайте разделы о доступности и ответственности.",
+   "sections": [
+    {
+     "heading": "Сервис",
+     "body": "MiLatexAI — это коннектор, позволяющий ИИ-ассистентам, таким как Claude от Anthropic и ChatGPT от OpenAI, читать, редактировать и компилировать ваши проекты Overleaf на LaTeX через Git-интеграцию Overleaf, посредством Model Context Protocol. Вы управляете ИИ обычными словами, и ваши изменения отправляются в ваш проект Overleaf в виде коммитов Git."
+    },
+    {
+     "heading": "Допустимое использование",
+     "body": "Используйте MiLatexAI только с теми проектами и учётными записями Overleaf, к которым у вас есть авторизованный доступ. Не используйте его для нарушения условий Overleaf, ущемления прав других лиц или попыток нарушить либо обойти безопасность сервиса. Вы несёте ответственность за проверку изменений, которые вносит ваш ИИ-ассистент, прежде чем полагаться на них."
+    },
+    {
+     "heading": "Ваша учётная запись Overleaf и токены",
+     "body": "Вы несёте ответственность за поддержание действительности вашего Git-токена Overleaf и за действия, совершённые с его помощью через коннектор. Мы шифруем предоставленный вами токен и используем его только для доступа к подключённым вами проектам, но вы сохраняете контроль над своей учётной записью Overleaf и её правами доступа."
+    },
+    {
+     "heading": "Доступность и предоставление «как есть»",
+     "body": "Сервис предоставляется «как есть» и «по мере доступности», без каких-либо гарантий. Как продукт на раннем этапе от независимого разработчика, MiLatexAI может иметь простои, ошибки или изменения, и мы не гарантируем, что он будет работать бесперебойно, без ошибок или что каждая правка скомпилируется корректно."
+    },
+    {
+     "heading": "Ограничение ответственности",
+     "body": "В максимальной степени, разрешённой законом, MiLatexAI и его сопровождающие не несут ответственности за любой косвенный, случайный или сопутствующий ущерб, а также за потерю данных или утрату работы, возникшие в результате использования вами сервиса. Всегда сохраняйте собственные копии и полагайтесь на историю Git в Overleaf для проверки и отката изменений."
+    },
+    {
+     "heading": "Открытый исходный код",
+     "body": "Исходный код MiLatexAI выпущен под лицензией GNU AGPL. Использование вами размещённого сервиса регулируется этими условиями, тогда как использование исходного кода дополнительно регулируется AGPL. Вы можете читать, проверять и самостоятельно размещать код в соответствии с этой лицензией."
+    },
+    {
+     "heading": "Прекращение использования",
+     "body": "Вы можете прекратить использование MiLatexAI и отключить свои проекты в любой момент. Мы можем приостановить или прекратить доступ в случае нарушения этих условий или если нам потребуется закрыть сервис, и мы приложим разумные усилия, чтобы уведомить вас."
+    },
+    {
+     "heading": "Изменения в этих условиях",
+     "body": "Мы можем обновлять эти условия по мере развития продукта. При внесении существенных изменений мы обновим дату выше, и продолжение использования сервиса означает, что вы принимаете пересмотренные условия."
+    },
+    {
+     "heading": "Контакты",
+     "body": "Вопросы об этих условиях можно направлять на support@milatexai.com — временный адрес поддержки для этого продукта на раннем этапе."
+    }
+   ]
+  }
+ },
+ "it": {
+  "brand_tagline": "Parla con la tua AI. Modifica il tuo vero documento Overleaf.",
+  "nav": {
+   "features": "Funzionalità",
+   "how": "Come funziona",
+   "pricing": "Prezzi",
+   "faq": "FAQ",
+   "privacy": "Privacy",
+   "terms": "Termini",
+   "get_started": "Inizia ora",
+   "manage_subscription": "Gestisci abbonamento"
+  },
+  "hero": {
+   "badge": "Compatibile con Claude e ChatGPT",
+   "title": "Modifica il tuo LaTeX su Overleaf parlando con la tua AI",
+   "subtitle": "MiLatexAI collega Claude o ChatGPT ai tuoi progetti Overleaf reali tramite Git. Chiedi in linguaggio naturale di leggere una sezione, riscrivere il LaTeX, inserire una figura o verificare che compili ancora: ogni modifica arriva su Overleaf come un vero commit Git che puoi visualizzare e annullare.",
+   "cta_primary": "Inizia gratis",
+   "cta_secondary": "Scopri come funziona",
+   "note": "Piano gratuito: 1 progetto e 25 commit di scrittura al mese. Le letture sono sempre gratuite."
+  },
+  "trust": "Il tuo token Git di Overleaf viene inserito in un modulo web sicuro, cifrato a riposo e non compare mai nella chat. L'intero connettore è open source su GitHub con licenza AGPL, così puoi verificare esattamente ciò che fa.",
+  "features": [
+   {
+    "title": "Modifica conversando",
+    "desc": "Chiedi alla tua AI di sintetizzare un abstract, riscrivere un paragrafo o ripulire una dimostrazione. Legge e modifica il LaTeX reale del tuo progetto Overleaf, non una copia."
+   },
+   {
+    "title": "Le modifiche vanno direttamente su Overleaf",
+    "desc": "Le modifiche vengono inviate al tuo progetto tramite l'integrazione Git di Overleaf, così il tuo documento si aggiorna sul posto. Niente copia-incolla tra la finestra della chat e il tuo editor."
+   },
+   {
+    "title": "Ogni scrittura è un vero commit Git",
+    "desc": "Ogni modifica è un commit autentico nella cronologia di Overleaf. Puoi visualizzarlo, esaminare il diff e annullarlo esattamente come qualsiasi altro commit. Nulla accade in silenzio."
+   },
+   {
+    "title": "Verifica che compili",
+    "desc": "Chiedi all'AI di confermare che il tuo LaTeX si compili ancora prima di fidarti di una modifica, così individui un \\\\begin danneggiato o una parentesi mancante ora invece che alla scadenza."
+   },
+   {
+    "title": "Il tuo token resta fuori dalla chat",
+    "desc": "Incolli il tuo token Git di Overleaf in un modulo web sicuro, mai nella conversazione. È cifrato a riposo e non viene mai scritto nella trascrizione."
+   },
+   {
+    "title": "Open source e verificabile",
+    "desc": "L'intero connettore è pubblico su GitHub con licenza AGPL, così puoi leggere con precisione come gestisce il tuo token e i tuoi progetti prima di dargli fiducia."
+   }
+  ],
+  "how": {
+   "title": "Dalla chat al commit in tre passaggi",
+   "subtitle": "Collega una volta, poi parla semplicemente con la tua AI.",
+   "steps": [
+    {
+     "title": "Aggiungi il connettore e accedi",
+     "desc": "Aggiungi MiLatexAI come connettore in Claude o ChatGPT e accedi con il single sign-on, gestito da WorkOS."
+    },
+    {
+     "title": "Incolla il tuo token Overleaf in modo sicuro",
+     "desc": "Esegui start_connect per ottenere un link monouso a milatexai.com/connect, poi incolla il tuo token Git di Overleaf nel modulo web. Viene cifrato immediatamente e non compare mai nella chat."
+    },
+    {
+     "title": "Chiedi all'AI di modificare il tuo documento",
+     "desc": "In linguaggio naturale, chiedile di elencare i file, leggere sezioni, riscrivere il LaTeX, aggiungere figure o verificare che compili. Le tue modifiche vengono committate in tempo reale su Overleaf."
+    }
+   ]
+  },
+  "platforms": {
+   "title": "Usa la tua AI preferita",
+   "subtitle": "MiLatexAI è un connettore Model Context Protocol, quindi funziona con l'assistente che già usi.",
+   "claude": "Aggiungi MiLatexAI come connettore in Claude di Anthropic e modifica i tuoi progetti Overleaf da qualsiasi conversazione con Claude.",
+   "chatgpt": "Aggiungi MiLatexAI come connettore in ChatGPT di OpenAI e fai lo stesso anche lì: stessi progetti, stessi commit, stessa cronologia Overleaf."
+  },
+  "pricing": {
+   "title": "Prezzi semplici",
+   "subtitle": "Le letture sono sempre gratuite e illimitate. Conti solo i commit di scrittura.",
+   "free": {
+    "name": "Gratuito",
+    "price": "$0",
+    "period": "per sempre",
+    "features": [
+     "1 progetto Overleaf collegato",
+     "25 commit di scrittura al mese",
+     "Letture illimitate",
+     "Compatibile con Claude e ChatGPT",
+     "Archiviazione del token cifrata"
+    ],
+    "cta": "Inizia gratis"
+   },
+   "pro": {
+    "name": "Pro",
+    "price": "Presto disponibile",
+    "period": "",
+    "badge": "Illimitato",
+    "features": [
+     "Progetti collegati illimitati",
+     "Commit di scrittura illimitati",
+     "Letture illimitate",
+     "Compatibile con Claude e ChatGPT",
+     "Archiviazione del token cifrata"
+    ],
+    "cta": "Ricevi una notifica"
+   },
+   "note": "Il prezzo del piano Pro non è ancora definito. Lascia la tua email e ti avviseremo al lancio."
+  },
+  "faq": {
+   "title": "Le domande dei ricercatori",
+   "items": [
+    {
+     "q": "Il mio token Overleaf è al sicuro?",
+     "a": "Incolli il tuo token in un modulo web sicuro su milatexai.com/connect, mai nella chat. È cifrato a riposo con cifratura autenticata e non viene mai scritto nella trascrizione della conversazione."
+    },
+    {
+     "q": "Potete vedere i miei documenti?",
+     "a": "Non memorizziamo i contenuti dei tuoi documenti. MiLatexAI legge e modifica i tuoi file al momento per eseguire una richiesta, ma le uniche cose che conserviamo sono l'email del tuo account, il tuo token Overleaf cifrato e un contatore mensile dei commit."
+    },
+    {
+     "q": "Con quali assistenti AI funziona?",
+     "a": "Sia con Claude di Anthropic sia con ChatGPT di OpenAI. MiLatexAI è un connettore Model Context Protocol, quindi lo aggiungi nell'assistente che già usi."
+    },
+    {
+     "q": "Cosa succede se raggiungo il limite di 25 commit?",
+     "a": "Le letture restano sempre gratuite e illimitate. Una volta raggiunti i 25 commit di scrittura in un mese con il piano gratuito, puoi attendere il reset del contatore il mese successivo oppure passare a Pro al suo lancio per commit illimitati."
+    },
+    {
+     "q": "È davvero open source?",
+     "a": "Sì. L'intero codice sorgente è pubblico su GitHub con licenza AGPL, così puoi verificare esattamente cosa fa il connettore prima di affidargli i tuoi progetti."
+    },
+    {
+     "q": "Posso disconnettermi o eliminare i miei dati?",
+     "a": "Sì. Puoi disconnettere un progetto in qualsiasi momento e puoi chiederci di eliminare il tuo token memorizzato e i dettagli del tuo account. Poiché non memorizziamo i tuoi documenti, la disconnessione interrompe immediatamente ogni accesso."
+    },
+    {
+     "q": "Accede a progetti che non ho collegato?",
+     "a": "No. MiLatexAI accede solo agli specifici progetti Overleaf che colleghi con il token che fornisci. Non ha alcuna visibilità su nient'altro nel tuo account Overleaf."
+    },
+    {
+     "q": "Le mie modifiche compariranno nella cronologia di Overleaf?",
+     "a": "Sì. Ogni scrittura è un vero commit Git inviato tramite l'integrazione Git di Overleaf, quindi compare nella cronologia del tuo progetto dove puoi esaminare il diff o annullarlo."
+    }
+   ]
+  },
+  "security": {
+   "title": "Progettato per accedere al minimo indispensabile",
+   "subtitle": "Esattamente ciò che MiLatexAI memorizza, e ciò che deliberatamente non memorizza.",
+   "points": [
+    {
+     "title": "Il tuo token è cifrato",
+     "desc": "I token Git di Overleaf sono cifrati a riposo con cifratura autenticata e vengono inseriti in un modulo web anziché nella chat."
+    },
+    {
+     "title": "Non memorizziamo i tuoi documenti",
+     "desc": "MiLatexAI conserva solo l'email del tuo account, il tuo token cifrato e un contatore mensile dei commit, mai i contenuti dei tuoi file LaTeX."
+    },
+    {
+     "title": "Solo i progetti che colleghi",
+     "desc": "L'accesso è limitato agli specifici progetti Overleaf che scegli di collegare. Nient'altro nel tuo account è raggiungibile."
+    },
+    {
+     "title": "Open source, in esecuzione su Azure",
+     "desc": "Il codice è pubblico su GitHub con licenza AGPL, l'accesso avviene tramite WorkOS AuthKit e il servizio è ospitato su Microsoft Azure nella regione Canada."
+    }
+   ]
+  },
+  "cta": {
+   "title": "Inizia a modificare il tuo documento parlando con la tua AI",
+   "subtitle": "Aggiungi MiLatexAI a Claude o ChatGPT, collega un progetto Overleaf e provalo gratis. Le letture sono sempre gratuite.",
+   "button": "Inizia gratis"
+  },
+  "footer": {
+   "blurb": "MiLatexAI collega Claude e ChatGPT ai tuoi progetti Overleaf reali tramite Git, così puoi leggere, modificare e compilare il tuo LaTeX semplicemente parlando con la tua AI. Open source con licenza AGPL.",
+   "rights": "© 2026 MiLatexAI. Tutti i diritti riservati.",
+   "language_label": "Lingua",
+   "contact_label": "Assistenza",
+   "contact_value": "support@milatexai.com"
+  },
+  "privacy": {
+   "title": "Informativa sulla privacy",
+   "updated_label": "Ultimo aggiornamento: luglio 2026",
+   "intro": "Questa informativa spiega, in linguaggio semplice, cosa raccoglie MiLatexAI, cosa deliberatamente non raccoglie e come viene protetto il tuo token Overleaf. MiLatexAI è un prodotto piccolo e indipendente, e cerchiamo di toccare il meno possibile dei tuoi dati.",
+   "sections": [
+    {
+     "heading": "Cosa raccogliamo",
+     "body": "Raccogliamo solo tre cose: l'indirizzo email del tuo account (fornito tramite single sign-on), il tuo token Git di Overleaf in forma cifrata e un contatore di quanti commit di scrittura hai effettuato nel mese in corso. Questo è l'elenco completo."
+    },
+    {
+     "heading": "Cosa NON raccogliamo",
+     "body": "Non memorizziamo i contenuti dei tuoi documenti LaTeX, le tue figure, i tuoi PDF compilati o la cronologia dei tuoi progetti. I file vengono letti e modificati al momento per eseguire le tue richieste e non vengono da noi conservati in seguito."
+    },
+    {
+     "heading": "Come viene protetto il tuo token",
+     "body": "Il tuo token Git di Overleaf viene inserito in un modulo web su milatexai.com/connect, mai nella chat, ed è cifrato a riposo con cifratura autenticata. Viene utilizzato solo per accedere agli specifici progetti che colleghi e non viene mai mostrato nella trascrizione della conversazione."
+    },
+    {
+     "heading": "Terze parti su cui ci affidiamo",
+     "body": "L'accesso è gestito da WorkOS AuthKit, che ti autentica e fornisce la tua email. L'hosting è su Microsoft Azure nella regione Canada. I tuoi progetti risiedono su Overleaf, e MiLatexAI comunica con essi tramite l'integrazione Git di Overleaf. Non vendiamo i tuoi dati né li condividiamo oltre quanto richiesto da questi fornitori per erogare il servizio."
+    },
+    {
+     "heading": "Conservazione ed eliminazione dei dati",
+     "body": "Conserviamo la tua email, il token cifrato e il contatore dei commit solo finché il tuo account è attivo. Puoi disconnettere un progetto o chiederci di eliminare i tuoi dati memorizzati in qualsiasi momento. Poiché non memorizziamo i tuoi documenti, la disconnessione pone immediatamente fine al nostro accesso ai tuoi progetti."
+    },
+    {
+     "heading": "I tuoi diritti",
+     "body": "Puoi richiedere l'accesso ai dati limitati che deteniamo su di te, chiederne la correzione o chiederne l'eliminazione. Per inoltrare una richiesta, contattaci all'indirizzo qui sotto."
+    },
+    {
+     "heading": "Contatti",
+     "body": "Le domande sulla privacy possono essere inviate a support@milatexai.com. Questo è un indirizzo di assistenza provvisorio per un prodotto in fase iniziale, e risponderemo il prima possibile."
+    }
+   ]
+  },
+  "terms": {
+   "title": "Termini di servizio",
+   "updated_label": "Ultimo aggiornamento: luglio 2026",
+   "intro": "Questi termini spiegano cosa offre MiLatexAI e le condizioni in base alle quali puoi utilizzarlo. MiLatexAI è un prodotto piccolo, indipendente e open source, quindi ti preghiamo di leggere attentamente le sezioni su disponibilità e responsabilità.",
+   "sections": [
+    {
+     "heading": "Il servizio",
+     "body": "MiLatexAI è un connettore che consente ad assistenti AI come Claude di Anthropic e ChatGPT di OpenAI di leggere, modificare e compilare i tuoi progetti LaTeX su Overleaf tramite l'integrazione Git di Overleaf, attraverso il Model Context Protocol. Tu guidi l'AI in linguaggio naturale e le tue modifiche vengono inviate al tuo progetto Overleaf come commit Git."
+    },
+    {
+     "heading": "Uso accettabile",
+     "body": "Utilizza MiLatexAI solo con progetti e account Overleaf a cui sei autorizzato ad accedere. Non usarlo per violare i termini di Overleaf, per ledere i diritti altrui o per tentare di disturbare o compromettere la sicurezza del servizio. Sei responsabile della revisione delle modifiche apportate dal tuo assistente AI prima di fare affidamento su di esse."
+    },
+    {
+     "heading": "Il tuo account e i tuoi token Overleaf",
+     "body": "Sei responsabile del mantenimento della validità del tuo token Git di Overleaf e delle azioni intraprese tramite esso attraverso il connettore. Cifriamo il token che fornisci e lo utilizziamo solo per accedere ai progetti che colleghi, ma resti tu a controllare il tuo account Overleaf e i suoi permessi."
+    },
+    {
+     "heading": "Disponibilità e \"così com'è\"",
+     "body": "Il servizio è fornito \"così com'è\" e \"come disponibile\", senza garanzie di alcun tipo. Essendo un prodotto indie in fase iniziale, MiLatexAI può presentare interruzioni, bug o modifiche, e non garantiamo che sarà ininterrotto, privo di errori o che ogni modifica compilerà correttamente."
+    },
+    {
+     "heading": "Limitazione di responsabilità",
+     "body": "Nella massima misura consentita dalla legge, MiLatexAI e i suoi manutentori non sono responsabili per eventuali danni indiretti, incidentali o consequenziali, né per la perdita di dati o di lavoro, derivanti dal tuo utilizzo del servizio. Conserva sempre copie personali e affidati alla cronologia Git di Overleaf per esaminare e annullare le modifiche."
+    },
+    {
+     "heading": "Codice open source",
+     "body": "Il codice sorgente di MiLatexAI è rilasciato con licenza GNU AGPL. Il tuo utilizzo del servizio ospitato è regolato da questi termini, mentre il tuo utilizzo del codice sorgente è ulteriormente regolato dalla AGPL. Sei libero di leggere, verificare e ospitare autonomamente il codice in conformità con tale licenza."
+    },
+    {
+     "heading": "Risoluzione",
+     "body": "Puoi smettere di usare MiLatexAI e disconnettere i tuoi progetti in qualsiasi momento. Possiamo sospendere o terminare l'accesso in caso di violazione di questi termini o qualora dovessimo interrompere il servizio, e faremo ragionevoli sforzi per informarti."
+    },
+    {
+     "heading": "Modifiche a questi termini",
+     "body": "Possiamo aggiornare questi termini con l'evolversi del prodotto. Quando apporteremo modifiche sostanziali, aggiorneremo la data indicata sopra, e l'uso continuato del servizio implica l'accettazione dei termini revisionati."
+    },
+    {
+     "heading": "Contatti",
+     "body": "Le domande su questi termini possono essere inviate a support@milatexai.com, un indirizzo di assistenza provvisorio per questo prodotto in fase iniziale."
+    }
+   ]
+  }
+ }
+}
