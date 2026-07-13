@@ -129,12 +129,15 @@ def test_connect_post_stores_encrypted_token_and_succeeds(harness):
     p = projects[0]
     assert p.project_id == HEX
     assert p.name == "thesis"
-    # Token is stored ENCRYPTED, not in the clear, and decrypts back.
-    assert "olp_realtoken123" not in p.token_encrypted
-    assert cipher.decrypt(p.token_encrypted) == "olp_realtoken123"
+    # The token is stored at the ACCOUNT level now (one token, many projects);
+    # the project itself carries no token.
+    assert p.token_encrypted == ""
+    user = asyncio.run(store.get_user("user_web"))
+    assert "olp_realtoken123" not in user.overleaf_token_encrypted
+    assert cipher.decrypt(user.overleaf_token_encrypted) == "olp_realtoken123"
 
 
-def test_connect_link_is_single_use(harness):
+def test_connect_link_reusable_within_ttl(harness):
     store, cipher, mcp = harness
     code = mint_connect_code(cipher, "user_web", "web@example.com")
     payload = {
@@ -146,10 +149,10 @@ def test_connect_link_is_single_use(harness):
     with TestClient(mcp.http_app()) as client:
         first = client.post("/connect", data=payload)
         second = client.post("/connect", data=payload)
+    # Codes are reusable within their TTL (the manage forms submit repeatedly);
+    # re-submitting the same project just updates it — no duplicate.
     assert first.status_code == 200
-    assert second.status_code == 409
-    assert "already been used" in second.text.lower()
-    # And the replay did not create a duplicate project.
+    assert second.status_code == 200
     assert len(_projects(store, "user_web")) == 1
 
 

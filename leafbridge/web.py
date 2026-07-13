@@ -46,6 +46,11 @@ button {
   color: #fff; background: #2f6df6; border: 0; border-radius: 9px; cursor: pointer;
 }
 button:hover { background: #245ce0; }
+.btn-danger { width: auto; margin: 0; padding: 8px 14px; font-size: 13px; background: #e5484d; }
+.btn-danger:hover { background: #c93b40; }
+.proj-list { margin: 14px 0 4px; }
+.proj-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #e6e9ef; }
+@media (prefers-color-scheme: dark) { .proj-row { border-color: #2a2e37; } }
 .hint { font-size: 12px; color: #6b7280; margin: 5px 0 0; }
 .hint a { color: #2f6df6; }
 .note {
@@ -140,6 +145,79 @@ def render_notice(title: str, message: str, *, icon: str = "⚠️") -> str:
   <h1>{html.escape(title)}</h1>
   <p class='muted'>{html.escape(message)}</p>
 </div>""",
+    )
+
+
+def render_manage_projects(code: str, projects, *, email: str = "", error: str | None = None) -> str:
+    """The 'update the list of projects' form: add by URL / remove. No token."""
+    err_html = f"<div class='error'>{html.escape(error)}</div>" if error else ""
+    rows = ""
+    for p in projects:
+        rows += (
+            "<div class='proj-row'><span><b>"
+            f"{html.escape(p.name)}</b><br><small class='muted'>{html.escape(p.project_id)}</small></span>"
+            "<form method='post' action='/projects' style='margin:0'>"
+            f"<input type='hidden' name='code' value='{html.escape(code, quote=True)}'>"
+            "<input type='hidden' name='action' value='remove'>"
+            f"<input type='hidden' name='project_id' value='{html.escape(p.project_id, quote=True)}'>"
+            "<button class='btn-danger' type='submit'>Remove</button></form></div>"
+        )
+    if not rows:
+        rows = "<p class='muted'>No projects connected yet.</p>"
+    codeq = html.escape(code, quote=True)
+    return _page(
+        f"Manage projects · {BRAND}",
+        f"""{_brand_header()}
+<h1>Your projects</h1>
+<p class='muted'>The AI can only touch the projects listed here — nothing else in
+  your Overleaf account. Add or remove any time; no token needed.</p>
+{err_html}
+<div class='proj-list'>{rows}</div>
+<form method='post' action='/projects' autocomplete='off'>
+  <input type='hidden' name='code' value='{codeq}'>
+  <input type='hidden' name='action' value='add'>
+  <label for='overleaf_url'>Add a project — Overleaf link</label>
+  <input id='overleaf_url' name='overleaf_url' inputmode='url'
+         placeholder='https://www.overleaf.com/project/…' required>
+  <label for='name'>Label <span class='muted'>(optional)</span></label>
+  <input id='name' name='name' placeholder='e.g. thesis'>
+  <button type='submit'>Add project</button>
+</form>
+<div class='note'>Need to change or revoke your Overleaf token?
+  <a href='/token?code={codeq}'>Manage your token →</a></div>""",
+    )
+
+
+def render_token_form(code: str, has_token: bool, *, email: str = "", error: str | None = None) -> str:
+    """The 'change or revoke token' form. Token only."""
+    err_html = f"<div class='error'>{html.escape(error)}</div>" if error else ""
+    codeq = html.escape(code, quote=True)
+    revoke = ""
+    if has_token:
+        revoke = f"""<form method='post' action='/token' style='margin-top:12px'>
+  <input type='hidden' name='code' value='{codeq}'>
+  <input type='hidden' name='action' value='revoke'>
+  <button class='btn-danger' type='submit'>Revoke token</button></form>"""
+    verb = "Update" if has_token else "Add"
+    return _page(
+        f"Your token · {BRAND}",
+        f"""{_brand_header()}
+<h1>Your Overleaf token</h1>
+<p class='muted'>{verb} the Git token the AI uses to reach your projects. It's
+  encrypted and never shown in the chat.</p>
+{err_html}
+<form method='post' action='/token' autocomplete='off'>
+  <input type='hidden' name='code' value='{codeq}'>
+  <input type='hidden' name='action' value='set'>
+  <label for='token'>Overleaf Git token</label>
+  <input id='token' name='token' type='password' placeholder='olp_…' required>
+  <p class='hint'>Create one in Overleaf → Account Settings →
+     <a href='https://www.overleaf.com/user/settings' target='_blank' rel='noopener'>Git Integration</a>.</p>
+  <button type='submit'>Save token</button>
+</form>
+{revoke}
+<div class='note'>🔒 Your token is encrypted before it touches disk and is never
+  written to the chat. Revoking removes the AI's access until you add one again.</div>""",
     )
 
 

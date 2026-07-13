@@ -77,7 +77,75 @@ class AccountService:
         except ConfigError as exc:
             raise ServiceError(str(exc)) from exc
 
-        existing = await self.store.list_projects(user_id)
+        # The Overleaf Git token is account-level — store it once on the user so
+        # later projects can be added without pasting it again.
+        user.overleaf_token_encrypted = self.cipher.encrypt(token)
+        await self.store.upsert_user(user)
+
+        await self._enforce_project_limit(user, pid)
+        project = Project(
+            user_id=user_id, project_id=pid, name=(name or pid[:8]),
+            token_encrypted="", git_url=git_url,  # empty -> uses the account token
+        )
+        await self.store.put_project(project)
+        return project
+
+    async def add_project(
+        self, user_id: str, overleaf_url_or_id: str, name: str | None = None,
+        git_url: str | None = None,
+    ) -> Project:
+        """Add another project for an already-onboarded user, REUSING their stored
+        account token (no token needed — only the URL)."""
+        user = await self.store.get_user(user_id)
+        if user is None:
+            raise ServiceError("Unknown user; sign in first.")
+        if not await self._account_token_enc(user):
+            raise ServiceError(
+                "Connect your first project (with your Overleaf token) before "
+                "adding more."
+            )
+        try:
+            pid = extract_project_id(overleaf_url_or_id)
+        except ConfigError as exc:
+            raise ServiceError(str(exc)) from exc
+        await self._enforce_project_limit(user, pid)
+        project = Project(
+            user_id=user_id, project_id=pid, name=(name or pid[:8]),
+            token_encrypted="", git_url=git_url,
+        )
+        await self.store.put_project(project)
+        return project
+
+    async def set_token(self, user_id: str, token: str) -> None:
+        """Change the user's Overleaf token (applies to all their projects)."""
+        if not token or "PASTE" in token:
+            raise ServiceError("A real Overleaf Git token is required.")
+        user = await self.store.get_user(user_id)
+        if user is None:
+            raise ServiceError("Unknown user; sign in first.")
+        user.overleaf_token_encrypted = self.cipher.encrypt(token)
+        await self.store.upsert_user(user)
+        await self._clear_project_token_overrides(user_id)
+
+    async def revoke_token(self, user_id: str) -> None:
+        """Revoke the stored token — the AI can no longer reach any project until a
+        new token is set. Projects stay in the list; re-add a token to restore."""
+        user = await self.store.get_user(user_id)
+        if user is not None and user.overleaf_token_encrypted:
+            user.overleaf_token_encrypted = ""
+            await self.store.upsert_user(user)
+        await self._clear_project_token_overrides(user_id)
+
+    async def disconnect_project(self, user_id: str, project_ref: str) -> bool:
+        proj = self._select(await self.store.list_projects(user_id), project_ref)
+        return await self.store.delete_project(user_id, proj.project_id)
+
+    async def has_token(self, user_id: str) -> bool:
+        user = await self.store.get_user(user_id)
+        return bool(user and await self._account_token_enc(user))
+
+    async def _enforce_project_limit(self, user: User, pid: str) -> None:
+        existing = await self.store.list_projects(user.user_id)
         already = any(p.project_id == pid for p in existing)
         limit = project_limit(user)
         if limit is not None and not already and len(existing) >= limit:
@@ -86,19 +154,23 @@ class AccountService:
                 f"Upgrade to Pro for unlimited: {UPGRADE_URL}"
             )
 
-        project = Project(
-            user_id=user_id,
-            project_id=pid,
-            name=(name or pid[:8]),
-            token_encrypted=self.cipher.encrypt(token),
-            git_url=git_url,
-        )
-        await self.store.put_project(project)
-        return project
+    async def _account_token_enc(self, user: User) -> str:
+        """The user's encrypted account token, backfilling once from a legacy
+        per-project token (for projects connected before account tokens existed)."""
+        if user.overleaf_token_encrypted:
+            return user.overleaf_token_encrypted
+        for p in await self.store.list_projects(user.user_id):
+            if p.token_encrypted:
+                user.overleaf_token_encrypted = p.token_encrypted
+                await self.store.upsert_user(user)
+                return p.token_encrypted
+        return ""
 
-    async def disconnect_project(self, user_id: str, project_ref: str) -> bool:
-        proj = self._select(await self.store.list_projects(user_id), project_ref)
-        return await self.store.delete_project(user_id, proj.project_id)
+    async def _clear_project_token_overrides(self, user_id: str) -> None:
+        for p in await self.store.list_projects(user_id):
+            if p.token_encrypted:
+                p.token_encrypted = ""
+                await self.store.put_project(p)
 
     # -- billing ------------------------------------------------------------
 
@@ -143,7 +215,16 @@ class AccountService:
                 "Add one at https://milatexai.com."
             )
         chosen = self._select(projects, project_ref)
-        token = self.cipher.decrypt(chosen.token_encrypted)
+        enc = chosen.token_encrypted
+        if not enc:
+            user = await self.store.get_user(user_id)
+            enc = await self._account_token_enc(user) if user else ""
+        if not enc:
+            raise ProjectNotConnected(
+                "Your Overleaf token is missing or was revoked. Add it again to "
+                "keep editing (ask me to change your token)."
+            )
+        token = self.cipher.decrypt(enc)
         return ProjectConfig(
             name=chosen.name,
             project_id=chosen.project_id,

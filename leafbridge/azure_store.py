@@ -58,6 +58,7 @@ class AzureTableStore(Store):
             plan=e.get("plan", "free"),
             is_admin=bool(e.get("is_admin", False)),
             stripe_customer_id=(e.get("stripe_customer_id") or None),
+            overleaf_token_encrypted=(e.get("overleaf_token_encrypted") or ""),
         )
 
     async def upsert_user(self, user: User) -> None:
@@ -70,6 +71,7 @@ class AzureTableStore(Store):
                 "plan": user.plan,
                 "is_admin": user.is_admin,
                 "stripe_customer_id": user.stripe_customer_id or "",
+                "overleaf_token_encrypted": user.overleaf_token_encrypted or "",
             },
             mode=UpdateMode.REPLACE,
         )

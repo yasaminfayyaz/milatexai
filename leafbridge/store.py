@@ -75,6 +75,10 @@ class User:
     plan: str = "free"  # "free" | "pro"
     is_admin: bool = False
     stripe_customer_id: str | None = None
+    # The Overleaf Git token is account-level (one token reaches all of a user's
+    # projects), so it lives on the user. Projects added later reuse it — no need
+    # to paste the token again. Encrypted with TokenCipher.
+    overleaf_token_encrypted: str = ""
 
 
 @dataclass
@@ -82,7 +86,7 @@ class Project:
     user_id: str
     project_id: str  # Overleaf project id (24-hex)
     name: str
-    token_encrypted: str  # ciphertext from TokenCipher.encrypt
+    token_encrypted: str = ""  # optional per-project override; "" -> use account token
     git_username: str = "git"
     git_url: str | None = None  # override for self-hosted Overleaf / testing
 

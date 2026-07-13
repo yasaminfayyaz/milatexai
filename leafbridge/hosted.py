@@ -144,9 +144,6 @@ class HostedApp:
         self.capacity = capacity if capacity is not None else CapacityGate(
             subscription_id="", resource_group="", stripe_api_key="",
         )
-        # Best-effort single-use tracking for connect codes (TTL is the real
-        # control; this just stops a link being replayed within its window).
-        self._consumed_codes: set[str] = set()
 
     async def ensure_capacity(self, user: User) -> None:
         """Admission control for the git-backed tools. Paid users and admins are
@@ -323,6 +320,54 @@ def create_hosted_server(
         if not projects:
             return "No projects connected yet. Use connect_project with your Overleaf link + Git token."
         return "\n".join(f"- {p.name}  (id {p.project_id})" for p in projects)
+
+    @mcp.tool
+    async def add_project(overleaf_url: str, name: str | None = None) -> str:
+        """Give the AI access to ANOTHER of your Overleaf projects. Reuses the
+        Overleaf token you already saved — you only provide the project link, no
+        token needed. (Run start_connect first if you've never connected one.)
+
+        Args:
+            overleaf_url: The project URL, https://www.overleaf.com/project/<id>.
+            name: A short label for the project (optional).
+        """
+        try:
+            user = await app.user()
+            proj = await app.service.add_project(user.user_id, overleaf_url, name)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it."
+
+    @mcp.tool
+    async def manage_projects() -> str:
+        """Get a secure link to view, add, or remove the Overleaf projects the AI
+        can access. No token needed — the AI only ever touches projects you list."""
+        try:
+            user = await app.user()
+            code = mint_connect_code(app.cipher, user.user_id, user.email)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        url = f"{app.base_url}/projects?code={quote(code, safe='')}"
+        return (
+            "Manage which Overleaf projects the AI can access here — add or remove "
+            f"any time, no token needed:\n\n{url}\n\nThe link is valid for 15 minutes."
+        )
+
+    @mcp.tool
+    async def change_token() -> str:
+        """Get a secure link to change or revoke your stored Overleaf Git token
+        (for example if you regenerated it in Overleaf). Entered on a web form,
+        never in this chat."""
+        try:
+            user = await app.user()
+            code = mint_connect_code(app.cipher, user.user_id, user.email)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        url = f"{app.base_url}/token?code={quote(code, safe='')}"
+        return (
+            "Change or revoke your Overleaf token here (it never appears in this "
+            f"chat):\n\n{url}\n\nThe link is valid for 15 minutes."
+        )
 
     # -- billing -----------------------------------------------------------
 
@@ -644,88 +689,148 @@ def create_hosted_server(
                 return Response("apply failed", status_code=500)
         return Response("ok", status_code=200)
 
+    def _verified(request_code: str):
+        """Return (user_id, email) for a valid capability code, else None. Codes
+        are valid for their TTL and reusable within it — the manage/token forms
+        submit several times per session."""
+        try:
+            return verify_connect_code(app.cipher, request_code)
+        except ConnectCodeError:
+            return None
+
+    def _expired() -> Response:
+        return HTMLResponse(
+            web.render_notice(
+                "Link expired",
+                "This link is invalid or has expired. Ask MiLatexAI for a fresh "
+                "one (start_connect / manage_projects / change_token).",
+                icon="⏰",
+            ),
+            status_code=400,
+        )
+
+    def _form_fields(body: bytes):
+        fields = parse_qs(body.decode("utf-8", "replace"), keep_blank_values=True)
+        return lambda key: (fields.get(key) or [""])[0].strip()
+
+    # -- onboarding: token + first project ---------------------------------
+
     @mcp.custom_route("/connect", methods=["GET"])
     async def connect_page(request: Request) -> Response:
-        code = request.query_params.get("code", "")
-        try:
-            _uid, email = verify_connect_code(app.cipher, code)
-        except ConnectCodeError as exc:
-            return HTMLResponse(
-                web.render_notice("Link expired", str(exc), icon="⏰"),
-                status_code=400,
-            )
-        if code in app._consumed_codes:
-            return HTMLResponse(
-                web.render_notice(
-                    "Already used",
-                    "This connect link has already been used. Run start_connect "
-                    "in Claude to get a fresh one.",
-                    icon="🔁",
-                ),
-                status_code=409,
-            )
-        return HTMLResponse(web.render_connect_form(code, email=email))
+        ident = _verified(request.query_params.get("code", ""))
+        if ident is None:
+            return _expired()
+        return HTMLResponse(web.render_connect_form(request.query_params["code"], email=ident[1]))
 
     @mcp.custom_route("/connect", methods=["POST"])
     async def connect_submit(request: Request) -> Response:
-        # Parse the urlencoded body ourselves (no python-multipart dependency).
-        body = (await request.body()).decode("utf-8", "replace")
-        fields = parse_qs(body, keep_blank_values=True)
-
-        def field(key: str) -> str:
-            return (fields.get(key) or [""])[0].strip()
-
-        code = field("code")
-        overleaf_url = field("overleaf_url")
-        token = field("token")
+        field = _form_fields(await request.body())
+        code, overleaf_url, token = field("code"), field("overleaf_url"), field("token")
         name = field("name") or None
-
-        try:
-            user_id, email = verify_connect_code(app.cipher, code)
-        except ConnectCodeError as exc:
-            return HTMLResponse(
-                web.render_notice("Link expired", str(exc), icon="⏰"),
-                status_code=400,
-            )
-        if code in app._consumed_codes:
-            return HTMLResponse(
-                web.render_notice(
-                    "Already used",
-                    "This connect link has already been used. Run start_connect "
-                    "in Claude to get a fresh one.",
-                    icon="🔁",
-                ),
-                status_code=409,
-            )
+        ident = _verified(code)
+        if ident is None:
+            return _expired()
+        user_id, email = ident
 
         def form_error(msg: str, status: int = 400) -> Response:
-            # Re-render with the token field cleared; never echo the token back.
             return HTMLResponse(
-                web.render_connect_form(
-                    code, overleaf_url=overleaf_url, name=name or "",
-                    email=email, error=msg,
-                ),
+                web.render_connect_form(code, overleaf_url=overleaf_url,
+                                        name=name or "", email=email, error=msg),
                 status_code=status,
             )
 
         if not overleaf_url or not token:
             return form_error("Please provide both your project link and Git token.")
         try:
-            await app.service.get_or_create_user(
-                user_id, email, admin_emails=app.admin_emails
-            )
-            proj = await app.service.connect_project(
-                user_id, overleaf_url, token, name
-            )
+            await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+            proj = await app.service.connect_project(user_id, overleaf_url, token, name)
         except (LimitExceeded, ProjectNotConnected, ServiceError) as exc:
             return form_error(str(exc))
         except Exception:  # noqa: BLE001
-            return form_error(
-                "Something went wrong connecting the project. Please try again.",
-                status=500,
-            )
-        app._consumed_codes.add(code)
+            return form_error("Something went wrong connecting the project. Please try again.", status=500)
         return HTMLResponse(web.render_success(proj.name, proj.project_id))
+
+    # -- manage the list of projects (add / remove, no token) --------------
+
+    @mcp.custom_route("/projects", methods=["GET"])
+    async def projects_page(request: Request) -> Response:
+        ident = _verified(request.query_params.get("code", ""))
+        if ident is None:
+            return _expired()
+        user_id, email = ident
+        await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        projects = await app.service.store.list_projects(user_id)
+        return HTMLResponse(web.render_manage_projects(request.query_params["code"], projects, email=email))
+
+    @mcp.custom_route("/projects", methods=["POST"])
+    async def projects_submit(request: Request) -> Response:
+        field = _form_fields(await request.body())
+        code, action = field("code"), field("action")
+        ident = _verified(code)
+        if ident is None:
+            return _expired()
+        user_id, email = ident
+        await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+
+        async def show(error: str | None = None, status: int = 200) -> Response:
+            projects = await app.service.store.list_projects(user_id)
+            return HTMLResponse(
+                web.render_manage_projects(code, projects, email=email, error=error),
+                status_code=status,
+            )
+
+        try:
+            if action == "add":
+                url = field("overleaf_url")
+                if not url:
+                    return await show("Please provide the project link.", 400)
+                await app.service.add_project(user_id, url, field("name") or None)
+            elif action == "remove":
+                await app.service.store.delete_project(user_id, field("project_id"))
+            else:
+                return await show("Unknown action.", 400)
+        except (LimitExceeded, ProjectNotConnected, ServiceError) as exc:
+            return await show(str(exc), 400)
+        except Exception:  # noqa: BLE001
+            return await show("Something went wrong. Please try again.", 500)
+        return await show()
+
+    # -- change / revoke the Overleaf token --------------------------------
+
+    @mcp.custom_route("/token", methods=["GET"])
+    async def token_page(request: Request) -> Response:
+        ident = _verified(request.query_params.get("code", ""))
+        if ident is None:
+            return _expired()
+        user_id, email = ident
+        await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        has = await app.service.has_token(user_id)
+        return HTMLResponse(web.render_token_form(request.query_params["code"], has, email=email))
+
+    @mcp.custom_route("/token", methods=["POST"])
+    async def token_submit(request: Request) -> Response:
+        field = _form_fields(await request.body())
+        code, action = field("code"), field("action")
+        ident = _verified(code)
+        if ident is None:
+            return _expired()
+        user_id, email = ident
+        await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        try:
+            if action == "set":
+                await app.service.set_token(user_id, field("token"))
+                return HTMLResponse(web.render_notice(
+                    "Token saved", "Your Overleaf token is updated. You can close "
+                    "this tab and go back to your assistant.", icon="✅"))
+            if action == "revoke":
+                await app.service.revoke_token(user_id)
+                return HTMLResponse(web.render_notice(
+                    "Token revoked", "The AI's access is removed until you add a "
+                    "token again.", icon="🔒"))
+        except ServiceError as exc:
+            has = await app.service.has_token(user_id)
+            return HTMLResponse(web.render_token_form(code, has, email=email, error=str(exc)), status_code=400)
+        return HTMLResponse(web.render_notice("Unknown action", "Please try again.", icon="⚠️"), status_code=400)
 
     return mcp
 
