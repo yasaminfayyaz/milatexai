@@ -61,6 +61,24 @@ _FALLBACK_EN = {
     "platforms": {"title": "One connector, two assistants", "subtitle": "MiLatexAI speaks the Model Context Protocol (MCP).",
                   "claude": "Add as a custom connector in Claude.",
                   "chatgpt": "Add as a custom connector in ChatGPT."},
+    "setup": {"title": "Add MiLatexAI in two minutes",
+              "subtitle": "The same connector works in Claude and ChatGPT.",
+              "url_label": "Connector URL", "docs_label": "Official setup guide →",
+              "claude_title": "In Claude",
+              "claude_steps": [
+                  "Open Settings → Connectors → Add custom connector.",
+                  "Paste the connector URL above and sign in.",
+                  "Run start_connect and paste your Overleaf Git token on the secure page.",
+                  "Ask Claude to read a section or edit your paper."],
+              "chatgpt_title": "In ChatGPT",
+              "chatgpt_steps": [
+                  "In Settings → Connectors, enable Developer mode, then Add custom connector.",
+                  "Paste the connector URL above and authorize access.",
+                  "Run start_connect and paste your token on the secure page.",
+                  "Ask ChatGPT to edit your paper."],
+              "chatgpt_note": "Adding a custom connector needs ChatGPT Plus or higher; full editing works best on Business or Enterprise. See the guide.",
+              "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+              "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"},
     "pricing": {"title": "Simple pricing", "subtitle": "Start free. Upgrade when you need more.",
                 "free": {"name": "Free", "price": "$0", "period": "/mo",
                          "features": ["1 connected project", "25 write-commits / month", "Unlimited reads & compile checks"],
@@ -153,6 +171,28 @@ def _node(en: dict, tag: str, path: str, cls: str = "") -> str:
     return f"<{tag} data-i18n=\"{path}\"{cls_attr}>{_t(en, path)}</{tag}>"
 
 
+# Language-neutral hero illustration: a chat message -> an edited Overleaf doc.
+_HERO_ART = """<svg class='hero-art' viewBox='0 0 640 250' role='img'
+  aria-label='Ask your AI, and it edits your Overleaf document' xmlns='http://www.w3.org/2000/svg'>
+  <rect x='12' y='58' width='236' height='134' rx='14' fill='var(--card)' stroke='var(--line)'/>
+  <rect x='34' y='82' width='150' height='12' rx='6' fill='var(--muted)' opacity='.45'/>
+  <rect x='34' y='106' width='196' height='12' rx='6' fill='var(--muted)' opacity='.3'/>
+  <rect x='34' y='146' width='150' height='30' rx='15' fill='var(--accent)'/>
+  <rect x='50' y='157' width='96' height='8' rx='4' fill='#fff' opacity='.85'/>
+  <g stroke='var(--accent)' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'>
+    <line x1='266' y1='125' x2='350' y2='125'/><path d='M338 113 L354 125 L338 137'/>
+  </g>
+  <rect x='378' y='34' width='250' height='184' rx='14' fill='var(--card)' stroke='var(--line)'/>
+  <rect x='400' y='60' width='126' height='14' rx='7' fill='var(--accent)' opacity='.85'/>
+  <rect x='400' y='90' width='206' height='10' rx='5' fill='var(--muted)' opacity='.4'/>
+  <rect x='400' y='110' width='196' height='10' rx='5' fill='var(--muted)' opacity='.4'/>
+  <rect x='400' y='130' width='176' height='10' rx='5' fill='var(--muted)' opacity='.4'/>
+  <rect x='400' y='162' width='96' height='10' rx='5' fill='var(--muted)' opacity='.3'/>
+  <circle cx='606' cy='196' r='16' fill='#22c55e'/>
+  <path d='M598 196 l6 6 l10 -11' stroke='#fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/>
+</svg>"""
+
+
 def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     content = content or load_content()
     en = content.get("en", _FALLBACK_EN)
@@ -201,6 +241,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     <a class='btn btn-ghost' href='#how' data-i18n='hero.cta_secondary'>{_t(en,'hero.cta_secondary')}</a>
   </div>
   {_node(en,'p','hero.note','hero-note')}
+  {_HERO_ART}
   {_node(en,'p','trust','trust')}
 </section>"""
 
@@ -222,16 +263,39 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <ol class='steps'>{steps}</ol>
 </section>"""
 
+    setup = en.get("setup", {})
+    n_cl = len(setup.get("claude_steps", []))
+    n_cg = len(setup.get("chatgpt_steps", []))
+    claude_docs = html.escape(str(setup.get("claude_docs_url", "#")), quote=True)
+    chatgpt_docs = html.escape(str(setup.get("chatgpt_docs_url", "#")), quote=True)
+    claude_steps = "".join(
+        f"<li data-i18n='setup.claude_steps.{i}'>{_t(en, f'setup.claude_steps.{i}')}</li>"
+        for i in range(n_cl)
+    )
+    chatgpt_steps = "".join(
+        f"<li data-i18n='setup.chatgpt_steps.{i}'>{_t(en, f'setup.chatgpt_steps.{i}')}</li>"
+        for i in range(n_cg)
+    )
     get_started = f"""<section class='section' id='get-started'>
-  {_node(en,'h2','platforms.title','h2')}
-  {_node(en,'p','platforms.subtitle','sub')}
-  <div class='grid two'>
-    <div class='card'><h3>Claude</h3>{_node(en,'p','platforms.claude','muted')}</div>
-    <div class='card'><h3>ChatGPT</h3>{_node(en,'p','platforms.chatgpt','muted')}</div>
-  </div>
+  {_node(en,'h2','setup.title','h2')}
+  {_node(en,'p','setup.subtitle','sub')}
   <div class='connect-url'>
+    <span class='cu-label' data-i18n='setup.url_label'>{_t(en,'setup.url_label')}</span>
     <code>https://milatexai.com/mcp</code>
     <button class='btn btn-sm' onclick="navigator.clipboard&amp;&amp;navigator.clipboard.writeText('https://milatexai.com/mcp')">Copy</button>
+  </div>
+  <div class='grid two setup-cols'>
+    <div class='card setup-card'>
+      {_node(en,'h3','setup.claude_title')}
+      <ol class='setup-steps'>{claude_steps}</ol>
+      <a class='doclink' href='{claude_docs}' target='_blank' rel='noopener' data-i18n='setup.docs_label'>{_t(en,'setup.docs_label')}</a>
+    </div>
+    <div class='card setup-card'>
+      {_node(en,'h3','setup.chatgpt_title')}
+      <ol class='setup-steps'>{chatgpt_steps}</ol>
+      {_node(en,'p','setup.chatgpt_note','muted small')}
+      <a class='doclink' href='{chatgpt_docs}' target='_blank' rel='noopener' data-i18n='setup.docs_label'>{_t(en,'setup.docs_label')}</a>
+    </div>
   </div>
 </section>"""
 
@@ -347,11 +411,46 @@ function applyLang(lang) {{
 </script>"""
 
     desc = html.escape(str(en.get("hero", {}).get("subtitle", "")))
+    tagline = html.escape(str(en.get("brand_tagline", "")))
+    title = f"MiLatexAI — {tagline}"
+    url = "https://milatexai.com/"
+    og_image = "https://milatexai.com/og.svg"
+    price = html.escape(str(en.get("pricing", {}).get("pro", {}).get("price", "$4.99")))
+    jsonld = json.dumps({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "MiLatexAI",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web (Claude, ChatGPT)",
+        "url": "https://milatexai.com",
+        "description": str(en.get("hero", {}).get("subtitle", "")),
+        "offers": [
+            {"@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free"},
+            {"@type": "Offer", "price": "4.99", "priceCurrency": "USD", "name": "Pro"},
+        ],
+        "sameAs": ["https://github.com/yasaminfayyaz/milatexai"],
+    }, ensure_ascii=False)
+    seo = f"""<title>{title}</title>
+<meta name='description' content='{desc}'>
+<meta name='keywords' content='Overleaf, LaTeX, Claude, ChatGPT, MCP connector, AI LaTeX editor, edit Overleaf with AI, research paper AI'>
+<link rel='canonical' href='{url}'>
+<meta name='robots' content='index,follow'>
+<meta name='theme-color' content='#2f6df6'>
+<meta property='og:type' content='website'>
+<meta property='og:site_name' content='MiLatexAI'>
+<meta property='og:title' content='{title}'>
+<meta property='og:description' content='{desc}'>
+<meta property='og:url' content='{url}'>
+<meta property='og:image' content='{og_image}'>
+<meta name='twitter:card' content='summary_large_image'>
+<meta name='twitter:title' content='{title}'>
+<meta name='twitter:description' content='{desc}'>
+<meta name='twitter:image' content='{og_image}'>
+<script type='application/ld+json'>{jsonld}</script>"""
     return f"""<!doctype html><html lang='en'><head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<title>MiLatexAI — {html.escape(str(en.get('brand_tagline','')))}</title>
-<meta name='description' content='{desc}'>
+{seo}
 <style>{_CSS}</style>
 </head><body>
 {header}
@@ -408,6 +507,31 @@ def render_account(status: str | None = None) -> str:
 </main></body></html>"""
 
 
+def render_og_image() -> str:
+    """A 1200x630 social preview image (SVG) referenced by og:image."""
+    return """<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'>
+<rect width='1200' height='630' fill='#0b0d12'/>
+<rect x='0' y='0' width='1200' height='8' fill='#2f6df6'/>
+<text x='90' y='300' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='96' font-weight='800' fill='#ffffff'>Mi<tspan fill='#2f6df6'>LaTeX</tspan>AI</text>
+<text x='94' y='378' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='42' fill='#c7cdd8'>Edit your Overleaf papers by talking to your AI.</text>
+<text x='94' y='452' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='30' fill='#7b8496'>Works with Claude &amp; ChatGPT  ·  milatexai.com</text>
+</svg>"""
+
+
+def robots_txt() -> str:
+    return "User-agent: *\nAllow: /\nSitemap: https://milatexai.com/sitemap.xml\n"
+
+
+def sitemap_xml() -> str:
+    return (
+        "<?xml version='1.0' encoding='UTF-8'?>\n"
+        "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>\n"
+        "  <url><loc>https://milatexai.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n"
+        "  <url><loc>https://milatexai.com/account</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>\n"
+        "</urlset>\n"
+    )
+
+
 _CSS = """
 :root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#2f6df6;--accent2:#6a3df6;--radius:14px}
 @media (prefers-color-scheme:dark){:root{--bg:#0b0d12;--fg:#e9ecf2;--muted:#9aa3b2;--line:#20242e;--card:#12151c}}
@@ -455,6 +579,16 @@ a{color:inherit;text-decoration:none}
 .step h3{margin:0 0 4px;font-size:16px}
 .connect-url{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:26px;flex-wrap:wrap}
 .connect-url code{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:15px}
+.cu-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.hero-art{width:100%;max-width:560px;height:auto;margin:26px auto 8px;display:block}
+.setup-cols{margin-top:26px;text-align:start}
+.setup-card{padding:24px}
+.setup-card h3{margin:0 0 12px;font-size:17px}
+.setup-steps{margin:0 0 14px;padding-inline-start:20px;display:grid;gap:8px}
+.setup-steps li{color:var(--muted);padding-inline-start:4px}
+.setup-steps li::marker{color:var(--accent);font-weight:700}
+.doclink{color:var(--accent);font-weight:600;font-size:14px}
+.doclink:hover{text-decoration:underline}
 .plans{align-items:stretch}
 .plan{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column}
 .section.alt .plan{background:var(--card)}

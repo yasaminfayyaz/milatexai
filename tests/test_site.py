@@ -10,6 +10,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.testclient import TestClient
 
 from leafbridge import site
+from leafbridge.capacity import CapacityGate
 from leafbridge.hosted import create_hosted_server
 from leafbridge.store import InMemoryStore, TokenCipher
 
@@ -21,12 +22,15 @@ def _cipher() -> TokenCipher:
 
 
 def _server():
+    # Inject an explicitly-disabled capacity gate so the test is deterministic
+    # regardless of any AZURE_SUBSCRIPTION_ID in the ambient environment.
     return create_hosted_server(
         store=InMemoryStore(),
         cipher=_cipher(),
         auth=False,
         identity_provider=lambda: ("u", "e"),
         base_url="https://milatexai.com",
+        capacity=CapacityGate(subscription_id="", resource_group="", stripe_api_key=""),
     )
 
 

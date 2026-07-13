@@ -581,6 +581,18 @@ def create_hosted_server(
         status = request.query_params.get("status")
         return HTMLResponse(site.render_account(status=status))
 
+    @mcp.custom_route("/og.svg", methods=["GET"])
+    async def og_image(request: Request) -> Response:
+        return Response(site.render_og_image(), media_type="image/svg+xml")
+
+    @mcp.custom_route("/robots.txt", methods=["GET"])
+    async def robots(request: Request) -> Response:
+        return Response(site.robots_txt(), media_type="text/plain")
+
+    @mcp.custom_route("/sitemap.xml", methods=["GET"])
+    async def sitemap(request: Request) -> Response:
+        return Response(site.sitemap_xml(), media_type="application/xml")
+
     @mcp.custom_route("/health/capacity", methods=["GET"])
     async def health_capacity(request: Request) -> Response:
         # Non-sensitive: booleans only, no dollar figures. `fresh` confirms the
