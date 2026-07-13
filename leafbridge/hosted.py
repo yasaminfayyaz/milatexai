@@ -57,12 +57,14 @@ from .store import InMemoryStore, Store, TokenCipher, User
 
 INSTRUCTIONS = """\
 MiLatexAI edits the signed-in user's real Overleaf projects over Overleaf's Git
-bridge. First-time users must run connect_project once with their Overleaf
-project link and a Git token (Account Settings > Git Integration) — the token is
-stored encrypted. Every write (edit_file/write_file/delete_file/upload_file)
-commits and pushes immediately and counts toward the monthly limit; reads are
-free and unlimited. Before editing, read the file so edit_file's old_string
-matches exactly.
+bridge. If the user has no project connected yet, just proceed with their request:
+any file tool returns a secure link where they paste their Overleaf Git token
+(never in chat) — relay that link and ask them to come back. Refer to a project
+by its name; list_projects shows the connected ones. To change a token or add
+another project, run start_connect (or connect that project again) — same secure
+form. Every write (edit_file/write_file/delete_file/upload_file) commits and
+pushes immediately and counts toward the monthly limit; reads are free and
+unlimited. Before editing, read the file so edit_file's old_string matches exactly.
 """
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
@@ -163,6 +165,24 @@ class HostedApp:
         return await self.service.get_or_create_user(
             user_id, email, admin_emails=self.admin_emails
         )
+
+    async def resolve_or_onboard(self, user: User, project: str | None) -> ProjectConfig:
+        """Resolve the caller's project. If they have NONE connected yet, don't
+        just error — hand back a secure connect link so onboarding happens on the
+        first action, without anyone needing to know the start_connect tool."""
+        try:
+            return await self.service.resolve_project(user.user_id, project)
+        except ProjectNotConnected:
+            projects = await self.service.store.list_projects(user.user_id)
+            if projects:
+                raise  # they have projects; this is an ambiguous/no-match message
+            code = mint_connect_code(self.cipher, user.user_id, user.email)
+            url = f"{self.base_url}/connect?code={quote(code, safe='')}"
+            raise ToolError(
+                "You haven't connected an Overleaf project yet. Open this secure "
+                "link to connect one — you enter your Overleaf Git token there, "
+                f"never in this chat:\n\n{url}\n\nOnce it's connected, ask me again."
+            )
 
     async def apply_and_push(
         self, user: User, proj: ProjectConfig, mutate, message: str,
@@ -357,7 +377,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
                 entries = list_source_files(repo, all_files=all_files)
         except Exception as exc:  # noqa: BLE001
@@ -373,7 +393,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
                 content = read_text(safe_join(repo, path))
         except Exception as exc:  # noqa: BLE001
@@ -386,7 +406,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
                 content = read_text(safe_join(repo, path))
         except Exception as exc:  # noqa: BLE001
@@ -399,7 +419,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
                 content = read_text(safe_join(repo, path))
         except Exception as exc:  # noqa: BLE001
@@ -419,7 +439,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
             async with app.worker.lock_for(proj):
                 return await app.worker.log(proj, limit=max(1, min(limit, 50)))
         except Exception as exc:  # noqa: BLE001
@@ -431,7 +451,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
                 main = texcompile.find_main_tex(repo)
                 if not main:
@@ -459,7 +479,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
@@ -494,7 +514,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
@@ -517,7 +537,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
@@ -546,7 +566,7 @@ def create_hosted_server(
         try:
             user = await app.user()
             await app.ensure_capacity(user)
-            proj = await app.service.resolve_project(user.user_id, project)
+            proj = await app.resolve_or_onboard(user, project)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 

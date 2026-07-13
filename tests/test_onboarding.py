@@ -166,6 +166,29 @@ def test_connect_post_missing_token_reprompts(harness):
     assert _projects(store, "user_web") == []
 
 
+def test_resolve_or_onboard_returns_link_when_no_project(tmp_path):
+    from fastmcp.exceptions import ToolError
+
+    from leafbridge.hosted import HostedApp
+    from leafbridge.store import InMemoryStore, User
+
+    cipher = _cipher()
+    app = HostedApp(store=InMemoryStore(), cipher=cipher, data_dir=tmp_path,
+                    base_url="https://milatexai.com")
+    user = asyncio.run(app.service.get_or_create_user("u1", "u@x.com"))
+    # No project yet -> any file action should hand back a secure connect link,
+    # not a dead error (so the user never needs to know start_connect).
+    try:
+        asyncio.run(app.resolve_or_onboard(user, None))
+        raise AssertionError("expected onboarding ToolError")
+    except ToolError as exc:
+        assert "milatexai.com/connect?code=" in str(exc)
+    # Once a project is connected, it resolves normally (by default / by name).
+    asyncio.run(app.service.connect_project("u1", OVERLEAF_URL, "olp_tok", "thesis"))
+    proj = asyncio.run(app.resolve_or_onboard(user, "thesis"))
+    assert proj.project_id == HEX
+
+
 def test_connect_post_does_not_echo_token_on_error(harness):
     _store, cipher, mcp = harness
     code = mint_connect_code(cipher, "user_web", "web@example.com")
