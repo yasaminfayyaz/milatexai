@@ -9,8 +9,10 @@ RUN apt-get update \
 
 # Tectonic — a self-contained LaTeX engine that fetches TeX packages on demand.
 # Far smaller than a TeX Live install (~5 GB), so it suits a scale-to-zero image.
-RUN cd /tmp && curl -fsSL https://drop-sh.fullyjustified.net | sh \
-    && mv /tmp/tectonic /usr/local/bin/tectonic \
+# Pinned static musl build (no shared-lib deps), extracted straight to PATH.
+ARG TECTONIC_VERSION=0.16.9
+RUN curl -fsSL "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%40${TECTONIC_VERSION}/tectonic-${TECTONIC_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+      | tar -xz -C /usr/local/bin tectonic \
     && chmod +x /usr/local/bin/tectonic \
     && tectonic --version
 
