@@ -569,7 +569,7 @@ a{color:inherit;text-decoration:none}
 .btn-ghost:hover{background:var(--card)}
 .hero{max-width:820px;margin:0 auto;padding:72px 24px 40px;text-align:center}
 .badge{display:inline-block;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;margin-bottom:20px}
-.hero-title{font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.03em;margin:0 0 16px;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-title{font-size:clamp(32px,5vw,52px);line-height:1.16;letter-spacing:-.03em;margin:0 0 26px;padding-bottom:6px;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-sub{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:640px;margin:0 auto 26px}
 .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .hero-note{margin:22px auto 0;font-size:13.5px;color:var(--muted)}
