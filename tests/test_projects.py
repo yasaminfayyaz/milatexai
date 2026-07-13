@@ -13,7 +13,13 @@ from starlette.testclient import TestClient
 from leafbridge.capacity import CapacityGate
 from leafbridge.connect_link import mint_connect_code
 from leafbridge.hosted import create_hosted_server
-from leafbridge.service import AccountService, ProjectNotConnected, ServiceError
+from leafbridge.hosted import HostedApp
+from leafbridge.service import (
+    AccountService,
+    LimitExceeded,
+    ProjectNotConnected,
+    ServiceError,
+)
 from leafbridge.store import InMemoryStore, Project, TokenCipher
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -73,6 +79,44 @@ def test_revoke_token_blocks_access_until_re_added():
         asyncio.run(svc.resolve_project("u", "first"))  # project stays, token gone
     asyncio.run(svc.set_token("u", "olp_again"))
     assert asyncio.run(svc.resolve_project("u", "first")).token == "olp_again"
+
+
+def test_get_or_create_promotes_admin_and_fills_email_on_later_login():
+    svc = _svc()
+    # First seen with NO email (token lacked the claim) -> not admin.
+    asyncio.run(svc.get_or_create_user("u", "", admin_emails=("boss@x.com",)))
+    u = asyncio.run(svc.store.get_user("u"))
+    assert u.is_admin is False and u.email == ""
+    # A later login supplies the admin email -> promoted + email backfilled.
+    u2 = asyncio.run(svc.get_or_create_user("u", "boss@x.com", admin_emails=("boss@x.com",)))
+    assert u2.is_admin is True and u2.email == "boss@x.com"
+
+
+def test_free_project_limit_message_mentions_swap_and_upgrade():
+    svc = _svc()
+    asyncio.run(svc.get_or_create_user("u", "u@x.com"))  # free (not admin)
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "first"))
+    with pytest.raises(LimitExceeded) as ei:
+        asyncio.run(svc.add_project("u", URL2, "second"))
+    msg = str(ei.value).lower()
+    assert "remove" in msg and "upgrade" in msg
+
+
+def test_user_email_backfilled_from_resolver_promotes_admin(tmp_path):
+    store = InMemoryStore()
+    cipher = TokenCipher(TokenCipher.generate_key())
+
+    async def resolver(_uid: str) -> str:
+        return "boss@x.com"
+
+    app = HostedApp(
+        store=store, cipher=cipher, data_dir=tmp_path,
+        admin_emails=("boss@x.com",),
+        identity_provider=lambda: ("u", ""),  # token carries no email
+        email_resolver=resolver,
+    )
+    u = asyncio.run(app.user())
+    assert u.email == "boss@x.com" and u.is_admin is True
 
 
 def test_legacy_per_project_token_still_resolves_and_backfills():

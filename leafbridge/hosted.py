@@ -113,6 +113,33 @@ def _identity_from_token() -> tuple[str, str]:
     return user_id, email
 
 
+def workos_email_resolver(api_key: str):
+    """An async ``(user_id) -> email`` lookup against the WorkOS Management API,
+    for when the access token doesn't carry an email claim. Returns "" on any
+    problem — email is nice-to-have, never load-bearing for a request."""
+
+    async def resolve(user_id: str) -> str:
+        if not api_key or not user_id.startswith("user_"):
+            return ""
+        import aiohttp
+
+        url = f"https://api.workos.com/user_management/users/{user_id}"
+        try:
+            timeout = aiohttp.ClientTimeout(total=10)
+            async with aiohttp.ClientSession(timeout=timeout) as sess:
+                async with sess.get(
+                    url, headers={"Authorization": f"Bearer {api_key}"}
+                ) as resp:
+                    if resp.status != 200:
+                        return ""
+                    data = await resp.json()
+            return data.get("email") or ""
+        except Exception:  # noqa: BLE001
+            return ""
+
+    return resolve
+
+
 class HostedApp:
     """Per-deployment state: the account service + one git worker, plus how to
     identify the current caller."""
@@ -128,12 +155,14 @@ class HostedApp:
         base_url: str = "http://localhost:8000",
         billing: Billing | None = None,
         capacity: CapacityGate | None = None,
+        email_resolver=None,
     ):
         self.service = AccountService(store, cipher)
         self.cipher = cipher
         self.worker = GitWorker(data_dir)
         self.admin_emails = admin_emails
         self._identity = identity_provider
+        self._email_resolver = email_resolver
         self.base_url = base_url.rstrip("/")
         # Disabled billing (no Stripe env) is a valid state — the tools just say so.
         self.billing = billing if billing is not None else Billing(
@@ -159,9 +188,19 @@ class HostedApp:
 
     async def user(self) -> User:
         user_id, email = self._identity()
-        return await self.service.get_or_create_user(
+        user = await self.service.get_or_create_user(
             user_id, email, admin_emails=self.admin_emails
         )
+        # WorkOS access tokens don't always carry an email claim. If we still have
+        # no email for this user, look it up once from WorkOS and reconcile (this
+        # also promotes admins whose email finally becomes known).
+        if not user.email and self._email_resolver is not None:
+            resolved = await self._email_resolver(user_id)
+            if resolved:
+                user = await self.service.get_or_create_user(
+                    user_id, resolved, admin_emails=self.admin_emails
+                )
+        return user
 
     async def resolve_or_onboard(self, user: User, project: str | None) -> ProjectConfig:
         """Resolve the caller's project. If they have NONE connected yet, don't
@@ -229,6 +268,7 @@ def create_hosted_server(
     base_url: str | None = None,
     billing: Billing | None = None,
     capacity: CapacityGate | None = None,
+    email_resolver=None,
 ) -> FastMCP:
     """Build the hosted server. Tests pass ``auth=False`` + a fake
     ``identity_provider`` + an ``InMemoryStore`` to drive it without WorkOS."""
@@ -236,6 +276,8 @@ def create_hosted_server(
     if cipher is None:
         cipher, _ = TokenCipher.from_env()
     resolved_base = base_url or os.environ.get("BASE_URL", "http://localhost:8000")
+    if email_resolver is None and os.environ.get("WORKOS_API_KEY"):
+        email_resolver = workos_email_resolver(os.environ["WORKOS_API_KEY"])
     app = HostedApp(
         store=store,
         cipher=cipher,
@@ -245,6 +287,7 @@ def create_hosted_server(
         base_url=resolved_base,
         billing=billing if billing is not None else Billing.from_env(resolved_base),
         capacity=capacity if capacity is not None else CapacityGate.from_env(),
+        email_resolver=email_resolver,
     )
 
     auth_provider = None

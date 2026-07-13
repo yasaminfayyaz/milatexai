@@ -45,13 +45,23 @@ class AccountService:
     async def get_or_create_user(
         self, user_id: str, email: str, *, admin_emails: tuple[str, ...] = ()
     ) -> User:
+        is_admin = bool(email) and email.lower() in {e.lower() for e in admin_emails}
         user = await self.store.get_user(user_id)
         if user is None:
-            user = User(
-                user_id=user_id,
-                email=email,
-                is_admin=email.lower() in {e.lower() for e in admin_emails},
-            )
+            user = User(user_id=user_id, email=email, is_admin=is_admin)
+            await self.store.upsert_user(user)
+            return user
+        # Reconcile on every login: fill in a newly-available email, and promote
+        # to admin if the email now matches (never auto-demote). Fixes records
+        # created before the email/admin was known.
+        changed = False
+        if email and user.email != email:
+            user.email = email
+            changed = True
+        if is_admin and not user.is_admin:
+            user.is_admin = True
+            changed = True
+        if changed:
             await self.store.upsert_user(user)
         return user
 
@@ -149,9 +159,12 @@ class AccountService:
         already = any(p.project_id == pid for p in existing)
         limit = project_limit(user)
         if limit is not None and not already and len(existing) >= limit:
+            plural = "project" if limit == 1 else "projects"
             raise LimitExceeded(
-                f"Your plan allows {limit} connected project(s). "
-                f"Upgrade to Pro for unlimited: {UPGRADE_URL}"
+                f"The free plan includes {limit} connected {plural} at a time. To "
+                "work on a different project, remove the current one first (ask to "
+                '"manage my projects"), or upgrade to Pro for unlimited projects at '
+                f"once: {UPGRADE_URL}"
             )
 
     async def _account_token_enc(self, user: User) -> str:
