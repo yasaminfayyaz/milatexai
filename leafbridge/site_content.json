@@ -532,6 +532,29 @@
      "body": "有关本条款的问题可发送至 support@milatexai.com，这是这款早期产品的临时支持邮箱。"
     }
    ]
+  },
+  "setup": {
+   "title": "两分钟添加 MiLatexAI",
+   "subtitle": "同一个连接器可在 Claude 和 ChatGPT 中使用。",
+   "url_label": "连接器 URL",
+   "docs_label": "官方设置指南 →",
+   "claude_title": "在 Claude 中",
+   "claude_steps": [
+    "打开 Settings → Connectors → Add custom connector。",
+    "粘贴上方的连接器 URL 并登录。",
+    "运行 start_connect，并在安全页面粘贴你的 Overleaf Git 令牌。",
+    "让 Claude 阅读某个章节或编辑你的论文。"
+   ],
+   "chatgpt_title": "在 ChatGPT 中",
+   "chatgpt_steps": [
+    "在 Settings → Connectors 中启用 Developer mode，然后点击 Add custom connector。",
+    "粘贴上方的连接器 URL 并授权访问。",
+    "运行 start_connect，并在安全页面粘贴你的令牌。",
+    "让 ChatGPT 编辑你的论文。"
+   ],
+   "chatgpt_note": "添加自定义连接器需要 ChatGPT Plus 或更高版本；完整的编辑功能在 Business 或 Enterprise 版本上效果最佳。请参阅该指南。",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "fr": {
@@ -788,6 +811,29 @@
      "body": "Les questions relatives aux présentes conditions peuvent être envoyées à support@milatexai.com, une adresse d'assistance provisoire pour ce produit à ses débuts."
     }
    ]
+  },
+  "setup": {
+   "title": "Ajoutez MiLatexAI en deux minutes",
+   "subtitle": "Le même connecteur fonctionne dans Claude et ChatGPT.",
+   "url_label": "URL du connecteur",
+   "docs_label": "Guide de configuration officiel →",
+   "claude_title": "Dans Claude",
+   "claude_steps": [
+    "Ouvrez Settings → Connectors → Add custom connector.",
+    "Collez l'URL du connecteur ci-dessus et connectez-vous.",
+    "Lancez start_connect et collez votre jeton Git Overleaf sur la page sécurisée.",
+    "Demandez à Claude de lire une section ou de modifier votre article."
+   ],
+   "chatgpt_title": "Dans ChatGPT",
+   "chatgpt_steps": [
+    "Dans Settings → Connectors, activez Developer mode, puis Add custom connector.",
+    "Collez l'URL du connecteur ci-dessus et autorisez l'accès.",
+    "Lancez start_connect et collez votre jeton sur la page sécurisée.",
+    "Demandez à ChatGPT de modifier votre article."
+   ],
+   "chatgpt_note": "L'ajout d'un connecteur personnalisé nécessite ChatGPT Plus ou une version supérieure ; l'édition complète fonctionne mieux avec Business ou Enterprise. Consultez le guide.",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "es": {
@@ -1044,6 +1090,29 @@
      "body": "Las preguntas sobre estos términos pueden enviarse a support@milatexai.com, una dirección de soporte provisional para este producto en fase inicial."
     }
    ]
+  },
+  "setup": {
+   "title": "Añade MiLatexAI en dos minutos",
+   "subtitle": "El mismo conector funciona en Claude y ChatGPT.",
+   "url_label": "URL del conector",
+   "docs_label": "Guía de configuración oficial →",
+   "claude_title": "En Claude",
+   "claude_steps": [
+    "Abre Settings → Connectors → Add custom connector.",
+    "Pega la URL del conector de arriba e inicia sesión.",
+    "Ejecuta start_connect y pega tu token de Git de Overleaf en la página segura.",
+    "Pídele a Claude que lea una sección o edite tu artículo."
+   ],
+   "chatgpt_title": "En ChatGPT",
+   "chatgpt_steps": [
+    "En Settings → Connectors, activa el Developer mode y luego Add custom connector.",
+    "Pega la URL del conector de arriba y autoriza el acceso.",
+    "Ejecuta start_connect y pega tu token en la página segura.",
+    "Pídele a ChatGPT que edite tu artículo."
+   ],
+   "chatgpt_note": "Añadir un conector personalizado requiere ChatGPT Plus o superior; la edición completa funciona mejor en Business o Enterprise. Consulta la guía.",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "de": {
@@ -1300,6 +1369,29 @@
      "body": "Fragen zu diesen Bedingungen können an support@milatexai.com gesendet werden, eine vorläufige Support-Adresse für dieses Produkt in einem frühen Stadium."
     }
    ]
+  },
+  "setup": {
+   "title": "MiLatexAI in zwei Minuten hinzufügen",
+   "subtitle": "Derselbe Connector funktioniert in Claude und ChatGPT.",
+   "url_label": "Connector-URL",
+   "docs_label": "Offizielle Einrichtungsanleitung →",
+   "claude_title": "In Claude",
+   "claude_steps": [
+    "Öffne Settings → Connectors → Add custom connector.",
+    "Füge die obige Connector-URL ein und melde dich an.",
+    "Führe start_connect aus und füge dein Overleaf-Git-Token auf der sicheren Seite ein.",
+    "Bitte Claude, einen Abschnitt zu lesen oder dein Paper zu bearbeiten."
+   ],
+   "chatgpt_title": "In ChatGPT",
+   "chatgpt_steps": [
+    "Aktiviere in Settings → Connectors den Developer mode und wähle dann Add custom connector.",
+    "Füge die obige Connector-URL ein und autorisiere den Zugriff.",
+    "Führe start_connect aus und füge dein Token auf der sicheren Seite ein.",
+    "Bitte ChatGPT, dein Paper zu bearbeiten."
+   ],
+   "chatgpt_note": "Zum Hinzufügen eines benutzerdefinierten Connectors ist ChatGPT Plus oder höher erforderlich; die vollständige Bearbeitung funktioniert am besten mit Business oder Enterprise. Siehe die Anleitung.",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "ja": {
@@ -1556,6 +1648,29 @@
      "body": "本規約に関するご質問は、この初期段階のプロダクトの仮のサポートアドレスであるsupport@milatexai.comまでお送りください。"
     }
    ]
+  },
+  "setup": {
+   "title": "MiLatexAIを2分で追加",
+   "subtitle": "同じコネクターがClaudeとChatGPTの両方で使えます。",
+   "url_label": "コネクターURL",
+   "docs_label": "公式セットアップガイド →",
+   "claude_title": "Claudeの場合",
+   "claude_steps": [
+    "Settings → Connectors → Add custom connector を開きます。",
+    "上記のコネクターURLを貼り付けてサインインします。",
+    "start_connect を実行し、安全なページで Overleaf の Git トークンを貼り付けます。",
+    "Claudeにセクションの読み取りや論文の編集を依頼します。"
+   ],
+   "chatgpt_title": "ChatGPTの場合",
+   "chatgpt_steps": [
+    "Settings → Connectors で Developer mode を有効にし、Add custom connector を選択します。",
+    "上記のコネクターURLを貼り付けてアクセスを許可します。",
+    "start_connect を実行し、安全なページでトークンを貼り付けます。",
+    "ChatGPTに論文の編集を依頼します。"
+   ],
+   "chatgpt_note": "カスタムコネクターの追加にはChatGPT Plus以上が必要です。完全な編集機能はBusinessまたはEnterpriseで最も快適に動作します。ガイドをご覧ください。",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "pt": {
@@ -1812,6 +1927,29 @@
      "body": "Dúvidas sobre estes termos podem ser enviadas para support@milatexai.com, um endereço de suporte provisório para este produto em estágio inicial."
     }
    ]
+  },
+  "setup": {
+   "title": "Adicione o MiLatexAI em dois minutos",
+   "subtitle": "O mesmo conector funciona no Claude e no ChatGPT.",
+   "url_label": "URL do conector",
+   "docs_label": "Guia oficial de configuração →",
+   "claude_title": "No Claude",
+   "claude_steps": [
+    "Abra Settings → Connectors → Add custom connector.",
+    "Cole a URL do conector acima e faça login.",
+    "Execute start_connect e cole seu token Git do Overleaf na página segura.",
+    "Peça ao Claude para ler uma seção ou editar seu artigo."
+   ],
+   "chatgpt_title": "No ChatGPT",
+   "chatgpt_steps": [
+    "Em Settings → Connectors, ative o Developer mode e depois Add custom connector.",
+    "Cole a URL do conector acima e autorize o acesso.",
+    "Execute start_connect e cole seu token na página segura.",
+    "Peça ao ChatGPT para editar seu artigo."
+   ],
+   "chatgpt_note": "Adicionar um conector personalizado requer ChatGPT Plus ou superior; a edição completa funciona melhor no Business ou Enterprise. Consulte o guia.",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "ar": {
@@ -2068,6 +2206,29 @@
      "body": "يمكن إرسال الأسئلة المتعلقة بهذه الشروط إلى support@milatexai.com، وهو عنوان دعم مؤقت لهذا المنتج في مرحلته المبكرة."
     }
    ]
+  },
+  "setup": {
+   "title": "أضف MiLatexAI في دقيقتين",
+   "subtitle": "الموصّل نفسه يعمل في Claude و ChatGPT.",
+   "url_label": "رابط الموصّل",
+   "docs_label": "دليل الإعداد الرسمي →",
+   "claude_title": "في Claude",
+   "claude_steps": [
+    "افتح Settings → Connectors → Add custom connector.",
+    "الصق رابط الموصّل أعلاه وسجّل الدخول.",
+    "شغّل start_connect والصق رمز Git الخاص بـ Overleaf في الصفحة الآمنة.",
+    "اطلب من Claude قراءة قسم أو تحرير ورقتك البحثية."
+   ],
+   "chatgpt_title": "في ChatGPT",
+   "chatgpt_steps": [
+    "في Settings → Connectors، فعّل Developer mode، ثم Add custom connector.",
+    "الصق رابط الموصّل أعلاه وامنح الإذن بالوصول.",
+    "شغّل start_connect والصق رمزك في الصفحة الآمنة.",
+    "اطلب من ChatGPT تحرير ورقتك البحثية."
+   ],
+   "chatgpt_note": "تتطلب إضافة موصّل مخصّص اشتراك ChatGPT Plus أو أعلى؛ ويعمل التحرير الكامل على أفضل وجه في خطط Business أو Enterprise. راجع الدليل.",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "hi": {
@@ -2324,6 +2485,29 @@
      "body": "इन शर्तों से संबंधित प्रश्न support@milatexai.com पर भेजे जा सकते हैं, जो इस प्रारंभिक-चरण उत्पाद के लिए एक अस्थायी सहायता पता है।"
     }
    ]
+  },
+  "setup": {
+   "title": "MiLatexAI को दो मिनट में जोड़ें",
+   "subtitle": "यही कनेक्टर Claude और ChatGPT दोनों में काम करता है।",
+   "url_label": "कनेक्टर URL",
+   "docs_label": "आधिकारिक सेटअप गाइड →",
+   "claude_title": "Claude में",
+   "claude_steps": [
+    "Settings → Connectors → Add custom connector खोलें।",
+    "ऊपर दिया गया कनेक्टर URL पेस्ट करें और साइन इन करें।",
+    "start_connect चलाएँ और सुरक्षित पेज पर अपना Overleaf Git टोकन पेस्ट करें।",
+    "Claude से किसी सेक्शन को पढ़ने या अपने पेपर को संपादित करने के लिए कहें।"
+   ],
+   "chatgpt_title": "ChatGPT में",
+   "chatgpt_steps": [
+    "Settings → Connectors में, Developer mode चालू करें, फिर Add custom connector करें।",
+    "ऊपर दिया गया कनेक्टर URL पेस्ट करें और एक्सेस को अधिकृत करें।",
+    "start_connect चलाएँ और सुरक्षित पेज पर अपना टोकन पेस्ट करें।",
+    "ChatGPT से अपने पेपर को संपादित करने के लिए कहें।"
+   ],
+   "chatgpt_note": "कस्टम कनेक्टर जोड़ने के लिए ChatGPT Plus या उससे ऊपर की ज़रूरत होती है; पूर्ण संपादन Business या Enterprise पर सबसे अच्छा काम करता है। गाइड देखें।",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "ko": {
@@ -2580,6 +2764,29 @@
      "body": "본 약관에 관한 질문은 초기 단계 제품을 위한 임시 지원 주소인 support@milatexai.com으로 보내실 수 있습니다."
     }
    ]
+  },
+  "setup": {
+   "title": "2분 만에 MiLatexAI 추가하기",
+   "subtitle": "동일한 커넥터가 Claude와 ChatGPT에서 작동합니다.",
+   "url_label": "커넥터 URL",
+   "docs_label": "공식 설정 가이드 →",
+   "claude_title": "Claude에서",
+   "claude_steps": [
+    "Settings → Connectors → Add custom connector를 엽니다.",
+    "위의 커넥터 URL을 붙여넣고 로그인합니다.",
+    "start_connect를 실행하고 보안 페이지에 Overleaf Git 토큰을 붙여넣습니다.",
+    "Claude에게 섹션을 읽거나 논문을 편집하도록 요청합니다."
+   ],
+   "chatgpt_title": "ChatGPT에서",
+   "chatgpt_steps": [
+    "Settings → Connectors에서 Developer mode를 활성화한 다음 Add custom connector를 선택합니다.",
+    "위의 커넥터 URL을 붙여넣고 액세스를 승인합니다.",
+    "start_connect를 실행하고 보안 페이지에 토큰을 붙여넣습니다.",
+    "ChatGPT에게 논문을 편집하도록 요청합니다."
+   ],
+   "chatgpt_note": "커스텀 커넥터를 추가하려면 ChatGPT Plus 이상이 필요하며, 전체 편집 기능은 Business 또는 Enterprise에서 가장 잘 작동합니다. 가이드를 참고하세요.",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "ru": {
@@ -2836,6 +3043,29 @@
      "body": "Вопросы об этих условиях можно направлять на support@milatexai.com — временный адрес поддержки для этого продукта на раннем этапе."
     }
    ]
+  },
+  "setup": {
+   "title": "Добавьте MiLatexAI за две минуты",
+   "subtitle": "Один и тот же коннектор работает в Claude и ChatGPT.",
+   "url_label": "URL коннектора",
+   "docs_label": "Официальное руководство по настройке →",
+   "claude_title": "В Claude",
+   "claude_steps": [
+    "Откройте Settings → Connectors → Add custom connector.",
+    "Вставьте указанный выше URL коннектора и войдите в систему.",
+    "Запустите start_connect и вставьте свой Git-токен Overleaf на защищённой странице.",
+    "Попросите Claude прочитать раздел или отредактировать вашу статью."
+   ],
+   "chatgpt_title": "В ChatGPT",
+   "chatgpt_steps": [
+    "В Settings → Connectors включите Developer mode, затем Add custom connector.",
+    "Вставьте указанный выше URL коннектора и предоставьте доступ.",
+    "Запустите start_connect и вставьте свой токен на защищённой странице.",
+    "Попросите ChatGPT отредактировать вашу статью."
+   ],
+   "chatgpt_note": "Для добавления пользовательского коннектора требуется ChatGPT Plus или выше; полноценное редактирование лучше всего работает на тарифах Business или Enterprise. См. руководство.",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  },
  "it": {
@@ -3092,6 +3322,29 @@
      "body": "Le domande su questi termini possono essere inviate a support@milatexai.com, un indirizzo di assistenza provvisorio per questo prodotto in fase iniziale."
     }
    ]
+  },
+  "setup": {
+   "title": "Aggiungi MiLatexAI in due minuti",
+   "subtitle": "Lo stesso connettore funziona in Claude e ChatGPT.",
+   "url_label": "URL del connettore",
+   "docs_label": "Guida ufficiale alla configurazione →",
+   "claude_title": "In Claude",
+   "claude_steps": [
+    "Apri Settings → Connectors → Add custom connector.",
+    "Incolla l'URL del connettore qui sopra e accedi.",
+    "Esegui start_connect e incolla il tuo token Git di Overleaf nella pagina sicura.",
+    "Chiedi a Claude di leggere una sezione o modificare il tuo documento."
+   ],
+   "chatgpt_title": "In ChatGPT",
+   "chatgpt_steps": [
+    "In Settings → Connectors, abilita la Developer mode, poi Add custom connector.",
+    "Incolla l'URL del connettore qui sopra e autorizza l'accesso.",
+    "Esegui start_connect e incolla il tuo token nella pagina sicura.",
+    "Chiedi a ChatGPT di modificare il tuo documento."
+   ],
+   "chatgpt_note": "Aggiungere un connettore personalizzato richiede ChatGPT Plus o superiore; la modifica completa funziona meglio con Business o Enterprise. Consulta la guida.",
+   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
  }
 }
