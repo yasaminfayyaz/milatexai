@@ -65,6 +65,9 @@ another project, run start_connect (or connect that project again) — same secu
 form. Every write (edit_file/write_file/delete_file/upload_file) commits and
 pushes immediately and counts toward the monthly limit; reads are free and
 unlimited. Before editing, read the file so edit_file's old_string matches exactly.
+When the user asks why their paper won't compile or why they're getting errors,
+run check_compile to build it and get the exact LaTeX errors, then read the
+offending file, fix the errors with edit_file, and check_compile again.
 """
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
@@ -535,7 +538,11 @@ def create_hosted_server(
 
     @mcp.tool(annotations={"readOnlyHint": True})
     async def check_compile(project: str | None = None) -> str:
-        """Build one of your projects with a local LaTeX engine (read-only)."""
+        """Compile a project with a local LaTeX engine and report whether it builds,
+        with the exact LaTeX errors and warnings. Use this whenever the user asks
+        why their paper won't compile, why they're getting errors, or wants to
+        verify a project builds. After it reports errors you can read the offending
+        file, fix them with edit_file, and run this again to confirm."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)

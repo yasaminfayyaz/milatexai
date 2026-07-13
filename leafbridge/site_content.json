@@ -34,8 +34,8 @@
     "desc": "Each change is a genuine commit in your Overleaf history. You can see it, review the diff, and roll it back exactly like any other commit. Nothing happens silently."
    },
    {
-    "title": "Check that it compiles",
-    "desc": "Ask the AI to confirm your LaTeX still builds before you trust an edit, so you catch a broken \\\\begin or a missing brace now instead of at deadline."
+    "title": "Catch and fix compile errors",
+    "desc": "Ask why your paper won't build. MiLatexAI compiles it, finds the exact LaTeX errors, and can fix them for you, so you're not hunting a missing brace before a deadline."
    },
    {
     "title": "Your token stays out of the chat",
@@ -139,6 +139,10 @@
     {
      "q": "Will my changes show up in Overleaf history?",
      "a": "Yes. Every write is a real Git commit pushed over Overleaf's Git integration, so it appears in your project history where you can review the diff or revert it."
+    },
+    {
+     "q": "Can it fix my LaTeX errors, not just write?",
+     "a": "Yes. Ask \"Why am I getting errors?\" and it compiles your paper, finds the exact LaTeX errors, and can fix them for you, then confirms it builds. It does far more than write sections."
     }
    ]
   },
@@ -313,8 +317,8 @@
     "desc": "每处改动都是 Overleaf 历史中一次真正的提交。你可以查看它、审阅差异、随时回滚，与其他任何提交别无二致。绝不会有暗中操作。"
    },
    {
-    "title": "检查是否能编译",
-    "desc": "在信任一处编辑之前，让 AI 确认你的 LaTeX 仍能成功构建，这样就能当下发现漏写的 \\\\begin 或缺失的括号，而不是等到截稿前才发现。"
+    "title": "发现并修复编译错误",
+    "desc": "直接问它论文为什么编译不通过。MiLatexAI 会帮你编译，定位到具体的 LaTeX 错误，还能帮你把它们修好，这样临近截止日期时，你就不用再苦苦排查是哪里少了一个括号。"
    },
    {
     "title": "令牌不进入对话",
@@ -418,6 +422,10 @@
     {
      "q": "我的改动会显示在 Overleaf 历史记录中吗？",
      "a": "会。每次写入都是通过 Overleaf 的 Git 集成推送的真实 Git 提交，因此会出现在你的项目历史中，你可以在那里审阅差异或回滚。"
+    },
+    {
+     "q": "它能修复我的 LaTeX 错误吗，还是只能帮我写内容？",
+     "a": "能。只要问一句\"Why am I getting errors?\"，它就会编译你的论文，定位到具体的 LaTeX 错误，并能帮你修好，然后确认可以正常编译通过。它的作用远不止是帮你写章节。"
     }
    ]
   },
@@ -592,8 +600,8 @@
     "desc": "Chaque modification est un authentique commit dans votre historique Overleaf. Vous pouvez le consulter, examiner le diff et le revenir en arrière exactement comme n'importe quel autre commit. Rien ne se produit en silence."
    },
    {
-    "title": "Vérifiez que ça compile",
-    "desc": "Demandez à l'IA de confirmer que votre LaTeX se compile toujours avant de vous fier à une modification, afin de repérer un \\\\begin cassé ou une accolade manquante dès maintenant plutôt qu'à l'échéance."
+    "title": "Détectez et corrigez les erreurs de compilation",
+    "desc": "Demandez pourquoi votre article refuse de compiler. MiLatexAI le compile, repère les erreurs LaTeX exactes et peut les corriger à votre place, pour vous éviter de traquer une accolade manquante juste avant une échéance."
    },
    {
     "title": "Votre jeton reste hors de la conversation",
@@ -697,6 +705,10 @@
     {
      "q": "Mes modifications apparaîtront-elles dans l'historique Overleaf ?",
      "a": "Oui. Chaque écriture est un véritable commit Git poussé via l'intégration Git d'Overleaf, il apparaît donc dans l'historique de votre projet où vous pouvez examiner le diff ou l'annuler."
+    },
+    {
+     "q": "Peut-il corriger mes erreurs LaTeX, et pas seulement rédiger ?",
+     "a": "Oui. Demandez « Pourquoi ai-je des erreurs ? » et il compile votre article, repère les erreurs LaTeX exactes et peut les corriger à votre place, puis confirme que la compilation réussit. Il fait bien plus que rédiger des sections."
     }
    ]
   },
@@ -871,8 +883,8 @@
     "desc": "Cada cambio es un commit genuino en tu historial de Overleaf. Puedes verlo, revisar el diff y revertirlo igual que cualquier otro commit. Nada ocurre en silencio."
    },
    {
-    "title": "Comprueba que compila",
-    "desc": "Pídele a la IA que confirme que tu LaTeX sigue compilando antes de fiarte de una edición, para detectar un \\\\begin roto o una llave que falta ahora y no en plena fecha límite."
+    "title": "Detecta y corrige errores de compilación",
+    "desc": "Pregunta por qué tu artículo no compila. MiLatexAI lo compila, encuentra los errores exactos de LaTeX y puede corregirlos por ti, así no andas buscando una llave que falta justo antes de una fecha límite."
    },
    {
     "title": "Tu token queda fuera del chat",
@@ -976,6 +988,10 @@
     {
      "q": "¿Aparecerán mis cambios en el historial de Overleaf?",
      "a": "Sí. Cada escritura es un commit de Git real enviado mediante la integración de Git de Overleaf, así que aparece en el historial de tu proyecto, donde puedes revisar el diff o revertirlo."
+    },
+    {
+     "q": "¿Puede corregir mis errores de LaTeX, no solo escribir?",
+     "a": "Sí. Pregunta \"¿Por qué me salen errores?\" y compila tu artículo, encuentra los errores exactos de LaTeX y puede corregirlos por ti, luego confirma que compila. Hace mucho más que escribir secciones."
     }
    ]
   },
@@ -1150,8 +1166,8 @@
     "desc": "Jede Änderung ist ein echter Commit in deiner Overleaf-Historie. Du kannst ihn einsehen, das Diff prüfen und ihn genau wie jeden anderen Commit rückgängig machen. Nichts passiert im Verborgenen."
    },
    {
-    "title": "Prüfen, ob es kompiliert",
-    "desc": "Bitte die KI zu bestätigen, dass dein LaTeX noch baut, bevor du einer Bearbeitung vertraust, so fängst du ein kaputtes \\\\begin oder eine fehlende Klammer jetzt ab und nicht erst zur Deadline."
+    "title": "Kompilierfehler finden und beheben",
+    "desc": "Frag, warum sich dein Paper nicht kompilieren lässt. MiLatexAI kompiliert es, findet die genauen LaTeX-Fehler und kann sie für dich beheben, damit du nicht kurz vor der Deadline nach einer fehlenden Klammer suchen musst."
    },
    {
     "title": "Dein Token bleibt aus dem Chat heraus",
@@ -1255,6 +1271,10 @@
     {
      "q": "Erscheinen meine Änderungen in der Overleaf-Historie?",
      "a": "Ja. Jeder Schreibvorgang ist ein echter Git-Commit, der über Overleafs Git-Integration gepusht wird, sodass er in deiner Projekthistorie erscheint, wo du das Diff prüfen oder ihn rückgängig machen kannst."
+    },
+    {
+     "q": "Kann es meine LaTeX-Fehler beheben, nicht nur schreiben?",
+     "a": "Ja. Frag „Warum bekomme ich Fehler?\" und es kompiliert dein Paper, findet die genauen LaTeX-Fehler und kann sie für dich beheben, danach bestätigt es, dass es sich kompilieren lässt. Es kann weit mehr, als nur Abschnitte zu schreiben."
     }
    ]
   },
@@ -1429,8 +1449,8 @@
     "desc": "各変更はOverleafの履歴に残る正真正銘のコミットです。確認し、差分をレビューし、他のコミットとまったく同じように取り消せます。何かがひそかに行われることはありません。"
    },
    {
-    "title": "コンパイルの確認",
-    "desc": "編集を信頼する前に、AIにLaTeXがまだビルドできるか確認するよう頼めます。壊れた\\\\beginや閉じ忘れた波かっこを、締め切り間際ではなく今のうちに見つけられます。"
+    "title": "コンパイルエラーの検出と修正",
+    "desc": "論文がビルドできない理由を尋ねてみてください。MiLatexAIが実際にコンパイルし、LaTeXのエラーを正確に特定して、そのまま修正まで行います。締め切り直前に波括弧の閉じ忘れを探し回らずに済みます。"
    },
    {
     "title": "トークンはチャットに残らない",
@@ -1534,6 +1554,10 @@
     {
      "q": "変更はOverleafの履歴に表示されますか？",
      "a": "はい。すべての書き込みはOverleafのGit連携を通じてプッシュされる本物のGitコミットなので、プロジェクト履歴に表示され、差分のレビューや取り消しができます。"
+    },
+    {
+     "q": "文章を書くだけでなく、LaTeXのエラーも修正できますか？",
+     "a": "はい。「なぜエラーが出るのですか？」と尋ねれば、論文をコンパイルし、LaTeXのエラーを正確に特定して修正まで行い、ビルドが通ることを確認します。単にセクションを書くだけにとどまりません。"
     }
    ]
   },
@@ -1708,8 +1732,8 @@
     "desc": "Cada alteração é um commit genuíno no seu histórico do Overleaf. Você pode vê-lo, revisar o diff e revertê-lo exatamente como qualquer outro commit. Nada acontece silenciosamente."
    },
    {
-    "title": "Verifique se compila",
-    "desc": "Peça à IA para confirmar que seu LaTeX ainda compila antes de confiar em uma edição, para que você identifique um \\\\begin quebrado ou uma chave faltando agora, e não na hora do prazo."
+    "title": "Detecte e corrija erros de compilação",
+    "desc": "Pergunte por que seu artigo não compila. O MiLatexAI compila o documento, encontra os erros exatos de LaTeX e pode corrigi-los para você, então você não fica procurando uma chave que falta na véspera do prazo."
    },
    {
     "title": "Seu token fica fora do chat",
@@ -1813,6 +1837,10 @@
     {
      "q": "Minhas alterações vão aparecer no histórico do Overleaf?",
      "a": "Sim. Cada escrita é um commit Git real enviado pela integração Git do Overleaf, então ela aparece no histórico do seu projeto, onde você pode revisar o diff ou revertê-la."
+    },
+    {
+     "q": "Ele consegue corrigir meus erros de LaTeX ou só escrever?",
+     "a": "Sim. Pergunte \"Why am I getting errors?\" e ele compila seu artigo, encontra os erros exatos de LaTeX e pode corrigi-los para você, depois confirma que o documento compila. Ele faz muito mais do que apenas escrever seções."
     }
    ]
   },
@@ -1987,8 +2015,8 @@
     "desc": "كل تغيير هو التزام فعلي في سجل Overleaf الخاص بك. يمكنك رؤيته ومراجعة الفروقات والتراجع عنه تماماً مثل أي التزام آخر. لا شيء يحدث في الخفاء."
    },
    {
-    "title": "تحقّق من قابلية الترجمة البرمجية",
-    "desc": "اطلب من الذكاء الاصطناعي التأكّد من أن كود LaTeX لا يزال يُبنى قبل أن تثق بأي تعديل، لتكتشف \\\\begin مكسوراً أو قوساً مفقوداً الآن بدلاً من موعد التسليم."
+    "title": "اكتشف أخطاء التصريف وأصلحها",
+    "desc": "اسأل لماذا لا يُبنى بحثك. يصرّفه MiLatexAI، ويحدد أخطاء LaTeX بدقة، ويمكنه إصلاحها نيابةً عنك، فلا تنشغل بالبحث عن قوس مفقود قبل موعد التسليم."
    },
    {
     "title": "يبقى رمزك خارج المحادثة",
@@ -2092,6 +2120,10 @@
     {
      "q": "هل ستظهر تغييراتي في سجل Overleaf؟",
      "a": "نعم. كل عملية كتابة هي التزام Git حقيقي يُدفَع عبر تكامل Git في Overleaf، فيظهر في سجل مشروعك حيث يمكنك مراجعة الفروقات أو التراجع عنه."
+    },
+    {
+     "q": "هل يمكنه إصلاح أخطاء LaTeX لديّ، لا الكتابة فقط؟",
+     "a": "نعم. اسأل «لماذا تظهر لي هذه الأخطاء؟» فيصرّف بحثك، ويعثر على أخطاء LaTeX بدقة، ويمكنه إصلاحها نيابةً عنك، ثم يؤكد نجاح البناء. إنه يفعل أكثر بكثير من مجرد كتابة الأقسام."
     }
    ]
   },
@@ -2266,8 +2298,8 @@
     "desc": "हर बदलाव आपके Overleaf इतिहास में एक वास्तविक commit होता है। आप इसे देख सकते हैं, diff की समीक्षा कर सकते हैं, और किसी भी अन्य commit की तरह इसे वापस ले सकते हैं। कुछ भी चुपचाप नहीं होता।"
    },
    {
-    "title": "जाँचें कि यह कंपाइल होता है",
-    "desc": "किसी एडिट पर भरोसा करने से पहले AI से पुष्टि करवाएँ कि आपका LaTeX अब भी बनता है, ताकि टूटा हुआ \\\\begin या छूटा हुआ ब्रेस आप डेडलाइन के बजाय अभी पकड़ लें।"
+    "title": "कंपाइल की गलतियाँ पकड़ें और ठीक करें",
+    "desc": "पूछिए कि आपका पेपर बिल्ड क्यों नहीं हो रहा। MiLatexAI उसे कंपाइल करता है, LaTeX की सटीक गलतियाँ ढूंढता है, और उन्हें आपके लिए ठीक भी कर सकता है, ताकि डेडलाइन से ठीक पहले आपको कोई छूटा हुआ ब्रेस न खोजना पड़े।"
    },
    {
     "title": "आपका टोकन चैट से बाहर रहता है",
@@ -2371,6 +2403,10 @@
     {
      "q": "क्या मेरे बदलाव Overleaf इतिहास में दिखेंगे?",
      "a": "हाँ। हर write एक असली Git commit है जो Overleaf के Git इंटीग्रेशन के ज़रिए पुश किया जाता है, इसलिए यह आपके प्रोजेक्ट इतिहास में दिखता है जहाँ आप diff की समीक्षा या इसे वापस ले सकते हैं।"
+    },
+    {
+     "q": "क्या यह सिर्फ़ लिखता है, या मेरी LaTeX की गलतियाँ भी ठीक कर सकता है?",
+     "a": "हाँ। बस पूछिए \"मुझे एरर क्यों आ रहे हैं?\" और यह आपका पेपर कंपाइल करता है, LaTeX की सटीक गलतियाँ ढूंढता है, उन्हें आपके लिए ठीक कर सकता है, और फिर पुष्टि करता है कि वह बिल्ड हो रहा है। यह केवल सेक्शन लिखने से कहीं ज़्यादा करता है।"
     }
    ]
   },
@@ -2545,8 +2581,8 @@
     "desc": "각 변경 사항은 Overleaf 히스토리에 남는 진짜 커밋입니다. 다른 커밋과 똑같이 확인하고, 차이를 검토하고, 되돌릴 수 있습니다. 아무것도 조용히 일어나지 않습니다."
    },
    {
-    "title": "컴파일 여부 확인",
-    "desc": "편집 내용을 신뢰하기 전에 LaTeX가 여전히 빌드되는지 AI에게 확인하도록 요청하세요. 그러면 마감이 아니라 지금, 잘못된 \\\\begin이나 누락된 중괄호를 잡아낼 수 있습니다."
+    "title": "컴파일 오류를 찾아서 고쳐 드립니다",
+    "desc": "논문이 왜 컴파일되지 않는지 물어보세요. MiLatexAI가 직접 컴파일해서 어떤 LaTeX 오류인지 정확히 찾아내고 대신 고쳐 드리므로, 마감을 앞두고 빠진 중괄호 하나를 찾아 헤맬 일이 없습니다."
    },
    {
     "title": "토큰은 채팅 밖에 보관",
@@ -2650,6 +2686,10 @@
     {
      "q": "제 변경 사항이 Overleaf 히스토리에 표시되나요?",
      "a": "네. 모든 쓰기는 Overleaf의 Git 통합을 통해 푸시되는 실제 Git 커밋이므로, 프로젝트 히스토리에 나타나며 그곳에서 차이를 검토하거나 되돌릴 수 있습니다."
+    },
+    {
+     "q": "글만 써 주는 게 아니라 제 LaTeX 오류도 고쳐 주나요?",
+     "a": "네. \"오류가 왜 자꾸 생기나요?\"라고 물어보면 논문을 컴파일해서 어떤 LaTeX 오류인지 정확히 찾아내고 대신 고친 다음, 정상적으로 빌드되는지 확인해 드립니다. 단순히 섹션을 작성하는 것보다 훨씬 많은 일을 합니다."
     }
    ]
   },
@@ -2824,8 +2864,8 @@
     "desc": "Каждое изменение, это полноценный коммит в истории вашего Overleaf. Вы можете увидеть его, просмотреть diff и откатить точно так же, как любой другой коммит. Ничего не происходит незаметно."
    },
    {
-    "title": "Проверка компиляции",
-    "desc": "Попросите ИИ убедиться, что ваш LaTeX всё ещё собирается, прежде чем доверять правке,, так вы поймаете сломанный \\\\begin или пропущенную скобку сейчас, а не в день дедлайна."
+    "title": "Находите и исправляйте ошибки компиляции",
+    "desc": "Спросите, почему ваша статья не собирается. MiLatexAI скомпилирует её, найдёт конкретные ошибки LaTeX и сможет их исправить, чтобы вам не пришлось искать пропущенную скобку перед дедлайном."
    },
    {
     "title": "Ваш токен остаётся вне чата",
@@ -2929,6 +2969,10 @@
     {
      "q": "Будут ли мои изменения отображаться в истории Overleaf?",
      "a": "Да. Каждая запись, это настоящий коммит Git, отправленный через Git-интеграцию Overleaf, поэтому он появляется в истории вашего проекта, где вы можете просмотреть diff или откатить его."
+    },
+    {
+     "q": "Может ли он исправлять мои ошибки LaTeX, а не только писать текст?",
+     "a": "Да. Спросите «Почему возникают ошибки?», и он скомпилирует вашу статью, найдёт конкретные ошибки LaTeX и сможет их исправить, а затем убедится, что она собирается. Он умеет гораздо больше, чем просто писать разделы."
     }
    ]
   },
@@ -3103,8 +3147,8 @@
     "desc": "Ogni modifica è un commit autentico nella cronologia di Overleaf. Puoi visualizzarlo, esaminare il diff e annullarlo esattamente come qualsiasi altro commit. Nulla accade in silenzio."
    },
    {
-    "title": "Verifica che compili",
-    "desc": "Chiedi all'AI di confermare che il tuo LaTeX si compili ancora prima di fidarti di una modifica, così individui un \\\\begin danneggiato o una parentesi mancante ora invece che alla scadenza."
+    "title": "Individua e correggi gli errori di compilazione",
+    "desc": "Chiedi perché il tuo articolo non si compila. MiLatexAI lo compila, individua gli errori LaTeX esatti e può correggerli al posto tuo, così non devi cercare una parentesi mancante proprio sotto scadenza."
    },
    {
     "title": "Il tuo token resta fuori dalla chat",
@@ -3208,6 +3252,10 @@
     {
      "q": "Le mie modifiche compariranno nella cronologia di Overleaf?",
      "a": "Sì. Ogni scrittura è un vero commit Git inviato tramite l'integrazione Git di Overleaf, quindi compare nella cronologia del tuo progetto dove puoi esaminare il diff o annullarlo."
+    },
+    {
+     "q": "Può correggere i miei errori LaTeX, non solo scrivere?",
+     "a": "Sì. Chiedi \"Why am I getting errors?\" e compila il tuo articolo, individua gli errori LaTeX esatti e può correggerli al posto tuo, poi conferma che la compilazione va a buon fine. Fa molto più che scrivere le sezioni."
     }
    ]
   },
