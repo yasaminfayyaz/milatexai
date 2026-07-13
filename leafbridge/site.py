@@ -11,7 +11,7 @@ Design goals:
   ``data-i18n="dot.path"`` attribute; the full set of languages is embedded as a
   JSON blob and a tiny script swaps text by path (and flips to RTL for Arabic).
 
-No external assets — all CSS/JS is inline, so it works behind the same strict
+No external assets, all CSS/JS is inline, so it works behind the same strict
 single-origin setup as the rest of the app.
 """
 
@@ -42,10 +42,10 @@ _FALLBACK_EN = {
              "title": "Your AI can now edit your real Overleaf projects.",
              "subtitle": "MiLatexAI connects Claude or ChatGPT to your Overleaf LaTeX projects over Git. Ask in plain language; changes go live in Overleaf.",
              "cta_primary": "Get started", "cta_secondary": "See how it works",
-             "note": "Your Overleaf token is entered on a secure web page — never in the chat."},
+             "note": "Your Overleaf token is entered on a secure web page, never in the chat."},
     "trust": "Encrypted tokens · Open-source (AGPL) · Your documents are never stored.",
     "features": [
-        {"title": "Edit by conversation", "desc": "Ask your AI to rewrite a section, fix a table, or add a figure — it edits the actual .tex and pushes to Overleaf."},
+        {"title": "Edit by conversation", "desc": "Ask your AI to rewrite a section, fix a table, or add a figure, it edits the actual .tex and pushes to Overleaf."},
         {"title": "Real Git commits", "desc": "Every change is a commit you can see and revert in your Overleaf history."},
         {"title": "Claude and ChatGPT", "desc": "Add one connector; use whichever assistant you prefer."},
         {"title": "Token stays out of chat", "desc": "You paste your Overleaf Git token into a secure web form; it is encrypted and never appears in the transcript."},
@@ -55,7 +55,7 @@ _FALLBACK_EN = {
     "how": {"title": "Three steps", "subtitle": "You're editing in minutes.",
             "steps": [
                 {"title": "Add the connector", "desc": "Add MiLatexAI in Claude or ChatGPT and sign in."},
-                {"title": "Connect a project", "desc": "Run start_connect, open the secure link, and paste your Overleaf Git token — it's encrypted, never shown in chat."},
+                {"title": "Connect a project", "desc": "Run start_connect, open the secure link, and paste your Overleaf Git token, it's encrypted, never shown in chat."},
                 {"title": "Ask for edits", "desc": "Tell your AI what to change. It edits the LaTeX and pushes it live to Overleaf."},
             ]},
     "platforms": {"title": "One connector, two assistants", "subtitle": "MiLatexAI speaks the Model Context Protocol (MCP).",
@@ -89,19 +89,19 @@ _FALLBACK_EN = {
                         "cta": "Get started",
                         "availability": "Guaranteed · always on"},
                 "note": "Reads are always free on every plan.",
-                "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access — you are never turned away."},
+                "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away."},
     "faq": {"title": "Frequently asked questions", "items": [
         {"q": "Is my Overleaf token safe?", "a": "You enter it on a secure web page, not in the chat. It's encrypted at rest and only used to sync your connected projects over Git."},
         {"q": "Do you see my documents?", "a": "We don't store your document contents. Edits flow through Overleaf's Git integration; we keep only your account email, your encrypted token, and a commit counter."},
         {"q": "Which assistants work?", "a": "Anthropic Claude and OpenAI ChatGPT, via the Model Context Protocol."},
         {"q": "What happens at the free limit?", "a": "Reads stay free and unlimited. New write-commits resume next month, or you can upgrade to Pro."},
-        {"q": "Is it open source?", "a": "Yes — the code is public under the AGPL license, so you can audit exactly what it does."},
+        {"q": "Is it open source?", "a": "Yes, the code is public under the AGPL license, so you can audit exactly what it does."},
         {"q": "Can I disconnect?", "a": "Yes, any time. Disconnecting deletes the stored token for that project."},
     ]},
     "security": {"title": "Built to be trusted", "subtitle": "Security and transparency first.",
                  "points": [
                      {"title": "Encrypted tokens", "desc": "Your Overleaf Git token is encrypted at rest with authenticated encryption."},
-                     {"title": "No document storage", "desc": "We never store your paper's contents — only account metadata and an encrypted token."},
+                     {"title": "No document storage", "desc": "We never store your paper's contents, only account metadata and an encrypted token."},
                      {"title": "Only your projects", "desc": "MiLatexAI can only touch the specific Overleaf projects you connect."},
                      {"title": "Open source", "desc": "The full source is public under the AGPL, so anyone can verify it."},
                  ]},
@@ -171,25 +171,39 @@ def _node(en: dict, tag: str, path: str, cls: str = "") -> str:
     return f"<{tag} data-i18n=\"{path}\"{cls_attr}>{_t(en, path)}</{tag}>"
 
 
-# Language-neutral hero illustration: a chat message -> an edited Overleaf doc.
-_HERO_ART = """<svg class='hero-art' viewBox='0 0 640 250' role='img'
-  aria-label='Ask your AI, and it edits your Overleaf document' xmlns='http://www.w3.org/2000/svg'>
-  <rect x='12' y='58' width='236' height='134' rx='14' fill='var(--card)' stroke='var(--line)'/>
-  <rect x='34' y='82' width='150' height='12' rx='6' fill='var(--muted)' opacity='.45'/>
-  <rect x='34' y='106' width='196' height='12' rx='6' fill='var(--muted)' opacity='.3'/>
-  <rect x='34' y='146' width='150' height='30' rx='15' fill='var(--accent)'/>
-  <rect x='50' y='157' width='96' height='8' rx='4' fill='#fff' opacity='.85'/>
-  <g stroke='var(--accent)' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'>
-    <line x1='266' y1='125' x2='350' y2='125'/><path d='M338 113 L354 125 L338 137'/>
-  </g>
-  <rect x='378' y='34' width='250' height='184' rx='14' fill='var(--card)' stroke='var(--line)'/>
-  <rect x='400' y='60' width='126' height='14' rx='7' fill='var(--accent)' opacity='.85'/>
-  <rect x='400' y='90' width='206' height='10' rx='5' fill='var(--muted)' opacity='.4'/>
-  <rect x='400' y='110' width='196' height='10' rx='5' fill='var(--muted)' opacity='.4'/>
-  <rect x='400' y='130' width='176' height='10' rx='5' fill='var(--muted)' opacity='.4'/>
-  <rect x='400' y='162' width='96' height='10' rx='5' fill='var(--muted)' opacity='.3'/>
-  <circle cx='606' cy='196' r='16' fill='#22c55e'/>
-  <path d='M598 196 l6 6 l10 -11' stroke='#fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/>
+# Hero illustration: your AI edits your real research paper. A LaTeX paper (title,
+# a real equation, body text) with one line freshly edited + committed, driven by
+# a chat instruction. Language-neutral (only universal math), theme-aware via vars.
+_HERO_ART = """<svg class='hero-art' viewBox='0 0 640 300' role='img'
+  aria-label='Your AI edits your real Overleaf research paper' xmlns='http://www.w3.org/2000/svg'>
+  <!-- the paper -->
+  <rect x='300' y='30' width='312' height='236' rx='16' fill='var(--card)' stroke='var(--line)'/>
+  <rect x='366' y='54' width='180' height='12' rx='6' fill='var(--accent)'/>
+  <rect x='396' y='78' width='120' height='7' rx='3.5' fill='var(--muted)' opacity='.4'/>
+  <rect x='411' y='90' width='90' height='7' rx='3.5' fill='var(--muted)' opacity='.3'/>
+  <rect x='346' y='112' width='220' height='46' rx='10' fill='var(--bg)' stroke='var(--line)'/>
+  <text x='456' y='143' text-anchor='middle' fill='var(--fg)'
+    font-family='Georgia, "Times New Roman", serif' font-size='24'>e<tspan
+    font-size='15' dy='-9'>i&#960;</tspan><tspan dy='9'> + 1 = 0</tspan></text>
+  <rect x='324' y='176' width='84' height='9' rx='4' fill='var(--accent)' opacity='.85'/>
+  <rect x='324' y='194' width='264' height='8' rx='4' fill='var(--muted)' opacity='.32'/>
+  <rect x='318' y='208' width='278' height='18' rx='5' fill='var(--accent)' opacity='.13'/>
+  <rect x='324' y='213' width='236' height='8' rx='4' fill='var(--accent)'/>
+  <rect x='565' y='210' width='2.5' height='14' rx='1' fill='var(--accent)'/>
+  <rect x='324' y='234' width='210' height='8' rx='4' fill='var(--muted)' opacity='.32'/>
+  <rect x='324' y='250' width='244' height='8' rx='4' fill='var(--muted)' opacity='.32'/>
+  <!-- committed -->
+  <circle cx='585' cy='188' r='11' fill='#22c55e'/>
+  <path d='M579 188 l4 4 l8 -9' stroke='#fff' stroke-width='2.4' fill='none'
+    stroke-linecap='round' stroke-linejoin='round'/>
+  <!-- the instruction that caused the edit -->
+  <path d='M232 236 Q286 226 314 217' fill='none' stroke='var(--accent)'
+    stroke-width='2' stroke-dasharray='2 6' stroke-linecap='round' opacity='.5'/>
+  <rect x='30' y='150' width='192' height='94' rx='18' fill='var(--accent)'/>
+  <path d='M208 230 L232 248 L204 242 Z' fill='var(--accent)'/>
+  <rect x='52' y='176' width='146' height='9' rx='4.5' fill='#fff' opacity='.95'/>
+  <rect x='52' y='195' width='116' height='9' rx='4.5' fill='#fff' opacity='.78'/>
+  <rect x='52' y='214' width='86' height='9' rx='4.5' fill='#fff' opacity='.6'/>
 </svg>"""
 
 
@@ -412,7 +426,7 @@ function applyLang(lang) {{
 
     desc = html.escape(str(en.get("hero", {}).get("subtitle", "")))
     tagline = html.escape(str(en.get("brand_tagline", "")))
-    title = f"MiLatexAI — {tagline}"
+    title = f"MiLatexAI · {tagline}"
     url = "https://milatexai.com/"
     og_image = "https://milatexai.com/og.svg"
     price = html.escape(str(en.get("pricing", {}).get("pro", {}).get("price", "$4.99")))
@@ -477,7 +491,7 @@ def render_account(status: str | None = None) -> str:
     if status == "success":
         icon, heading, body = (
             "🎉", "You're on Pro!",
-            "Thanks for upgrading. Your plan is now Pro — unlimited projects and "
+            "Thanks for upgrading. Your plan is now Pro, unlimited projects and "
             "commits. It may take a few seconds to reflect in your assistant.",
         )
     elif status == "cancelled":

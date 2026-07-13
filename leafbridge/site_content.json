@@ -13,8 +13,8 @@
   },
   "hero": {
    "badge": "Works with Claude and ChatGPT",
-   "title": "From thought to paper — no copy-paste.",
-   "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project. No pasting sections, no downloading files — your AI works on the live document, always the ground truth, and every change lands in Overleaf as a real Git commit.",
+   "title": "From thought to paper, no copy-paste.",
+   "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project. No pasting sections, no downloading files, your AI works on the live document, always the ground truth, and every change lands in Overleaf as a real Git commit.",
    "cta_primary": "Get started free",
    "cta_secondary": "See how it works",
    "note": "Free plan: 1 project and 25 write-commits per month. Reads are always free."
@@ -68,7 +68,7 @@
    "title": "Bring your own AI",
    "subtitle": "MiLatexAI is a Model Context Protocol connector, so it works with the assistant you already use.",
    "claude": "Add MiLatexAI as a connector in Anthropic's Claude and edit your Overleaf projects from any Claude conversation.",
-   "chatgpt": "Add MiLatexAI as a connector in OpenAI's ChatGPT and do the same there — same projects, same commits, same Overleaf history."
+   "chatgpt": "Add MiLatexAI as a connector in OpenAI's ChatGPT and do the same there, same projects, same commits, same Overleaf history."
   },
   "pricing": {
    "title": "Simple pricing",
@@ -103,7 +103,7 @@
     "availability": "Guaranteed · always on"
    },
    "note": "The Pro price isn't set yet. Leave your email and we'll let you know when it launches.",
-   "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access — you are never turned away."
+   "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away."
   },
   "faq": {
    "title": "Questions researchers ask",
@@ -152,7 +152,7 @@
     },
     {
      "title": "We don't store your documents",
-     "desc": "MiLatexAI keeps only your account email, your encrypted token, and a monthly commit counter — never the contents of your LaTeX files."
+     "desc": "MiLatexAI keeps only your account email, your encrypted token, and a monthly commit counter, never the contents of your LaTeX files."
     },
     {
      "title": "Only the projects you connect",
@@ -292,8 +292,8 @@
   },
   "hero": {
    "badge": "支持 Claude 与 ChatGPT",
-   "title": "从灵感到论文 —— 无需复制粘贴",
-   "subtitle": "让 Claude 或 ChatGPT 直接编辑你真实的 Overleaf 项目。无需粘贴章节，无需下载文件——AI 始终在实时文档（也就是唯一权威的原稿）上工作，每一处改动都会作为一次真实的 Git 提交同步进 Overleaf。",
+   "title": "从灵感到论文 ， 无需复制粘贴",
+   "subtitle": "让 Claude 或 ChatGPT 直接编辑你真实的 Overleaf 项目。无需粘贴章节，无需下载文件，AI 始终在实时文档（也就是唯一权威的原稿）上工作，每一处改动都会作为一次真实的 Git 提交同步进 Overleaf。",
    "cta_primary": "免费开始使用",
    "cta_secondary": "了解工作原理",
    "note": "免费方案：1 个项目，每月 25 次写入提交。阅读始终免费。"
@@ -347,7 +347,7 @@
    "title": "自带你惯用的 AI",
    "subtitle": "MiLatexAI 是一个 Model Context Protocol 连接器，因此可以搭配你已经在用的助手。",
    "claude": "在 Anthropic 的 Claude 中将 MiLatexAI 添加为连接器，从任意 Claude 对话中编辑你的 Overleaf 项目。",
-   "chatgpt": "在 OpenAI 的 ChatGPT 中将 MiLatexAI 添加为连接器，同样如此——相同的项目、相同的提交、相同的 Overleaf 历史记录。"
+   "chatgpt": "在 OpenAI 的 ChatGPT 中将 MiLatexAI 添加为连接器，同样如此，相同的项目、相同的提交、相同的 Overleaf 历史记录。"
   },
   "pricing": {
    "title": "简单透明的价格",
@@ -382,7 +382,7 @@
     "availability": "保证可用 · 始终在线"
    },
    "note": "专业版价格尚未确定。留下你的邮箱，上线时我们会通知你。",
-   "capacity_note": "免费套餐依托闲置容量运行，在需求高峰期可能会短暂暂停。Pro 保证不间断访问——您永远不会被拒之门外。"
+   "capacity_note": "免费套餐依托闲置容量运行，在需求高峰期可能会短暂暂停。Pro 保证不间断访问，您永远不会被拒之门外。"
   },
   "faq": {
    "title": "研究者常问的问题",
@@ -431,7 +431,7 @@
     },
     {
      "title": "我们不存储你的文档",
-     "desc": "MiLatexAI 仅保留你的账户邮箱、加密令牌和一个每月提交计数器——绝不保留你 LaTeX 文件的内容。"
+     "desc": "MiLatexAI 仅保留你的账户邮箱、加密令牌和一个每月提交计数器，绝不保留你 LaTeX 文件的内容。"
     },
     {
      "title": "只限你连接的项目",
@@ -571,8 +571,8 @@
   },
   "hero": {
    "badge": "Compatible avec Claude et ChatGPT",
-   "title": "De l'idée à l'article — sans copier-coller.",
-   "subtitle": "Demandez à Claude ou ChatGPT de modifier votre véritable projet Overleaf. Aucune section à coller, aucun fichier à télécharger — votre IA travaille sur le document en direct, toujours la source de vérité, et chaque modification arrive dans Overleaf sous la forme d'un véritable commit Git.",
+   "title": "De l'idée à l'article, sans copier-coller.",
+   "subtitle": "Demandez à Claude ou ChatGPT de modifier votre véritable projet Overleaf. Aucune section à coller, aucun fichier à télécharger, votre IA travaille sur le document en direct, toujours la source de vérité, et chaque modification arrive dans Overleaf sous la forme d'un véritable commit Git.",
    "cta_primary": "Commencer gratuitement",
    "cta_secondary": "Voir le fonctionnement",
    "note": "Formule gratuite : 1 projet et 25 commits d'écriture par mois. Les lectures sont toujours gratuites."
@@ -626,7 +626,7 @@
    "title": "Apportez votre propre IA",
    "subtitle": "MiLatexAI est un connecteur Model Context Protocol, il fonctionne donc avec l'assistant que vous utilisez déjà.",
    "claude": "Ajoutez MiLatexAI comme connecteur dans Claude d'Anthropic et modifiez vos projets Overleaf depuis n'importe quelle conversation Claude.",
-   "chatgpt": "Ajoutez MiLatexAI comme connecteur dans ChatGPT d'OpenAI et faites de même — mêmes projets, mêmes commits, même historique Overleaf."
+   "chatgpt": "Ajoutez MiLatexAI comme connecteur dans ChatGPT d'OpenAI et faites de même, mêmes projets, mêmes commits, même historique Overleaf."
   },
   "pricing": {
    "title": "Une tarification simple",
@@ -661,7 +661,7 @@
     "availability": "Garanti · toujours actif"
    },
    "note": "Le tarif Pro n'est pas encore fixé. Laissez votre e-mail et nous vous préviendrons de son lancement.",
-   "capacity_note": "L'offre gratuite fonctionne sur les capacités disponibles et peut être suspendue brièvement en cas de forte demande. Pro garantit un accès ininterrompu — vous n'êtes jamais refusé."
+   "capacity_note": "L'offre gratuite fonctionne sur les capacités disponibles et peut être suspendue brièvement en cas de forte demande. Pro garantit un accès ininterrompu, vous n'êtes jamais refusé."
   },
   "faq": {
    "title": "Les questions que se posent les chercheurs",
@@ -710,7 +710,7 @@
     },
     {
      "title": "Nous ne stockons pas vos documents",
-     "desc": "MiLatexAI ne conserve que l'e-mail de votre compte, votre jeton chiffré et un compteur mensuel de commits — jamais le contenu de vos fichiers LaTeX."
+     "desc": "MiLatexAI ne conserve que l'e-mail de votre compte, votre jeton chiffré et un compteur mensuel de commits, jamais le contenu de vos fichiers LaTeX."
     },
     {
      "title": "Uniquement les projets que vous connectez",
@@ -850,8 +850,8 @@
   },
   "hero": {
    "badge": "Compatible con Claude y ChatGPT",
-   "title": "De la idea al artículo — sin copiar y pegar.",
-   "subtitle": "Pídele a Claude o ChatGPT que edite tu proyecto real de Overleaf. Sin pegar secciones ni descargar archivos — tu IA trabaja sobre el documento en vivo, siempre la fuente de verdad, y cada cambio llega a Overleaf como un commit de Git real.",
+   "title": "De la idea al artículo, sin copiar y pegar.",
+   "subtitle": "Pídele a Claude o ChatGPT que edite tu proyecto real de Overleaf. Sin pegar secciones ni descargar archivos, tu IA trabaja sobre el documento en vivo, siempre la fuente de verdad, y cada cambio llega a Overleaf como un commit de Git real.",
    "cta_primary": "Empieza gratis",
    "cta_secondary": "Descubre cómo funciona",
    "note": "Plan gratuito: 1 proyecto y 25 commits de escritura al mes. Las lecturas son siempre gratuitas."
@@ -1129,8 +1129,8 @@
   },
   "hero": {
    "badge": "Funktioniert mit Claude und ChatGPT",
-   "title": "Vom Gedanken aufs Papier — ohne Copy-and-Paste.",
-   "subtitle": "Lass Claude oder ChatGPT dein echtes Overleaf-Projekt bearbeiten. Keine Abschnitte einfügen, keine Dateien herunterladen — deine KI arbeitet direkt am lebenden Dokument, immer die maßgebliche Version, und jede Änderung landet als echter Git-Commit in Overleaf.",
+   "title": "Vom Gedanken aufs Papier, ohne Copy-and-Paste.",
+   "subtitle": "Lass Claude oder ChatGPT dein echtes Overleaf-Projekt bearbeiten. Keine Abschnitte einfügen, keine Dateien herunterladen, deine KI arbeitet direkt am lebenden Dokument, immer die maßgebliche Version, und jede Änderung landet als echter Git-Commit in Overleaf.",
    "cta_primary": "Kostenlos starten",
    "cta_secondary": "So funktioniert's",
    "note": "Kostenloser Plan: 1 Projekt und 25 Schreib-Commits pro Monat. Lesen ist immer kostenlos."
@@ -1151,7 +1151,7 @@
    },
    {
     "title": "Prüfen, ob es kompiliert",
-    "desc": "Bitte die KI zu bestätigen, dass dein LaTeX noch baut, bevor du einer Bearbeitung vertraust – so fängst du ein kaputtes \\\\begin oder eine fehlende Klammer jetzt ab und nicht erst zur Deadline."
+    "desc": "Bitte die KI zu bestätigen, dass dein LaTeX noch baut, bevor du einer Bearbeitung vertraust, so fängst du ein kaputtes \\\\begin oder eine fehlende Klammer jetzt ab und nicht erst zur Deadline."
    },
    {
     "title": "Dein Token bleibt aus dem Chat heraus",
@@ -1184,7 +1184,7 @@
    "title": "Nutze deine eigene KI",
    "subtitle": "MiLatexAI ist ein Connector für das Model Context Protocol und funktioniert daher mit dem Assistenten, den du bereits nutzt.",
    "claude": "Füge MiLatexAI als Connector in Anthropics Claude hinzu und bearbeite deine Overleaf-Projekte aus jeder Claude-Unterhaltung heraus.",
-   "chatgpt": "Füge MiLatexAI als Connector in OpenAIs ChatGPT hinzu und mach dort dasselbe – dieselben Projekte, dieselben Commits, dieselbe Overleaf-Historie."
+   "chatgpt": "Füge MiLatexAI als Connector in OpenAIs ChatGPT hinzu und mach dort dasselbe, dieselben Projekte, dieselben Commits, dieselbe Overleaf-Historie."
   },
   "pricing": {
    "title": "Einfache Preise",
@@ -1219,7 +1219,7 @@
     "availability": "Garantiert · immer verfügbar"
    },
    "note": "Der Pro-Preis steht noch nicht fest. Hinterlasse deine E-Mail-Adresse, und wir informieren dich zum Start.",
-   "capacity_note": "Der kostenlose Tarif nutzt freie Kapazitäten und kann bei hoher Nachfrage kurz pausieren. Pro garantiert ununterbrochenen Zugriff — Sie werden niemals abgewiesen."
+   "capacity_note": "Der kostenlose Tarif nutzt freie Kapazitäten und kann bei hoher Nachfrage kurz pausieren. Pro garantiert ununterbrochenen Zugriff, Sie werden niemals abgewiesen."
   },
   "faq": {
    "title": "Fragen, die Forschende stellen",
@@ -1260,7 +1260,7 @@
   },
   "security": {
    "title": "Entwickelt, um so wenig wie möglich zu berühren",
-   "subtitle": "Genau das, was MiLatexAI speichert – und was es bewusst nicht speichert.",
+   "subtitle": "Genau das, was MiLatexAI speichert, und was es bewusst nicht speichert.",
    "points": [
     {
      "title": "Dein Token ist verschlüsselt",
@@ -1268,7 +1268,7 @@
     },
     {
      "title": "Wir speichern deine Dokumente nicht",
-     "desc": "MiLatexAI behält nur deine Konto-E-Mail, dein verschlüsseltes Token und einen monatlichen Commit-Zähler – niemals die Inhalte deiner LaTeX-Dateien."
+     "desc": "MiLatexAI behält nur deine Konto-E-Mail, dein verschlüsseltes Token und einen monatlichen Commit-Zähler, niemals die Inhalte deiner LaTeX-Dateien."
     },
     {
      "title": "Nur die Projekte, die du verbindest",
@@ -1408,8 +1408,8 @@
   },
   "hero": {
    "badge": "ClaudeとChatGPTに対応",
-   "title": "アイデアが、そのまま論文に — コピペ不要。",
-   "subtitle": "Claude や ChatGPT に頼むだけで、あなたの本物の Overleaf プロジェクトをそのまま編集。セクションを貼り付けたり、ファイルをダウンロードしたりする必要はありません — AI は常に唯一の原本となるライブ文書を直接編集し、すべての変更が本物の Git コミットとして Overleaf に反映されます。",
+   "title": "アイデアが、そのまま論文に、コピペ不要。",
+   "subtitle": "Claude や ChatGPT に頼むだけで、あなたの本物の Overleaf プロジェクトをそのまま編集。セクションを貼り付けたり、ファイルをダウンロードしたりする必要はありません、AI は常に唯一の原本となるライブ文書を直接編集し、すべての変更が本物の Git コミットとして Overleaf に反映されます。",
    "cta_primary": "無料で始める",
    "cta_secondary": "仕組みを見る",
    "note": "無料プラン：プロジェクト1件、書き込みコミットは月25回まで。読み取りは常に無料です。"
@@ -1418,7 +1418,7 @@
   "features": [
    {
     "title": "会話で編集",
-    "desc": "アブストラクトを引き締める、段落を書き直す、証明を整理する——AIにそう頼むだけ。コピーではなく、Overleafプロジェクト内の実際のLaTeXを読み書きします。"
+    "desc": "アブストラクトを引き締める、段落を書き直す、証明を整理する、AIにそう頼むだけ。コピーではなく、Overleafプロジェクト内の実際のLaTeXを読み書きします。"
    },
    {
     "title": "変更はそのままOverleafへ",
@@ -1463,7 +1463,7 @@
    "title": "使い慣れたAIをそのまま",
    "subtitle": "MiLatexAIはModel Context Protocolのコネクターなので、すでにお使いのアシスタントで動作します。",
    "claude": "AnthropicのClaudeにMiLatexAIをコネクターとして追加すれば、どのClaudeの会話からでもOverleafプロジェクトを編集できます。",
-   "chatgpt": "OpenAIのChatGPTにMiLatexAIをコネクターとして追加すれば、同じことができます——同じプロジェクト、同じコミット、同じOverleafの履歴。"
+   "chatgpt": "OpenAIのChatGPTにMiLatexAIをコネクターとして追加すれば、同じことができます、同じプロジェクト、同じコミット、同じOverleafの履歴。"
   },
   "pricing": {
    "title": "シンプルな料金",
@@ -1687,8 +1687,8 @@
   },
   "hero": {
    "badge": "Funciona com Claude e ChatGPT",
-   "title": "Da ideia ao papel — sem copiar e colar.",
-   "subtitle": "Peça ao Claude ou ao ChatGPT para editar seu projeto real no Overleaf. Sem colar seções, sem baixar arquivos — sua IA trabalha no documento ao vivo, sempre a fonte da verdade, e cada mudança chega ao Overleaf como um commit real no Git.",
+   "title": "Da ideia ao papel, sem copiar e colar.",
+   "subtitle": "Peça ao Claude ou ao ChatGPT para editar seu projeto real no Overleaf. Sem colar seções, sem baixar arquivos, sua IA trabalha no documento ao vivo, sempre a fonte da verdade, e cada mudança chega ao Overleaf como um commit real no Git.",
    "cta_primary": "Comece grátis",
    "cta_secondary": "Veja como funciona",
    "note": "Plano gratuito: 1 projeto e 25 commits de escrita por mês. As leituras são sempre gratuitas."
@@ -1742,7 +1742,7 @@
    "title": "Use a IA que você já tem",
    "subtitle": "O MiLatexAI é um conector do Model Context Protocol, então funciona com o assistente que você já usa.",
    "claude": "Adicione o MiLatexAI como conector no Claude, da Anthropic, e edite seus projetos do Overleaf a partir de qualquer conversa no Claude.",
-   "chatgpt": "Adicione o MiLatexAI como conector no ChatGPT, da OpenAI, e faça o mesmo por lá — os mesmos projetos, os mesmos commits, o mesmo histórico do Overleaf."
+   "chatgpt": "Adicione o MiLatexAI como conector no ChatGPT, da OpenAI, e faça o mesmo por lá, os mesmos projetos, os mesmos commits, o mesmo histórico do Overleaf."
   },
   "pricing": {
    "title": "Preços simples",
@@ -1777,7 +1777,7 @@
     "availability": "Garantido · sempre ativo"
    },
    "note": "O preço do Pro ainda não foi definido. Deixe seu e-mail e avisaremos quando ele for lançado.",
-   "capacity_note": "O plano gratuito funciona com capacidade ociosa e pode pausar brevemente quando a demanda está alta. O Pro garante acesso ininterrupto — você nunca fica sem acesso."
+   "capacity_note": "O plano gratuito funciona com capacidade ociosa e pode pausar brevemente quando a demanda está alta. O Pro garante acesso ininterrupto, você nunca fica sem acesso."
   },
   "faq": {
    "title": "Perguntas que os pesquisadores fazem",
@@ -1826,7 +1826,7 @@
     },
     {
      "title": "Não armazenamos seus documentos",
-     "desc": "O MiLatexAI guarda apenas o e-mail da sua conta, seu token criptografado e um contador mensal de commits — nunca o conteúdo dos seus arquivos LaTeX."
+     "desc": "O MiLatexAI guarda apenas o e-mail da sua conta, seu token criptografado e um contador mensal de commits, nunca o conteúdo dos seus arquivos LaTeX."
     },
     {
      "title": "Apenas os projetos que você conecta",
@@ -1966,8 +1966,8 @@
   },
   "hero": {
    "badge": "يعمل مع Claude و ChatGPT",
-   "title": "من الفكرة إلى الورقة — دون نسخ ولصق.",
-   "subtitle": "اطلب من Claude أو ChatGPT تعديل مشروعك الحقيقي على Overleaf. لا لصق للأقسام، ولا تنزيل للملفات — يعمل الذكاء الاصطناعي مباشرةً على المستند الحيّ، وهو دائمًا المرجع الموثوق الوحيد، ويصل كل تغيير إلى Overleaf كـ commit حقيقي في Git.",
+   "title": "من الفكرة إلى الورقة، دون نسخ ولصق.",
+   "subtitle": "اطلب من Claude أو ChatGPT تعديل مشروعك الحقيقي على Overleaf. لا لصق للأقسام، ولا تنزيل للملفات، يعمل الذكاء الاصطناعي مباشرةً على المستند الحيّ، وهو دائمًا المرجع الموثوق الوحيد، ويصل كل تغيير إلى Overleaf كـ commit حقيقي في Git.",
    "cta_primary": "ابدأ مجاناً",
    "cta_secondary": "شاهد كيف يعمل",
    "note": "الخطة المجانية: مشروع واحد و25 التزام كتابة شهرياً. القراءة مجانية دائماً."
@@ -2021,7 +2021,7 @@
    "title": "استخدم الذكاء الاصطناعي الذي تفضّله",
    "subtitle": "MiLatexAI موصّل يعتمد على بروتوكول MCP، لذا فهو يعمل مع المساعد الذي تستخدمه بالفعل.",
    "claude": "أضف MiLatexAI كموصّل في Claude من Anthropic وحرّر مشاريعك على Overleaf من أي محادثة في Claude.",
-   "chatgpt": "أضف MiLatexAI كموصّل في ChatGPT من OpenAI وافعل الشيء نفسه هناك — المشاريع ذاتها، والالتزامات ذاتها، وسجل Overleaf ذاته."
+   "chatgpt": "أضف MiLatexAI كموصّل في ChatGPT من OpenAI وافعل الشيء نفسه هناك، المشاريع ذاتها، والالتزامات ذاتها، وسجل Overleaf ذاته."
   },
   "pricing": {
    "title": "أسعار بسيطة",
@@ -2056,7 +2056,7 @@
     "availability": "مضمون · متاح دائماً"
    },
    "note": "لم يُحدَّد سعر الخطة الاحترافية بعد. اترك بريدك الإلكتروني وسنعلمك عند إطلاقها.",
-   "capacity_note": "تعمل الخطة المجانية على السعة الفائضة وقد تتوقف مؤقتاً لفترة وجيزة عند ارتفاع الطلب. تضمن Pro وصولاً متواصلاً دون انقطاع — فلن تُحرم من الوصول أبداً."
+   "capacity_note": "تعمل الخطة المجانية على السعة الفائضة وقد تتوقف مؤقتاً لفترة وجيزة عند ارتفاع الطلب. تضمن Pro وصولاً متواصلاً دون انقطاع، فلن تُحرم من الوصول أبداً."
   },
   "faq": {
    "title": "أسئلة يطرحها الباحثون",
@@ -2105,7 +2105,7 @@
     },
     {
      "title": "نحن لا نخزّن مستنداتك",
-     "desc": "يحتفظ MiLatexAI فقط ببريد حسابك الإلكتروني، ورمزك المشفّر، وعدّاد الالتزامات الشهري — وليس محتويات ملفات LaTeX الخاصة بك أبداً."
+     "desc": "يحتفظ MiLatexAI فقط ببريد حسابك الإلكتروني، ورمزك المشفّر، وعدّاد الالتزامات الشهري، وليس محتويات ملفات LaTeX الخاصة بك أبداً."
     },
     {
      "title": "المشاريع التي توصّلها فقط",
@@ -2245,8 +2245,8 @@
   },
   "hero": {
    "badge": "Claude और ChatGPT के साथ काम करता है",
-   "title": "विचार से पेपर तक — बिना कॉपी-पेस्ट।",
-   "subtitle": "Claude या ChatGPT से कहें कि वे आपके असली Overleaf प्रोजेक्ट को सीधे एडिट करें। न कोई सेक्शन पेस्ट करना, न फ़ाइलें डाउनलोड करना — आपका AI लाइव डॉक्यूमेंट पर ही काम करता है, जो हमेशा असली और आधिकारिक प्रति रहती है, और हर बदलाव Overleaf में एक असली Git commit बनकर पहुँचता है।",
+   "title": "विचार से पेपर तक, बिना कॉपी-पेस्ट।",
+   "subtitle": "Claude या ChatGPT से कहें कि वे आपके असली Overleaf प्रोजेक्ट को सीधे एडिट करें। न कोई सेक्शन पेस्ट करना, न फ़ाइलें डाउनलोड करना, आपका AI लाइव डॉक्यूमेंट पर ही काम करता है, जो हमेशा असली और आधिकारिक प्रति रहती है, और हर बदलाव Overleaf में एक असली Git commit बनकर पहुँचता है।",
    "cta_primary": "मुफ़्त में शुरू करें",
    "cta_secondary": "देखें यह कैसे काम करता है",
    "note": "मुफ़्त प्लान: प्रति माह 1 प्रोजेक्ट और 25 write-commits। पढ़ना हमेशा मुफ़्त है।"
@@ -2300,7 +2300,7 @@
    "title": "अपना खुद का AI लाएँ",
    "subtitle": "MiLatexAI एक Model Context Protocol कनेक्टर है, इसलिए यह उसी असिस्टेंट के साथ काम करता है जिसे आप पहले से इस्तेमाल करते हैं।",
    "claude": "Anthropic के Claude में MiLatexAI को एक कनेक्टर के रूप में जोड़ें और किसी भी Claude बातचीत से अपने Overleaf प्रोजेक्ट्स एडिट करें।",
-   "chatgpt": "OpenAI के ChatGPT में MiLatexAI को एक कनेक्टर के रूप में जोड़ें और वहीं भी वही करें — वही प्रोजेक्ट्स, वही commits, वही Overleaf इतिहास।"
+   "chatgpt": "OpenAI के ChatGPT में MiLatexAI को एक कनेक्टर के रूप में जोड़ें और वहीं भी वही करें, वही प्रोजेक्ट्स, वही commits, वही Overleaf इतिहास।"
   },
   "pricing": {
    "title": "सरल मूल्य निर्धारण",
@@ -2335,7 +2335,7 @@
     "availability": "सुनिश्चित · हमेशा उपलब्ध"
    },
    "note": "Pro की कीमत अभी तय नहीं हुई है। अपना ईमेल छोड़ें और लॉन्च होने पर हम आपको बताएँगे।",
-   "capacity_note": "फ्री टियर अतिरिक्त क्षमता पर चलता है और मांग अधिक होने पर कुछ देर के लिए रुक सकता है। Pro निर्बाध पहुँच की गारंटी देता है — आपको कभी मना नहीं किया जाता।"
+   "capacity_note": "फ्री टियर अतिरिक्त क्षमता पर चलता है और मांग अधिक होने पर कुछ देर के लिए रुक सकता है। Pro निर्बाध पहुँच की गारंटी देता है, आपको कभी मना नहीं किया जाता।"
   },
   "faq": {
    "title": "शोधकर्ताओं के सवाल",
@@ -2384,7 +2384,7 @@
     },
     {
      "title": "हम आपके दस्तावेज़ संग्रहीत नहीं करते",
-     "desc": "MiLatexAI केवल आपका खाता ईमेल, आपका एन्क्रिप्टेड टोकन, और एक मासिक commit काउंटर रखता है — आपकी LaTeX फ़ाइलों की सामग्री कभी नहीं।"
+     "desc": "MiLatexAI केवल आपका खाता ईमेल, आपका एन्क्रिप्टेड टोकन, और एक मासिक commit काउंटर रखता है, आपकी LaTeX फ़ाइलों की सामग्री कभी नहीं।"
     },
     {
      "title": "केवल वही प्रोजेक्ट्स जिन्हें आप कनेक्ट करते हैं",
@@ -2524,8 +2524,8 @@
   },
   "hero": {
    "badge": "Claude 및 ChatGPT와 함께 작동",
-   "title": "생각에서 논문까지 — 복붙은 이제 그만.",
-   "subtitle": "Claude나 ChatGPT에게 실제 Overleaf 프로젝트를 직접 편집하도록 맡기세요. 섹션을 붙여넣거나 파일을 내려받을 필요 없이 — AI가 언제나 유일한 원본인 실시간 문서에서 바로 작업하고, 모든 변경 사항은 실제 Git 커밋으로 Overleaf에 그대로 반영됩니다.",
+   "title": "생각에서 논문까지, 복붙은 이제 그만.",
+   "subtitle": "Claude나 ChatGPT에게 실제 Overleaf 프로젝트를 직접 편집하도록 맡기세요. 섹션을 붙여넣거나 파일을 내려받을 필요 없이, AI가 언제나 유일한 원본인 실시간 문서에서 바로 작업하고, 모든 변경 사항은 실제 Git 커밋으로 Overleaf에 그대로 반영됩니다.",
    "cta_primary": "무료로 시작하기",
    "cta_secondary": "작동 방식 보기",
    "note": "무료 요금제: 프로젝트 1개, 월 25회 쓰기 커밋. 읽기는 항상 무료입니다."
@@ -2803,8 +2803,8 @@
   },
   "hero": {
    "badge": "Работает с Claude и ChatGPT",
-   "title": "От мысли до статьи — без копипаста.",
-   "subtitle": "Попросите Claude или ChatGPT отредактировать ваш настоящий проект в Overleaf. Никакой вставки разделов, никаких скачанных файлов — ИИ работает прямо с живым документом, который всегда остаётся единственным источником истины, а каждое изменение попадает в Overleaf настоящим Git-коммитом.",
+   "title": "От мысли до статьи, без копипаста.",
+   "subtitle": "Попросите Claude или ChatGPT отредактировать ваш настоящий проект в Overleaf. Никакой вставки разделов, никаких скачанных файлов, ИИ работает прямо с живым документом, который всегда остаётся единственным источником истины, а каждое изменение попадает в Overleaf настоящим Git-коммитом.",
    "cta_primary": "Начать бесплатно",
    "cta_secondary": "Посмотреть, как это работает",
    "note": "Бесплатный тариф: 1 проект и 25 коммитов с изменениями в месяц. Чтение всегда бесплатно."
@@ -2820,12 +2820,12 @@
     "desc": "Правки отправляются в ваш проект через Git-интеграцию Overleaf, поэтому статья обновляется прямо на месте. Никакого копирования между окном чата и вашим редактором."
    },
    {
-    "title": "Каждая запись — настоящий коммит Git",
-    "desc": "Каждое изменение — это полноценный коммит в истории вашего Overleaf. Вы можете увидеть его, просмотреть diff и откатить точно так же, как любой другой коммит. Ничего не происходит незаметно."
+    "title": "Каждая запись, настоящий коммит Git",
+    "desc": "Каждое изменение, это полноценный коммит в истории вашего Overleaf. Вы можете увидеть его, просмотреть diff и откатить точно так же, как любой другой коммит. Ничего не происходит незаметно."
    },
    {
     "title": "Проверка компиляции",
-    "desc": "Попросите ИИ убедиться, что ваш LaTeX всё ещё собирается, прежде чем доверять правке, — так вы поймаете сломанный \\\\begin или пропущенную скобку сейчас, а не в день дедлайна."
+    "desc": "Попросите ИИ убедиться, что ваш LaTeX всё ещё собирается, прежде чем доверять правке,, так вы поймаете сломанный \\\\begin или пропущенную скобку сейчас, а не в день дедлайна."
    },
    {
     "title": "Ваш токен остаётся вне чата",
@@ -2856,9 +2856,9 @@
   },
   "platforms": {
    "title": "Используйте свой ИИ",
-   "subtitle": "MiLatexAI — это коннектор Model Context Protocol, поэтому он работает с тем ассистентом, которым вы уже пользуетесь.",
+   "subtitle": "MiLatexAI, это коннектор Model Context Protocol, поэтому он работает с тем ассистентом, которым вы уже пользуетесь.",
    "claude": "Добавьте MiLatexAI как коннектор в Claude от Anthropic и редактируйте свои проекты Overleaf из любого разговора с Claude.",
-   "chatgpt": "Добавьте MiLatexAI как коннектор в ChatGPT от OpenAI и делайте то же самое там — те же проекты, те же коммиты, та же история Overleaf."
+   "chatgpt": "Добавьте MiLatexAI как коннектор в ChatGPT от OpenAI и делайте то же самое там, те же проекты, те же коммиты, та же история Overleaf."
   },
   "pricing": {
    "title": "Простые тарифы",
@@ -2893,7 +2893,7 @@
     "availability": "Гарантированно · всегда доступно"
    },
    "note": "Цена Pro пока не установлена. Оставьте свой email, и мы сообщим вам о запуске.",
-   "capacity_note": "Бесплатный тариф работает на свободных ресурсах и может ненадолго приостанавливаться при высокой нагрузке. Pro гарантирует бесперебойный доступ — вам никогда не откажут."
+   "capacity_note": "Бесплатный тариф работает на свободных ресурсах и может ненадолго приостанавливаться при высокой нагрузке. Pro гарантирует бесперебойный доступ, вам никогда не откажут."
   },
   "faq": {
    "title": "Вопросы, которые задают исследователи",
@@ -2904,11 +2904,11 @@
     },
     {
      "q": "Видите ли вы мои документы?",
-     "a": "Мы не храним содержимое ваших документов. MiLatexAI читает и редактирует ваши файлы в момент выполнения запроса, но единственное, что мы сохраняем, — это email вашей учётной записи, зашифрованный токен Overleaf и месячный счётчик коммитов."
+     "a": "Мы не храним содержимое ваших документов. MiLatexAI читает и редактирует ваши файлы в момент выполнения запроса, но единственное, что мы сохраняем,, это email вашей учётной записи, зашифрованный токен Overleaf и месячный счётчик коммитов."
     },
     {
      "q": "С какими ИИ-ассистентами это работает?",
-     "a": "И с Claude от Anthropic, и с ChatGPT от OpenAI. MiLatexAI — это коннектор Model Context Protocol, поэтому вы добавляете его в тот ассистент, которым уже пользуетесь."
+     "a": "И с Claude от Anthropic, и с ChatGPT от OpenAI. MiLatexAI, это коннектор Model Context Protocol, поэтому вы добавляете его в тот ассистент, которым уже пользуетесь."
     },
     {
      "q": "Что произойдёт, если я достигну лимита в 25 коммитов?",
@@ -2928,7 +2928,7 @@
     },
     {
      "q": "Будут ли мои изменения отображаться в истории Overleaf?",
-     "a": "Да. Каждая запись — это настоящий коммит Git, отправленный через Git-интеграцию Overleaf, поэтому он появляется в истории вашего проекта, где вы можете просмотреть diff или откатить его."
+     "a": "Да. Каждая запись, это настоящий коммит Git, отправленный через Git-интеграцию Overleaf, поэтому он появляется в истории вашего проекта, где вы можете просмотреть diff или откатить его."
     }
    ]
   },
@@ -2942,7 +2942,7 @@
     },
     {
      "title": "Мы не храним ваши документы",
-     "desc": "MiLatexAI хранит только email вашей учётной записи, зашифрованный токен и месячный счётчик коммитов — никогда содержимое ваших файлов LaTeX."
+     "desc": "MiLatexAI хранит только email вашей учётной записи, зашифрованный токен и месячный счётчик коммитов, никогда содержимое ваших файлов LaTeX."
     },
     {
      "title": "Только подключённые вами проекты",
@@ -2969,7 +2969,7 @@
   "privacy": {
    "title": "Политика конфиденциальности",
    "updated_label": "Последнее обновление: июль 2026",
-   "intro": "Эта политика простыми словами объясняет, что собирает MiLatexAI, что он намеренно не собирает и как защищается ваш токен Overleaf. MiLatexAI — небольшой независимый продукт, и мы стараемся затрагивать как можно меньше ваших данных.",
+   "intro": "Эта политика простыми словами объясняет, что собирает MiLatexAI, что он намеренно не собирает и как защищается ваш токен Overleaf. MiLatexAI, небольшой независимый продукт, и мы стараемся затрагивать как можно меньше ваших данных.",
    "sections": [
     {
      "heading": "Что мы собираем",
@@ -2985,7 +2985,7 @@
     },
     {
      "heading": "Сторонние сервисы, на которые мы полагаемся",
-     "body": "Вход обрабатывается WorkOS AuthKit, который аутентифицирует вас и предоставляет ваш email. Хостинг — на Microsoft Azure в регионе Канады. Ваши проекты находятся на Overleaf, и MiLatexAI взаимодействует с ними через Git-интеграцию Overleaf. Мы не продаём ваши данные и не передаём их за пределы того, что необходимо этим поставщикам для работы сервиса."
+     "body": "Вход обрабатывается WorkOS AuthKit, который аутентифицирует вас и предоставляет ваш email. Хостинг, на Microsoft Azure в регионе Канады. Ваши проекты находятся на Overleaf, и MiLatexAI взаимодействует с ними через Git-интеграцию Overleaf. Мы не продаём ваши данные и не передаём их за пределы того, что необходимо этим поставщикам для работы сервиса."
     },
     {
      "heading": "Хранение и удаление данных",
@@ -3004,11 +3004,11 @@
   "terms": {
    "title": "Условия использования",
    "updated_label": "Последнее обновление: июль 2026",
-   "intro": "Эти условия объясняют, что предоставляет MiLatexAI и на каких основаниях вы можете его использовать. MiLatexAI — небольшой независимый продукт с открытым кодом, поэтому, пожалуйста, внимательно прочитайте разделы о доступности и ответственности.",
+   "intro": "Эти условия объясняют, что предоставляет MiLatexAI и на каких основаниях вы можете его использовать. MiLatexAI, небольшой независимый продукт с открытым кодом, поэтому, пожалуйста, внимательно прочитайте разделы о доступности и ответственности.",
    "sections": [
     {
      "heading": "Сервис",
-     "body": "MiLatexAI — это коннектор, позволяющий ИИ-ассистентам, таким как Claude от Anthropic и ChatGPT от OpenAI, читать, редактировать и компилировать ваши проекты Overleaf на LaTeX через Git-интеграцию Overleaf, посредством Model Context Protocol. Вы управляете ИИ обычными словами, и ваши изменения отправляются в ваш проект Overleaf в виде коммитов Git."
+     "body": "MiLatexAI, это коннектор, позволяющий ИИ-ассистентам, таким как Claude от Anthropic и ChatGPT от OpenAI, читать, редактировать и компилировать ваши проекты Overleaf на LaTeX через Git-интеграцию Overleaf, посредством Model Context Protocol. Вы управляете ИИ обычными словами, и ваши изменения отправляются в ваш проект Overleaf в виде коммитов Git."
     },
     {
      "heading": "Допустимое использование",
@@ -3040,7 +3040,7 @@
     },
     {
      "heading": "Контакты",
-     "body": "Вопросы об этих условиях можно направлять на support@milatexai.com — временный адрес поддержки для этого продукта на раннем этапе."
+     "body": "Вопросы об этих условиях можно направлять на support@milatexai.com, временный адрес поддержки для этого продукта на раннем этапе."
     }
    ]
   },
@@ -3082,8 +3082,8 @@
   },
   "hero": {
    "badge": "Compatibile con Claude e ChatGPT",
-   "title": "Dall'idea alla pagina — senza copia-incolla.",
-   "subtitle": "Chiedi a Claude o ChatGPT di modificare il tuo vero progetto Overleaf. Niente sezioni da incollare, niente file da scaricare — la tua AI lavora sul documento dal vivo, sempre la fonte di verità, e ogni modifica arriva su Overleaf come un vero commit Git.",
+   "title": "Dall'idea alla pagina, senza copia-incolla.",
+   "subtitle": "Chiedi a Claude o ChatGPT di modificare il tuo vero progetto Overleaf. Niente sezioni da incollare, niente file da scaricare, la tua AI lavora sul documento dal vivo, sempre la fonte di verità, e ogni modifica arriva su Overleaf come un vero commit Git.",
    "cta_primary": "Inizia gratis",
    "cta_secondary": "Scopri come funziona",
    "note": "Piano gratuito: 1 progetto e 25 commit di scrittura al mese. Le letture sono sempre gratuite."

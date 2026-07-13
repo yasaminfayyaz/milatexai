@@ -1,5 +1,5 @@
 """Self-contained HTML for the tiny web surface (the connect page + a landing
-page). No templates engine, no external assets — one string per page, every
+page). No templates engine, no external assets, one string per page, every
 interpolated value HTML-escaped. Kept apart from the server wiring so the markup
 is easy to eyeball and change.
 """
@@ -116,7 +116,7 @@ def render_connect_form(
   <button type='submit'>Connect securely</button>
 </form>
 <div class='note'>🔒 This link is single-use and expires 15 minutes after you
-  generated it. Your Git token is encrypted before it touches disk — it is never
+  generated it. Your Git token is encrypted before it touches disk, it is never
   written to the chat.</div>""",
     )
 
@@ -130,7 +130,7 @@ def render_success(project_name: str, project_id: str) -> str:
   <h1>Connected</h1>
   <p class='muted'>Project <b>{html.escape(project_name)}</b>
      (<code>{html.escape(project_id)}</code>) is now linked to your account.</p>
-  <p class='muted'>You can close this tab and go back to Claude — try
+  <p class='muted'>You can close this tab and go back to Claude, try
      <b>“list my files”</b> or ask it to edit your paper.</p>
 </div>""",
     )
@@ -169,14 +169,14 @@ def render_manage_projects(code: str, projects, *, email: str = "", error: str |
         f"Manage projects · {BRAND}",
         f"""{_brand_header()}
 <h1>Your projects</h1>
-<p class='muted'>The AI can only touch the projects listed here — nothing else in
+<p class='muted'>The AI can only touch the projects listed here, nothing else in
   your Overleaf account. Add or remove any time; no token needed.</p>
 {err_html}
 <div class='proj-list'>{rows}</div>
 <form method='post' action='/projects' autocomplete='off'>
   <input type='hidden' name='code' value='{codeq}'>
   <input type='hidden' name='action' value='add'>
-  <label for='overleaf_url'>Add a project — Overleaf link</label>
+  <label for='overleaf_url'>Add a project, Overleaf link</label>
   <input id='overleaf_url' name='overleaf_url' inputmode='url'
          placeholder='https://www.overleaf.com/project/…' required>
   <label for='name'>Label <span class='muted'>(optional)</span></label>
