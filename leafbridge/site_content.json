@@ -13,8 +13,8 @@
   },
   "hero": {
    "badge": "Works with Claude and ChatGPT",
-   "title": "Edit your Overleaf LaTeX by talking to your AI",
-   "subtitle": "MiLatexAI connects Claude or ChatGPT to your real Overleaf projects over Git. Ask in plain language to read a section, rewrite the LaTeX, drop in a figure, or check that it still compiles — every change lands in Overleaf as a real Git commit you can see and revert.",
+   "title": "From thought to paper — no copy-paste.",
+   "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project. No pasting sections, no downloading files — your AI works on the live document, always the ground truth, and every change lands in Overleaf as a real Git commit.",
    "cta_primary": "Get started free",
    "cta_secondary": "See how it works",
    "note": "Free plan: 1 project and 25 write-commits per month. Reads are always free."
@@ -292,8 +292,8 @@
   },
   "hero": {
    "badge": "支持 Claude 与 ChatGPT",
-   "title": "用对话的方式编辑你的 Overleaf LaTeX",
-   "subtitle": "MiLatexAI 通过 Git 将 Claude 或 ChatGPT 连接到你真实的 Overleaf 项目。用日常语言就能让它阅读某个章节、改写 LaTeX、插入图表，或检查是否仍能顺利编译——每一处改动都会以真实的 Git 提交落到 Overleaf 中，你随时可以查看和撤销。",
+   "title": "从灵感到论文 —— 无需复制粘贴",
+   "subtitle": "让 Claude 或 ChatGPT 直接编辑你真实的 Overleaf 项目。无需粘贴章节，无需下载文件——AI 始终在实时文档（也就是唯一权威的原稿）上工作，每一处改动都会作为一次真实的 Git 提交同步进 Overleaf。",
    "cta_primary": "免费开始使用",
    "cta_secondary": "了解工作原理",
    "note": "免费方案：1 个项目，每月 25 次写入提交。阅读始终免费。"
@@ -571,8 +571,8 @@
   },
   "hero": {
    "badge": "Compatible avec Claude et ChatGPT",
-   "title": "Modifiez votre LaTeX Overleaf en parlant à votre IA",
-   "subtitle": "MiLatexAI relie Claude ou ChatGPT à vos véritables projets Overleaf via Git. Demandez en langage naturel de lire une section, de réécrire le LaTeX, d'insérer une figure ou de vérifier que le document compile toujours — chaque modification arrive dans Overleaf sous la forme d'un véritable commit Git que vous pouvez consulter et annuler.",
+   "title": "De l'idée à l'article — sans copier-coller.",
+   "subtitle": "Demandez à Claude ou ChatGPT de modifier votre véritable projet Overleaf. Aucune section à coller, aucun fichier à télécharger — votre IA travaille sur le document en direct, toujours la source de vérité, et chaque modification arrive dans Overleaf sous la forme d'un véritable commit Git.",
    "cta_primary": "Commencer gratuitement",
    "cta_secondary": "Voir le fonctionnement",
    "note": "Formule gratuite : 1 projet et 25 commits d'écriture par mois. Les lectures sont toujours gratuites."
@@ -850,8 +850,8 @@
   },
   "hero": {
    "badge": "Compatible con Claude y ChatGPT",
-   "title": "Edita tu LaTeX de Overleaf hablando con tu IA",
-   "subtitle": "MiLatexAI conecta Claude o ChatGPT con tus proyectos reales de Overleaf a través de Git. Pide en lenguaje natural que lea una sección, reescriba el LaTeX, inserte una figura o compruebe que sigue compilando: cada cambio llega a Overleaf como un commit de Git real que puedes ver y revertir.",
+   "title": "De la idea al artículo — sin copiar y pegar.",
+   "subtitle": "Pídele a Claude o ChatGPT que edite tu proyecto real de Overleaf. Sin pegar secciones ni descargar archivos — tu IA trabaja sobre el documento en vivo, siempre la fuente de verdad, y cada cambio llega a Overleaf como un commit de Git real.",
    "cta_primary": "Empieza gratis",
    "cta_secondary": "Descubre cómo funciona",
    "note": "Plan gratuito: 1 proyecto y 25 commits de escritura al mes. Las lecturas son siempre gratuitas."
@@ -1129,8 +1129,8 @@
   },
   "hero": {
    "badge": "Funktioniert mit Claude und ChatGPT",
-   "title": "Bearbeite dein Overleaf-LaTeX im Gespräch mit deiner KI",
-   "subtitle": "MiLatexAI verbindet Claude oder ChatGPT über Git mit deinen echten Overleaf-Projekten. Bitte einfach in normaler Sprache darum, einen Abschnitt zu lesen, das LaTeX umzuschreiben, eine Abbildung einzufügen oder zu prüfen, ob es noch kompiliert – jede Änderung landet als echter Git-Commit in Overleaf, den du einsehen und rückgängig machen kannst.",
+   "title": "Vom Gedanken aufs Papier — ohne Copy-and-Paste.",
+   "subtitle": "Lass Claude oder ChatGPT dein echtes Overleaf-Projekt bearbeiten. Keine Abschnitte einfügen, keine Dateien herunterladen — deine KI arbeitet direkt am lebenden Dokument, immer die maßgebliche Version, und jede Änderung landet als echter Git-Commit in Overleaf.",
    "cta_primary": "Kostenlos starten",
    "cta_secondary": "So funktioniert's",
    "note": "Kostenloser Plan: 1 Projekt und 25 Schreib-Commits pro Monat. Lesen ist immer kostenlos."
@@ -1408,8 +1408,8 @@
   },
   "hero": {
    "badge": "ClaudeとChatGPTに対応",
-   "title": "AIと話すだけで、OverleafのLaTeXを編集",
-   "subtitle": "MiLatexAIは、ClaudeまたはChatGPTを、Git経由であなたの実際のOverleafプロジェクトに接続します。セクションを読む、LaTeXを書き直す、図を挿入する、コンパイルが通るか確認する——こうした操作を普段の言葉で頼むだけ。すべての変更は、あなたが確認・取り消しできる本物のGitコミットとしてOverleafに反映されます。",
+   "title": "アイデアが、そのまま論文に — コピペ不要。",
+   "subtitle": "Claude や ChatGPT に頼むだけで、あなたの本物の Overleaf プロジェクトをそのまま編集。セクションを貼り付けたり、ファイルをダウンロードしたりする必要はありません — AI は常に唯一の原本となるライブ文書を直接編集し、すべての変更が本物の Git コミットとして Overleaf に反映されます。",
    "cta_primary": "無料で始める",
    "cta_secondary": "仕組みを見る",
    "note": "無料プラン：プロジェクト1件、書き込みコミットは月25回まで。読み取りは常に無料です。"
@@ -1687,8 +1687,8 @@
   },
   "hero": {
    "badge": "Funciona com Claude e ChatGPT",
-   "title": "Edite seu LaTeX no Overleaf conversando com sua IA",
-   "subtitle": "O MiLatexAI conecta o Claude ou o ChatGPT aos seus projetos reais do Overleaf via Git. Peça em linguagem natural para ler uma seção, reescrever o LaTeX, inserir uma figura ou verificar se ainda compila — cada alteração chega ao Overleaf como um commit Git real que você pode ver e reverter.",
+   "title": "Da ideia ao papel — sem copiar e colar.",
+   "subtitle": "Peça ao Claude ou ao ChatGPT para editar seu projeto real no Overleaf. Sem colar seções, sem baixar arquivos — sua IA trabalha no documento ao vivo, sempre a fonte da verdade, e cada mudança chega ao Overleaf como um commit real no Git.",
    "cta_primary": "Comece grátis",
    "cta_secondary": "Veja como funciona",
    "note": "Plano gratuito: 1 projeto e 25 commits de escrita por mês. As leituras são sempre gratuitas."
@@ -1966,8 +1966,8 @@
   },
   "hero": {
    "badge": "يعمل مع Claude و ChatGPT",
-   "title": "حرّر مستندات Overleaf LaTeX الخاصة بك بمجرد التحدث إلى الذكاء الاصطناعي",
-   "subtitle": "يربط MiLatexAI بين Claude أو ChatGPT ومشاريعك الحقيقية على Overleaf عبر Git. اطلب بلغة طبيعية قراءة قسم معيّن، أو إعادة صياغة كود LaTeX، أو إدراج شكل توضيحي، أو التحقق من أن المستند لا يزال قابلاً للترجمة البرمجية — وكل تغيير يصل إلى Overleaf كالتزام Git حقيقي يمكنك رؤيته والتراجع عنه.",
+   "title": "من الفكرة إلى الورقة — دون نسخ ولصق.",
+   "subtitle": "اطلب من Claude أو ChatGPT تعديل مشروعك الحقيقي على Overleaf. لا لصق للأقسام، ولا تنزيل للملفات — يعمل الذكاء الاصطناعي مباشرةً على المستند الحيّ، وهو دائمًا المرجع الموثوق الوحيد، ويصل كل تغيير إلى Overleaf كـ commit حقيقي في Git.",
    "cta_primary": "ابدأ مجاناً",
    "cta_secondary": "شاهد كيف يعمل",
    "note": "الخطة المجانية: مشروع واحد و25 التزام كتابة شهرياً. القراءة مجانية دائماً."
@@ -2245,8 +2245,8 @@
   },
   "hero": {
    "badge": "Claude और ChatGPT के साथ काम करता है",
-   "title": "अपने AI से बात करके अपना Overleaf LaTeX एडिट करें",
-   "subtitle": "MiLatexAI आपके Claude या ChatGPT को Git के ज़रिए आपके असली Overleaf प्रोजेक्ट्स से जोड़ता है। सामान्य भाषा में कहें कि कोई सेक्शन पढ़े, LaTeX फिर से लिखे, कोई figure जोड़े, या जाँचे कि यह अब भी कंपाइल होता है — हर बदलाव Overleaf में एक असली Git commit के रूप में दर्ज होता है, जिसे आप देख और वापस ले सकते हैं।",
+   "title": "विचार से पेपर तक — बिना कॉपी-पेस्ट।",
+   "subtitle": "Claude या ChatGPT से कहें कि वे आपके असली Overleaf प्रोजेक्ट को सीधे एडिट करें। न कोई सेक्शन पेस्ट करना, न फ़ाइलें डाउनलोड करना — आपका AI लाइव डॉक्यूमेंट पर ही काम करता है, जो हमेशा असली और आधिकारिक प्रति रहती है, और हर बदलाव Overleaf में एक असली Git commit बनकर पहुँचता है।",
    "cta_primary": "मुफ़्त में शुरू करें",
    "cta_secondary": "देखें यह कैसे काम करता है",
    "note": "मुफ़्त प्लान: प्रति माह 1 प्रोजेक्ट और 25 write-commits। पढ़ना हमेशा मुफ़्त है।"
@@ -2524,8 +2524,8 @@
   },
   "hero": {
    "badge": "Claude 및 ChatGPT와 함께 작동",
-   "title": "AI와 대화하며 Overleaf LaTeX를 편집하세요",
-   "subtitle": "MiLatexAI는 Git을 통해 Claude 또는 ChatGPT를 실제 Overleaf 프로젝트에 연결합니다. 일상적인 언어로 섹션을 읽거나, LaTeX를 다시 쓰거나, 그림을 삽입하거나, 여전히 컴파일되는지 확인하도록 요청하세요. 모든 변경 사항은 확인하고 되돌릴 수 있는 실제 Git 커밋으로 Overleaf에 반영됩니다.",
+   "title": "생각에서 논문까지 — 복붙은 이제 그만.",
+   "subtitle": "Claude나 ChatGPT에게 실제 Overleaf 프로젝트를 직접 편집하도록 맡기세요. 섹션을 붙여넣거나 파일을 내려받을 필요 없이 — AI가 언제나 유일한 원본인 실시간 문서에서 바로 작업하고, 모든 변경 사항은 실제 Git 커밋으로 Overleaf에 그대로 반영됩니다.",
    "cta_primary": "무료로 시작하기",
    "cta_secondary": "작동 방식 보기",
    "note": "무료 요금제: 프로젝트 1개, 월 25회 쓰기 커밋. 읽기는 항상 무료입니다."
@@ -2803,8 +2803,8 @@
   },
   "hero": {
    "badge": "Работает с Claude и ChatGPT",
-   "title": "Редактируйте LaTeX в Overleaf, просто общаясь со своим ИИ",
-   "subtitle": "MiLatexAI связывает Claude или ChatGPT с вашими реальными проектами в Overleaf через Git. Просите обычными словами прочитать раздел, переписать LaTeX, вставить рисунок или проверить, что всё по-прежнему компилируется, — и каждое изменение попадает в Overleaf как настоящий коммит Git, который вы можете увидеть и откатить.",
+   "title": "От мысли до статьи — без копипаста.",
+   "subtitle": "Попросите Claude или ChatGPT отредактировать ваш настоящий проект в Overleaf. Никакой вставки разделов, никаких скачанных файлов — ИИ работает прямо с живым документом, который всегда остаётся единственным источником истины, а каждое изменение попадает в Overleaf настоящим Git-коммитом.",
    "cta_primary": "Начать бесплатно",
    "cta_secondary": "Посмотреть, как это работает",
    "note": "Бесплатный тариф: 1 проект и 25 коммитов с изменениями в месяц. Чтение всегда бесплатно."
@@ -3082,8 +3082,8 @@
   },
   "hero": {
    "badge": "Compatibile con Claude e ChatGPT",
-   "title": "Modifica il tuo LaTeX su Overleaf parlando con la tua AI",
-   "subtitle": "MiLatexAI collega Claude o ChatGPT ai tuoi progetti Overleaf reali tramite Git. Chiedi in linguaggio naturale di leggere una sezione, riscrivere il LaTeX, inserire una figura o verificare che compili ancora: ogni modifica arriva su Overleaf come un vero commit Git che puoi visualizzare e annullare.",
+   "title": "Dall'idea alla pagina — senza copia-incolla.",
+   "subtitle": "Chiedi a Claude o ChatGPT di modificare il tuo vero progetto Overleaf. Niente sezioni da incollare, niente file da scaricare — la tua AI lavora sul documento dal vivo, sempre la fonte di verità, e ogni modifica arriva su Overleaf come un vero commit Git.",
    "cta_primary": "Inizia gratis",
    "cta_secondary": "Scopri come funziona",
    "note": "Piano gratuito: 1 progetto e 25 commit di scrittura al mese. Le letture sono sempre gratuite."
