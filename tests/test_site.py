@@ -84,7 +84,8 @@ def test_health_capacity_route():
     # Default server has a disabled gate (no Azure sub) -> free stays open.
     assert body["gating_enabled"] is False
     assert body["free_open"] is True
-    assert set(body) == {"gating_enabled", "free_open", "signals_fresh"}
+    assert set(body) == {"gating_enabled", "free_open", "signals_fresh", "latex_available"}
+    assert isinstance(body["latex_available"], bool)
 
 
 # --- ChatGPT compatibility -------------------------------------------------

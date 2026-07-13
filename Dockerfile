@@ -1,10 +1,25 @@
 # MiLatexAI hosted server — Streamable HTTP MCP at /mcp/
 FROM python:3.12-slim
 
-# git is required at runtime (the git worker shells out to it).
+# git: the git worker shells out to it. curl: fetch Tectonic. poppler-utils:
+# render a PDF page to PNG for compile previews.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends git ca-certificates \
+    && apt-get install -y --no-install-recommends git ca-certificates curl poppler-utils \
     && rm -rf /var/lib/apt/lists/*
+
+# Tectonic — a self-contained LaTeX engine that fetches TeX packages on demand.
+# Far smaller than a TeX Live install (~5 GB), so it suits a scale-to-zero image.
+RUN cd /tmp && curl -fsSL https://drop-sh.fullyjustified.net | sh \
+    && mv /tmp/tectonic /usr/local/bin/tectonic \
+    && chmod +x /usr/local/bin/tectonic \
+    && tectonic --version
+
+# Warm the package-bundle cache into an image layer, so the FIRST compile after a
+# cold start needs no network. (Runtime downloads of un-primed packages still work,
+# they're just not persisted past a scale-to-zero.)
+ENV TECTONIC_CACHE_DIR=/opt/tectonic-cache
+COPY docker/prime.tex /tmp/prime/main.tex
+RUN cd /tmp/prime && tectonic -X compile main.tex && rm -rf /tmp/prime
 
 WORKDIR /app
 

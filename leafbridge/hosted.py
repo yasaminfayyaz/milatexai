@@ -710,6 +710,7 @@ def create_hosted_server(
             "gating_enabled": app.capacity.enabled,
             "free_open": snap.free_open,
             "signals_fresh": snap.fresh,
+            "latex_available": bool(texcompile.tectonic_path()),
         }
         return Response(json.dumps(payload), media_type="application/json")
 
