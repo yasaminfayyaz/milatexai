@@ -12,7 +12,7 @@
    "manage_subscription": "Manage subscription"
   },
   "hero": {
-   "badge": "Works with Claude and ChatGPT",
+   "badge": "Free on Claude and ChatGPT",
    "title": "From thought to paper, no copy-paste.",
    "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project. No pasting sections, no downloading files, your AI works on the live document, always the ground truth, and every change lands in Overleaf as a real Git commit.",
    "cta_primary": "Get started free",
@@ -277,7 +277,7 @@
     "Run start_connect and paste your token on the secure page.",
     "Ask ChatGPT to edit your paper."
    ],
-   "chatgpt_note": "Adding a custom connector needs ChatGPT Plus or higher; full editing works best on Business or Enterprise. See the guide.",
+   "chatgpt_note": "Works on ChatGPT, including its free plan. See the guide.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -295,7 +295,7 @@
    "manage_subscription": "管理订阅"
   },
   "hero": {
-   "badge": "支持 Claude 与 ChatGPT",
+   "badge": "Claude 和 ChatGPT 免费可用",
    "title": "从灵感到论文 ， 无需复制粘贴",
    "subtitle": "让 Claude 或 ChatGPT 直接编辑你真实的 Overleaf 项目。无需粘贴章节，无需下载文件，AI 始终在实时文档（也就是唯一权威的原稿）上工作，每一处改动都会作为一次真实的 Git 提交同步进 Overleaf。",
    "cta_primary": "免费开始使用",
@@ -560,7 +560,7 @@
     "运行 start_connect，并在安全页面粘贴你的令牌。",
     "让 ChatGPT 编辑你的论文。"
    ],
-   "chatgpt_note": "添加自定义连接器需要 ChatGPT Plus 或更高版本；完整的编辑功能在 Business 或 Enterprise 版本上效果最佳。请参阅该指南。",
+   "chatgpt_note": "支持 ChatGPT，含免费版。查看指南。",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -578,7 +578,7 @@
    "manage_subscription": "Gérer l'abonnement"
   },
   "hero": {
-   "badge": "Compatible avec Claude et ChatGPT",
+   "badge": "Gratuit sur Claude et ChatGPT",
    "title": "De l'idée à l'article, sans copier-coller.",
    "subtitle": "Demandez à Claude ou ChatGPT de modifier votre véritable projet Overleaf. Aucune section à coller, aucun fichier à télécharger, votre IA travaille sur le document en direct, toujours la source de vérité, et chaque modification arrive dans Overleaf sous la forme d'un véritable commit Git.",
    "cta_primary": "Commencer gratuitement",
@@ -843,7 +843,7 @@
     "Lancez start_connect et collez votre jeton sur la page sécurisée.",
     "Demandez à ChatGPT de modifier votre article."
    ],
-   "chatgpt_note": "L'ajout d'un connecteur personnalisé nécessite ChatGPT Plus ou une version supérieure ; l'édition complète fonctionne mieux avec Business ou Enterprise. Consultez le guide.",
+   "chatgpt_note": "Fonctionne sur ChatGPT, y compris son offre gratuite. Voir le guide.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -861,7 +861,7 @@
    "manage_subscription": "Gestionar suscripción"
   },
   "hero": {
-   "badge": "Compatible con Claude y ChatGPT",
+   "badge": "Gratis en Claude y ChatGPT",
    "title": "De la idea al artículo, sin copiar y pegar.",
    "subtitle": "Pídele a Claude o ChatGPT que edite tu proyecto real de Overleaf. Sin pegar secciones ni descargar archivos, tu IA trabaja sobre el documento en vivo, siempre la fuente de verdad, y cada cambio llega a Overleaf como un commit de Git real.",
    "cta_primary": "Empieza gratis",
@@ -1126,7 +1126,7 @@
     "Ejecuta start_connect y pega tu token en la página segura.",
     "Pídele a ChatGPT que edite tu artículo."
    ],
-   "chatgpt_note": "Añadir un conector personalizado requiere ChatGPT Plus o superior; la edición completa funciona mejor en Business o Enterprise. Consulta la guía.",
+   "chatgpt_note": "Funciona en ChatGPT, incluso en su plan gratuito. Consulta la guía.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -1144,7 +1144,7 @@
    "manage_subscription": "Abo verwalten"
   },
   "hero": {
-   "badge": "Funktioniert mit Claude und ChatGPT",
+   "badge": "Kostenlos in Claude und ChatGPT",
    "title": "Vom Gedanken aufs Papier, ohne Copy-and-Paste.",
    "subtitle": "Lass Claude oder ChatGPT dein echtes Overleaf-Projekt bearbeiten. Keine Abschnitte einfügen, keine Dateien herunterladen, deine KI arbeitet direkt am lebenden Dokument, immer die maßgebliche Version, und jede Änderung landet als echter Git-Commit in Overleaf.",
    "cta_primary": "Kostenlos starten",
@@ -1409,7 +1409,7 @@
     "Führe start_connect aus und füge dein Token auf der sicheren Seite ein.",
     "Bitte ChatGPT, dein Paper zu bearbeiten."
    ],
-   "chatgpt_note": "Zum Hinzufügen eines benutzerdefinierten Connectors ist ChatGPT Plus oder höher erforderlich; die vollständige Bearbeitung funktioniert am besten mit Business oder Enterprise. Siehe die Anleitung.",
+   "chatgpt_note": "Funktioniert in ChatGPT, auch im kostenlosen Tarif. Zur Anleitung.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -1427,7 +1427,7 @@
    "manage_subscription": "サブスクリプションの管理"
   },
   "hero": {
-   "badge": "ClaudeとChatGPTに対応",
+   "badge": "ClaudeとChatGPTで無料",
    "title": "アイデアが、そのまま論文に、コピペ不要。",
    "subtitle": "Claude や ChatGPT に頼むだけで、あなたの本物の Overleaf プロジェクトをそのまま編集。セクションを貼り付けたり、ファイルをダウンロードしたりする必要はありません、AI は常に唯一の原本となるライブ文書を直接編集し、すべての変更が本物の Git コミットとして Overleaf に反映されます。",
    "cta_primary": "無料で始める",
@@ -1692,7 +1692,7 @@
     "start_connect を実行し、安全なページでトークンを貼り付けます。",
     "ChatGPTに論文の編集を依頼します。"
    ],
-   "chatgpt_note": "カスタムコネクターの追加にはChatGPT Plus以上が必要です。完全な編集機能はBusinessまたはEnterpriseで最も快適に動作します。ガイドをご覧ください。",
+   "chatgpt_note": "ChatGPTで利用可能、無料プランにも対応。ガイドはこちら。",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -1710,7 +1710,7 @@
    "manage_subscription": "Gerenciar assinatura"
   },
   "hero": {
-   "badge": "Funciona com Claude e ChatGPT",
+   "badge": "Grátis no Claude e no ChatGPT",
    "title": "Da ideia ao papel, sem copiar e colar.",
    "subtitle": "Peça ao Claude ou ao ChatGPT para editar seu projeto real no Overleaf. Sem colar seções, sem baixar arquivos, sua IA trabalha no documento ao vivo, sempre a fonte da verdade, e cada mudança chega ao Overleaf como um commit real no Git.",
    "cta_primary": "Comece grátis",
@@ -1975,7 +1975,7 @@
     "Execute start_connect e cole seu token na página segura.",
     "Peça ao ChatGPT para editar seu artigo."
    ],
-   "chatgpt_note": "Adicionar um conector personalizado requer ChatGPT Plus ou superior; a edição completa funciona melhor no Business ou Enterprise. Consulte o guia.",
+   "chatgpt_note": "Funciona no ChatGPT, incluindo o plano gratuito. Veja o guia.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -1993,7 +1993,7 @@
    "manage_subscription": "إدارة الاشتراك"
   },
   "hero": {
-   "badge": "يعمل مع Claude و ChatGPT",
+   "badge": "مجاني على Claude وChatGPT",
    "title": "من الفكرة إلى الورقة، دون نسخ ولصق.",
    "subtitle": "اطلب من Claude أو ChatGPT تعديل مشروعك الحقيقي على Overleaf. لا لصق للأقسام، ولا تنزيل للملفات، يعمل الذكاء الاصطناعي مباشرةً على المستند الحيّ، وهو دائمًا المرجع الموثوق الوحيد، ويصل كل تغيير إلى Overleaf كـ commit حقيقي في Git.",
    "cta_primary": "ابدأ مجاناً",
@@ -2258,7 +2258,7 @@
     "شغّل start_connect والصق رمزك في الصفحة الآمنة.",
     "اطلب من ChatGPT تحرير ورقتك البحثية."
    ],
-   "chatgpt_note": "تتطلب إضافة موصّل مخصّص اشتراك ChatGPT Plus أو أعلى؛ ويعمل التحرير الكامل على أفضل وجه في خطط Business أو Enterprise. راجع الدليل.",
+   "chatgpt_note": "يعمل على ChatGPT، بما في ذلك خطته المجانية. اطّلع على الدليل.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -2276,7 +2276,7 @@
    "manage_subscription": "सदस्यता प्रबंधित करें"
   },
   "hero": {
-   "badge": "Claude और ChatGPT के साथ काम करता है",
+   "badge": "Claude और ChatGPT पर मुफ़्त",
    "title": "विचार से पेपर तक, बिना कॉपी-पेस्ट।",
    "subtitle": "Claude या ChatGPT से कहें कि वे आपके असली Overleaf प्रोजेक्ट को सीधे एडिट करें। न कोई सेक्शन पेस्ट करना, न फ़ाइलें डाउनलोड करना, आपका AI लाइव डॉक्यूमेंट पर ही काम करता है, जो हमेशा असली और आधिकारिक प्रति रहती है, और हर बदलाव Overleaf में एक असली Git commit बनकर पहुँचता है।",
    "cta_primary": "मुफ़्त में शुरू करें",
@@ -2541,7 +2541,7 @@
     "start_connect चलाएँ और सुरक्षित पेज पर अपना टोकन पेस्ट करें।",
     "ChatGPT से अपने पेपर को संपादित करने के लिए कहें।"
    ],
-   "chatgpt_note": "कस्टम कनेक्टर जोड़ने के लिए ChatGPT Plus या उससे ऊपर की ज़रूरत होती है; पूर्ण संपादन Business या Enterprise पर सबसे अच्छा काम करता है। गाइड देखें।",
+   "chatgpt_note": "ChatGPT पर काम करता है, इसके मुफ़्त प्लान पर भी। गाइड देखें।",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -2559,7 +2559,7 @@
    "manage_subscription": "구독 관리"
   },
   "hero": {
-   "badge": "Claude 및 ChatGPT와 함께 작동",
+   "badge": "Claude와 ChatGPT에서 무료",
    "title": "생각에서 논문까지, 복붙은 이제 그만.",
    "subtitle": "Claude나 ChatGPT에게 실제 Overleaf 프로젝트를 직접 편집하도록 맡기세요. 섹션을 붙여넣거나 파일을 내려받을 필요 없이, AI가 언제나 유일한 원본인 실시간 문서에서 바로 작업하고, 모든 변경 사항은 실제 Git 커밋으로 Overleaf에 그대로 반영됩니다.",
    "cta_primary": "무료로 시작하기",
@@ -2824,7 +2824,7 @@
     "start_connect를 실행하고 보안 페이지에 토큰을 붙여넣습니다.",
     "ChatGPT에게 논문을 편집하도록 요청합니다."
    ],
-   "chatgpt_note": "커스텀 커넥터를 추가하려면 ChatGPT Plus 이상이 필요하며, 전체 편집 기능은 Business 또는 Enterprise에서 가장 잘 작동합니다. 가이드를 참고하세요.",
+   "chatgpt_note": "무료 요금제를 포함해 ChatGPT에서 작동합니다. 가이드를 참고하세요.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -2842,7 +2842,7 @@
    "manage_subscription": "Управление подпиской"
   },
   "hero": {
-   "badge": "Работает с Claude и ChatGPT",
+   "badge": "Бесплатно в Claude и ChatGPT",
    "title": "От мысли до статьи, без копипаста.",
    "subtitle": "Попросите Claude или ChatGPT отредактировать ваш настоящий проект в Overleaf. Никакой вставки разделов, никаких скачанных файлов, ИИ работает прямо с живым документом, который всегда остаётся единственным источником истины, а каждое изменение попадает в Overleaf настоящим Git-коммитом.",
    "cta_primary": "Начать бесплатно",
@@ -3107,7 +3107,7 @@
     "Запустите start_connect и вставьте свой токен на защищённой странице.",
     "Попросите ChatGPT отредактировать вашу статью."
    ],
-   "chatgpt_note": "Для добавления пользовательского коннектора требуется ChatGPT Plus или выше; полноценное редактирование лучше всего работает на тарифах Business или Enterprise. См. руководство.",
+   "chatgpt_note": "Работает в ChatGPT, в том числе на бесплатном тарифе. Смотрите руководство.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }
@@ -3125,7 +3125,7 @@
    "manage_subscription": "Gestisci abbonamento"
   },
   "hero": {
-   "badge": "Compatibile con Claude e ChatGPT",
+   "badge": "Gratis su Claude e ChatGPT",
    "title": "Dall'idea alla pagina, senza copia-incolla.",
    "subtitle": "Chiedi a Claude o ChatGPT di modificare il tuo vero progetto Overleaf. Niente sezioni da incollare, niente file da scaricare, la tua AI lavora sul documento dal vivo, sempre la fonte di verità, e ogni modifica arriva su Overleaf come un vero commit Git.",
    "cta_primary": "Inizia gratis",
@@ -3390,7 +3390,7 @@
     "Esegui start_connect e incolla il tuo token nella pagina sicura.",
     "Chiedi a ChatGPT di modificare il tuo documento."
    ],
-   "chatgpt_note": "Aggiungere un connettore personalizzato richiede ChatGPT Plus o superiore; la modifica completa funziona meglio con Business o Enterprise. Consulta la guida.",
+   "chatgpt_note": "Funziona su ChatGPT, incluso il piano gratuito. Consulta la guida.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
   }

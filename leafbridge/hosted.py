@@ -60,9 +60,11 @@ MiLatexAI edits the signed-in user's real Overleaf projects over Overleaf's Git
 bridge. If the user has no project connected yet, just proceed with their request:
 any file tool returns a secure link where they paste their Overleaf Git token
 (never in chat) — relay that link and ask them to come back. Refer to a project
-by its name; list_projects shows the connected ones. To change a token or add
-another project, run start_connect (or connect that project again) — same secure
-form. Every write (edit_file/write_file/delete_file/upload_file) commits and
+by its name; list_projects shows the connected ones. Whenever the user wants to
+check, view, change, update, rotate, or revoke their Overleaf token, use
+change_token (it returns a secure link; the token itself can't be shown in chat).
+To add or remove projects, use manage_projects, or add_project with just a project
+URL (no token needed). Every write (edit_file/write_file/delete_file/upload_file) commits and
 pushes immediately and counts toward the monthly limit; reads are free and
 unlimited. Before editing, read the file so edit_file's old_string matches exactly.
 When the user asks why their paper won't compile or why they're getting errors,
@@ -401,9 +403,10 @@ def create_hosted_server(
 
     @mcp.tool
     async def change_token() -> str:
-        """Get a secure link to change or revoke your stored Overleaf Git token
-        (for example if you regenerated it in Overleaf). Entered on a web form,
-        never in this chat."""
+        """Manage your stored Overleaf Git token. Use this whenever the user wants
+        to check, view, see, change, update, rotate, or revoke their token: it
+        returns a secure link to a web page for that. The token itself can't be
+        shown in chat (it's encrypted), but this is how they update or revoke it."""
         try:
             user = await app.user()
             code = mint_connect_code(app.cipher, user.user_id, user.email)

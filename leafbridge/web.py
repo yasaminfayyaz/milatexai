@@ -9,7 +9,7 @@ from __future__ import annotations
 import html
 
 BRAND = "MiLatexAI"
-TAGLINE = "Edit your Overleaf projects from Claude."
+TAGLINE = "Edit your Overleaf projects from your AI assistant."
 
 _STYLE = """
 :root { color-scheme: light dark; }
@@ -130,7 +130,7 @@ def render_success(project_name: str, project_id: str) -> str:
   <h1>Connected</h1>
   <p class='muted'>Project <b>{html.escape(project_name)}</b>
      (<code>{html.escape(project_id)}</code>) is now linked to your account.</p>
-  <p class='muted'>You can close this tab and go back to Claude, try
+  <p class='muted'>You can close this tab and go back to your AI assistant, try
      <b>“list my files”</b> or ask it to edit your paper.</p>
 </div>""",
     )
@@ -226,9 +226,9 @@ def render_landing() -> str:
         BRAND,
         f"""{_brand_header()}
 <h1>{html.escape(TAGLINE)}</h1>
-<p class='muted'>{BRAND} is a connector that lets Claude read and edit your real
+<p class='muted'>{BRAND} is a connector that lets Claude or ChatGPT read and edit your real
    Overleaf projects over Overleaf's Git integration.</p>
-<div class='note'>To get started, add {BRAND} as a connector in Claude, then run
+<div class='note'>To get started, add {BRAND} as a connector in Claude or ChatGPT, then run
    <b>start_connect</b> to link a project. There's nothing to configure on this
    page directly.</div>""",
     )
