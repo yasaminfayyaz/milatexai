@@ -389,6 +389,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     <a href='mailto:support@milatexai.com'><span data-i18n='footer.contact_label'>{_t(en,'footer.contact_label')}</span></a>
   </nav>
   {_node(en,'p','footer.rights','muted small')}
+  {_node(en,'p','footer.disclaimer','muted small disclaimer')}
 </footer>"""
 
     i18n_json = json.dumps(content, ensure_ascii=False, separators=(",", ":"))
@@ -631,5 +632,6 @@ a{color:inherit;text-decoration:none}
 .foot-links{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:16px 0;font-size:14px}
 .foot-links a{color:var(--muted)}.foot-links a:hover{color:var(--fg)}
 .small{font-size:13px}
+.disclaimer{max-width:640px;margin:10px auto 0;font-size:11.5px;opacity:.8}
 @media(max-width:640px){.links{display:none}}
 """

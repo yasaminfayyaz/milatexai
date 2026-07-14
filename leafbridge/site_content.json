@@ -76,7 +76,7 @@
    "free": {
     "name": "Free",
     "price": "$0",
-    "period": "forever",
+    "period": "",
     "features": [
      "1 connected Overleaf project",
      "25 write-commits per month",
@@ -102,7 +102,7 @@
     "cta": "Get started",
     "availability": "Guaranteed · always on"
    },
-   "note": "The Pro price isn't set yet. Leave your email and we'll let you know when it launches.",
+   "note": "Reads are always free and unlimited. Free access is best-effort, as capacity allows.",
    "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away."
   },
   "faq": {
@@ -178,7 +178,8 @@
    "rights": "© 2026 MiLatexAI. All rights reserved.",
    "language_label": "Language",
    "contact_label": "Support",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI is an independent product, not affiliated with or endorsed by Overleaf, Claude, or ChatGPT. All trademarks belong to their owners."
   },
   "privacy": {
    "title": "Privacy Policy",
@@ -255,6 +256,10 @@
     {
      "heading": "Contact",
      "body": "Questions about these terms can be sent to support@milatexai.com, a placeholder support address for this early-stage product."
+    },
+    {
+     "heading": "Independent product and trademarks",
+     "body": "MiLatexAI is an independent tool. It is not affiliated with, endorsed by, or sponsored by Overleaf or Digital Science, nor by Anthropic (Claude) or OpenAI (ChatGPT). Overleaf, Claude, ChatGPT and other names are trademarks of their respective owners, used only to describe compatibility. You are responsible for using MiLatexAI in line with Overleaf's and your AI provider's own terms of service, and only with projects you are authorized to access."
     }
    ]
   },
@@ -359,7 +364,7 @@
    "free": {
     "name": "免费版",
     "price": "$0",
-    "period": "永久",
+    "period": "",
     "features": [
      "1 个已连接的 Overleaf 项目",
      "每月 25 次写入提交",
@@ -385,7 +390,7 @@
     "cta": "开始使用",
     "availability": "保证可用 · 始终在线"
    },
-   "note": "专业版价格尚未确定。留下你的邮箱，上线时我们会通知你。",
+   "note": "读取操作始终免费且不限量。免费访问以尽力而为的方式提供，视容量情况而定。",
    "capacity_note": "免费套餐依托闲置容量运行，在需求高峰期可能会短暂暂停。Pro 保证不间断访问，您永远不会被拒之门外。"
   },
   "faq": {
@@ -461,7 +466,8 @@
    "rights": "© 2026 MiLatexAI。保留所有权利。",
    "language_label": "语言",
    "contact_label": "支持",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI 是一款独立产品，与 Overleaf、Claude 或 ChatGPT 无隶属关系，也未获得其认可。所有商标均归各自所有者所有。"
   },
   "privacy": {
    "title": "隐私政策",
@@ -538,6 +544,10 @@
     {
      "heading": "联系方式",
      "body": "有关本条款的问题可发送至 support@milatexai.com，这是这款早期产品的临时支持邮箱。"
+    },
+    {
+     "heading": "独立产品与商标",
+     "body": "MiLatexAI 是一款独立工具。它与 Overleaf 或 Digital Science 无隶属关系，也未获得它们的认可或赞助；与 Anthropic（Claude）或 OpenAI（ChatGPT）之间同样如此。Overleaf、Claude、ChatGPT 及其他名称均为各自所有者的商标，此处使用仅为说明兼容性。您有责任在使用 MiLatexAI 时遵守 Overleaf 及您所用 AI 提供商各自的服务条款，并且仅将其用于您已获授权访问的项目。"
     }
    ]
   },
@@ -642,7 +652,7 @@
    "free": {
     "name": "Gratuit",
     "price": "$0",
-    "period": "pour toujours",
+    "period": "",
     "features": [
      "1 projet Overleaf connecté",
      "25 commits d'écriture par mois",
@@ -668,7 +678,7 @@
     "cta": "Commencer",
     "availability": "Garanti · toujours actif"
    },
-   "note": "Le tarif Pro n'est pas encore fixé. Laissez votre e-mail et nous vous préviendrons de son lancement.",
+   "note": "La lecture est toujours gratuite et illimitée. L'accès gratuit est fourni au mieux, dans la limite des capacités disponibles.",
    "capacity_note": "L'offre gratuite fonctionne sur les capacités disponibles et peut être suspendue brièvement en cas de forte demande. Pro garantit un accès ininterrompu, vous n'êtes jamais refusé."
   },
   "faq": {
@@ -744,7 +754,8 @@
    "rights": "© 2026 MiLatexAI. Tous droits réservés.",
    "language_label": "Langue",
    "contact_label": "Assistance",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI est un produit indépendant, non affilié à Overleaf, Claude ou ChatGPT ni approuvé par eux. Toutes les marques appartiennent à leurs propriétaires respectifs."
   },
   "privacy": {
    "title": "Politique de confidentialité",
@@ -821,6 +832,10 @@
     {
      "heading": "Contact",
      "body": "Les questions relatives aux présentes conditions peuvent être envoyées à support@milatexai.com, une adresse d'assistance provisoire pour ce produit à ses débuts."
+    },
+    {
+     "heading": "Produit indépendant et marques",
+     "body": "MiLatexAI est un outil indépendant. Il n'est ni affilié à Overleaf ou Digital Science, ni approuvé ou parrainé par eux, ni par Anthropic (Claude) ou OpenAI (ChatGPT). Overleaf, Claude, ChatGPT et les autres noms sont des marques de leurs propriétaires respectifs, utilisées uniquement pour décrire la compatibilité. Il vous incombe d'utiliser MiLatexAI conformément aux conditions d'utilisation d'Overleaf et de votre fournisseur d'IA, et uniquement avec des projets auxquels vous êtes autorisé à accéder."
     }
    ]
   },
@@ -925,7 +940,7 @@
    "free": {
     "name": "Gratis",
     "price": "$0",
-    "period": "para siempre",
+    "period": "",
     "features": [
      "1 proyecto de Overleaf conectado",
      "25 commits de escritura al mes",
@@ -951,7 +966,7 @@
     "cta": "Empieza ahora",
     "availability": "Garantizado · siempre activo"
    },
-   "note": "El precio de Pro aún no está fijado. Déjanos tu correo y te avisaremos cuando se lance.",
+   "note": "Las lecturas son siempre gratuitas e ilimitadas. El acceso gratuito se ofrece en la medida de lo posible, según la capacidad disponible.",
    "capacity_note": "El plan gratuito funciona con capacidad sobrante y puede pausarse brevemente cuando la demanda es alta. Pro garantiza acceso ininterrumpido: nunca se te rechaza."
   },
   "faq": {
@@ -1027,7 +1042,8 @@
    "rights": "© 2026 MiLatexAI. Todos los derechos reservados.",
    "language_label": "Idioma",
    "contact_label": "Soporte",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI es un producto independiente, sin afiliación con Overleaf, Claude ni ChatGPT, ni respaldo por parte de ellos. Todas las marcas comerciales pertenecen a sus respectivos propietarios."
   },
   "privacy": {
    "title": "Política de Privacidad",
@@ -1104,6 +1120,10 @@
     {
      "heading": "Contacto",
      "body": "Las preguntas sobre estos términos pueden enviarse a support@milatexai.com, una dirección de soporte provisional para este producto en fase inicial."
+    },
+    {
+     "heading": "Producto independiente y marcas comerciales",
+     "body": "MiLatexAI es una herramienta independiente. No está afiliada, respaldada ni patrocinada por Overleaf o Digital Science, ni por Anthropic (Claude) u OpenAI (ChatGPT). Overleaf, Claude, ChatGPT y otros nombres son marcas comerciales de sus respectivos propietarios, utilizadas únicamente para describir la compatibilidad. Usted es responsable de utilizar MiLatexAI conforme a los términos de servicio de Overleaf y de su proveedor de IA, y únicamente con proyectos a los que esté autorizado a acceder."
     }
    ]
   },
@@ -1208,7 +1228,7 @@
    "free": {
     "name": "Kostenlos",
     "price": "$0",
-    "period": "für immer",
+    "period": "",
     "features": [
      "1 verbundenes Overleaf-Projekt",
      "25 Schreib-Commits pro Monat",
@@ -1234,7 +1254,7 @@
     "cta": "Loslegen",
     "availability": "Garantiert · immer verfügbar"
    },
-   "note": "Der Pro-Preis steht noch nicht fest. Hinterlasse deine E-Mail-Adresse, und wir informieren dich zum Start.",
+   "note": "Lesezugriffe sind immer kostenlos und unbegrenzt. Der kostenlose Zugang erfolgt nach bestem Bemühen, im Rahmen der verfügbaren Kapazitäten.",
    "capacity_note": "Der kostenlose Tarif nutzt freie Kapazitäten und kann bei hoher Nachfrage kurz pausieren. Pro garantiert ununterbrochenen Zugriff, Sie werden niemals abgewiesen."
   },
   "faq": {
@@ -1310,7 +1330,8 @@
    "rights": "© 2026 MiLatexAI. Alle Rechte vorbehalten.",
    "language_label": "Sprache",
    "contact_label": "Support",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI ist ein unabhängiges Produkt, das in keiner Verbindung zu Overleaf, Claude oder ChatGPT steht und von diesen weder unterstützt noch gebilligt wird. Alle Marken sind Eigentum ihrer jeweiligen Inhaber."
   },
   "privacy": {
    "title": "Datenschutzerklärung",
@@ -1387,6 +1408,10 @@
     {
      "heading": "Kontakt",
      "body": "Fragen zu diesen Bedingungen können an support@milatexai.com gesendet werden, eine vorläufige Support-Adresse für dieses Produkt in einem frühen Stadium."
+    },
+    {
+     "heading": "Unabhängiges Produkt und Marken",
+     "body": "MiLatexAI ist ein unabhängiges Werkzeug. Es steht in keiner Verbindung zu Overleaf oder Digital Science und wird von diesen weder unterstützt noch gesponsert, ebenso wenig von Anthropic (Claude) oder OpenAI (ChatGPT). Overleaf, Claude, ChatGPT und andere Namen sind Marken ihrer jeweiligen Inhaber und werden ausschließlich zur Beschreibung der Kompatibilität verwendet. Sie sind dafür verantwortlich, MiLatexAI im Einklang mit den Nutzungsbedingungen von Overleaf und Ihres KI-Anbieters zu verwenden und nur mit Projekten, auf die Sie zugriffsberechtigt sind."
     }
    ]
   },
@@ -1491,7 +1516,7 @@
    "free": {
     "name": "無料",
     "price": "$0",
-    "period": "ずっと無料",
+    "period": "",
     "features": [
      "接続できるOverleafプロジェクト1件",
      "書き込みコミット月25回",
@@ -1517,7 +1542,7 @@
     "cta": "始める",
     "availability": "保証付き · 常時稼働"
    },
-   "note": "Proの価格はまだ決まっていません。メールアドレスを登録いただければ、公開時にお知らせします。",
+   "note": "読み取りは常に無料かつ無制限です。無料アクセスはベストエフォート型で、処理能力の許す範囲で提供されます。",
    "capacity_note": "無料プランは余剰容量で稼働しているため、需要が高いときは短時間停止する場合があります。Pro なら中断のないアクセスが保証され、締め出されることは決してありません。"
   },
   "faq": {
@@ -1593,7 +1618,8 @@
    "rights": "© 2026 MiLatexAI. All rights reserved.",
    "language_label": "言語",
    "contact_label": "サポート",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI は独立した製品であり、Overleaf、Claude、ChatGPT と提携しておらず、これらによる推奨も受けていません。すべての商標はそれぞれの所有者に帰属します。"
   },
   "privacy": {
    "title": "プライバシーポリシー",
@@ -1670,6 +1696,10 @@
     {
      "heading": "お問い合わせ",
      "body": "本規約に関するご質問は、この初期段階のプロダクトの仮のサポートアドレスであるsupport@milatexai.comまでお送りください。"
+    },
+    {
+     "heading": "独立した製品および商標について",
+     "body": "MiLatexAI は独立したツールです。Overleaf または Digital Science、ならびに Anthropic（Claude）または OpenAI（ChatGPT）と提携しておらず、これらによる推奨や後援も受けていません。Overleaf、Claude、ChatGPT およびその他の名称は、それぞれの所有者の商標であり、互換性を説明する目的でのみ使用されています。MiLatexAI を Overleaf およびお客様の AI プロバイダーそれぞれの利用規約に従って使用すること、ならびにアクセスを許可されたプロジェクトのみで使用することは、お客様の責任です。"
     }
    ]
   },
@@ -1774,7 +1804,7 @@
    "free": {
     "name": "Gratuito",
     "price": "$0",
-    "period": "para sempre",
+    "period": "",
     "features": [
      "1 projeto do Overleaf conectado",
      "25 commits de escrita por mês",
@@ -1800,7 +1830,7 @@
     "cta": "Começar",
     "availability": "Garantido · sempre ativo"
    },
-   "note": "O preço do Pro ainda não foi definido. Deixe seu e-mail e avisaremos quando ele for lançado.",
+   "note": "As leituras são sempre gratuitas e ilimitadas. O acesso gratuito é fornecido conforme a disponibilidade, na medida da capacidade.",
    "capacity_note": "O plano gratuito funciona com capacidade ociosa e pode pausar brevemente quando a demanda está alta. O Pro garante acesso ininterrupto, você nunca fica sem acesso."
   },
   "faq": {
@@ -1876,7 +1906,8 @@
    "rights": "© 2026 MiLatexAI. Todos os direitos reservados.",
    "language_label": "Idioma",
    "contact_label": "Suporte",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "O MiLatexAI é um produto independente, sem afiliação nem endosso da Overleaf, do Claude ou do ChatGPT. Todas as marcas registradas pertencem aos seus respectivos titulares."
   },
   "privacy": {
    "title": "Política de Privacidade",
@@ -1953,6 +1984,10 @@
     {
      "heading": "Contato",
      "body": "Dúvidas sobre estes termos podem ser enviadas para support@milatexai.com, um endereço de suporte provisório para este produto em estágio inicial."
+    },
+    {
+     "heading": "Produto independente e marcas registradas",
+     "body": "O MiLatexAI é uma ferramenta independente. Não possui afiliação, endosso nem patrocínio da Overleaf ou da Digital Science, tampouco da Anthropic (Claude) ou da OpenAI (ChatGPT). Overleaf, Claude, ChatGPT e outros nomes são marcas registradas de seus respectivos titulares, utilizadas apenas para descrever compatibilidade. Você é responsável por usar o MiLatexAI em conformidade com os termos de serviço da Overleaf e do seu provedor de IA, e somente com projetos que você está autorizado a acessar."
     }
    ]
   },
@@ -2057,7 +2092,7 @@
    "free": {
     "name": "مجاني",
     "price": "$0",
-    "period": "إلى الأبد",
+    "period": "",
     "features": [
      "مشروع Overleaf واحد متصل",
      "25 التزام كتابة شهرياً",
@@ -2083,7 +2118,7 @@
     "cta": "ابدأ الآن",
     "availability": "مضمون · متاح دائماً"
    },
-   "note": "لم يُحدَّد سعر الخطة الاحترافية بعد. اترك بريدك الإلكتروني وسنعلمك عند إطلاقها.",
+   "note": "القراءة مجانية دائمًا وغير محدودة. والوصول المجاني يُقدَّم وفق أفضل جهد ممكن، بحسب ما تسمح به السعة.",
    "capacity_note": "تعمل الخطة المجانية على السعة الفائضة وقد تتوقف مؤقتاً لفترة وجيزة عند ارتفاع الطلب. تضمن Pro وصولاً متواصلاً دون انقطاع، فلن تُحرم من الوصول أبداً."
   },
   "faq": {
@@ -2159,7 +2194,8 @@
    "rights": "© 2026 MiLatexAI. جميع الحقوق محفوظة.",
    "language_label": "اللغة",
    "contact_label": "الدعم",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI منتج مستقل، وهو ليس تابعًا لـ Overleaf أو Claude أو ChatGPT ولا معتمَدًا منها. وجميع العلامات التجارية مملوكة لأصحابها."
   },
   "privacy": {
    "title": "سياسة الخصوصية",
@@ -2236,6 +2272,10 @@
     {
      "heading": "التواصل",
      "body": "يمكن إرسال الأسئلة المتعلقة بهذه الشروط إلى support@milatexai.com، وهو عنوان دعم مؤقت لهذا المنتج في مرحلته المبكرة."
+    },
+    {
+     "heading": "منتج مستقل والعلامات التجارية",
+     "body": "MiLatexAI أداة مستقلة. وهي ليست تابعة لـ Overleaf أو Digital Science ولا لـ Anthropic (Claude) أو OpenAI (ChatGPT)، وليست معتمَدة منها ولا مدعومة. إن Overleaf وClaude وChatGPT وغيرها من الأسماء هي علامات تجارية تخص أصحابها، وتُستخدم فقط لوصف التوافق. وأنت مسؤول عن استخدام MiLatexAI بما يتوافق مع شروط الخدمة الخاصة بـ Overleaf وبمزوّد خدمة الذكاء الاصطناعي الذي تستخدمه، وفقط مع المشاريع المصرَّح لك بالوصول إليها."
     }
    ]
   },
@@ -2340,7 +2380,7 @@
    "free": {
     "name": "मुफ़्त",
     "price": "$0",
-    "period": "हमेशा के लिए",
+    "period": "",
     "features": [
      "1 जुड़ा हुआ Overleaf प्रोजेक्ट",
      "प्रति माह 25 write-commits",
@@ -2366,7 +2406,7 @@
     "cta": "शुरू करें",
     "availability": "सुनिश्चित · हमेशा उपलब्ध"
    },
-   "note": "Pro की कीमत अभी तय नहीं हुई है। अपना ईमेल छोड़ें और लॉन्च होने पर हम आपको बताएँगे।",
+   "note": "पढ़ना (रीड) हमेशा निःशुल्क और असीमित है। निःशुल्क पहुँच सर्वोत्तम-प्रयास के आधार पर है, जैसा क्षमता अनुमति दे।",
    "capacity_note": "फ्री टियर अतिरिक्त क्षमता पर चलता है और मांग अधिक होने पर कुछ देर के लिए रुक सकता है। Pro निर्बाध पहुँच की गारंटी देता है, आपको कभी मना नहीं किया जाता।"
   },
   "faq": {
@@ -2442,7 +2482,8 @@
    "rights": "© 2026 MiLatexAI. सर्वाधिकार सुरक्षित।",
    "language_label": "भाषा",
    "contact_label": "सहायता",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI एक स्वतंत्र उत्पाद है, जो Overleaf, Claude, या ChatGPT से संबद्ध नहीं है और न ही उनके द्वारा समर्थित है। सभी ट्रेडमार्क उनके संबंधित स्वामियों के हैं।"
   },
   "privacy": {
    "title": "गोपनीयता नीति",
@@ -2519,6 +2560,10 @@
     {
      "heading": "संपर्क",
      "body": "इन शर्तों से संबंधित प्रश्न support@milatexai.com पर भेजे जा सकते हैं, जो इस प्रारंभिक-चरण उत्पाद के लिए एक अस्थायी सहायता पता है।"
+    },
+    {
+     "heading": "स्वतंत्र उत्पाद और ट्रेडमार्क",
+     "body": "MiLatexAI एक स्वतंत्र टूल है। यह न तो Overleaf या Digital Science से संबद्ध, समर्थित या प्रायोजित है, और न ही Anthropic (Claude) या OpenAI (ChatGPT) से। Overleaf, Claude, ChatGPT और अन्य नाम उनके संबंधित स्वामियों के ट्रेडमार्क हैं, जिनका उपयोग केवल अनुकूलता दर्शाने के लिए किया गया है। आप MiLatexAI का उपयोग Overleaf और अपने AI प्रदाता की अपनी सेवा-शर्तों के अनुरूप, तथा केवल उन्हीं प्रोजेक्ट्स के साथ करने के लिए ज़िम्मेदार हैं जिन तक पहुँचने के लिए आप अधिकृत हैं।"
     }
    ]
   },
@@ -2623,7 +2668,7 @@
    "free": {
     "name": "무료",
     "price": "$0",
-    "period": "영구",
+    "period": "",
     "features": [
      "연결된 Overleaf 프로젝트 1개",
      "월 25회 쓰기 커밋",
@@ -2649,7 +2694,7 @@
     "cta": "시작하기",
     "availability": "보장 · 항상 이용 가능"
    },
-   "note": "Pro 가격은 아직 정해지지 않았습니다. 이메일을 남겨 주시면 출시 시 알려드리겠습니다.",
+   "note": "읽기는 항상 무료이며 무제한입니다. 무료 이용은 용량이 허용하는 범위 내에서 최선의 노력으로 제공됩니다.",
    "capacity_note": "무료 요금제는 여유 용량으로 운영되며 수요가 많을 때 잠시 중단될 수 있습니다. Pro는 끊김 없는 이용을 보장하므로 언제든 이용이 거부되지 않습니다."
   },
   "faq": {
@@ -2725,7 +2770,8 @@
    "rights": "© 2026 MiLatexAI. 모든 권리 보유.",
    "language_label": "언어",
    "contact_label": "지원",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI는 독립적인 제품으로, Overleaf, Claude 또는 ChatGPT와 제휴하거나 이들의 보증을 받지 않았습니다. 모든 상표는 해당 소유자에게 귀속됩니다."
   },
   "privacy": {
    "title": "개인정보처리방침",
@@ -2802,6 +2848,10 @@
     {
      "heading": "문의",
      "body": "본 약관에 관한 질문은 초기 단계 제품을 위한 임시 지원 주소인 support@milatexai.com으로 보내실 수 있습니다."
+    },
+    {
+     "heading": "독립 제품 및 상표",
+     "body": "MiLatexAI는 독립적인 도구입니다. Overleaf 또는 Digital Science는 물론 Anthropic(Claude)이나 OpenAI(ChatGPT)와도 제휴하거나 이들의 보증 또는 후원을 받지 않았습니다. Overleaf, Claude, ChatGPT 및 기타 명칭은 각 소유자의 상표이며, 오직 호환성을 설명하기 위한 목적으로만 사용됩니다. 귀하는 Overleaf 및 귀하가 사용하는 AI 제공업체의 자체 서비스 약관에 따라, 그리고 귀하가 접근 권한을 가진 프로젝트에 대해서만 MiLatexAI를 사용할 책임이 있습니다."
     }
    ]
   },
@@ -2906,7 +2956,7 @@
    "free": {
     "name": "Бесплатный",
     "price": "$0",
-    "period": "навсегда",
+    "period": "",
     "features": [
      "1 подключённый проект Overleaf",
      "25 коммитов с изменениями в месяц",
@@ -2932,7 +2982,7 @@
     "cta": "Начать",
     "availability": "Гарантированно · всегда доступно"
    },
-   "note": "Цена Pro пока не установлена. Оставьте свой email, и мы сообщим вам о запуске.",
+   "note": "Операции чтения всегда бесплатны и без ограничений. Бесплатный доступ предоставляется по мере возможности, в пределах доступных мощностей.",
    "capacity_note": "Бесплатный тариф работает на свободных ресурсах и может ненадолго приостанавливаться при высокой нагрузке. Pro гарантирует бесперебойный доступ, вам никогда не откажут."
   },
   "faq": {
@@ -3008,7 +3058,8 @@
    "rights": "© 2026 MiLatexAI. Все права защищены.",
    "language_label": "Язык",
    "contact_label": "Поддержка",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI является независимым продуктом и не связан с Overleaf, Claude или ChatGPT, а также не одобрен ими. Все товарные знаки принадлежат их владельцам."
   },
   "privacy": {
    "title": "Политика конфиденциальности",
@@ -3085,6 +3136,10 @@
     {
      "heading": "Контакты",
      "body": "Вопросы об этих условиях можно направлять на support@milatexai.com, временный адрес поддержки для этого продукта на раннем этапе."
+    },
+    {
+     "heading": "Независимый продукт и товарные знаки",
+     "body": "MiLatexAI является независимым инструментом. Он не связан с Overleaf или Digital Science, а также с Anthropic (Claude) или OpenAI (ChatGPT), не одобрен и не спонсируется ими. Overleaf, Claude, ChatGPT и другие названия являются товарными знаками соответствующих владельцев и используются исключительно для описания совместимости. Вы несете ответственность за использование MiLatexAI в соответствии с условиями обслуживания Overleaf и вашего поставщика ИИ, а также только с проектами, к которым вам предоставлен доступ."
     }
    ]
   },
@@ -3189,7 +3244,7 @@
    "free": {
     "name": "Gratuito",
     "price": "$0",
-    "period": "per sempre",
+    "period": "",
     "features": [
      "1 progetto Overleaf collegato",
      "25 commit di scrittura al mese",
@@ -3215,7 +3270,7 @@
     "cta": "Inizia ora",
     "availability": "Garantito · sempre attivo"
    },
-   "note": "Il prezzo del piano Pro non è ancora definito. Lascia la tua email e ti avviseremo al lancio.",
+   "note": "Le letture sono sempre gratuite e illimitate. L'accesso gratuito è fornito nella misura del possibile, in base alla capacità disponibile.",
    "capacity_note": "Il piano gratuito funziona sulla capacità in eccesso e può sospendersi brevemente nei momenti di forte domanda. Pro garantisce un accesso senza interruzioni: non ti viene mai negato l'accesso."
   },
   "faq": {
@@ -3291,7 +3346,8 @@
    "rights": "© 2026 MiLatexAI. Tutti i diritti riservati.",
    "language_label": "Lingua",
    "contact_label": "Assistenza",
-   "contact_value": "support@milatexai.com"
+   "contact_value": "support@milatexai.com",
+   "disclaimer": "MiLatexAI è un prodotto indipendente, non affiliato né approvato da Overleaf, Claude o ChatGPT. Tutti i marchi appartengono ai rispettivi proprietari."
   },
   "privacy": {
    "title": "Informativa sulla privacy",
@@ -3368,6 +3424,10 @@
     {
      "heading": "Contatti",
      "body": "Le domande su questi termini possono essere inviate a support@milatexai.com, un indirizzo di assistenza provvisorio per questo prodotto in fase iniziale."
+    },
+    {
+     "heading": "Prodotto indipendente e marchi",
+     "body": "MiLatexAI è uno strumento indipendente. Non è affiliato, approvato o sponsorizzato da Overleaf o Digital Science, né da Anthropic (Claude) o OpenAI (ChatGPT). Overleaf, Claude, ChatGPT e altri nomi sono marchi dei rispettivi proprietari, utilizzati esclusivamente per descrivere la compatibilità. Sei responsabile dell'utilizzo di MiLatexAI nel rispetto dei termini di servizio di Overleaf e del tuo fornitore di IA, e solo con i progetti a cui sei autorizzato ad accedere."
     }
    ]
   },
