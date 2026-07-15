@@ -21,6 +21,7 @@ import base64
 import difflib
 import json
 import os
+import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, quote
@@ -30,7 +31,7 @@ from fastmcp.exceptions import ToolError
 from fastmcp.server.auth.providers.workos import AuthKitProvider
 from fastmcp.server.dependencies import get_access_token
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, Response
+from starlette.responses import HTMLResponse, RedirectResponse, Response
 
 from . import __version__, latex, site, texcompile, web
 from .billing import Billing, plan_change_from_event
@@ -54,6 +55,8 @@ from .service import (
     ServiceError,
 )
 from .store import InMemoryStore, Store, TokenCipher, User
+from .web_session import SESSION_TTL_SECONDS, SessionError, mint_session, verify_session
+from .workos_web import WorkOSWebAuth
 
 INSTRUCTIONS = """\
 MiLatexAI edits the signed-in user's real Overleaf projects over Overleaf's Git
@@ -73,6 +76,10 @@ offending file, fix the errors with edit_file, and check_compile again.
 """
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
+
+# Website sign-in cookies.
+SESSION_COOKIE = "mila_session"
+STATE_COOKIE = "mila_oauth_state"
 
 
 def _month() -> str:
@@ -161,6 +168,7 @@ class HostedApp:
         billing: Billing | None = None,
         capacity: CapacityGate | None = None,
         email_resolver=None,
+        web_auth: WorkOSWebAuth | None = None,
     ):
         self.service = AccountService(store, cipher)
         self.cipher = cipher
@@ -169,6 +177,12 @@ class HostedApp:
         self._identity = identity_provider
         self._email_resolver = email_resolver
         self.base_url = base_url.rstrip("/")
+        self.cookie_secure = self.base_url.startswith("https")
+        # Website sign-in (WorkOS AuthKit). A disabled instance just makes /login
+        # report it's unavailable; the rest of the site is unaffected.
+        self.web_auth = web_auth if web_auth is not None else WorkOSWebAuth(
+            api_key="", client_id=""
+        )
         # Disabled billing (no Stripe env) is a valid state — the tools just say so.
         self.billing = billing if billing is not None else Billing(
             api_key="", price_id="", webhook_secret="",
@@ -206,6 +220,25 @@ class HostedApp:
                     user_id, resolved, admin_emails=self.admin_emails
                 )
         return user
+
+    async def session_user(self, request: Request) -> User | None:
+        """Resolve the signed-in website user from the session cookie, or None.
+
+        The cookie carries only identity; the current plan / Stripe customer id
+        are read fresh from the store (they change via webhooks)."""
+        cookie = request.cookies.get(SESSION_COOKIE, "")
+        if not cookie:
+            return None
+        try:
+            user_id, email = verify_session(self.cipher, cookie)
+        except SessionError:
+            return None
+        try:
+            return await self.service.get_or_create_user(
+                user_id, email, admin_emails=self.admin_emails
+            )
+        except Exception:  # noqa: BLE001
+            return None
 
     async def resolve_or_onboard(self, user: User, project: str | None) -> ProjectConfig:
         """Resolve the caller's project. If they have NONE connected yet, don't
@@ -274,6 +307,7 @@ def create_hosted_server(
     billing: Billing | None = None,
     capacity: CapacityGate | None = None,
     email_resolver=None,
+    web_auth: WorkOSWebAuth | None = None,
 ) -> FastMCP:
     """Build the hosted server. Tests pass ``auth=False`` + a fake
     ``identity_provider`` + an ``InMemoryStore`` to drive it without WorkOS."""
@@ -283,6 +317,11 @@ def create_hosted_server(
     resolved_base = base_url or os.environ.get("BASE_URL", "http://localhost:8000")
     if email_resolver is None and os.environ.get("WORKOS_API_KEY"):
         email_resolver = workos_email_resolver(os.environ["WORKOS_API_KEY"])
+    if web_auth is None and os.environ.get("WORKOS_API_KEY") and os.environ.get("WORKOS_CLIENT_ID"):
+        web_auth = WorkOSWebAuth(
+            api_key=os.environ["WORKOS_API_KEY"],
+            client_id=os.environ["WORKOS_CLIENT_ID"],
+        )
     app = HostedApp(
         store=store,
         cipher=cipher,
@@ -293,6 +332,7 @@ def create_hosted_server(
         billing=billing if billing is not None else Billing.from_env(resolved_base),
         capacity=capacity if capacity is not None else CapacityGate.from_env(),
         email_resolver=email_resolver,
+        web_auth=web_auth,
     )
 
     auth_provider = None
@@ -697,7 +737,123 @@ def create_hosted_server(
     @mcp.custom_route("/account", methods=["GET"])
     async def account(request: Request) -> Response:
         status = request.query_params.get("status")
-        return HTMLResponse(site.render_account(status=status))
+        user = await app.session_user(request)
+        if user is None:
+            return HTMLResponse(site.render_account(
+                status=status, signed_in=False, billing_enabled=app.billing.enabled))
+        view = {
+            "email": user.email,
+            "plan": "pro" if (user.is_admin or user.plan == "pro") else "free",
+            "is_admin": user.is_admin,
+            "has_customer": bool(user.stripe_customer_id),
+        }
+        return HTMLResponse(site.render_account(
+            status=status, signed_in=True, account=view,
+            billing_enabled=app.billing.enabled))
+
+    # -- website sign-in (WorkOS AuthKit) so a user can manage billing on the web
+    # with the SAME account as the connector. The session cookie is signed,
+    # HttpOnly, and SameSite=Lax — Lax also stops a cross-site POST from carrying
+    # it, which is the CSRF guard for the billing actions below.
+
+    @mcp.custom_route("/login", methods=["GET"])
+    async def login(request: Request) -> Response:
+        if not app.web_auth.enabled:
+            return HTMLResponse(web.render_notice(
+                "Sign-in unavailable",
+                "Website sign-in isn't set up yet. You can manage billing inside "
+                "Claude or ChatGPT.", icon="⚠️"), status_code=503)
+        state = secrets.token_urlsafe(24)
+        url = app.web_auth.authorization_url(
+            redirect_uri=f"{app.base_url}/callback", state=state)
+        resp = RedirectResponse(url, status_code=303)
+        resp.set_cookie(STATE_COOKIE, state, max_age=600, httponly=True,
+                        secure=app.cookie_secure, samesite="lax", path="/")
+        return resp
+
+    @mcp.custom_route("/callback", methods=["GET"])
+    async def callback(request: Request) -> Response:
+        params = request.query_params
+        if params.get("error"):
+            # Don't reflect the provider's error_description (attacker-controllable
+            # query text on our own domain) — show a fixed message.
+            return HTMLResponse(web.render_notice(
+                "Sign-in failed",
+                "Sign-in was cancelled or could not be completed. Please try again.",
+                icon="⚠️"), status_code=400)
+        code = params.get("code", "")
+        state = params.get("state", "")
+        cookie_state = request.cookies.get(STATE_COOKIE, "")
+        if not (code and state and cookie_state
+                and secrets.compare_digest(state, cookie_state)):
+            return HTMLResponse(web.render_notice(
+                "Sign-in failed",
+                "This sign-in attempt is invalid or expired. Please try again.",
+                icon="⚠️"), status_code=400)
+        try:
+            user_id, email = await app.web_auth.authenticate(code)
+        except Exception:  # noqa: BLE001
+            return HTMLResponse(web.render_notice(
+                "Sign-in failed",
+                "We couldn't complete sign-in. Please try again.", icon="⚠️"),
+                status_code=502)
+        await app.service.get_or_create_user(
+            user_id, email, admin_emails=app.admin_emails)
+        resp = RedirectResponse("/account", status_code=303)
+        resp.set_cookie(SESSION_COOKIE, mint_session(app.cipher, user_id, email),
+                        max_age=SESSION_TTL_SECONDS, httponly=True,
+                        secure=app.cookie_secure, samesite="lax", path="/")
+        resp.delete_cookie(STATE_COOKIE, path="/")
+        return resp
+
+    @mcp.custom_route("/logout", methods=["POST"])
+    async def logout(request: Request) -> Response:
+        # Only clear when a valid session is actually present. A cross-site POST
+        # can't carry the SameSite=Lax session cookie, so this makes forced-logout
+        # CSRF a no-op while a real (same-site) sign-out still works.
+        user = await app.session_user(request)
+        resp = RedirectResponse("/", status_code=303)
+        if user is not None:
+            resp.delete_cookie(SESSION_COOKIE, path="/")
+        return resp
+
+    @mcp.custom_route("/account/upgrade", methods=["POST"])
+    async def account_upgrade(request: Request) -> Response:
+        user = await app.session_user(request)
+        if user is None:
+            return RedirectResponse("/login", status_code=303)
+        if user.is_admin or user.plan == "pro":
+            return RedirectResponse("/account", status_code=303)
+        if not app.billing.enabled:
+            return HTMLResponse(web.render_notice(
+                "Billing unavailable",
+                "Upgrades are briefly unavailable. Please try again soon.",
+                icon="⚠️"), status_code=503)
+        try:
+            url, cid = await app.billing.create_checkout(user, user.stripe_customer_id)
+            await app.service.set_stripe_customer(user.user_id, cid)
+        except Exception:  # noqa: BLE001
+            return HTMLResponse(web.render_notice(
+                "Something went wrong",
+                "We couldn't start checkout. Please try again.", icon="⚠️"),
+                status_code=502)
+        return RedirectResponse(url, status_code=303)
+
+    @mcp.custom_route("/account/manage", methods=["POST"])
+    async def account_manage(request: Request) -> Response:
+        user = await app.session_user(request)
+        if user is None:
+            return RedirectResponse("/login", status_code=303)
+        if not user.stripe_customer_id or not app.billing.enabled:
+            return RedirectResponse("/account", status_code=303)
+        try:
+            url = await app.billing.create_portal(user.stripe_customer_id)
+        except Exception:  # noqa: BLE001
+            return HTMLResponse(web.render_notice(
+                "Something went wrong",
+                "We couldn't open the billing portal. Please try again.",
+                icon="⚠️"), status_code=502)
+        return RedirectResponse(url, status_code=303)
 
     @mcp.custom_route("/og.svg", methods=["GET"])
     async def og_image(request: Request) -> Response:

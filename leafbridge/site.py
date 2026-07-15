@@ -486,39 +486,84 @@ function applyLang(lang) {{
 </body></html>"""
 
 
-def render_account(status: str | None = None) -> str:
-    """The /account page. ``status`` reflects a Checkout return
-    (``success`` / ``cancelled``); otherwise it explains how to upgrade/manage."""
+def render_account(
+    status: str | None = None,
+    *,
+    signed_in: bool = False,
+    account: dict | None = None,
+    billing_enabled: bool = True,
+) -> str:
+    """The /account page.
+
+    ``status`` reflects a Stripe Checkout return (``success`` / ``cancelled``).
+    When ``signed_in`` is True, ``account`` is ``{email, plan, is_admin,
+    has_customer}`` and the page shows the real upgrade / manage-or-cancel /
+    sign-out controls; otherwise it invites the user to sign in with the same
+    account they use in Claude or ChatGPT.
+    """
+    acct = account or {}
+    email = acct.get("email") or ""
+    plan = acct.get("plan") or "free"
+    is_admin = bool(acct.get("is_admin"))
+    has_customer = bool(acct.get("has_customer"))
+
+    # A checkout return is shown as a small banner above the main state.
+    banner = ""
     if status == "success":
-        icon, heading, body = (
-            "🎉", "You're on Pro!",
-            "Thanks for upgrading. Your plan is now Pro, unlimited projects and "
-            "commits. It may take a few seconds to reflect in your assistant.",
-        )
+        banner = ("<div class='acct-banner ok'>🎉 <b>You're on Pro!</b> Thanks for "
+                  "upgrading. It may take a few seconds to reflect in your assistant.</div>")
     elif status == "cancelled":
-        icon, heading, body = (
-            "↩️", "Checkout cancelled",
-            "No charge was made. You can upgrade any time by asking MiLatexAI to "
-            "“upgrade my plan”.",
-        )
+        banner = ("<div class='acct-banner'>↩️ Checkout cancelled, no charge was made. "
+                  "You can upgrade any time.</div>")
+
+    def _form(action: str, label: str, cls: str = "btn") -> str:
+        return (f"<form method='post' action='{action}' style='margin:0'>"
+                f"<button class='{cls}' type='submit'>{html.escape(label)}</button></form>")
+
+    signout = _form("/logout", "Sign out", "btn btn-ghost btn-sm")
+
+    if not signed_in:
+        icon, heading = "🔐", "Sign in"
+        body = ("Sign in with the same account you use in Claude or ChatGPT to "
+                "upgrade, view, or cancel your subscription here. You can also manage "
+                "billing right inside your assistant, whichever you prefer.")
+        actions = "<a class='btn btn-lg' href='/login'>Sign in</a>"
+    elif is_admin:
+        icon, heading = "🛠️", "You have admin access"
+        body = "Your account has unlimited access, no subscription needed."
+        actions = signout
+    elif plan == "pro":
+        icon, heading = "⭐", "You're on Pro"
+        body = ("Unlimited projects and unlimited write-commits. Update your payment "
+                "method, view invoices, or cancel any time.")
+        manage = (_form("/account/manage", "Manage or cancel subscription")
+                  if (billing_enabled and has_customer) else "")
+        actions = f"{manage}{signout}"
     else:
-        icon, heading, body = (
-            "💳", "Manage your subscription",
-            "Billing is handled inside your assistant, so it stays tied to your "
-            "account. In Claude or ChatGPT, ask MiLatexAI to “upgrade my plan” for a "
-            "secure Stripe checkout link, or “manage my subscription” to view "
-            "invoices, change your card, or cancel.",
-        )
+        icon, heading = "💳", "You're on the Free plan"
+        body = ("Upgrade to Pro for unlimited projects and unlimited write-commits, "
+                "$4.99/mo. Reads stay free and unlimited either way.")
+        upgrade = (_form("/account/upgrade", "Upgrade to Pro · $4.99/mo")
+                   if billing_enabled else
+                   "<p class='muted'>Upgrades are briefly unavailable, please try again soon.</p>")
+        actions = f"{upgrade}{signout}"
+
+    whoami = (f"<p class='muted' style='margin-top:2px'>Signed in as {html.escape(email)}</p>"
+              if signed_in and email else "")
+
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>{html.escape(heading)} · MiLatexAI</title><style>{_CSS}</style></head>
-<body><main class='section' style='max-width:620px;margin:0 auto;text-align:center;min-height:72vh;display:flex;flex-direction:column;justify-content:center;gap:6px'>
+<body><main class='section' style='max-width:560px;margin:0 auto;text-align:center;min-height:72vh;display:flex;flex-direction:column;justify-content:center;gap:8px'>
 <a class='brand' href='/' style='margin-bottom:10px'>Mi<span>LaTeX</span>AI</a>
+{banner}
 <div style='font-size:44px'>{icon}</div>
 <h2 class='h2'>{html.escape(heading)}</h2>
 <p class='muted'>{html.escape(body)}</p>
-<p class='muted' style='margin-top:10px'>Questions? <a href='mailto:support@milatexai.com'>support@milatexai.com</a></p>
-<p style='margin-top:14px'><a class='btn' href='/'>Back to home</a></p>
+{whoami}
+<div class='acct-actions'>{actions}</div>
+<p class='muted' style='margin-top:14px'>Questions? <a href='mailto:support@milatexai.com'>support@milatexai.com</a></p>
+<p style='margin-top:2px'><a class='muted' href='/'>Back to home</a></p>
 </main></body></html>"""
 
 
@@ -568,6 +613,9 @@ a{color:inherit;text-decoration:none}
 .btn-lg{padding:15px 30px;font-size:17px}
 .btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
 .btn-ghost:hover{background:var(--card)}
+.acct-banner{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--muted);margin-bottom:6px}
+.acct-banner.ok{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));color:var(--fg)}
+.acct-actions{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:10px}
 .hero{max-width:820px;margin:0 auto;padding:72px 24px 40px;text-align:center}
 .badge{display:inline-block;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;margin-bottom:20px}
 .hero-title{font-size:clamp(32px,5vw,52px);line-height:1.16;letter-spacing:-.03em;margin:0 0 26px;padding-bottom:6px;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}

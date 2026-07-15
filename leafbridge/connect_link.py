@@ -53,6 +53,11 @@ def verify_connect_code(
         user_id = data["u"]
     except (ValueError, KeyError, TypeError) as exc:
         raise ConnectCodeError("Malformed connect code.") from exc
+    # Connect codes carry no ``kind`` field. Anything that does (e.g. a login
+    # session cookie, kind "sess", signed with the same key) is a different
+    # credential and must not be usable to drive the connect/projects/token forms.
+    if isinstance(data, dict) and data.get("k") is not None:
+        raise ConnectCodeError("Wrong link type.")
     if not user_id:
         raise ConnectCodeError("Connect code is missing a user.")
     return user_id, data.get("e", "")

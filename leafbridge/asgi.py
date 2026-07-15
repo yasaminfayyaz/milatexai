@@ -34,6 +34,29 @@ _CORS = Middleware(
 )
 
 
+class _SecurityHeaders:
+    """Emit ``Referrer-Policy: no-referrer`` on every response, so one-time connect
+    codes and OAuth ``state``/session values that ride in URLs never leak through
+    the Referer header when a page links out (e.g. to overleaf.com)."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        async def _send(message):
+            if message["type"] == "http.response.start":
+                message.setdefault("headers", []).append(
+                    (b"referrer-policy", b"no-referrer")
+                )
+            await send(message)
+
+        await self.app(scope, receive, _send)
+
+
 def store_from_env() -> Store:
     if os.environ.get("AZURE_STORAGE_CONNECTION_STRING"):
         from .azure_store import AzureTableStore
@@ -53,7 +76,9 @@ def build_app():
     # "Session terminated" (the single most common FastMCP<->ChatGPT failure).
     # This server holds no per-session memory — all state is per-user in the
     # store — so stateless mode is safe here and keeps Claude working too.
-    return mcp.http_app(stateless_http=True, middleware=[_CORS])
+    return mcp.http_app(
+        stateless_http=True, middleware=[_CORS, Middleware(_SecurityHeaders)]
+    )
 
 
 app = build_app()
