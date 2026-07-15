@@ -741,6 +741,7 @@ def create_hosted_server(
         if user is None:
             return HTMLResponse(site.render_account(
                 status=status, signed_in=False, billing_enabled=app.billing.enabled))
+        projects = await app.service.store.list_projects(user.user_id)
         view = {
             "email": user.email,
             "plan": "pro" if (user.is_admin or user.plan == "pro") else "free",
@@ -749,7 +750,7 @@ def create_hosted_server(
         }
         return HTMLResponse(site.render_account(
             status=status, signed_in=True, account=view,
-            billing_enabled=app.billing.enabled))
+            billing_enabled=app.billing.enabled, has_projects=bool(projects)))
 
     # -- website sign-in (WorkOS AuthKit) so a user can manage billing on the web
     # with the SAME account as the connector. The session cookie is signed,

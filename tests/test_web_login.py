@@ -13,7 +13,7 @@ from starlette.testclient import TestClient
 
 from leafbridge.connect_link import ConnectCodeError, mint_connect_code, verify_connect_code
 from leafbridge.hosted import create_hosted_server
-from leafbridge.store import InMemoryStore, TokenCipher, User
+from leafbridge.store import InMemoryStore, Project, TokenCipher, User
 from leafbridge.web_session import SessionError, mint_session, verify_session
 from leafbridge.workos_web import WorkOSWebAuth
 
@@ -170,6 +170,24 @@ def test_account_signed_in_pro_shows_manage():
         r = client.get("/account")
     assert "on Pro" in r.text  # heading "You're on Pro" (apostrophe HTML-escaped)
     assert "/account/manage" in r.text
+
+
+def test_account_shows_setup_nudge_when_no_project():
+    store, cipher, mcp = _harness(billing=FakeBilling())
+    with _client(mcp) as client:
+        client.cookies.set("mila_session", mint_session(cipher, "user_web", "web@example.com"))
+        r = client.get("/account")
+    assert "Next step: start editing" in r.text
+    assert "/#get-started" in r.text
+
+
+def test_account_hides_setup_nudge_when_project_connected():
+    store, cipher, mcp = _harness(billing=FakeBilling())
+    asyncio.run(store.put_project(Project(user_id="user_web", project_id="deadbeef", name="thesis")))
+    with _client(mcp) as client:
+        client.cookies.set("mila_session", mint_session(cipher, "user_web", "web@example.com"))
+        r = client.get("/account")
+    assert "Next step: start editing" not in r.text
 
 
 # --- /login + /callback flow ----------------------------------------------

@@ -492,6 +492,7 @@ def render_account(
     signed_in: bool = False,
     account: dict | None = None,
     billing_enabled: bool = True,
+    has_projects: bool = False,
 ) -> str:
     """The /account page.
 
@@ -551,6 +552,18 @@ def render_account(
     whoami = (f"<p class='muted' style='margin-top:2px'>Signed in as {html.escape(email)}</p>"
               if signed_in and email else "")
 
+    # Web-first signups (signed in, no project connected yet) need to know the
+    # actual next step: editing happens through the assistant connector.
+    nudge = ""
+    if signed_in and not has_projects:
+        nudge = (
+            "<div class='acct-nudge'><b>Next step: start editing</b><br>"
+            "Editing happens inside your assistant. Add MiLatexAI as a connector in "
+            "Claude or ChatGPT, then connect an Overleaf project (this needs an "
+            "Overleaf plan with Git integration). It takes about two minutes. "
+            "<a href='/#get-started'>See the setup guide</a>.</div>"
+        )
+
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>{html.escape(heading)} · MiLatexAI</title><style>{_CSS}</style></head>
@@ -561,6 +574,7 @@ def render_account(
 <h2 class='h2'>{html.escape(heading)}</h2>
 <p class='muted'>{html.escape(body)}</p>
 {whoami}
+{nudge}
 <div class='acct-actions'>{actions}</div>
 <p class='muted' style='margin-top:14px'>Questions? <a href='mailto:support@milatexai.com'>support@milatexai.com</a></p>
 <p style='margin-top:2px'><a class='muted' href='/'>Back to home</a></p>
@@ -616,6 +630,8 @@ a{color:inherit;text-decoration:none}
 .acct-banner{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--muted);margin-bottom:6px}
 .acct-banner.ok{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));color:var(--fg)}
 .acct-actions{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:10px}
+.acct-nudge{background:color-mix(in srgb,var(--accent) 8%,var(--card));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:12px;padding:14px 16px;font-size:14px;text-align:start;margin:8px auto;max-width:460px}
+.acct-nudge a{color:var(--accent);font-weight:600}
 .hero{max-width:820px;margin:0 auto;padding:72px 24px 40px;text-align:center}
 .badge{display:inline-block;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;margin-bottom:20px}
 .hero-title{font-size:clamp(32px,5vw,52px);line-height:1.16;letter-spacing:-.03em;margin:0 0 26px;padding-bottom:6px;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
