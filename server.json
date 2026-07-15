@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.yasaminfayyaz/milatexai",
+  "description": "Edit your real Overleaf projects from Claude and ChatGPT. Read, edit, and compile your LaTeX papers by chatting with your AI; every change is a real Git commit pushed to Overleaf.",
+  "repository": {
+    "url": "https://github.com/yasaminfayyaz/milatexai",
+    "source": "github"
+  },
+  "websiteUrl": "https://milatexai.com",
+  "version": "0.2.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://milatexai.com/mcp"
+    }
+  ]
+}

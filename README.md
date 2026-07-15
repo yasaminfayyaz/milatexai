@@ -1,145 +1,98 @@
-# LeafBridge
+# MiLatexAI
 
-**Edit your Overleaf projects straight from Claude and ChatGPT — no installs, no cloning, no copy‑paste.**
+**Edit your real Overleaf projects by talking to Claude or ChatGPT. No copy-paste, no downloading files, and every change lands in Overleaf as a real Git commit.**
 
-LeafBridge is a remote [MCP](https://modelcontextprotocol.io) server that connects an AI assistant to your Overleaf projects through Overleaf's own Git bridge. Ask *"fix the grammar in my introduction"* or *"add a related‑work paragraph citing Smith 2021"* and the change is committed and pushed to Overleaf instantly, visible in your project's history.
+[milatexai.com](https://milatexai.com) · Works with Claude and ChatGPT · Open source (AGPL-3.0)
 
-> **Status: Phase 1 (local engine) — working and tested.** You run the server on your own machine and add its URL to Claude/ChatGPT. The hosted, multi‑user, billed service (Phases 2–3) is on the roadmap below.
+MiLatexAI is a hosted, remote [MCP](https://modelcontextprotocol.io) server that connects your AI assistant to your Overleaf projects over Overleaf's own Git integration. Ask *"tighten my introduction"* or *"add a related-work paragraph citing Smith 2021"* and the edit is committed and pushed to Overleaf instantly, visible in your project history where you can review the diff or revert it.
 
----
-
-## ⚠️ Requirement: Overleaf Git integration
-
-LeafBridge works through Overleaf's **Git integration**, which is a **paid/premium feature** on Overleaf Cloud. You need one of:
-
-- An Overleaf **paid plan** (Standard/Professional), **or**
-- Access through a **university/institutional site license** that includes Git integration (many do — check whether your Overleaf shows *Account Settings → Git Integration*).
-
-Free Overleaf accounts cannot create Git tokens, so LeafBridge can't connect to them.
+> The internal Python package is still named `leafbridge`.
 
 ---
 
-## Quick start (local)
+## Use it (hosted, recommended)
 
-**Prerequisites:** Python 3.10+ and Git.
+Nothing to install. In Claude or ChatGPT, add MiLatexAI as a **custom connector**:
 
-```bash
-# 1. Install dependencies (from the repo root)
-python -m venv .venv
-.venv\Scripts\activate           # Windows PowerShell:  .venv\Scripts\Activate.ps1
-#  source .venv/bin/activate      # macOS/Linux
-pip install -r requirements.txt
+1. **Add the connector** using the URL **`https://milatexai.com/mcp`**.
+   - **Claude:** Settings, Connectors, Add custom connector, paste the URL, sign in.
+   - **ChatGPT:** Settings, Connectors, enable Developer mode, Add custom connector, paste the URL, authorize. Works on ChatGPT including its free plan.
+2. **Connect a project.** Ask the assistant to connect a project (or run `start_connect`). You get a one-time link to a secure web form where you paste your Overleaf Git token. It never appears in the chat and is encrypted at rest.
+3. **Talk to your paper.** "List my files," "read the methods section," "why won't it compile," "rewrite this paragraph."
 
-# 2. Configure your project(s)
-copy projects.example.json projects.json     #  cp on macOS/Linux
-#   then edit projects.json (see below)
-
-# 3. Run it
-python -m leafbridge
-#   -> MCP endpoint: http://127.0.0.1:8000/mcp/
-```
-
-### Getting your Overleaf Git token
-
-1. In Overleaf, open **Account Settings → Git Integration** (also called *Project Synchronization*).
-2. Click **Create Token** / **Add another token** and copy the `olp_…` token (you only see it once).
-3. Grab your project link: open the project and copy the URL — it looks like
-   `https://www.overleaf.com/project/aaaaaaaaaaaaaaaaaaaaaaaa`.
-
-### `projects.json`
-
-```json
-{
-  "projects": [
-    {
-      "name": "thesis",
-      "url": "https://www.overleaf.com/project/aaaaaaaaaaaaaaaaaaaaaaaa",
-      "token": "olp_your_token_here"
-    }
-  ]
-}
-```
-
-`projects.json` is **git‑ignored** and never leaves your machine except as HTTPS requests to `git.overleaf.com`. You can list several projects; tools default to the only project when you have just one.
-
-### Connect it to your AI
-
-- **Claude** (web/desktop): *Settings → Connectors → Add custom connector* → paste `http://127.0.0.1:8000/mcp/`.
-- **ChatGPT** (Plus/Pro/Business/Edu): enable *Developer mode* under *Settings → Apps/Connectors*, then add the same URL. (Write actions require a Business/Enterprise/Edu workspace; read‑only works on Plus/Pro.)
-
-Then just talk to the assistant about your paper.
+Full setup guide: **[milatexai.com/#get-started](https://milatexai.com/#get-started)**
 
 ---
 
-## Tools
+## Requirement: Overleaf Git integration (a paid Overleaf feature)
 
-| Tool | What it does | Metered\* |
+MiLatexAI works through Overleaf's **Git integration**, which is a **premium (paid) feature** on Overleaf. To use it on your own projects you need one of:
+
+- An Overleaf **paid plan** (Standard or Professional), or
+- A project shared with you from a **premium or group/institutional** account that includes Git integration.
+
+Quick test: if you can create a Git token under **Overleaf, Account Settings, Git Integration**, you are good to go. Free-only Overleaf accounts cannot create Git tokens.
+
+You will also need **Claude or ChatGPT**. Their free tiers work fine.
+
+---
+
+## Pricing
+
+- **Free:** 1 connected project, 25 write-commits per month, unlimited reads. Runs on spare capacity (best-effort).
+- **Pro, $4.99/mo:** unlimited projects, unlimited write-commits, guaranteed access.
+
+Reads are always free and unlimited. Overleaf's own subscription is separate and billed by Overleaf. Manage billing inside your assistant or at [milatexai.com/account](https://milatexai.com/account).
+
+---
+
+## What it does
+
+| Tool | What it does | Write |
 |---|---|---|
-| `list_projects` | Show your connected projects | No |
-| `list_files` | List `.tex`, `.bib`, `.cls`, `.sty`, … files | No |
-| `read_file` | Read a file (with line numbers) | No |
-| `get_sections` | Parse a `.tex` file's section outline | No |
-| `read_section` | Return one section by title | No |
-| `edit_file` | Exact‑string replacement → commit + push | **Yes** |
-| `write_file` | Create/overwrite a file → commit + push | **Yes** |
-| `delete_file` | Delete a file → commit + push | **Yes** |
-| `upload_file` | Add/replace a **binary** file (image, PDF) → commit + push | **Yes** |
-| `check_compile` | Build the project with a local LaTeX engine and report errors (optional; needs Tectonic) | No |
-| `get_history` | Recent commits from Overleaf's history | No |
-| `search` | Keyword search across project files | No |
-| `fetch` | Return a file's full text by id (ChatGPT contract) | No |
+| `list_projects`, `list_files` | List your projects, or a project's files | No |
+| `read_file`, `get_sections`, `read_section` | Read files and navigate LaTeX structure | No |
+| `check_compile` | Build with a bundled LaTeX engine (Tectonic) and report the exact errors | No |
+| `get_history` | Recent Overleaf commits | No |
+| `edit_file`, `write_file`, `delete_file`, `upload_file` | Change files, each an immediate Git commit and push | Yes |
 
-\* Only *writes* (pushes to Overleaf) are metered in the future hosted plan; reading is always free. In Phase 1 there is no metering at all.
-
-**Every write commits *and* pushes immediately** and returns the commit hash — there's no separate "save," and the change is auditable in Overleaf's history. All file paths are validated against the project directory (no traversal), edits require an exact, unique match, and the engine always pulls before pushing and never force‑pushes.
+Only **writes** count toward the monthly limit; reads are always free. Every write commits *and* pushes immediately and returns the commit hash, auditable in Overleaf's history. Paths are validated (no traversal), edits require an exact unique match, and the engine always pulls before pushing and never force-pushes.
 
 ---
 
-## Architecture (Phase 1)
+## Security and privacy
 
-```
-Claude / ChatGPT
-      │  MCP over Streamable HTTP  (http://127.0.0.1:8000/mcp/)
-      ▼
-LeafBridge (FastMCP, Python)
-      ├─ tools: list / read / sections / edit / write / history / search / fetch
-      ├─ git worker: shallow clone cache, per‑project lock, pull‑then‑push
-      └─ projects.json (your links + tokens, local only)
-      │  HTTPS + your Overleaf Git token
-      ▼
-Overleaf Git bridge  (git.overleaf.com/<projectId>)
-```
+- Your **Overleaf Git token** is entered on a secure web form, **encrypted at rest**, and **never written to the chat**.
+- MiLatexAI touches **only the projects you explicitly connect**, nothing else in your Overleaf account.
+- We **do not store your document contents**. We keep only your account email, your encrypted token, and a monthly commit counter.
+- The full connector is **open source** (AGPL-3.0), so you can audit exactly what it does.
 
-The clone cache is disposable (default: `%LOCALAPPDATA%\LeafBridge\cache`) and re‑created on demand. See [`docs/RESEARCH-NOTES.md`](docs/RESEARCH-NOTES.md) for the verified Overleaf / MCP / FastMCP API details this is built on.
+MiLatexAI is not affiliated with, endorsed by, or sponsored by Overleaf or Digital Science, Anthropic, or OpenAI. Overleaf, Claude, and ChatGPT are trademarks of their respective owners, used only to describe compatibility.
 
 ---
 
-## Development
+## Self-host
+
+MiLatexAI is AGPL-3.0, so you can run the server yourself.
 
 ```bash
-pip install -e ".[dev]"
-
-python -m pytest tests/test_units.py -q     # fast, no network
-python tests/it_gitflow.py                  # full clone→edit→push flow vs a local fake remote
-python tests/http_smoke.py                  # against a running `python -m leafbridge`
+python -m venv .venv
+. .venv/Scripts/activate          # or: source .venv/bin/activate
+pip install -r requirements.txt
+python -m pytest -q                # test suite
 ```
 
-Settings via environment (optional, or in a `.env`): `LEAFBRIDGE_HOST`, `LEAFBRIDGE_PORT`, `LEAFBRIDGE_DATA_DIR`, `LEAFBRIDGE_CONFIG`.
-
-Self‑hosted Overleaf Server Pro (or local testing) is supported by adding a `git_url` override to a project entry.
+The hosted service runs `leafbridge.asgi:app` (Streamable HTTP MCP at `/mcp`) on Azure Container Apps, with WorkOS AuthKit for authentication and Stripe for billing. Self-hosted Overleaf Server Pro is supported via a `git_url` override on a project. Running a modified version as a network service requires publishing your changes (AGPL).
 
 ---
 
-## Roadmap
+## Status
 
-- **Phase 1 — local engine** ✅ *(this repo)* — read/edit/write tools over the Git bridge, tested end‑to‑end.
-- **Phase 2 — hosted + auth** — deploy to Azure Container Apps; OAuth 2.1 (PKCE + DCR) so users connect via `claude.ai`'s custom‑connector flow; per‑user encrypted token storage.
-- **Phase 3 — billing** — Stripe Checkout, usage metering (writes only), free tier + Pro.
-- **Phase 4 — publish** — docs site, privacy policy, Connectors Directory submission.
-- **Later** — compile checks (chktex), multi‑file smart edits, team plans.
+- **Live** at [milatexai.com](https://milatexai.com): hosted multi-user server, WorkOS sign-in, per-user encrypted tokens, server-side compile checks (Tectonic), Stripe billing, and website sign-in for managing your subscription.
+- Roadmap: connector-directory listings, multi-file smart edits, team plans.
 
 ---
 
 ## License
 
-[AGPL‑3.0‑or‑later](LICENSE). You may self‑host freely; running a modified version as a network service requires publishing your changes.
+[AGPL-3.0-or-later](LICENSE). You may self-host freely; running a modified version as a network service requires publishing your changes.
