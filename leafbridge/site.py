@@ -427,7 +427,14 @@ function applyLang(lang) {{
 
     desc = html.escape(str(en.get("hero", {}).get("subtitle", "")))
     tagline = html.escape(str(en.get("brand_tagline", "")))
-    title = f"MiLatexAI · {tagline}"
+    # SEO <title> front-loads the high-intent search terms, then the brand
+    # (people search "edit Overleaf with ChatGPT", not "MiLatexAI").
+    title = "Edit Overleaf with ChatGPT or Claude · MiLatexAI"
+    meta_desc = html.escape(
+        "Edit your real Overleaf LaTeX papers by chatting with ChatGPT or Claude. "
+        "Read, edit, and fix compile errors; every change is a real Git commit. "
+        "Free tier plus Pro."
+    )
     url = "https://milatexai.com/"
     og_image = "https://milatexai.com/og.svg"
     price = html.escape(str(en.get("pricing", {}).get("pro", {}).get("price", "$4.99")))
@@ -445,9 +452,20 @@ function applyLang(lang) {{
         ],
         "sameAs": ["https://github.com/yasaminfayyaz/milatexai"],
     }, ensure_ascii=False)
+    # FAQ structured data, built from the English FAQ (helps search engines
+    # understand the page and can surface Q&A in results).
+    faq_jsonld = json.dumps({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {"@type": "Question", "name": str(it.get("q", "")),
+             "acceptedAnswer": {"@type": "Answer", "text": str(it.get("a", ""))}}
+            for it in en.get("faq", {}).get("items", [])
+        ],
+    }, ensure_ascii=False)
     seo = f"""<title>{title}</title>
-<meta name='description' content='{desc}'>
-<meta name='keywords' content='Overleaf, LaTeX, Claude, ChatGPT, MCP connector, AI LaTeX editor, edit Overleaf with AI, research paper AI'>
+<meta name='description' content='{meta_desc}'>
+<meta name='keywords' content='edit Overleaf with ChatGPT, edit Overleaf with Claude, Overleaf AI editor, ChatGPT Overleaf, Claude Overleaf, edit LaTeX with AI, Overleaf MCP connector, AI research paper editor, LaTeX AI assistant'>
 <link rel='canonical' href='{url}'>
 <meta name='robots' content='index,follow'>
 <meta name='theme-color' content='#0891b2'>
@@ -461,7 +479,8 @@ function applyLang(lang) {{
 <meta name='twitter:title' content='{title}'>
 <meta name='twitter:description' content='{desc}'>
 <meta name='twitter:image' content='{og_image}'>
-<script type='application/ld+json'>{jsonld}</script>"""
+<script type='application/ld+json'>{jsonld}</script>
+<script type='application/ld+json'>{faq_jsonld}</script>"""
     return f"""<!doctype html><html lang='en'><head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
