@@ -86,14 +86,37 @@ def render_connect_form(
     name: str = "",
     email: str = "",
     error: str | None = None,
+    has_token: bool = False,
 ) -> str:
     err_html = f"<div class='error'>{html.escape(error)}</div>" if error else ""
-    who = (
-        f"<p class='muted'>Signed in as {html.escape(email)}. "
-        "Your token is stored encrypted and never shown again.</p>"
-        if email
-        else "<p class='muted'>Your token is stored encrypted and never shown again.</p>"
-    )
+    if has_token:
+        # Returning user: the account already has a saved Overleaf token, so don't
+        # ask for it again — just take the project link.
+        who = (
+            f"<p class='muted'>Signed in as {html.escape(email)}. "
+            "Using your saved Overleaf token, no need to enter it again.</p>"
+            if email
+            else "<p class='muted'>Using your saved Overleaf token, no need to enter it again.</p>"
+        )
+        token_field = ""
+        note = ("<div class='note'>🔒 This link is single-use and expires 15 minutes after "
+                "you generated it. The AI only ever touches the projects you add here.</div>")
+    else:
+        who = (
+            f"<p class='muted'>Signed in as {html.escape(email)}. "
+            "Your token is stored encrypted and never shown again.</p>"
+            if email
+            else "<p class='muted'>Your token is stored encrypted and never shown again.</p>"
+        )
+        token_field = (
+            "<label for='token'>Overleaf Git token</label>"
+            "<input id='token' name='token' type='password' placeholder='olp_…' required>"
+            "<p class='hint'>Create one in Overleaf → Account Settings → "
+            "<a href='https://www.overleaf.com/user/settings' target='_blank' rel='noopener'>Git Integration</a>.</p>"
+        )
+        note = ("<div class='note'>🔒 This link is single-use and expires 15 minutes after you "
+                "generated it. Your Git token is encrypted before it touches disk, it is never "
+                "written to the chat.</div>")
     return _page(
         f"Connect a project · {BRAND}",
         f"""{_brand_header()}
@@ -106,18 +129,13 @@ def render_connect_form(
   <input id='overleaf_url' name='overleaf_url' inputmode='url'
          placeholder='https://www.overleaf.com/project/…'
          value='{html.escape(overleaf_url, quote=True)}' required>
-  <label for='token'>Overleaf Git token</label>
-  <input id='token' name='token' type='password' placeholder='olp_…' required>
-  <p class='hint'>Create one in Overleaf → Account Settings →
-     <a href='https://www.overleaf.com/user/settings' target='_blank' rel='noopener'>Git Integration</a>.</p>
+  {token_field}
   <label for='name'>Label <span class='muted'>(optional)</span></label>
   <input id='name' name='name' placeholder='e.g. thesis'
          value='{html.escape(name, quote=True)}'>
   <button type='submit'>Connect securely</button>
 </form>
-<div class='note'>🔒 This link is single-use and expires 15 minutes after you
-  generated it. Your Git token is encrypted before it touches disk, it is never
-  written to the chat.</div>""",
+{note}""",
     )
 
 

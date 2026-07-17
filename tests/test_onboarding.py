@@ -137,6 +137,45 @@ def test_connect_post_stores_encrypted_token_and_succeeds(harness):
     assert cipher.decrypt(user.overleaf_token_encrypted) == "olp_realtoken123"
 
 
+def test_connect_get_hides_token_when_account_has_token(harness):
+    _store, cipher, mcp = harness
+    code = mint_connect_code(cipher, "user_web", "web@example.com")
+    with TestClient(mcp.http_app()) as client:
+        # First connection stores the account-level token.
+        client.post("/connect", data={
+            "code": code, "overleaf_url": OVERLEAF_URL,
+            "token": "olp_realtoken123", "name": "first"})
+        # Re-opening /connect must NOT ask for the token again.
+        r = client.get("/connect", params={"code": code})
+    assert r.status_code == 200
+    assert "Using your saved Overleaf token" in r.text
+    assert "name='token'" not in r.text
+
+
+def test_connect_post_reuses_saved_token_for_second_project():
+    # Admin so the free 1-project limit doesn't mask the token-reuse behavior.
+    store = InMemoryStore()
+    cipher = _cipher()
+    mcp = create_hosted_server(
+        store=store, cipher=cipher, auth=False,
+        identity_provider=lambda: ("user_web", "admin@example.com"),
+        admin_emails=("admin@example.com",),
+        base_url="https://milatexai.com",
+    )
+    code = mint_connect_code(cipher, "user_web", "admin@example.com")
+    second = "https://www.overleaf.com/project/0123456789abcdef01234568"
+    with TestClient(mcp.http_app()) as client:
+        client.post("/connect", data={
+            "code": code, "overleaf_url": OVERLEAF_URL,
+            "token": "olp_realtoken123", "name": "first"})
+        # Second project, NO token submitted -> must reuse the saved account token.
+        r = client.post("/connect", data={
+            "code": code, "overleaf_url": second, "name": "second"})
+    assert r.status_code == 200
+    assert "Connected" in r.text
+    assert len(_projects(store, "user_web")) == 2
+
+
 def test_connect_link_reusable_within_ttl(harness):
     store, cipher, mcp = harness
     code = mint_connect_code(cipher, "user_web", "web@example.com")

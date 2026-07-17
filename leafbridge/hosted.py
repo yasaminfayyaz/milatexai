@@ -931,7 +931,14 @@ def create_hosted_server(
         ident = _verified(request.query_params.get("code", ""))
         if ident is None:
             return _expired()
-        return HTMLResponse(web.render_connect_form(request.query_params["code"], email=ident[1]))
+        user_id, email = ident
+        # If the account already has a saved token, this is an "add another
+        # project" case — render the form WITHOUT the token field.
+        await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        has = await app.service.has_token(user_id)
+        return HTMLResponse(
+            web.render_connect_form(request.query_params["code"], email=email, has_token=has)
+        )
 
     @mcp.custom_route("/connect", methods=["POST"])
     async def connect_submit(request: Request) -> Response:
@@ -942,19 +949,27 @@ def create_hosted_server(
         if ident is None:
             return _expired()
         user_id, email = ident
+        await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        has = await app.service.has_token(user_id)
 
         def form_error(msg: str, status: int = 400) -> Response:
             return HTMLResponse(
                 web.render_connect_form(code, overleaf_url=overleaf_url,
-                                        name=name or "", email=email, error=msg),
+                                        name=name or "", email=email, error=msg, has_token=has),
                 status_code=status,
             )
 
-        if not overleaf_url or not token:
+        if not overleaf_url:
+            return form_error("Please provide your project link.")
+        if not token and not has:
             return form_error("Please provide both your project link and Git token.")
         try:
-            await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
-            proj = await app.service.connect_project(user_id, overleaf_url, token, name)
+            if token:
+                # First connection, or the user is (re)setting the account token here.
+                proj = await app.service.connect_project(user_id, overleaf_url, token, name)
+            else:
+                # Returning user: reuse the saved account token, no re-entry needed.
+                proj = await app.service.add_project(user_id, overleaf_url, name)
         except (LimitExceeded, ProjectNotConnected, ServiceError) as exc:
             return form_error(str(exc))
         except Exception:  # noqa: BLE001
