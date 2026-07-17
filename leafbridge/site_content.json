@@ -46,6 +46,12 @@
     "desc": "The entire connector is public on GitHub under the AGPL license, so you can read precisely how it handles your token and your projects before trusting it."
    }
   ],
+  "see": {
+   "badge": "New",
+   "title": "Your AI sees the compiled page, not just the code",
+   "desc": "When a table or figure looks off, MiLatexAI compiles your paper, captures the exact page it lands on, and reads the image. It catches layout problems the LaTeX source never shows: cramped columns, overfull cells, collisions. Multi-page tables are handled automatically.",
+   "example": "\"This table looks cramped.\" It renders the page, sees the collision, and widens the columns."
+  },
   "how": {
    "title": "From chat to committed in three steps",
    "subtitle": "Connect once, then just talk to your AI.",

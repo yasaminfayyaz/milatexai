@@ -207,6 +207,56 @@ _HERO_ART = """<svg class='hero-art' viewBox='0 0 640 300' role='img'
 </svg>"""
 
 
+# "Sees the compiled page" illustration: a chat instruction -> the AI scanning a
+# rendered table (magnifier) on the compiled page -> a fixed/committed check.
+# Theme-aware via CSS vars, language-neutral.
+_SEE_ART = """<svg class='see-art' viewBox='0 0 640 300' role='img'
+  aria-label='Your AI sees the compiled table and fixes its layout' xmlns='http://www.w3.org/2000/svg'>
+  <!-- compiled page -->
+  <rect x='300' y='34' width='306' height='232' rx='16' fill='var(--card)' stroke='var(--line)'/>
+  <rect x='330' y='58' width='150' height='10' rx='5' fill='var(--accent)'/>
+  <rect x='330' y='76' width='96' height='6' rx='3' fill='var(--muted)' opacity='.4'/>
+  <!-- rendered table -->
+  <rect x='330' y='100' width='246' height='134' rx='6' fill='var(--bg)' stroke='var(--line)'/>
+  <rect x='330' y='100' width='246' height='24' fill='var(--accent)' opacity='.15'/>
+  <g stroke='var(--line)' stroke-width='1.3'>
+    <line x1='330' y1='124' x2='576' y2='124'/>
+    <line x1='330' y1='152' x2='576' y2='152'/>
+    <line x1='330' y1='180' x2='576' y2='180'/>
+    <line x1='330' y1='208' x2='576' y2='208'/>
+    <line x1='392' y1='100' x2='392' y2='234'/>
+    <line x1='454' y1='100' x2='454' y2='234'/>
+    <line x1='516' y1='100' x2='516' y2='234'/>
+  </g>
+  <g fill='var(--accent)'>
+    <rect x='340' y='108' width='40' height='7' rx='3.5'/><rect x='402' y='108' width='40' height='7' rx='3.5'/>
+    <rect x='464' y='108' width='40' height='7' rx='3.5'/><rect x='526' y='108' width='40' height='7' rx='3.5'/>
+  </g>
+  <g fill='var(--muted)' opacity='.35'>
+    <rect x='340' y='134' width='36' height='6' rx='3'/><rect x='402' y='134' width='40' height='6' rx='3'/>
+    <rect x='464' y='134' width='30' height='6' rx='3'/><rect x='526' y='134' width='40' height='6' rx='3'/>
+    <rect x='340' y='162' width='40' height='6' rx='3'/><rect x='402' y='162' width='34' height='6' rx='3'/>
+    <rect x='464' y='162' width='40' height='6' rx='3'/><rect x='526' y='162' width='30' height='6' rx='3'/>
+  </g>
+  <!-- magnifier: the AI looking at the rendered table -->
+  <circle cx='500' cy='176' r='34' fill='var(--accent)' opacity='.07'/>
+  <circle cx='500' cy='176' r='34' fill='none' stroke='var(--accent)' stroke-width='3'/>
+  <line x1='524' y1='200' x2='548' y2='224' stroke='var(--accent)' stroke-width='5' stroke-linecap='round'/>
+  <!-- fixed / committed -->
+  <circle cx='590' cy='56' r='12' fill='#22c55e'/>
+  <path d='M584 56 l4 4 l8 -9' stroke='#fff' stroke-width='2.4' fill='none'
+    stroke-linecap='round' stroke-linejoin='round'/>
+  <!-- chat instruction -->
+  <path d='M232 214 Q286 206 306 196' fill='none' stroke='var(--accent)'
+    stroke-width='2' stroke-dasharray='2 6' stroke-linecap='round' opacity='.5'/>
+  <rect x='30' y='128' width='196' height='96' rx='18' fill='var(--accent)'/>
+  <path d='M212 210 L236 228 L208 222 Z' fill='var(--accent)'/>
+  <rect x='52' y='154' width='150' height='9' rx='4.5' fill='#fff' opacity='.95'/>
+  <rect x='52' y='173' width='120' height='9' rx='4.5' fill='#fff' opacity='.78'/>
+  <rect x='52' y='192' width='88' height='9' rx='4.5' fill='#fff' opacity='.6'/>
+</svg>"""
+
+
 def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     content = content or load_content()
     en = content.get("en", _FALLBACK_EN)
@@ -265,6 +315,18 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     )
     features = f"""<section class='section' id='features'>
   <div class='grid'>{feature_cards}</div>
+</section>"""
+
+    see = f"""<section class='section see' id='see'>
+  <div class='spotlight'>
+    <div class='spotlight-text'>
+      <span class='badge' data-i18n='see.badge'>{_t(en,'see.badge')}</span>
+      {_node(en,'h2','see.title','h2 spot-h2')}
+      {_node(en,'p','see.desc','muted')}
+      {_node(en,'p','see.example','see-eg')}
+    </div>
+    <div class='spotlight-art'>{_SEE_ART}</div>
+  </div>
 </section>"""
 
     steps = "".join(
@@ -491,6 +553,7 @@ function applyLang(lang) {{
 <main>
 {hero}
 {features}
+{see}
 {how}
 {get_started}
 {security}
@@ -679,6 +742,12 @@ a{color:inherit;text-decoration:none}
 .connect-url code{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:15px}
 .cu-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .hero-art{width:100%;max-width:560px;height:auto;margin:26px auto 8px;display:block}
+.spotlight{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center;max-width:1000px;margin-inline:auto}
+.spotlight-text{text-align:start}
+.spotlight .spot-h2{text-align:start;margin:12px 0 10px}
+.see-eg{margin-top:16px;font-size:14.5px;color:var(--accent);font-weight:600}
+.see-art{width:100%;max-width:520px;height:auto;display:block}
+@media(max-width:760px){.spotlight{grid-template-columns:1fr;gap:16px}.see-art{margin:0 auto}}
 .setup-cols{margin-top:26px;text-align:start}
 .setup-card{padding:24px}
 .setup-card h3{margin:0 0 12px;font-size:17px}
