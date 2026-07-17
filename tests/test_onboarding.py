@@ -176,6 +176,22 @@ def test_connect_post_reuses_saved_token_for_second_project():
     assert len(_projects(store, "user_web")) == 2
 
 
+def test_connect_duplicate_url_shows_already_connected(harness):
+    store, cipher, mcp = harness
+    code = mint_connect_code(cipher, "user_web", "web@example.com")
+    with TestClient(mcp.http_app()) as client:
+        client.post("/connect", data={
+            "code": code, "overleaf_url": OVERLEAF_URL,
+            "token": "olp_tok", "name": "thesis"})
+        # Submit the SAME project again -> "already connected", not a duplicate/rename.
+        r = client.post("/connect", data={
+            "code": code, "overleaf_url": OVERLEAF_URL, "name": "renamed"})
+    assert "already" in r.text.lower()
+    projects = _projects(store, "user_web")
+    assert len(projects) == 1
+    assert projects[0].name == "thesis"
+
+
 def test_connect_link_reusable_within_ttl(harness):
     store, cipher, mcp = harness
     code = mint_connect_code(cipher, "user_web", "web@example.com")

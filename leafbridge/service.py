@@ -35,6 +35,10 @@ class ProjectNotConnected(ServiceError):
     pass
 
 
+class AlreadyConnected(ServiceError):
+    """The project the user tried to add is already one of their connected projects."""
+
+
 class AccountService:
     def __init__(self, store: Store, cipher: TokenCipher):
         self.store = store
@@ -118,6 +122,15 @@ class AccountService:
             pid = extract_project_id(overleaf_url_or_id)
         except ConfigError as exc:
             raise ServiceError(str(exc)) from exc
+        dup = next(
+            (p for p in await self.store.list_projects(user_id) if p.project_id == pid),
+            None,
+        )
+        if dup is not None:
+            raise AlreadyConnected(
+                f"'{dup.name}' is already one of your connected projects, so you can "
+                "edit it right now. No need to add it again."
+            )
         await self._enforce_project_limit(user, pid)
         project = Project(
             user_id=user_id, project_id=pid, name=(name or pid[:8]),

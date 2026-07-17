@@ -50,6 +50,7 @@ from .files import (
 from .git_worker import GitError, GitWorker, PushConflict
 from .service import (
     AccountService,
+    AlreadyConnected,
     LimitExceeded,
     ProjectNotConnected,
     ServiceError,
@@ -422,6 +423,8 @@ def create_hosted_server(
         try:
             user = await app.user()
             proj = await app.service.add_project(user.user_id, overleaf_url, name)
+        except AlreadyConnected as exc:
+            return str(exc)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it."
@@ -970,6 +973,8 @@ def create_hosted_server(
             else:
                 # Returning user: reuse the saved account token, no re-entry needed.
                 proj = await app.service.add_project(user_id, overleaf_url, name)
+        except AlreadyConnected as exc:
+            return HTMLResponse(web.render_notice("Already connected", str(exc), icon="✅"))
         except (LimitExceeded, ProjectNotConnected, ServiceError) as exc:
             return form_error(str(exc))
         except Exception:  # noqa: BLE001
@@ -1015,6 +1020,8 @@ def create_hosted_server(
                 await app.service.store.delete_project(user_id, field("project_id"))
             else:
                 return await show("Unknown action.", 400)
+        except AlreadyConnected as exc:
+            return await show(str(exc))
         except (LimitExceeded, ProjectNotConnected, ServiceError) as exc:
             return await show(str(exc), 400)
         except Exception:  # noqa: BLE001
