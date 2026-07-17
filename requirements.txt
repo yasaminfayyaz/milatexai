@@ -7,3 +7,4 @@ azure-data-tables>=12.5   # Phase 2: persistent multi-tenant store
 azure-identity>=1.19      # Phase 2: managed identity / Key Vault
 aiohttp>=3.10             # async transport for the Azure SDK
 stripe
+PyMuPDF>=1.24             # render PDF pages to PNG for show_table / show_figure

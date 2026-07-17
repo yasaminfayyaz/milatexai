@@ -17,6 +17,7 @@ The Phase-1 local server is untouched; this is an additive module.
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import difflib
 import json
@@ -33,7 +34,7 @@ from fastmcp.server.dependencies import get_access_token
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
 
-from . import __version__, latex, site, texcompile, web
+from . import __version__, latex, site, texcompile, texlocate, web
 from .billing import Billing, plan_change_from_event
 from .capacity import CapacityGate
 from .config import ProjectConfig, default_data_dir
@@ -111,6 +112,30 @@ def _wrap(exc: Exception) -> ToolError:
     if isinstance(exc, GitError):
         return ToolError(f"Git operation failed: {exc}")
     return ToolError(f"Unexpected error: {exc}")
+
+
+async def _float_map(repo: Path, main: str) -> str:
+    """Best-effort: where each table/figure landed, one line each. Never raises."""
+    exe = texcompile.tectonic_path()
+    if not exe:
+        return ""
+    try:
+        res = await asyncio.to_thread(texlocate.compile_and_locate, str(repo), main, exe)
+    except Exception:  # noqa: BLE001
+        return ""
+    if not res.floats:
+        return ""
+    lines = ["Where each table/figure landed (use show_table / show_figure to see one):"]
+    for kind, num in sorted(res.floats):
+        pg = res.floats[(kind, num)].pages
+        if not pg:
+            continue
+        loc = f"p.{pg[0]}" if len(pg) == 1 else f"p.{pg[0]}-{pg[-1]} (spans)"
+        lines.append(f"  {kind.title()} {num}: {loc}")
+    labeled = sorted((n, p) for n, (_n, p) in res.labels.items() if n.startswith(("tab", "fig")))
+    if labeled:
+        lines.append("  Labels: " + ", ".join(f"{n} p.{p}" for n, p in labeled))
+    return "\n".join(lines)
 
 
 def _identity_from_token() -> tuple[str, str]:
@@ -593,11 +618,14 @@ def create_hosted_server(
             user = await app.user()
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
+            float_map = ""
             async with app.worker.open_repo(proj) as repo:
                 main = texcompile.find_main_tex(repo)
                 if not main:
                     raise ToolError("Could not find a root .tex to compile.")
                 res = await texcompile.compile_project(repo, main)
+                if res.ok:
+                    float_map = await _float_map(repo, main)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if not res.available:
@@ -605,7 +633,57 @@ def create_hosted_server(
         lines = [f"{main}: {res.message}"]
         if not res.ok and res.errors:
             lines += ["Errors:"] + [f"  {e}" for e in res.errors]
+        if float_map:
+            lines += ["", float_map]
         return "\n".join(lines)
+
+    async def _show_float(kind: str, number: int, project: str | None):
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            exe = texcompile.tectonic_path()
+            if not exe:
+                raise ToolError("The LaTeX engine is unavailable on the server right now.")
+            async with app.worker.open_repo(proj) as repo:
+                main = texcompile.find_main_tex(repo)
+                if not main:
+                    raise ToolError("Could not find a root .tex to compile.")
+                res = await asyncio.to_thread(texlocate.compile_and_locate, str(repo), main, exe)
+                f = res.floats.get((kind, number))
+                if f is None:
+                    avail = sorted(n for (k, n) in res.floats if k == kind)
+                    raise ToolError(
+                        f"No {kind} {number} found. {kind.title()}s in this document: "
+                        f"{avail or 'none'}."
+                    )
+                if not f.pages:
+                    raise ToolError(f"{kind.title()} {number} is present but its page could not be resolved.")
+                pages = f.pages
+                imgs = await asyncio.to_thread(texlocate.render_pages, res.pdf_path, pages)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        if not imgs:
+            raise ToolError("The page rendered empty; nothing to show.")
+        from fastmcp.utilities.types import Image
+
+        span = "" if len(pages) == 1 else f" (spans pages {pages[0]}-{pages[-1]})"
+        note = f"{kind.title()} {number}: page {pages[0]}{span}."
+        return [note, *[Image(data=b, format="png") for b in imgs]]
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def show_table(number: int, project: str | None = None):
+        """Render the page(s) that contain Table <number> as an image, so you can SEE
+        how the table actually looks (layout, column widths, overfull or misaligned
+        cells) and fix it — things the LaTeX source alone can't tell you. If the
+        table spans multiple pages, every page is returned."""
+        return await _show_float("table", number, project)
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def show_figure(number: int, project: str | None = None):
+        """Render the page(s) that contain Figure <number> as an image, so you can SEE
+        the rendered figure. If it spans multiple pages, every page is returned."""
+        return await _show_float("figure", number, project)
 
     # -- writes (metered) --------------------------------------------------
 
