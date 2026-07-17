@@ -75,6 +75,13 @@ unlimited. Before editing, read the file so edit_file's old_string matches exact
 When the user asks why their paper won't compile or why they're getting errors,
 run check_compile to build it and get the exact LaTeX errors, then read the
 offending file, fix the errors with edit_file, and check_compile again.
+When the user says a table or figure "looks weird/off/strange", or asks you to
+look at how it renders or to see a picture of it, use show_table or show_figure to
+get an IMAGE of the actual rendered float, then fix it with edit_file. The server
+does no semantic matching: if the user names the float in words rather than a
+number, first read the document (get_sections / read_section) to find its number
+or \\label, then pass that to show_table/show_figure. An unknown reference just
+returns the list of tables/figures to choose from.
 """
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
@@ -637,7 +644,7 @@ def create_hosted_server(
             lines += ["", float_map]
         return "\n".join(lines)
 
-    async def _show_float(kind: str, number: int, project: str | None):
+    async def _show_float(kind: str, ref: str, project: str | None):
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -650,15 +657,17 @@ def create_hosted_server(
                 if not main:
                     raise ToolError("Could not find a root .tex to compile.")
                 res = await asyncio.to_thread(texlocate.compile_and_locate, str(repo), main, exe)
-                f = res.floats.get((kind, number))
-                if f is None:
-                    avail = sorted(n for (k, n) in res.floats if k == kind)
-                    raise ToolError(
-                        f"No {kind} {number} found. {kind.title()}s in this document: "
-                        f"{avail or 'none'}."
+                number = texlocate.resolve_number(ref, res)
+                f = res.floats.get((kind, number)) if number is not None else None
+                if f is None or not f.pages:
+                    # Can't pin it down. The server does NO semantic matching, so
+                    # hand back the list and let the assistant pick the right number
+                    # or label (that resolution is the model's job).
+                    return (
+                        f"I couldn't identify {kind} {ref!r}. "
+                        + texlocate.float_listing(res, kind)
+                        + f"\n\nTell me the {kind} number or its \\label and I'll show it."
                     )
-                if not f.pages:
-                    raise ToolError(f"{kind.title()} {number} is present but its page could not be resolved.")
                 pages = f.pages
                 imgs = await asyncio.to_thread(texlocate.render_pages, res.pdf_path, pages)
         except Exception as exc:  # noqa: BLE001
@@ -672,18 +681,23 @@ def create_hosted_server(
         return [note, *[Image(data=b, format="png") for b in imgs]]
 
     @mcp.tool(annotations={"readOnlyHint": True})
-    async def show_table(number: int, project: str | None = None):
-        """Render the page(s) that contain Table <number> as an image, so you can SEE
-        how the table actually looks (layout, column widths, overfull or misaligned
-        cells) and fix it — things the LaTeX source alone can't tell you. If the
-        table spans multiple pages, every page is returned."""
-        return await _show_float("table", number, project)
+    async def show_table(table: str, project: str | None = None):
+        """Show a rendered IMAGE of a table so you can SEE how it actually looks
+        (layout, column widths, overfull or misaligned cells) and fix it, things the
+        LaTeX source alone can't tell you. Pass the table NUMBER (e.g. "4") or its
+        \\label (e.g. "tab:results"). If the user describes a table in words, first
+        read the document (get_sections / read_section) to find its number or label,
+        then call this. A table that spans multiple pages returns all of them; an
+        unknown reference returns the list of tables so you can pick."""
+        return await _show_float("table", table, project)
 
     @mcp.tool(annotations={"readOnlyHint": True})
-    async def show_figure(number: int, project: str | None = None):
-        """Render the page(s) that contain Figure <number> as an image, so you can SEE
-        the rendered figure. If it spans multiple pages, every page is returned."""
-        return await _show_float("figure", number, project)
+    async def show_figure(figure: str, project: str | None = None):
+        """Show a rendered IMAGE of a figure so you can SEE how it renders. Pass the
+        figure NUMBER (e.g. "3") or its \\label. If the user describes it in words,
+        read the document first to find its number or label, then call this. Spanning
+        figures return all pages; an unknown reference returns the list of figures."""
+        return await _show_float("figure", figure, project)
 
     # -- writes (metered) --------------------------------------------------
 

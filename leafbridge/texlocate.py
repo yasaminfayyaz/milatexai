@@ -150,6 +150,51 @@ def compile_and_locate(
     )
 
 
+_REFNUM = re.compile(r"(?:table|figure|fig\.?|tab\.?)?\s*#?\s*(\d+)\s*$", re.I)
+
+
+def resolve_number(ref: str, res: "LocateResult") -> int | None:
+    """Turn a caller-supplied reference into a float number.
+
+    Accepts a bare number ("4"), a "Table 4" / "Fig 3" style string, or a user
+    ``\\label`` (looked up in the parsed .aux). Returns None if it can't resolve,
+    in which case the caller should list the available floats.
+    """
+    ref = (ref or "").strip()
+    if not ref:
+        return None
+    lab = res.labels.get(ref)
+    if lab:
+        try:
+            return int(lab[0])
+        except ValueError:
+            pass
+    if ref.isdigit():
+        return int(ref)
+    m = _REFNUM.match(ref)
+    return int(m.group(1)) if m else None
+
+
+def float_listing(res: "LocateResult", kind: str) -> str:
+    """A human/LLM-readable list of the floats of ``kind`` with page + label."""
+    labels_by_num: dict[str, str] = {}
+    prefix = "tab" if kind == "table" else "fig"
+    for name, (num, _p) in res.labels.items():
+        if name.startswith(prefix):
+            labels_by_num.setdefault(num, name)
+    rows = []
+    for (k, n) in sorted(res.floats):
+        if k != kind:
+            continue
+        pg = res.floats[(k, n)].pages
+        loc = f"p.{pg[0]}" if len(pg) == 1 else f"p.{pg[0]}-{pg[-1]}"
+        lab = labels_by_num.get(str(n))
+        rows.append(f"  {kind.title()} {n}: {loc}" + (f"  (\\label {{{lab}}})" if lab else ""))
+    if not rows:
+        return f"No {kind}s were found in this document."
+    return f"{kind.title()}s in this document:\n" + "\n".join(rows)
+
+
 def render_pages(pdf_path: str, pages: list[int], dpi: int = 150) -> list[bytes]:
     """Render 1-based absolute page numbers of ``pdf_path`` to PNG bytes."""
     import fitz  # PyMuPDF
