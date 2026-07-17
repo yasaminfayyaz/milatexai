@@ -595,6 +595,12 @@
    "chatgpt_note": "支持 ChatGPT，含免费版。查看指南。",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "新",
+   "title": "你的 AI 看到的是编译后的页面，而不只是代码",
+   "desc": "当表格或图片显示异常时，MiLatexAI 会编译你的论文，捕捉它所在的确切页面，并读取该图像。它能发现 LaTeX 源代码无法呈现的排版问题：列过于拥挤、单元格溢出、元素重叠。跨页表格也会被自动处理。",
+   "example": "“这个表格看起来太挤了。”它会渲染该页面，看到重叠之处，然后加宽各列。"
   }
  },
  "fr": {
@@ -891,6 +897,12 @@
    "chatgpt_note": "Fonctionne sur ChatGPT, y compris son offre gratuite. Voir le guide.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "Nouveau",
+   "title": "Votre IA voit la page compilée, pas seulement le code",
+   "desc": "Quand un tableau ou une figure semble mal placé, MiLatexAI compile votre article, capture la page exacte où il apparaît et lit l'image. Il détecte les problèmes de mise en page que le source LaTeX ne montre jamais : colonnes trop serrées, cellules débordantes, chevauchements. Les tableaux sur plusieurs pages sont gérés automatiquement.",
+   "example": "« Ce tableau paraît trop serré. » L'IA affiche la page, repère le chevauchement et élargit les colonnes."
   }
  },
  "es": {
@@ -1187,6 +1199,12 @@
    "chatgpt_note": "Funciona en ChatGPT, incluso en su plan gratuito. Consulta la guía.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "Nuevo",
+   "title": "Tu IA ve la página compilada, no solo el código",
+   "desc": "Cuando una tabla o figura se ve mal, MiLatexAI compila tu artículo, captura la página exacta en la que aparece y lee la imagen. Detecta problemas de maquetación que el código LaTeX nunca muestra: columnas apretadas, celdas desbordadas, colisiones. Las tablas de varias páginas se gestionan automáticamente.",
+   "example": "\"Esta tabla se ve apretada.\" Renderiza la página, ve la colisión y ensancha las columnas."
   }
  },
  "de": {
@@ -1483,6 +1501,12 @@
    "chatgpt_note": "Funktioniert in ChatGPT, auch im kostenlosen Tarif. Zur Anleitung.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "Neu",
+   "title": "Ihre KI sieht die kompilierte Seite, nicht nur den Code",
+   "desc": "Wenn eine Tabelle oder Abbildung nicht stimmt, kompiliert MiLatexAI Ihr Paper, erfasst genau die Seite, auf der sie landet, und liest das Bild. So erkennt es Layout-Probleme, die der LaTeX-Quellcode nie zeigt: beengte Spalten, überfüllte Zellen, Kollisionen. Mehrseitige Tabellen werden automatisch verarbeitet.",
+   "example": "„Diese Tabelle wirkt beengt.“ Es rendert die Seite, erkennt die Kollision und verbreitert die Spalten."
   }
  },
  "ja": {
@@ -1779,6 +1803,12 @@
    "chatgpt_note": "ChatGPTで利用可能、無料プランにも対応。ガイドはこちら。",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "新",
+   "title": "AIがコードだけでなく、コンパイル後のページを見ます",
+   "desc": "表や図の見た目がおかしいとき、MiLatexAIは論文をコンパイルし、それが配置される正確なページをキャプチャして、その画像を読み取ります。LaTeXソースには決して現れないレイアウトの問題を検出します。窮屈な列、あふれるセル、要素の衝突などです。複数ページにわたる表も自動的に処理します。",
+   "example": "「この表は窮屈に見えます。」AIはページをレンダリングし、衝突を確認して、列の幅を広げます。"
   }
  },
  "pt": {
@@ -2075,6 +2105,12 @@
    "chatgpt_note": "Funciona no ChatGPT, incluindo o plano gratuito. Veja o guia.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "Novo",
+   "title": "Sua IA vê a página compilada, não apenas o código",
+   "desc": "Quando uma tabela ou figura fica estranha, o MiLatexAI compila seu artigo, captura a página exata em que ela aparece e lê a imagem. Ele detecta problemas de layout que o código LaTeX nunca mostra: colunas apertadas, células transbordando, sobreposições. Tabelas de várias páginas são tratadas automaticamente.",
+   "example": "\"Esta tabela parece apertada.\" Ele renderiza a página, vê a sobreposição e alarga as colunas."
   }
  },
  "ar": {
@@ -2371,6 +2407,12 @@
    "chatgpt_note": "يعمل على ChatGPT، بما في ذلك خطته المجانية. اطّلع على الدليل.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "جديد",
+   "title": "الذكاء الاصطناعي لديك يرى الصفحة بعد التصريف، لا الشيفرة فقط",
+   "desc": "عندما يبدو شكل جدول أو صورة غير سليم، يقوم MiLatexAI بتصريف ورقتك البحثية، والتقاط صورة للصفحة الدقيقة التي يظهر عليها العنصر، ثم قراءة تلك الصورة. إنه يكتشف مشكلات التنسيق التي لا تظهر أبداً في شيفرة LaTeX: الأعمدة المتضايقة، والخلايا المكتظة، والتداخلات. أما الجداول الممتدة على عدة صفحات فيتم التعامل معها تلقائياً.",
+   "example": "\"هذا الجدول يبدو متضايقاً.\" فيقوم بعرض الصفحة، ويلاحظ التداخل، ثم يوسّع الأعمدة."
   }
  },
  "hi": {
@@ -2667,6 +2709,12 @@
    "chatgpt_note": "ChatGPT पर काम करता है, इसके मुफ़्त प्लान पर भी। गाइड देखें।",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "नया",
+   "title": "आपका AI संकलित पेज देखता है, सिर्फ कोड नहीं",
+   "desc": "जब कोई टेबल या फिगर गड़बड़ दिखती है, तो MiLatexAI आपका पेपर संकलित करता है, वह पेज कैप्चर करता है जिस पर वह आती है, और इमेज को पढ़ता है। यह उन लेआउट समस्याओं को पकड़ता है जो LaTeX सोर्स कभी नहीं दिखाता: तंग कॉलम, भरे हुए सेल, टकराव। मल्टी पेज टेबल अपने आप संभाली जाती हैं।",
+   "example": "\"यह टेबल तंग दिख रही है।\" यह पेज रेंडर करता है, टकराव देखता है, और कॉलम चौड़े कर देता है।"
   }
  },
  "ko": {
@@ -2963,6 +3011,12 @@
    "chatgpt_note": "무료 요금제를 포함해 ChatGPT에서 작동합니다. 가이드를 참고하세요.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "신규",
+   "title": "코드만이 아니라 컴파일된 페이지를 보는 AI",
+   "desc": "표나 그림이 이상해 보이면 MiLatexAI가 논문을 컴파일하고, 그 요소가 배치된 정확한 페이지를 캡처한 뒤 이미지를 읽습니다. LaTeX 소스로는 절대 드러나지 않는 레이아웃 문제, 즉 비좁은 열, 넘치는 셀, 겹침을 잡아냅니다. 여러 페이지에 걸친 표도 자동으로 처리됩니다.",
+   "example": "\"이 표가 비좁아 보여요.\" AI가 페이지를 렌더링하고, 겹침을 확인한 뒤 열 너비를 넓힙니다."
   }
  },
  "ru": {
@@ -3259,6 +3313,12 @@
    "chatgpt_note": "Работает в ChatGPT, в том числе на бесплатном тарифе. Смотрите руководство.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "Новое",
+   "title": "Ваш ИИ видит скомпилированную страницу, а не только код",
+   "desc": "Когда таблица или рисунок выглядят неудачно, MiLatexAI компилирует вашу статью, делает снимок именно той страницы, на которую они попадают, и читает это изображение. Он находит проблемы вёрстки, которые исходный код LaTeX никогда не показывает: тесные колонки, переполненные ячейки, наложения. Многостраничные таблицы обрабатываются автоматически.",
+   "example": "«Эта таблица выглядит слишком тесной». Он отрисовывает страницу, видит наложение и расширяет колонки."
   }
  },
  "it": {
@@ -3555,6 +3615,12 @@
    "chatgpt_note": "Funziona su ChatGPT, incluso il piano gratuito. Consulta la guida.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "see": {
+   "badge": "Novità",
+   "title": "La tua AI vede la pagina compilata, non solo il codice",
+   "desc": "Quando una tabella o una figura sembra fuori posto, MiLatexAI compila il tuo articolo, cattura la pagina esatta in cui finisce e legge l'immagine. Individua i problemi di impaginazione che il sorgente LaTeX non mostra mai: colonne troppo strette, celle sovraccariche, sovrapposizioni. Le tabelle su più pagine vengono gestite automaticamente.",
+   "example": "\"Questa tabella sembra troppo stretta.\" Renderizza la pagina, vede la sovrapposizione e allarga le colonne."
   }
  }
 }
