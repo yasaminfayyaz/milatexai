@@ -34,7 +34,7 @@ from fastmcp.server.dependencies import get_access_token
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
 
-from . import __version__, latex, site, texcompile, texlocate, web
+from . import __version__, figures, latex, site, texcompile, texlocate, web
 from .billing import Billing, plan_change_from_event
 from .capacity import CapacityGate
 from .config import ProjectConfig, default_data_dir
@@ -56,6 +56,7 @@ from .service import (
     ProjectNotConnected,
     ServiceError,
 )
+from .sessions import SessionsClient, SessionsError
 from .store import InMemoryStore, Store, TokenCipher, User
 from .web_session import SESSION_TTL_SECONDS, SessionError, mint_session, verify_session
 from .workos_web import WorkOSWebAuth
@@ -82,6 +83,14 @@ does no semantic matching: if the user names the float in words rather than a
 number, first read the document (get_sections / read_section) to find its number
 or \\label, then pass that to show_table/show_figure. An unknown reference just
 returns the list of tables/figures to choose from.
+Figure Studio (Pro): to create or change a matplotlib chart, write the Python and
+RENDER IT YOURSELF in your own code-execution environment first, show the user
+the image, iterate until they approve, and only then call commit_figure with the
+exact approved code (it must save figure.pdf). The server re-renders it in an
+isolated sandbox and commits both the source and the PDF, so every figure stays
+editable later: list_figures shows them, read the figures/src/<name>.py, modify,
+and repeat. If you cannot execute Python yourself, commit first and verify with
+show_figure instead.
 """
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
@@ -202,6 +211,7 @@ class HostedApp:
         capacity: CapacityGate | None = None,
         email_resolver=None,
         web_auth: WorkOSWebAuth | None = None,
+        sessions: SessionsClient | None = None,
     ):
         self.service = AccountService(store, cipher)
         self.cipher = cipher
@@ -224,6 +234,18 @@ class HostedApp:
         # No capacity gate given (e.g. tests) -> a disabled gate (free always ok).
         self.capacity = capacity if capacity is not None else CapacityGate(
             subscription_id="", resource_group="", stripe_api_key="",
+        )
+        # Figure Studio sandbox; disabled (no pool endpoint) is a valid state.
+        self.sessions = sessions if sessions is not None else SessionsClient("")
+
+    def ensure_pro(self, user: User, feature: str) -> None:
+        """Gate a paid-only feature. Admin and Pro pass; free users get a clear
+        upgrade path instead of a confusing failure."""
+        if user.is_admin or user.plan == "pro":
+            return
+        raise ToolError(
+            f"{feature} is a Pro feature ($4.99/mo, unlimited projects and "
+            "commits included). Run `upgrade` to unlock it."
         )
 
     async def ensure_capacity(self, user: User) -> None:
@@ -341,6 +363,7 @@ def create_hosted_server(
     capacity: CapacityGate | None = None,
     email_resolver=None,
     web_auth: WorkOSWebAuth | None = None,
+    sessions: SessionsClient | None = None,
 ) -> FastMCP:
     """Build the hosted server. Tests pass ``auth=False`` + a fake
     ``identity_provider`` + an ``InMemoryStore`` to drive it without WorkOS."""
@@ -366,6 +389,7 @@ def create_hosted_server(
         capacity=capacity if capacity is not None else CapacityGate.from_env(),
         email_resolver=email_resolver,
         web_auth=web_auth,
+        sessions=sessions if sessions is not None else SessionsClient.from_env(),
     )
 
     auth_provider = None
@@ -699,6 +723,122 @@ def create_hosted_server(
         figures return all pages; an unknown reference returns the list of figures."""
         return await _show_float("figure", figure, project)
 
+    # -- Figure Studio (Pro): matplotlib figures with their source kept -------
+
+    _FIG_SHIM = (
+        "import os as _os, contextlib as _ctx\n"
+        "with _ctx.suppress(FileNotFoundError):\n"
+        "    _os.remove('/mnt/data/figure.pdf')\n"
+        "_os.chdir('/mnt/data')\n"
+    )
+
+    @mcp.tool
+    async def commit_figure(code: str, name: str, project: str | None = None):
+        """Save an APPROVED matplotlib figure into the user's Overleaf project (Pro).
+        FLOW: write the Python and render it YOURSELF in your own code-execution
+        environment first, show the user the image, and only call this after they
+        approve. The server re-runs the code in an isolated sandbox (matplotlib 3.8,
+        numpy 1.26; no network, no pip, no other libraries) and commits BOTH the
+        source (figures/src/<name>.py, so the figure stays editable forever) and the
+        rendered artifact (figures/<name>.pdf) in one push. The code MUST save
+        exactly one file named figure.pdf in the working directory, e.g.
+        fig.savefig('figure.pdf'); seed any randomness. Overwrites an existing
+        figure with the same name; counts as one commit toward the monthly limit."""
+        try:
+            user = await app.user()
+            app.ensure_pro(user, "Figure Studio (creating and editing matplotlib figures)")
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            slug = figures.slugify(name)
+            if not app.sessions.enabled:
+                raise ToolError("Figure Studio isn't available on this server right now.")
+
+            sess = app.sessions.session_for(user.user_id)
+            res = await app.sessions.execute(sess, _FIG_SHIM + code)
+            if not res.ok:
+                tail = (res.stderr or res.detail or "unknown error")[-800:]
+                raise ToolError(f"The figure code failed in the sandbox:\n{tail}")
+            try:
+                pdf = await app.sessions.download(sess, "figure.pdf")
+            except SessionsError:
+                have = await app.sessions.list_files(sess)
+                stderr = (res.stderr or "")[-400:]
+                raise ToolError(
+                    "The code ran but produced no figure.pdf. It must call "
+                    "savefig('figure.pdf'). Files it did produce: "
+                    f"{have or 'none'}.{(' stderr: ' + stderr) if stderr else ''}"
+                )
+            if not pdf.startswith(b"%PDF"):
+                raise ToolError("The produced figure.pdf is not a valid PDF; fix the savefig call.")
+
+            src_rel, out_rel = figures.src_path(slug), figures.out_path(slug)
+            file_body = figures.build_header(slug) + code.rstrip("\n") + "\n"
+
+            def mutate(repo: Path) -> None:
+                src_t = safe_join(repo, src_rel)
+                out_t = safe_join(repo, out_rel)
+                src_t.parent.mkdir(parents=True, exist_ok=True)
+                out_t.parent.mkdir(parents=True, exist_ok=True)
+                write_text_exact(src_t, file_body)
+                write_bytes_exact(out_t, pdf)
+
+            result = await app.apply_and_push(
+                user, proj, mutate, f"Figure {slug} (MiLatexAI Figure Studio)"
+            )
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        from fastmcp.utilities.types import Image
+
+        note = (
+            f"{result}\n\nCommitted {src_rel} (editable source) and {out_rel} "
+            f"({len(pdf)} bytes). Include it with:\n"
+            f"\\begin{{figure}}[t]\\centering\n"
+            f"  \\includegraphics[width=\\linewidth]{{{out_rel}}}\n"
+            f"  \\caption{{...}}\\label{{fig:{slug}}}\n\\end{{figure}}\n"
+            "Below is the exact committed artifact."
+        )
+        try:
+            png = figures.pdf_to_png(pdf)
+        except Exception:  # noqa: BLE001  (preview is best-effort)
+            return note
+        return [note, Image(data=png, format="png")]
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def list_figures(project: str | None = None) -> str:
+        """List the project's Figure Studio figures (Pro): each managed figure's
+        slug, source file, and whether its rendered output exists, plus recently
+        DELETED figures that can still be recovered from git history. To edit one,
+        read its figures/src/<slug>.py, change the code, re-render for the user,
+        and commit_figure again with the same name."""
+        try:
+            user = await app.user()
+            app.ensure_pro(user, "Figure Studio (creating and editing matplotlib figures)")
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.open_repo(proj) as repo:
+                found = figures.scan_figures(repo)
+                raw_log = await app.worker.log_deleted(proj, figures.SRC_DIR + "/")
+            live = {f.slug for f in found}
+            deleted = figures.parse_deleted(raw_log, live)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        if not found and not deleted:
+            return ("No Figure Studio figures in this project yet. Create one: write "
+                    "matplotlib code, render it for the user, then commit_figure.")
+        lines = []
+        if found:
+            lines.append(f"{len(found)} managed figure(s) in {proj.name!r}:")
+            for f in found:
+                status = "ok" if f.out_exists else "output missing (re-run commit_figure)"
+                lines.append(f"- {f.slug}  (source {f.src}, output {f.out}: {status})")
+        if deleted:
+            lines.append("Deleted figures still recoverable from git history:")
+            for slug, commit in deleted.items():
+                lines.append(
+                    f"- {slug}  (deleted; recover the code with: git show {commit}^:{figures.src_path(slug)})"
+                )
+        return "\n".join(lines)
+
     # -- writes (metered) --------------------------------------------------
 
     @mcp.tool
@@ -973,6 +1113,7 @@ def create_hosted_server(
             "free_open": snap.free_open,
             "signals_fresh": snap.fresh,
             "latex_available": bool(texcompile.tectonic_path()),
+            "figure_studio": app.sessions.enabled,
         }
         return Response(json.dumps(payload), media_type="application/json")
 

@@ -191,6 +191,19 @@ class GitWorker:
         )
         return out.strip() or "(no history)"
 
+    async def log_deleted(self, project: ProjectConfig, prefix: str) -> str:
+        """Raw ``git log`` of deletions under ``prefix`` (within the shallow-clone
+        window), used to remember figures whose source was deleted. Best-effort:
+        history problems just mean an empty answer, never a failed request."""
+        await self.ensure_repo(project)
+        try:
+            return await self._git(
+                project,
+                ["log", "--diff-filter=D", "--format=@%h", "--name-only", "--", prefix],
+            )
+        except GitError:
+            return ""
+
     # -- internals ----------------------------------------------------------
 
     async def _git_networked(
