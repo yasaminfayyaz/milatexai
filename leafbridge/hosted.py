@@ -90,7 +90,10 @@ exact approved code (it must save figure.pdf). The server re-renders it in an
 isolated sandbox and commits both the source and the PDF, so every figure stays
 editable later: list_figures shows them, read the figures/src/<name>.py, modify,
 and repeat. If you cannot execute Python yourself, commit first and verify with
-show_figure instead.
+show_figure instead. BEFORE editing an existing figure, check list_figures: if it
+says the PDF was changed outside Figure Studio (or both diverged), the stored
+code no longer matches the artifact, so tell the user and ask which version
+should win instead of silently regenerating from stale code.
 """
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
@@ -772,7 +775,8 @@ def create_hosted_server(
                 raise ToolError("The produced figure.pdf is not a valid PDF; fix the savefig call.")
 
             src_rel, out_rel = figures.src_path(slug), figures.out_path(slug)
-            file_body = figures.build_header(slug) + code.rstrip("\n") + "\n"
+            body = code.rstrip("\n") + "\n"
+            file_body = figures.build_header(slug, code_body=body, pdf_bytes=pdf) + body
 
             def mutate(repo: Path) -> None:
                 src_t = safe_join(repo, src_rel)
@@ -817,6 +821,7 @@ def create_hosted_server(
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
                 found = figures.scan_figures(repo)
+                states = {f.slug: figures.sync_state(repo, f) for f in found}
                 raw_log = await app.worker.log_deleted(proj, figures.SRC_DIR + "/")
             live = {f.slug for f in found}
             deleted = figures.parse_deleted(raw_log, live)
@@ -828,9 +833,21 @@ def create_hosted_server(
         lines = []
         if found:
             lines.append(f"{len(found)} managed figure(s) in {proj.name!r}:")
+            state_msgs = {
+                figures.IN_SYNC: "ok, in sync (the source code is ground truth)",
+                figures.CODE_EDITED: ("source was edited since the last render; the PDF is "
+                                      "STALE. Re-render and commit_figure to update it"),
+                figures.ARTIFACT_REPLACED: ("PDF was changed OUTSIDE Figure Studio; the stored "
+                                            "code is NOT ground truth anymore. Ask the user "
+                                            "which version wins before editing"),
+                figures.DIVERGED: ("both the code and the PDF changed independently; ask the "
+                                   "user which is authoritative before touching either"),
+                figures.OUTPUT_MISSING: "output missing (re-run commit_figure)",
+                figures.UNTRACKED: "no provenance record (hand-made or pre-tracking)",
+            }
             for f in found:
-                status = "ok" if f.out_exists else "output missing (re-run commit_figure)"
-                lines.append(f"- {f.slug}  (source {f.src}, output {f.out}: {status})")
+                state = states.get(f.slug, figures.UNTRACKED)
+                lines.append(f"- {f.slug}  (source {f.src}, output {f.out}: {state_msgs[state]})")
         if deleted:
             lines.append("Deleted figures still recoverable from git history:")
             for slug, commit in deleted.items():

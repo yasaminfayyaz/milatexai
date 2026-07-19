@@ -13,6 +13,7 @@ were deleted, so they can be recovered with ``git show``.
 
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -22,7 +23,8 @@ SRC_DIR = "figures/src"
 OUT_DIR = "figures"
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
 
-_HEADER_KEY = re.compile(r"^#\s*(figure|output|created|tool)\s*:\s*(.+?)\s*$")
+_HEADER_KEY = re.compile(r"^#\s*(figure|output|created|tool|code-sha256|output-sha256)\s*:\s*(.+?)\s*$")
+_HEADER_END = "# ========================"
 
 
 class FigureError(Exception):
@@ -48,7 +50,12 @@ def out_path(slug: str) -> str:
     return f"{OUT_DIR}/{slug}.pdf"
 
 
-def build_header(slug: str, *, created: str | None = None) -> str:
+def build_header(
+    slug: str, *, code_body: str = "", pdf_bytes: bytes = b"", created: str | None = None
+) -> str:
+    """Header written above the code. The two sha256 lines are the provenance
+    record: they prove later whether the code body and the committed PDF are
+    still the pair this tool produced, or were changed outside Figure Studio."""
     created = created or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     return (
         "# === milatexai figure ===\n"
@@ -56,8 +63,10 @@ def build_header(slug: str, *, created: str | None = None) -> str:
         f"# output: {out_path(slug)}\n"
         f"# created: {created}\n"
         "# tool: milatexai/1\n"
+        f"# code-sha256: {hashlib.sha256(code_body.encode('utf-8')).hexdigest()}\n"
+        f"# output-sha256: {hashlib.sha256(pdf_bytes).hexdigest()}\n"
         f"# Regenerate: run this file with matplotlib installed; it writes {out_path(slug)}\n"
-        "# ========================\n"
+        f"{_HEADER_END}\n"
     )
 
 
@@ -99,6 +108,48 @@ def scan_figures(repo: Path) -> list[FigureInfo]:
             out_exists=(repo / declared_out).is_file(),
         ))
     return found
+
+
+def split_body(src_text: str) -> str | None:
+    """The code below the header, or None if there is no header terminator."""
+    lines = src_text.splitlines(keepends=True)
+    for i, line in enumerate(lines):
+        if line.rstrip() == _HEADER_END:
+            return "".join(lines[i + 1:])
+    return None
+
+
+# Sync states: is the stored code still ground truth for the committed artifact?
+IN_SYNC = "in-sync"                    # code and PDF are the pair we committed
+CODE_EDITED = "code-edited"            # .py changed since last render; PDF stale
+ARTIFACT_REPLACED = "artifact-replaced"  # PDF changed OUTSIDE Figure Studio
+DIVERGED = "diverged"                  # both changed independently
+OUTPUT_MISSING = "output-missing"
+UNTRACKED = "untracked"                # no provenance hashes (older / hand-made)
+
+
+def sync_state(repo: Path, info: FigureInfo) -> str:
+    """Compare the header's provenance hashes against what is on disk NOW."""
+    try:
+        src_text = (repo / info.src).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return UNTRACKED
+    head = parse_header(src_text) or {}
+    body = split_body(src_text)
+    if body is None or "code-sha256" not in head or "output-sha256" not in head:
+        return UNTRACKED
+    code_ok = hashlib.sha256(body.encode("utf-8")).hexdigest() == head["code-sha256"]
+    out_file = repo / info.out
+    if not out_file.is_file():
+        return OUTPUT_MISSING
+    out_ok = hashlib.sha256(out_file.read_bytes()).hexdigest() == head["output-sha256"]
+    if code_ok and out_ok:
+        return IN_SYNC
+    if out_ok:
+        return CODE_EDITED
+    if code_ok:
+        return ARTIFACT_REPLACED
+    return DIVERGED
 
 
 def parse_deleted(git_log_output: str, live_slugs: set[str]) -> dict[str, str]:

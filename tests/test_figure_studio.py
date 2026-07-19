@@ -60,6 +60,46 @@ def test_scan_figures(tmp_path: Path):
     assert figures.scan_figures(tmp_path / "nowhere") == []
 
 
+def _write_pair(repo: Path, slug: str, code: str, pdf: bytes):
+    body = code.rstrip("\n") + "\n"
+    src = repo / "figures" / "src"
+    src.mkdir(parents=True, exist_ok=True)
+    (src / f"{slug}.py").write_text(
+        figures.build_header(slug, code_body=body, pdf_bytes=pdf) + body, encoding="utf-8")
+    (repo / "figures" / f"{slug}.pdf").write_bytes(pdf)
+
+
+def test_sync_state_detects_all_four_states(tmp_path: Path):
+    _write_pair(tmp_path, "a", "plot()\n", b"%PDF-one")
+    info = figures.scan_figures(tmp_path)[0]
+    assert figures.sync_state(tmp_path, info) == figures.IN_SYNC
+
+    # Hand-edit the code below the header -> PDF is stale.
+    p = tmp_path / "figures" / "src" / "a.py"
+    p.write_text(p.read_text() + "plt.title('tweak')\n", encoding="utf-8")
+    assert figures.sync_state(tmp_path, info) == figures.CODE_EDITED
+
+    # Restore code, replace the PDF externally -> code is NOT ground truth.
+    _write_pair(tmp_path, "a", "plot()\n", b"%PDF-one")
+    (tmp_path / "figures" / "a.pdf").write_bytes(b"%PDF-other")
+    assert figures.sync_state(tmp_path, info) == figures.ARTIFACT_REPLACED
+
+    # Change both -> diverged.
+    p.write_text(p.read_text() + "extra\n", encoding="utf-8")
+    assert figures.sync_state(tmp_path, info) == figures.DIVERGED
+
+
+def test_sync_state_output_missing_and_untracked(tmp_path: Path):
+    _write_pair(tmp_path, "b", "plot()\n", b"%PDF-x")
+    info = figures.scan_figures(tmp_path)[0]
+    (tmp_path / "figures" / "b.pdf").unlink()
+    assert figures.sync_state(tmp_path, info) == figures.OUTPUT_MISSING
+    # A hand-made script with no provenance header is untracked.
+    (tmp_path / "figures" / "src" / "c.py").write_text("print('mine')\n")
+    infos = {f.slug: f for f in figures.scan_figures(tmp_path)}
+    assert figures.sync_state(tmp_path, infos["c"]) == figures.UNTRACKED
+
+
 def test_parse_deleted_maps_slug_to_commit_and_skips_readded():
     log = "@abc123\nfigures/src/old-fig.py\n\n@def456\nfigures/src/readded.py\n"
     out = figures.parse_deleted(log, live_slugs={"readded"})
@@ -310,7 +350,15 @@ def test_list_figures_lifecycle_including_deletion_memory(tmp_path):
     assert "No Figure Studio figures" in _text(_call(mcp, "list_figures", {}))
     _call(mcp, "commit_figure", {"code": CODE, "name": "speedup"})
     listing = _text(_call(mcp, "list_figures", {}))
-    assert "speedup" in listing and "ok" in listing
+    assert "speedup" in listing and "in sync" in listing
+    # Replace the PDF "outside Figure Studio" (as if the user uploaded their own)
+    # and push; the listing must flag that the code is no longer ground truth.
+    _call(mcp, "upload_file", {
+        "path": "figures/speedup.pdf",
+        "content_base64": __import__("base64").b64encode(b"%PDF-external-edit").decode(),
+    })
+    listing = _text(_call(mcp, "list_figures", {}))
+    assert "NOT ground truth" in listing
     # Delete the source through the normal tool, then the listing must remember it.
     _call(mcp, "delete_file", {"path": "figures/src/speedup.py"})
     listing = _text(_call(mcp, "list_figures", {}))
