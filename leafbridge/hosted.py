@@ -918,7 +918,10 @@ def create_hosted_server(
     async def write_file(
         path: str, content: str, project: str | None = None, allow_shrink: bool = False
     ) -> str:
-        """Create or overwrite a file, then commit+push."""
+        """Create a BRAND-NEW file or overwrite an existing one, then commit+push.
+        The file does not need to exist first and parent folders are created
+        automatically, so use this freely for new .tex/.bib/.sty files (e.g. a new
+        section file or a preamble you found for the user)."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
