@@ -34,7 +34,7 @@ from fastmcp.server.dependencies import get_access_token
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
 
-from . import __version__, figures, latex, site, texcompile, texlocate, web
+from . import __version__, citations, figures, latex, paperstats, site, texcompile, texlocate, web
 from .billing import Billing, plan_change_from_event
 from .capacity import CapacityGate
 from .config import ProjectConfig, default_data_dir
@@ -319,6 +319,7 @@ class HostedApp:
     async def apply_and_push(
         self, user: User, proj: ProjectConfig, mutate, message: str,
         *, guard_path: str | None = None, allow_shrink: bool = False,
+        allow_empty: bool = False,
     ) -> str:
         # Free users are refused when we're over capacity; paid/admin never are.
         await self.ensure_capacity(user)
@@ -343,7 +344,7 @@ class HostedApp:
                         f"({before} -> {after} bytes). If intentional, retry with "
                         f"allow_shrink=true."
                     )
-            result = await self.worker.commit_and_push(proj, message)
+            result = await self.worker.commit_and_push(proj, message, allow_empty=allow_empty)
         if not result.committed:
             return f"No change made: {result.message}"
         used = await self.service.record_commit(user.user_id, month)
@@ -725,6 +726,174 @@ def create_hosted_server(
         read the document first to find its number or label, then call this. Spanning
         figures return all pages; an unknown reference returns the list of figures."""
         return await _show_float("figure", figure, project)
+
+    # -- version safety: checkpoints, diffs, restores -------------------------
+
+    @mcp.tool
+    async def checkpoint(name: str, project: str | None = None) -> str:
+        """Save a named restore point of the project RIGHT NOW (before a big
+        rewrite, before a deadline push). Cheap and instant; restore any file
+        later with restore_file. Counts as one commit."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            label = (name or "checkpoint").strip()[:60]
+            result = await app.apply_and_push(
+                user, proj, lambda repo: None, f"CHECKPOINT: {label}", allow_empty=True
+            )
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return f"{result}\nCheckpoint {label!r} saved. See them with list_checkpoints."
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def list_checkpoints(project: str | None = None) -> str:
+        """List saved checkpoints (newest first) with their commit ids, for
+        project_diff / restore_file."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.lock_for(proj):
+                out = await app.worker.log_matching(proj, "CHECKPOINT:")
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return out or "No checkpoints yet. Create one with checkpoint('before rewrite')."
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def project_diff(ref: str, project: str | None = None) -> str:
+        """What changed since a commit/checkpoint id (from list_checkpoints or
+        get_history): per-file change summary."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.lock_for(proj):
+                out = await app.worker.diff_stat(proj, ref.strip())
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return out or f"No changes since {ref}."
+
+    @mcp.tool
+    async def restore_file(path: str, ref: str, project: str | None = None) -> str:
+        """Restore one file to its content at a commit/checkpoint id and commit
+        the restoration (undo for AI edits gone wrong). Counts as one commit."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.lock_for(proj):
+                old = await app.worker.show_file(proj, ref.strip(), path)
+
+            def mutate(repo: Path) -> None:
+                write_text_exact(safe_join(repo, path), old)
+
+            return await app.apply_and_push(
+                user, proj, mutate, f"Restore {path} from {ref} (MiLatexAI)",
+                guard_path=path, allow_shrink=True,
+            )
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+
+    # -- citation toolkit -----------------------------------------------------
+
+    @mcp.tool
+    async def add_citation(
+        reference: str, bib_file: str | None = None, project: str | None = None
+    ) -> str:
+        """Add a VERIFIED citation to the bibliography. Give a DOI (10.xxxx/...)
+        or arXiv id (2301.01234); the server fetches the real BibTeX from
+        doi.org / arXiv (never trusting model memory, so no hallucinated
+        references), de-duplicates, appends to the .bib, and commits. Returns
+        the entry key to use in \\cite{...}. Counts as one commit."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            entry = await citations.fetch_bibtex(reference)
+            key = citations.entry_key(entry)
+            if not key:
+                raise ToolError("The registry returned unusable BibTeX; try the DOI instead.")
+            async with app.worker.open_repo(proj) as repo:
+                bibs = [p.relative_to(repo).as_posix() for p in repo.rglob("*.bib")
+                        if ".git" not in p.parts]
+                target = bib_file or (bibs[0] if len(bibs) == 1 else None)
+                if target is None:
+                    raise ToolError(
+                        f"Multiple .bib files ({', '.join(bibs)}); pass bib_file."
+                        if bibs else "No .bib file in the project; create one with write_file first."
+                    )
+                existing = read_text(safe_join(repo, target)) if (repo / target).is_file() else ""
+            if key in citations.bib_keys(existing):
+                return f"'{key}' is already in {target}; cite it with \\cite{{{key}}}."
+
+            def mutate(repo: Path) -> None:
+                t = safe_join(repo, target)
+                cur = read_text(t) if t.is_file() else ""
+                sep = "" if (not cur or cur.endswith("\n\n")) else ("\n" if cur.endswith("\n") else "\n\n")
+                write_text_exact(t, cur + sep + entry.rstrip("\n") + "\n")
+
+            result = await app.apply_and_push(
+                user, proj, mutate, f"Add citation {key} (MiLatexAI)"
+            )
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return f"{result}\nAdded {key!r} to {target}. Cite it with \\cite{{{key}}}."
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def check_citations(project: str | None = None) -> str:
+        """Bibliography integrity check: \\cite keys with no .bib entry
+        (broken/hallucinated) and .bib entries never cited."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.open_repo(proj) as repo:
+                cited: set[str] = set()
+                have: set[str] = set()
+                for p in repo.rglob("*.tex"):
+                    if ".git" not in p.parts:
+                        cited |= citations.cite_keys(p.read_text(encoding="utf-8", errors="replace"))
+                for p in repo.rglob("*.bib"):
+                    if ".git" not in p.parts:
+                        have |= citations.bib_keys(p.read_text(encoding="utf-8", errors="replace"))
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        undefined = sorted(cited - have)
+        unused = sorted(have - cited)
+        lines = [f"{len(cited)} cited key(s), {len(have)} bibliography entr(ies)."]
+        if undefined:
+            lines.append("UNDEFINED (cited but not in any .bib, fix or add_citation): "
+                         + ", ".join(undefined))
+        if unused:
+            lines.append("Unused .bib entries (never cited): " + ", ".join(unused))
+        if not undefined and not unused:
+            lines.append("All citations resolve and every entry is used.")
+        return "\n".join(lines)
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def project_stats(project: str | None = None) -> str:
+        """Word counts per .tex file (approximate, comments/commands stripped),
+        TODO/FIXME markers, and undefined or unused \\ref labels, for trimming
+        to journal limits and pre-submission checks."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.open_repo(proj) as repo:
+                a = paperstats.analyze(repo)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        lines = [f"~{a['total']} words across {len(a['counts'])} .tex file(s):"]
+        lines += [f"  {f}: ~{n}" for f, n in sorted(a["counts"].items(), key=lambda x: -x[1])]
+        if a["todos"]:
+            lines.append("TODO markers:")
+            lines += [f"  {t}" for t in a["todos"]]
+        if a["undefined_refs"]:
+            lines.append("Undefined \\ref targets: " + ", ".join(a["undefined_refs"]))
+        if a["unused_labels"]:
+            lines.append("Labels never referenced: " + ", ".join(a["unused_labels"]))
+        return "\n".join(lines)
 
     # -- Figure Studio (Pro): matplotlib figures with their source kept -------
 

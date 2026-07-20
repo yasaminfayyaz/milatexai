@@ -129,29 +129,26 @@ class GitWorker:
         self._last_sync[pid] = time.monotonic()
 
     async def commit_and_push(
-        self, project: ProjectConfig, message: str
+        self, project: ProjectConfig, message: str, *, allow_empty: bool = False
     ) -> CommitResult:
         """Stage all changes, commit, and push. Assumes caller holds the lock and
         has already applied file changes on disk after a fresh sync.
+        ``allow_empty`` commits even with no file changes (checkpoint markers).
         """
         # Stage everything and see whether anything actually changed.
         await self._git(project, ["add", "-A"])
         status = await self._git(project, ["status", "--porcelain"])
-        if not status.strip():
+        if not status.strip() and not allow_empty:
             return CommitResult(False, False, None, "No changes to commit.")
 
-        await self._git(
-            project,
-            [
-                "-c",
-                f"user.name={_COMMIT_NAME}",
-                "-c",
-                f"user.email={_COMMIT_EMAIL}",
-                "commit",
-                "-m",
-                message,
-            ],
-        )
+        commit_args = [
+            "-c", f"user.name={_COMMIT_NAME}",
+            "-c", f"user.email={_COMMIT_EMAIL}",
+            "commit", "-m", message,
+        ]
+        if allow_empty:
+            commit_args.append("--allow-empty")
+        await self._git(project, commit_args)
         commit_hash = (await self._git(project, ["rev-parse", "--short", "HEAD"])).strip()
 
         branch = await self._get_branch(project)
@@ -190,6 +187,25 @@ class GitWorker:
             ["log", f"-{max(1, min(limit, CLONE_DEPTH))}", f"--pretty=format:{fmt}", "--stat"],
         )
         return out.strip() or "(no history)"
+
+    async def log_matching(self, project: ProjectConfig, needle: str, limit: int = 30) -> str:
+        """Commits whose message contains ``needle`` (checkpoint listing)."""
+        await self.ensure_repo(project)
+        out = await self._git(
+            project, ["log", f"-{limit}", "--format=%h  %ar  %s", "--grep", needle]
+        )
+        return out.strip()
+
+    async def diff_stat(self, project: ProjectConfig, ref: str) -> str:
+        """File-level summary of what changed between ``ref`` and now."""
+        await self.ensure_repo(project)
+        out = await self._git(project, ["diff", "--stat", f"{ref}..HEAD"])
+        return out.strip()
+
+    async def show_file(self, project: ProjectConfig, ref: str, path: str) -> str:
+        """A file's content as of ``ref`` (raises GitError if unknown)."""
+        await self.ensure_repo(project)
+        return await self._git(project, ["show", f"{ref}:{path}"])
 
     async def log_deleted(self, project: ProjectConfig, prefix: str) -> str:
         """Raw ``git log`` of deletions under ``prefix`` (within the shallow-clone
