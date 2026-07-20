@@ -12,7 +12,7 @@
    "manage_subscription": "Manage subscription"
   },
   "hero": {
-   "badge": "Works in Claude and ChatGPT",
+   "badge": "Works with Claude, ChatGPT, and more",
    "title": "From thought to paper, no copy-paste.",
    "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project. No pasting sections, no downloading files, your AI works on the live document, always the ground truth, and every change lands in Overleaf as a real Git commit.",
    "cta_primary": "Get started",
@@ -44,6 +44,22 @@
    {
     "title": "Open source and auditable",
     "desc": "The entire connector is public on GitHub under the AGPL license, so you can read precisely how it handles your token and your projects before trusting it."
+   },
+   {
+    "title": "Citations that are never made up",
+    "desc": "Ask for a citation by DOI or arXiv id. MiLatexAI fetches the real BibTeX from the registry of record, de-duplicates it, and commits it to your .bib. It can also flag broken or unused references."
+   },
+   {
+    "title": "Checkpoints and instant undo",
+    "desc": "Save a named restore point before a big rewrite and roll any file back in one step. Every change lives in your project's Git history, with no 24 hour limit."
+   },
+   {
+    "title": "Reviewer-ready in one ask",
+    "desc": "Get a tracked-changes PDF between any two versions for your response to reviewers, or an arXiv-ready bundle with the precompiled bibliography arXiv requires."
+   },
+   {
+    "title": "Figures and diagrams from chat",
+    "desc": "Create matplotlib charts and TikZ diagrams by describing them. The source code is kept in your project, so a future edit is one sentence away. A Pro feature."
    }
   ],
   "see": {
@@ -72,7 +88,7 @@
   },
   "platforms": {
    "title": "Bring your own AI",
-   "subtitle": "MiLatexAI is a Model Context Protocol connector, so it works with the assistant you already use.",
+   "subtitle": "MiLatexAI is a Model Context Protocol connector: it works in Claude, ChatGPT, and other MCP-compatible assistants.",
    "claude": "Add MiLatexAI as a connector in Anthropic's Claude and edit your Overleaf projects from any Claude conversation.",
    "chatgpt": "Add MiLatexAI as a connector in OpenAI's ChatGPT and do the same there, same projects, same commits, same Overleaf history."
   },
@@ -273,7 +289,7 @@
     },
     {
      "heading": "Independent product and trademarks",
-     "body": "MiLatexAI is an independent tool. It is not affiliated with, endorsed by, or sponsored by Overleaf or Digital Science, nor by Anthropic (Claude) or OpenAI (ChatGPT). Overleaf, Claude, ChatGPT and other names are trademarks of their respective owners, used only to describe compatibility. You are responsible for using MiLatexAI in line with Overleaf's and your AI provider's own terms of service, and only with projects you are authorized to access."
+     "body": "MiLatexAI is an independent tool. It is not affiliated with, endorsed by, or sponsored by Overleaf or Digital Science, nor by Anthropic (Claude) or OpenAI (ChatGPT). Overleaf, Claude, ChatGPT and other names are trademarks of their respective owners, used only to describe compatibility. You are responsible for using MiLatexAI in line with Overleaf's and your AI provider's own terms of service, and only with projects you are authorized to access. MiLatexAI implements the open Model Context Protocol and may connect from other MCP-compatible assistants; it is tested only with Claude and ChatGPT, and other clients are not officially supported."
     }
    ]
   },
@@ -314,7 +330,7 @@
    "manage_subscription": "管理订阅"
   },
   "hero": {
-   "badge": "支持 Claude 和 ChatGPT",
+   "badge": "支持 Claude、ChatGPT 等多种助手",
    "title": "从灵感到论文 ， 无需复制粘贴",
    "subtitle": "让 Claude 或 ChatGPT 直接编辑你真实的 Overleaf 项目。无需粘贴章节，无需下载文件，AI 始终在实时文档（也就是唯一权威的原稿）上工作，每一处改动都会作为一次真实的 Git 提交同步进 Overleaf。",
    "cta_primary": "开始使用",
@@ -346,6 +362,22 @@
    {
     "title": "开源且可审计",
     "desc": "整个连接器在 GitHub 上以 AGPL 许可证公开，在你信任它之前，就能精确了解它如何处理你的令牌和项目。"
+   },
+   {
+    "title": "绝不凭空捏造的文献引用",
+    "desc": "通过 DOI 或 arXiv 编号请求引用，MiLatexAI 会从权威注册库获取真实的 BibTeX 条目，去重后写入你的 .bib 文件。它还能标记失效或未使用的参考文献。"
+   },
+   {
+    "title": "检查点与即时撤销",
+    "desc": "在大幅改写之前保存一个带名称的还原点，之后可一步回滚任意文件。每次更改都保存在项目的 Git 历史中，没有 24 小时的限制。"
+   },
+   {
+    "title": "一句话，备齐审稿材料",
+    "desc": "生成任意两个版本之间的修订标记 PDF，用于回复审稿人；也可生成符合 arXiv 要求的投稿包，内含 arXiv 所要求的预编译参考文献。"
+   },
+   {
+    "title": "在对话中生成图表与示意图",
+    "desc": "只需用语言描述，即可创建 matplotlib 图表和 TikZ 示意图。源代码会保存在你的项目中，日后修改只需一句话。此为 Pro 功能。"
    }
   ],
   "how": {
@@ -368,7 +400,7 @@
   },
   "platforms": {
    "title": "自带你惯用的 AI",
-   "subtitle": "MiLatexAI 是一个 Model Context Protocol 连接器，因此可以搭配你已经在用的助手。",
+   "subtitle": "MiLatexAI 是一个 Model Context Protocol 连接器：可在 Claude、ChatGPT 以及其他兼容 MCP 的助手中使用。",
    "claude": "在 Anthropic 的 Claude 中将 MiLatexAI 添加为连接器，从任意 Claude 对话中编辑你的 Overleaf 项目。",
    "chatgpt": "在 OpenAI 的 ChatGPT 中将 MiLatexAI 添加为连接器，同样如此，相同的项目、相同的提交、相同的 Overleaf 历史记录。"
   },
@@ -569,7 +601,7 @@
     },
     {
      "heading": "独立产品与商标",
-     "body": "MiLatexAI 是一款独立工具。它与 Overleaf 或 Digital Science 无隶属关系，也未获得它们的认可或赞助；与 Anthropic（Claude）或 OpenAI（ChatGPT）之间同样如此。Overleaf、Claude、ChatGPT 及其他名称均为各自所有者的商标，此处使用仅为说明兼容性。您有责任在使用 MiLatexAI 时遵守 Overleaf 及您所用 AI 提供商各自的服务条款，并且仅将其用于您已获授权访问的项目。"
+     "body": "MiLatexAI 是一款独立工具。它与 Overleaf 或 Digital Science 无隶属关系，也未获得它们的认可或赞助；与 Anthropic（Claude）或 OpenAI（ChatGPT）之间同样如此。Overleaf、Claude、ChatGPT 及其他名称均为各自所有者的商标，此处使用仅为说明兼容性。您有责任在使用 MiLatexAI 时遵守 Overleaf 及您所用 AI 提供商各自的服务条款，并且仅将其用于您已获授权访问的项目。 MiLatexAI 实现了开放的 Model Context Protocol，其他兼容 MCP 的助手亦可能与之建立连接；本服务仅在 Claude 和 ChatGPT 上经过测试，其他客户端不在官方支持范围之内。"
     }
    ]
   },
@@ -616,7 +648,7 @@
    "manage_subscription": "Gérer l'abonnement"
   },
   "hero": {
-   "badge": "Fonctionne dans Claude et ChatGPT",
+   "badge": "Fonctionne avec Claude, ChatGPT et plus encore",
    "title": "De l'idée à l'article, sans copier-coller.",
    "subtitle": "Demandez à Claude ou ChatGPT de modifier votre véritable projet Overleaf. Aucune section à coller, aucun fichier à télécharger, votre IA travaille sur le document en direct, toujours la source de vérité, et chaque modification arrive dans Overleaf sous la forme d'un véritable commit Git.",
    "cta_primary": "Commencer",
@@ -648,6 +680,22 @@
    {
     "title": "Open source et vérifiable",
     "desc": "L'intégralité du connecteur est publique sur GitHub sous licence AGPL, vous pouvez donc lire précisément comment il gère votre jeton et vos projets avant de lui faire confiance."
+   },
+   {
+    "title": "Des citations jamais inventées",
+    "desc": "Demandez une citation par DOI ou identifiant arXiv. MiLatexAI récupère le vrai BibTeX auprès du registre de référence, le déduplique et l'enregistre dans votre .bib. Il peut aussi signaler les références cassées ou inutilisées."
+   },
+   {
+    "title": "Points de contrôle et annulation instantanée",
+    "desc": "Enregistrez un point de restauration nommé avant une réécriture majeure et restaurez n'importe quel fichier en une seule étape. Chaque modification est conservée dans l'historique Git de votre projet, sans limite de 24 heures."
+   },
+   {
+    "title": "Prêt pour les relecteurs en une seule demande",
+    "desc": "Obtenez un PDF avec suivi des modifications entre deux versions quelconques pour votre réponse aux relecteurs, ou une archive prête pour arXiv avec la bibliographie précompilée qu'arXiv exige."
+   },
+   {
+    "title": "Figures et diagrammes depuis le chat",
+    "desc": "Créez des graphiques matplotlib et des diagrammes TikZ en les décrivant. Le code source est conservé dans votre projet : une modification ultérieure ne demande donc qu'une phrase. Une fonctionnalité Pro."
    }
   ],
   "how": {
@@ -670,7 +718,7 @@
   },
   "platforms": {
    "title": "Apportez votre propre IA",
-   "subtitle": "MiLatexAI est un connecteur Model Context Protocol, il fonctionne donc avec l'assistant que vous utilisez déjà.",
+   "subtitle": "MiLatexAI est un connecteur Model Context Protocol : il fonctionne dans Claude, ChatGPT et d'autres assistants compatibles MCP.",
    "claude": "Ajoutez MiLatexAI comme connecteur dans Claude d'Anthropic et modifiez vos projets Overleaf depuis n'importe quelle conversation Claude.",
    "chatgpt": "Ajoutez MiLatexAI comme connecteur dans ChatGPT d'OpenAI et faites de même, mêmes projets, mêmes commits, même historique Overleaf."
   },
@@ -871,7 +919,7 @@
     },
     {
      "heading": "Produit indépendant et marques",
-     "body": "MiLatexAI est un outil indépendant. Il n'est ni affilié à Overleaf ou Digital Science, ni approuvé ou parrainé par eux, ni par Anthropic (Claude) ou OpenAI (ChatGPT). Overleaf, Claude, ChatGPT et les autres noms sont des marques de leurs propriétaires respectifs, utilisées uniquement pour décrire la compatibilité. Il vous incombe d'utiliser MiLatexAI conformément aux conditions d'utilisation d'Overleaf et de votre fournisseur d'IA, et uniquement avec des projets auxquels vous êtes autorisé à accéder."
+     "body": "MiLatexAI est un outil indépendant. Il n'est ni affilié à Overleaf ou Digital Science, ni approuvé ou parrainé par eux, ni par Anthropic (Claude) ou OpenAI (ChatGPT). Overleaf, Claude, ChatGPT et les autres noms sont des marques de leurs propriétaires respectifs, utilisées uniquement pour décrire la compatibilité. Il vous incombe d'utiliser MiLatexAI conformément aux conditions d'utilisation d'Overleaf et de votre fournisseur d'IA, et uniquement avec des projets auxquels vous êtes autorisé à accéder. MiLatexAI met en œuvre le protocole ouvert Model Context Protocol et peut être connecté depuis d'autres assistants compatibles MCP ; il n'est testé qu'avec Claude et ChatGPT, et les autres clients ne sont pas officiellement pris en charge."
     }
    ]
   },
@@ -918,7 +966,7 @@
    "manage_subscription": "Gestionar suscripción"
   },
   "hero": {
-   "badge": "Funciona en Claude y ChatGPT",
+   "badge": "Funciona con Claude, ChatGPT y más",
    "title": "De la idea al artículo, sin copiar y pegar.",
    "subtitle": "Pídele a Claude o ChatGPT que edite tu proyecto real de Overleaf. Sin pegar secciones ni descargar archivos, tu IA trabaja sobre el documento en vivo, siempre la fuente de verdad, y cada cambio llega a Overleaf como un commit de Git real.",
    "cta_primary": "Empieza ahora",
@@ -950,6 +998,22 @@
    {
     "title": "Código abierto y auditable",
     "desc": "Todo el conector es público en GitHub bajo la licencia AGPL, así que puedes leer con precisión cómo maneja tu token y tus proyectos antes de confiar en él."
+   },
+   {
+    "title": "Citas que nunca se inventan",
+    "desc": "Pide una cita por DOI o identificador de arXiv. MiLatexAI obtiene el BibTeX real del registro oficial, elimina duplicados y lo guarda en tu .bib. También puede señalar referencias rotas o sin usar."
+   },
+   {
+    "title": "Puntos de control y deshacer al instante",
+    "desc": "Guarda un punto de restauración con nombre antes de una gran reescritura y revierte cualquier archivo en un solo paso. Cada cambio queda en el historial de Git de tu proyecto, sin límite de 24 horas."
+   },
+   {
+    "title": "Listo para los revisores con una sola petición",
+    "desc": "Obtén un PDF con cambios marcados entre dos versiones cualesquiera para tu respuesta a los revisores, o un paquete listo para arXiv con la bibliografía precompilada que arXiv exige."
+   },
+   {
+    "title": "Figuras y diagramas desde el chat",
+    "desc": "Crea gráficas de matplotlib y diagramas de TikZ con solo describirlos. El código fuente se conserva en tu proyecto, así que una edición futura está a una sola frase de distancia. Una función Pro."
    }
   ],
   "how": {
@@ -972,7 +1036,7 @@
   },
   "platforms": {
    "title": "Usa tu propia IA",
-   "subtitle": "MiLatexAI es un conector del Model Context Protocol, así que funciona con el asistente que ya utilizas.",
+   "subtitle": "MiLatexAI es un conector de Model Context Protocol: funciona en Claude, ChatGPT y otros asistentes compatibles con MCP.",
    "claude": "Añade MiLatexAI como conector en Claude de Anthropic y edita tus proyectos de Overleaf desde cualquier conversación de Claude.",
    "chatgpt": "Añade MiLatexAI como conector en ChatGPT de OpenAI y haz lo mismo allí: los mismos proyectos, los mismos commits, el mismo historial de Overleaf."
   },
@@ -1173,7 +1237,7 @@
     },
     {
      "heading": "Producto independiente y marcas comerciales",
-     "body": "MiLatexAI es una herramienta independiente. No está afiliada, respaldada ni patrocinada por Overleaf o Digital Science, ni por Anthropic (Claude) u OpenAI (ChatGPT). Overleaf, Claude, ChatGPT y otros nombres son marcas comerciales de sus respectivos propietarios, utilizadas únicamente para describir la compatibilidad. Usted es responsable de utilizar MiLatexAI conforme a los términos de servicio de Overleaf y de su proveedor de IA, y únicamente con proyectos a los que esté autorizado a acceder."
+     "body": "MiLatexAI es una herramienta independiente. No está afiliada, respaldada ni patrocinada por Overleaf o Digital Science, ni por Anthropic (Claude) u OpenAI (ChatGPT). Overleaf, Claude, ChatGPT y otros nombres son marcas comerciales de sus respectivos propietarios, utilizadas únicamente para describir la compatibilidad. Usted es responsable de utilizar MiLatexAI conforme a los términos de servicio de Overleaf y de su proveedor de IA, y únicamente con proyectos a los que esté autorizado a acceder. MiLatexAI implementa el protocolo abierto Model Context Protocol y puede aceptar conexiones desde otros asistentes compatibles con MCP; las pruebas se realizan únicamente con Claude y ChatGPT, y los demás clientes no cuentan con soporte oficial."
     }
    ]
   },
@@ -1220,7 +1284,7 @@
    "manage_subscription": "Abo verwalten"
   },
   "hero": {
-   "badge": "Funktioniert in Claude und ChatGPT",
+   "badge": "Funktioniert mit Claude, ChatGPT und mehr",
    "title": "Vom Gedanken aufs Papier, ohne Copy-and-Paste.",
    "subtitle": "Lass Claude oder ChatGPT dein echtes Overleaf-Projekt bearbeiten. Keine Abschnitte einfügen, keine Dateien herunterladen, deine KI arbeitet direkt am lebenden Dokument, immer die maßgebliche Version, und jede Änderung landet als echter Git-Commit in Overleaf.",
    "cta_primary": "Loslegen",
@@ -1252,6 +1316,22 @@
    {
     "title": "Quelloffen und überprüfbar",
     "desc": "Der gesamte Connector ist auf GitHub unter der AGPL-Lizenz öffentlich, sodass du genau nachlesen kannst, wie er mit deinem Token und deinen Projekten umgeht, bevor du ihm vertraust."
+   },
+   {
+    "title": "Quellenangaben, die niemals erfunden sind",
+    "desc": "Fragen Sie nach einer Quellenangabe per DOI oder arXiv-ID. MiLatexAI ruft das echte BibTeX aus dem offiziellen Register ab, entfernt Duplikate und übernimmt es in Ihre .bib-Datei. Fehlerhafte oder ungenutzte Referenzen kann es ebenfalls kennzeichnen."
+   },
+   {
+    "title": "Checkpoints und sofortiges Zurücksetzen",
+    "desc": "Speichern Sie vor einer großen Überarbeitung einen benannten Wiederherstellungspunkt und setzen Sie jede beliebige Datei in einem Schritt zurück. Jede Änderung liegt in der Git-Historie Ihres Projekts, ganz ohne 24-Stunden-Limit."
+   },
+   {
+    "title": "Gutachterfertig mit nur einer Anfrage",
+    "desc": "Erhalten Sie ein PDF mit nachverfolgten Änderungen zwischen zwei beliebigen Versionen für Ihre Antwort an die Gutachter, oder ein arXiv-fertiges Paket mit dem vorkompilierten Literaturverzeichnis, das arXiv verlangt."
+   },
+   {
+    "title": "Abbildungen und Diagramme direkt aus dem Chat",
+    "desc": "Erstellen Sie matplotlib-Grafiken und TikZ-Diagramme, indem Sie sie einfach beschreiben. Der Quellcode bleibt in Ihrem Projekt erhalten, sodass eine spätere Änderung nur einen Satz entfernt ist. Ein Pro-Feature."
    }
   ],
   "how": {
@@ -1274,7 +1354,7 @@
   },
   "platforms": {
    "title": "Nutze deine eigene KI",
-   "subtitle": "MiLatexAI ist ein Connector für das Model Context Protocol und funktioniert daher mit dem Assistenten, den du bereits nutzt.",
+   "subtitle": "MiLatexAI ist ein Connector für das Model Context Protocol: Es funktioniert in Claude, ChatGPT und anderen MCP-kompatiblen Assistenten.",
    "claude": "Füge MiLatexAI als Connector in Anthropics Claude hinzu und bearbeite deine Overleaf-Projekte aus jeder Claude-Unterhaltung heraus.",
    "chatgpt": "Füge MiLatexAI als Connector in OpenAIs ChatGPT hinzu und mach dort dasselbe, dieselben Projekte, dieselben Commits, dieselbe Overleaf-Historie."
   },
@@ -1475,7 +1555,7 @@
     },
     {
      "heading": "Unabhängiges Produkt und Marken",
-     "body": "MiLatexAI ist ein unabhängiges Werkzeug. Es steht in keiner Verbindung zu Overleaf oder Digital Science und wird von diesen weder unterstützt noch gesponsert, ebenso wenig von Anthropic (Claude) oder OpenAI (ChatGPT). Overleaf, Claude, ChatGPT und andere Namen sind Marken ihrer jeweiligen Inhaber und werden ausschließlich zur Beschreibung der Kompatibilität verwendet. Sie sind dafür verantwortlich, MiLatexAI im Einklang mit den Nutzungsbedingungen von Overleaf und Ihres KI-Anbieters zu verwenden und nur mit Projekten, auf die Sie zugriffsberechtigt sind."
+     "body": "MiLatexAI ist ein unabhängiges Werkzeug. Es steht in keiner Verbindung zu Overleaf oder Digital Science und wird von diesen weder unterstützt noch gesponsert, ebenso wenig von Anthropic (Claude) oder OpenAI (ChatGPT). Overleaf, Claude, ChatGPT und andere Namen sind Marken ihrer jeweiligen Inhaber und werden ausschließlich zur Beschreibung der Kompatibilität verwendet. Sie sind dafür verantwortlich, MiLatexAI im Einklang mit den Nutzungsbedingungen von Overleaf und Ihres KI-Anbieters zu verwenden und nur mit Projekten, auf die Sie zugriffsberechtigt sind. MiLatexAI implementiert das offene Model Context Protocol, sodass Verbindungen auch von anderen MCP-kompatiblen Assistenten aus hergestellt werden können. Getestet wird MiLatexAI ausschließlich mit Claude und ChatGPT; andere Clients werden nicht offiziell unterstützt."
     }
    ]
   },
@@ -1522,7 +1602,7 @@
    "manage_subscription": "サブスクリプションの管理"
   },
   "hero": {
-   "badge": "ClaudeとChatGPTで動作します",
+   "badge": "Claude、ChatGPT などに対応",
    "title": "アイデアが、そのまま論文に、コピペ不要。",
    "subtitle": "Claude や ChatGPT に頼むだけで、あなたの本物の Overleaf プロジェクトをそのまま編集。セクションを貼り付けたり、ファイルをダウンロードしたりする必要はありません、AI は常に唯一の原本となるライブ文書を直接編集し、すべての変更が本物の Git コミットとして Overleaf に反映されます。",
    "cta_primary": "始める",
@@ -1554,6 +1634,22 @@
    {
     "title": "オープンソースで監査可能",
     "desc": "コネクター全体がAGPLライセンスのもとGitHubで公開されています。信頼する前に、トークンやプロジェクトがどう扱われるかを正確に読み取れます。"
+   },
+   {
+    "title": "決して捏造されない引用",
+    "desc": "DOI または arXiv ID を指定して引用を依頼してください。MiLatexAI は正規の登録機関から実際の BibTeX を取得し、重複を除去したうえで .bib に書き込みます。リンク切れや未使用の参考文献の検出も可能です。"
+   },
+   {
+    "title": "チェックポイントと即座の取り消し",
+    "desc": "大幅な書き直しの前に名前付きの復元ポイントを保存し、どのファイルもワンステップで巻き戻せます。すべての変更はプロジェクトの Git 履歴に保存され、24 時間の制限はありません。"
+   },
+   {
+    "title": "一度の依頼で査読対応の準備完了",
+    "desc": "査読者への回答用に、任意の 2 バージョン間の変更履歴付き PDF を生成できます。また、arXiv が要求するプリコンパイル済みの参考文献を同梱した、arXiv 投稿用バンドルも作成できます。"
+   },
+   {
+    "title": "チャットから作る図とダイアグラム",
+    "desc": "説明するだけで matplotlib のグラフや TikZ のダイアグラムを作成できます。ソースコードはプロジェクト内に保存されるため、後からの編集もひと言で済みます。Pro 機能です。"
    }
   ],
   "how": {
@@ -1576,7 +1672,7 @@
   },
   "platforms": {
    "title": "使い慣れたAIをそのまま",
-   "subtitle": "MiLatexAIはModel Context Protocolのコネクターなので、すでにお使いのアシスタントで動作します。",
+   "subtitle": "MiLatexAI は Model Context Protocol コネクタです。Claude、ChatGPT をはじめ、その他の MCP 対応アシスタントでも動作します。",
    "claude": "AnthropicのClaudeにMiLatexAIをコネクターとして追加すれば、どのClaudeの会話からでもOverleafプロジェクトを編集できます。",
    "chatgpt": "OpenAIのChatGPTにMiLatexAIをコネクターとして追加すれば、同じことができます、同じプロジェクト、同じコミット、同じOverleafの履歴。"
   },
@@ -1777,7 +1873,7 @@
     },
     {
      "heading": "独立した製品および商標について",
-     "body": "MiLatexAI は独立したツールです。Overleaf または Digital Science、ならびに Anthropic（Claude）または OpenAI（ChatGPT）と提携しておらず、これらによる推奨や後援も受けていません。Overleaf、Claude、ChatGPT およびその他の名称は、それぞれの所有者の商標であり、互換性を説明する目的でのみ使用されています。MiLatexAI を Overleaf およびお客様の AI プロバイダーそれぞれの利用規約に従って使用すること、ならびにアクセスを許可されたプロジェクトのみで使用することは、お客様の責任です。"
+     "body": "MiLatexAI は独立したツールです。Overleaf または Digital Science、ならびに Anthropic（Claude）または OpenAI（ChatGPT）と提携しておらず、これらによる推奨や後援も受けていません。Overleaf、Claude、ChatGPT およびその他の名称は、それぞれの所有者の商標であり、互換性を説明する目的でのみ使用されています。MiLatexAI を Overleaf およびお客様の AI プロバイダーそれぞれの利用規約に従って使用すること、ならびにアクセスを許可されたプロジェクトのみで使用することは、お客様の責任です。 MiLatexAI はオープンな Model Context Protocol を実装しており、他の MCP 対応アシスタントから接続される場合があります。動作確認は Claude および ChatGPT についてのみ実施しており、その他のクライアントは公式にはサポートされません。"
     }
    ]
   },
@@ -1824,7 +1920,7 @@
    "manage_subscription": "Gerenciar assinatura"
   },
   "hero": {
-   "badge": "Funciona no Claude e no ChatGPT",
+   "badge": "Funciona com Claude, ChatGPT e muito mais",
    "title": "Da ideia ao papel, sem copiar e colar.",
    "subtitle": "Peça ao Claude ou ao ChatGPT para editar seu projeto real no Overleaf. Sem colar seções, sem baixar arquivos, sua IA trabalha no documento ao vivo, sempre a fonte da verdade, e cada mudança chega ao Overleaf como um commit real no Git.",
    "cta_primary": "Começar",
@@ -1856,6 +1952,22 @@
    {
     "title": "Código aberto e auditável",
     "desc": "O conector inteiro é público no GitHub sob a licença AGPL, então você pode ler exatamente como ele lida com seu token e seus projetos antes de confiar nele."
+   },
+   {
+    "title": "Citações que nunca são inventadas",
+    "desc": "Peça uma citação por DOI ou id do arXiv. O MiLatexAI busca o BibTeX real no registro oficial, elimina duplicatas e o grava no seu .bib. Ele também pode sinalizar referências quebradas ou não utilizadas."
+   },
+   {
+    "title": "Checkpoints e desfazer instantâneo",
+    "desc": "Salve um ponto de restauração nomeado antes de uma grande reescrita e reverta qualquer arquivo em uma única etapa. Cada alteração fica no histórico Git do seu projeto, sem limite de 24 horas."
+   },
+   {
+    "title": "Pronto para os revisores em um único pedido",
+    "desc": "Obtenha um PDF com alterações marcadas entre duas versões quaisquer para a sua resposta aos revisores, ou um pacote pronto para o arXiv com a bibliografia pré-compilada que o arXiv exige."
+   },
+   {
+    "title": "Figuras e diagramas direto do chat",
+    "desc": "Crie gráficos matplotlib e diagramas TikZ apenas descrevendo o que deseja. O código-fonte fica guardado no seu projeto, então uma edição futura está a uma frase de distância. Um recurso Pro."
    }
   ],
   "how": {
@@ -1878,7 +1990,7 @@
   },
   "platforms": {
    "title": "Use a IA que você já tem",
-   "subtitle": "O MiLatexAI é um conector do Model Context Protocol, então funciona com o assistente que você já usa.",
+   "subtitle": "O MiLatexAI é um conector Model Context Protocol: funciona no Claude, no ChatGPT e em outros assistentes compatíveis com MCP.",
    "claude": "Adicione o MiLatexAI como conector no Claude, da Anthropic, e edite seus projetos do Overleaf a partir de qualquer conversa no Claude.",
    "chatgpt": "Adicione o MiLatexAI como conector no ChatGPT, da OpenAI, e faça o mesmo por lá, os mesmos projetos, os mesmos commits, o mesmo histórico do Overleaf."
   },
@@ -2079,7 +2191,7 @@
     },
     {
      "heading": "Produto independente e marcas registradas",
-     "body": "O MiLatexAI é uma ferramenta independente. Não possui afiliação, endosso nem patrocínio da Overleaf ou da Digital Science, tampouco da Anthropic (Claude) ou da OpenAI (ChatGPT). Overleaf, Claude, ChatGPT e outros nomes são marcas registradas de seus respectivos titulares, utilizadas apenas para descrever compatibilidade. Você é responsável por usar o MiLatexAI em conformidade com os termos de serviço da Overleaf e do seu provedor de IA, e somente com projetos que você está autorizado a acessar."
+     "body": "O MiLatexAI é uma ferramenta independente. Não possui afiliação, endosso nem patrocínio da Overleaf ou da Digital Science, tampouco da Anthropic (Claude) ou da OpenAI (ChatGPT). Overleaf, Claude, ChatGPT e outros nomes são marcas registradas de seus respectivos titulares, utilizadas apenas para descrever compatibilidade. Você é responsável por usar o MiLatexAI em conformidade com os termos de serviço da Overleaf e do seu provedor de IA, e somente com projetos que você está autorizado a acessar. O MiLatexAI implementa o protocolo aberto Model Context Protocol e pode receber conexões de outros assistentes compatíveis com MCP; ele é testado apenas com Claude e ChatGPT, e outros clientes não contam com suporte oficial."
     }
    ]
   },
@@ -2126,7 +2238,7 @@
    "manage_subscription": "إدارة الاشتراك"
   },
   "hero": {
-   "badge": "يعمل في Claude وChatGPT",
+   "badge": "يعمل مع Claude وChatGPT وغيرهما",
    "title": "من الفكرة إلى الورقة، دون نسخ ولصق.",
    "subtitle": "اطلب من Claude أو ChatGPT تعديل مشروعك الحقيقي على Overleaf. لا لصق للأقسام، ولا تنزيل للملفات، يعمل الذكاء الاصطناعي مباشرةً على المستند الحيّ، وهو دائمًا المرجع الموثوق الوحيد، ويصل كل تغيير إلى Overleaf كـ commit حقيقي في Git.",
    "cta_primary": "ابدأ الآن",
@@ -2158,6 +2270,22 @@
    {
     "title": "مفتوح المصدر وقابل للمراجعة",
     "desc": "الموصّل بالكامل متاح للعموم على GitHub بموجب رخصة AGPL، بحيث يمكنك أن تقرأ بدقة كيف يتعامل مع رمزك ومشاريعك قبل أن تثق به."
+   },
+   {
+    "title": "استشهادات لا تُختلق أبدًا",
+    "desc": "اطلب استشهادًا عبر DOI أو معرّف arXiv، فيجلب MiLatexAI بيانات BibTeX الحقيقية من السجل الرسمي المعتمد، ويزيل التكرارات، ويحفظها في ملف .bib الخاص بك. كما يمكنه الإشارة إلى المراجع المعطوبة أو غير المستخدمة."
+   },
+   {
+    "title": "نقاط استعادة وتراجع فوري",
+    "desc": "احفظ نقطة استعادة مسماة قبل أي إعادة كتابة كبيرة، واسترجع أي ملف بخطوة واحدة. كل تغيير محفوظ في سجل Git الخاص بمشروعك، بلا حد زمني مدته 24 ساعة."
+   },
+   {
+    "title": "جاهز للمراجعين بطلب واحد",
+    "desc": "احصل على ملف PDF يُظهر التغييرات المتعقّبة بين أي نسختين لردّك على المراجعين، أو على حزمة جاهزة للرفع إلى arXiv تتضمن قائمة المراجع المجمّعة مسبقًا التي يشترطها arXiv."
+   },
+   {
+    "title": "أشكال ورسوم تخطيطية من المحادثة",
+    "desc": "أنشئ مخططات matplotlib ورسومات TikZ التخطيطية بمجرد وصفها. تُحفظ الشيفرة المصدرية في مشروعك، فيصبح أي تعديل مستقبلي على بُعد جملة واحدة. هذه ميزة من مزايا Pro."
    }
   ],
   "how": {
@@ -2180,7 +2308,7 @@
   },
   "platforms": {
    "title": "استخدم الذكاء الاصطناعي الذي تفضّله",
-   "subtitle": "MiLatexAI موصّل يعتمد على بروتوكول MCP، لذا فهو يعمل مع المساعد الذي تستخدمه بالفعل.",
+   "subtitle": "MiLatexAI هو موصّل يعتمد على Model Context Protocol: يعمل في Claude وChatGPT وغيرهما من المساعدين المتوافقين مع MCP.",
    "claude": "أضف MiLatexAI كموصّل في Claude من Anthropic وحرّر مشاريعك على Overleaf من أي محادثة في Claude.",
    "chatgpt": "أضف MiLatexAI كموصّل في ChatGPT من OpenAI وافعل الشيء نفسه هناك، المشاريع ذاتها، والالتزامات ذاتها، وسجل Overleaf ذاته."
   },
@@ -2381,7 +2509,7 @@
     },
     {
      "heading": "منتج مستقل والعلامات التجارية",
-     "body": "MiLatexAI أداة مستقلة. وهي ليست تابعة لـ Overleaf أو Digital Science ولا لـ Anthropic (Claude) أو OpenAI (ChatGPT)، وليست معتمَدة منها ولا مدعومة. إن Overleaf وClaude وChatGPT وغيرها من الأسماء هي علامات تجارية تخص أصحابها، وتُستخدم فقط لوصف التوافق. وأنت مسؤول عن استخدام MiLatexAI بما يتوافق مع شروط الخدمة الخاصة بـ Overleaf وبمزوّد خدمة الذكاء الاصطناعي الذي تستخدمه، وفقط مع المشاريع المصرَّح لك بالوصول إليها."
+     "body": "MiLatexAI أداة مستقلة. وهي ليست تابعة لـ Overleaf أو Digital Science ولا لـ Anthropic (Claude) أو OpenAI (ChatGPT)، وليست معتمَدة منها ولا مدعومة. إن Overleaf وClaude وChatGPT وغيرها من الأسماء هي علامات تجارية تخص أصحابها، وتُستخدم فقط لوصف التوافق. وأنت مسؤول عن استخدام MiLatexAI بما يتوافق مع شروط الخدمة الخاصة بـ Overleaf وبمزوّد خدمة الذكاء الاصطناعي الذي تستخدمه، وفقط مع المشاريع المصرَّح لك بالوصول إليها. ينفّذ MiLatexAI بروتوكول Model Context Protocol المفتوح، وقد يتصل به من مساعدين آخرين متوافقين مع MCP. وقد جرى اختباره مع Claude وChatGPT فقط، ولا يحظى العملاء الآخرون بدعم رسمي."
     }
    ]
   },
@@ -2428,7 +2556,7 @@
    "manage_subscription": "सदस्यता प्रबंधित करें"
   },
   "hero": {
-   "badge": "Claude और ChatGPT में काम करता है",
+   "badge": "Claude, ChatGPT और अन्य के साथ काम करता है",
    "title": "विचार से पेपर तक, बिना कॉपी-पेस्ट।",
    "subtitle": "Claude या ChatGPT से कहें कि वे आपके असली Overleaf प्रोजेक्ट को सीधे एडिट करें। न कोई सेक्शन पेस्ट करना, न फ़ाइलें डाउनलोड करना, आपका AI लाइव डॉक्यूमेंट पर ही काम करता है, जो हमेशा असली और आधिकारिक प्रति रहती है, और हर बदलाव Overleaf में एक असली Git commit बनकर पहुँचता है।",
    "cta_primary": "शुरू करें",
@@ -2460,6 +2588,22 @@
    {
     "title": "ओपन सोर्स और जाँच-योग्य",
     "desc": "पूरा कनेक्टर GitHub पर AGPL लाइसेंस के तहत सार्वजनिक है, इसलिए भरोसा करने से पहले आप ठीक-ठीक पढ़ सकते हैं कि यह आपके टोकन और आपके प्रोजेक्ट्स को कैसे संभालता है।"
+   },
+   {
+    "title": "ऐसे साइटेशन जो कभी मनगढ़ंत नहीं होते",
+    "desc": "DOI या arXiv आईडी से साइटेशन मांगें। MiLatexAI आधिकारिक रजिस्ट्री से असली BibTeX लाता है, डुप्लिकेट हटाता है, और उसे आपकी .bib फ़ाइल में कमिट कर देता है। यह टूटे हुए या अप्रयुक्त रेफरेंस को भी चिह्नित कर सकता है।"
+   },
+   {
+    "title": "चेकपॉइंट और तुरंत अनडू",
+    "desc": "किसी बड़े रीराइट से पहले एक नामित रिस्टोर पॉइंट सेव करें और किसी भी फ़ाइल को एक ही चरण में वापस लौटाएं। हर बदलाव आपके प्रोजेक्ट के Git इतिहास में सुरक्षित रहता है, बिना किसी 24 घंटे की सीमा के।"
+   },
+   {
+    "title": "एक ही अनुरोध में रिव्यूअर के लिए तैयार",
+    "desc": "रिव्यूअर्स को जवाब देने के लिए किन्हीं दो वर्ज़न के बीच ट्रैक किए गए बदलावों वाला PDF पाएं, या arXiv के लिए तैयार बंडल पाएं, जिसमें arXiv द्वारा आवश्यक प्री-कंपाइल की गई बिब्लियोग्राफी शामिल होती है।"
+   },
+   {
+    "title": "चैट से फ़िगर और डायग्राम",
+    "desc": "matplotlib चार्ट और TikZ डायग्राम बस उनका वर्णन करके बनाएं। सोर्स कोड आपके प्रोजेक्ट में रखा जाता है, इसलिए भविष्य में कोई भी बदलाव सिर्फ एक वाक्य की दूरी पर है। यह एक Pro फ़ीचर है।"
    }
   ],
   "how": {
@@ -2482,7 +2626,7 @@
   },
   "platforms": {
    "title": "अपना खुद का AI लाएँ",
-   "subtitle": "MiLatexAI एक Model Context Protocol कनेक्टर है, इसलिए यह उसी असिस्टेंट के साथ काम करता है जिसे आप पहले से इस्तेमाल करते हैं।",
+   "subtitle": "MiLatexAI एक Model Context Protocol कनेक्टर है: यह Claude, ChatGPT और अन्य MCP-संगत असिस्टेंट में काम करता है।",
    "claude": "Anthropic के Claude में MiLatexAI को एक कनेक्टर के रूप में जोड़ें और किसी भी Claude बातचीत से अपने Overleaf प्रोजेक्ट्स एडिट करें।",
    "chatgpt": "OpenAI के ChatGPT में MiLatexAI को एक कनेक्टर के रूप में जोड़ें और वहीं भी वही करें, वही प्रोजेक्ट्स, वही commits, वही Overleaf इतिहास।"
   },
@@ -2683,7 +2827,7 @@
     },
     {
      "heading": "स्वतंत्र उत्पाद और ट्रेडमार्क",
-     "body": "MiLatexAI एक स्वतंत्र टूल है। यह न तो Overleaf या Digital Science से संबद्ध, समर्थित या प्रायोजित है, और न ही Anthropic (Claude) या OpenAI (ChatGPT) से। Overleaf, Claude, ChatGPT और अन्य नाम उनके संबंधित स्वामियों के ट्रेडमार्क हैं, जिनका उपयोग केवल अनुकूलता दर्शाने के लिए किया गया है। आप MiLatexAI का उपयोग Overleaf और अपने AI प्रदाता की अपनी सेवा-शर्तों के अनुरूप, तथा केवल उन्हीं प्रोजेक्ट्स के साथ करने के लिए ज़िम्मेदार हैं जिन तक पहुँचने के लिए आप अधिकृत हैं।"
+     "body": "MiLatexAI एक स्वतंत्र टूल है। यह न तो Overleaf या Digital Science से संबद्ध, समर्थित या प्रायोजित है, और न ही Anthropic (Claude) या OpenAI (ChatGPT) से। Overleaf, Claude, ChatGPT और अन्य नाम उनके संबंधित स्वामियों के ट्रेडमार्क हैं, जिनका उपयोग केवल अनुकूलता दर्शाने के लिए किया गया है। आप MiLatexAI का उपयोग Overleaf और अपने AI प्रदाता की अपनी सेवा-शर्तों के अनुरूप, तथा केवल उन्हीं प्रोजेक्ट्स के साथ करने के लिए ज़िम्मेदार हैं जिन तक पहुँचने के लिए आप अधिकृत हैं। MiLatexAI ओपन Model Context Protocol को लागू करता है और अन्य MCP-संगत असिस्टेंट से भी कनेक्ट हो सकता है; इसका परीक्षण केवल Claude और ChatGPT के साथ किया गया है, तथा अन्य क्लाइंट आधिकारिक रूप से समर्थित नहीं हैं।"
     }
    ]
   },
@@ -2730,7 +2874,7 @@
    "manage_subscription": "구독 관리"
   },
   "hero": {
-   "badge": "Claude와 ChatGPT에서 작동",
+   "badge": "Claude, ChatGPT 등에서 사용 가능",
    "title": "생각에서 논문까지, 복붙은 이제 그만.",
    "subtitle": "Claude나 ChatGPT에게 실제 Overleaf 프로젝트를 직접 편집하도록 맡기세요. 섹션을 붙여넣거나 파일을 내려받을 필요 없이, AI가 언제나 유일한 원본인 실시간 문서에서 바로 작업하고, 모든 변경 사항은 실제 Git 커밋으로 Overleaf에 그대로 반영됩니다.",
    "cta_primary": "시작하기",
@@ -2762,6 +2906,22 @@
    {
     "title": "오픈 소스이며 감사 가능",
     "desc": "전체 커넥터는 AGPL 라이선스로 GitHub에 공개되어 있어, 신뢰하기 전에 토큰과 프로젝트를 어떻게 처리하는지 정확히 읽어볼 수 있습니다."
+   },
+   {
+    "title": "절대 지어내지 않는 인용",
+    "desc": "DOI 또는 arXiv id로 인용을 요청하세요. MiLatexAI가 공식 등록 기관에서 실제 BibTeX를 가져와 중복을 제거한 뒤 .bib 파일에 커밋합니다. 깨졌거나 사용되지 않는 참고문헌도 표시해 줍니다."
+   },
+   {
+    "title": "체크포인트와 즉시 실행 취소",
+    "desc": "대규모 수정 전에 이름을 붙인 복원 지점을 저장하고, 어떤 파일이든 한 번에 되돌리세요. 모든 변경 사항은 프로젝트의 Git 히스토리에 남으며, 24시간 제한도 없습니다."
+   },
+   {
+    "title": "한 번의 요청으로 리뷰어 대응 준비 완료",
+    "desc": "리뷰어 답변용으로 임의의 두 버전 간 변경 사항이 추적 표시된 PDF를 받거나, arXiv가 요구하는 사전 컴파일된 참고문헌이 포함된 arXiv 제출용 번들을 받아 보세요."
+   },
+   {
+    "title": "채팅으로 만드는 그림과 다이어그램",
+    "desc": "설명만으로 matplotlib 차트와 TikZ 다이어그램을 만드세요. 소스 코드가 프로젝트에 보관되므로, 나중에 수정할 때도 문장 하나면 충분합니다. Pro 기능입니다."
    }
   ],
   "how": {
@@ -2784,7 +2944,7 @@
   },
   "platforms": {
    "title": "사용하던 AI를 그대로",
-   "subtitle": "MiLatexAI는 Model Context Protocol 커넥터이므로, 이미 사용 중인 어시스턴트와 함께 작동합니다.",
+   "subtitle": "MiLatexAI는 Model Context Protocol 커넥터입니다. Claude, ChatGPT를 비롯한 MCP 호환 어시스턴트에서 작동합니다.",
    "claude": "Anthropic의 Claude에 MiLatexAI를 커넥터로 추가하고, 어떤 Claude 대화에서든 Overleaf 프로젝트를 편집하세요.",
    "chatgpt": "OpenAI의 ChatGPT에 MiLatexAI를 커넥터로 추가하면 그곳에서도 동일하게 작업할 수 있습니다. 같은 프로젝트, 같은 커밋, 같은 Overleaf 히스토리입니다."
   },
@@ -2985,7 +3145,7 @@
     },
     {
      "heading": "독립 제품 및 상표",
-     "body": "MiLatexAI는 독립적인 도구입니다. Overleaf 또는 Digital Science는 물론 Anthropic(Claude)이나 OpenAI(ChatGPT)와도 제휴하거나 이들의 보증 또는 후원을 받지 않았습니다. Overleaf, Claude, ChatGPT 및 기타 명칭은 각 소유자의 상표이며, 오직 호환성을 설명하기 위한 목적으로만 사용됩니다. 귀하는 Overleaf 및 귀하가 사용하는 AI 제공업체의 자체 서비스 약관에 따라, 그리고 귀하가 접근 권한을 가진 프로젝트에 대해서만 MiLatexAI를 사용할 책임이 있습니다."
+     "body": "MiLatexAI는 독립적인 도구입니다. Overleaf 또는 Digital Science는 물론 Anthropic(Claude)이나 OpenAI(ChatGPT)와도 제휴하거나 이들의 보증 또는 후원을 받지 않았습니다. Overleaf, Claude, ChatGPT 및 기타 명칭은 각 소유자의 상표이며, 오직 호환성을 설명하기 위한 목적으로만 사용됩니다. 귀하는 Overleaf 및 귀하가 사용하는 AI 제공업체의 자체 서비스 약관에 따라, 그리고 귀하가 접근 권한을 가진 프로젝트에 대해서만 MiLatexAI를 사용할 책임이 있습니다. MiLatexAI는 개방형 Model Context Protocol을 구현하며, 다른 MCP 호환 어시스턴트에서도 연결될 수 있습니다. 다만 Claude 및 ChatGPT에 대해서만 테스트되었으며, 그 외의 클라이언트는 공식적으로 지원되지 않습니다."
     }
    ]
   },
@@ -3032,7 +3192,7 @@
    "manage_subscription": "Управление подпиской"
   },
   "hero": {
-   "badge": "Работает в Claude и ChatGPT",
+   "badge": "Работает с Claude, ChatGPT и не только",
    "title": "От мысли до статьи, без копипаста.",
    "subtitle": "Попросите Claude или ChatGPT отредактировать ваш настоящий проект в Overleaf. Никакой вставки разделов, никаких скачанных файлов, ИИ работает прямо с живым документом, который всегда остаётся единственным источником истины, а каждое изменение попадает в Overleaf настоящим Git-коммитом.",
    "cta_primary": "Начать",
@@ -3064,6 +3224,22 @@
    {
     "title": "Открытый код и возможность аудита",
     "desc": "Весь коннектор публично доступен на GitHub под лицензией AGPL, поэтому вы можете точно прочитать, как он обращается с вашим токеном и проектами, прежде чем довериться ему."
+   },
+   {
+    "title": "Ссылки, которые никогда не выдумываются",
+    "desc": "Запросите ссылку по DOI или идентификатору arXiv. MiLatexAI получает настоящий BibTeX из официального реестра, устраняет дубликаты и записывает его в ваш .bib. Он также может отмечать неработающие или неиспользуемые ссылки."
+   },
+   {
+    "title": "Контрольные точки и мгновенная отмена",
+    "desc": "Сохраните именованную точку восстановления перед крупной переработкой и откатите любой файл за один шаг. Каждое изменение хранится в истории Git вашего проекта, без ограничения в 24 часа."
+   },
+   {
+    "title": "Готово для рецензентов по одному запросу",
+    "desc": "Получите PDF с отслеживанием изменений между любыми двумя версиями для ответа рецензентам или готовый для arXiv пакет с предварительно скомпилированной библиографией, которую требует arXiv."
+   },
+   {
+    "title": "Рисунки и диаграммы прямо из чата",
+    "desc": "Создавайте графики matplotlib и диаграммы TikZ, просто описывая их. Исходный код хранится в вашем проекте, поэтому для будущей правки достаточно одного предложения. Функция Pro."
    }
   ],
   "how": {
@@ -3086,7 +3262,7 @@
   },
   "platforms": {
    "title": "Используйте свой ИИ",
-   "subtitle": "MiLatexAI, это коннектор Model Context Protocol, поэтому он работает с тем ассистентом, которым вы уже пользуетесь.",
+   "subtitle": "MiLatexAI является коннектором Model Context Protocol: он работает в Claude, ChatGPT и других ассистентах, совместимых с MCP.",
    "claude": "Добавьте MiLatexAI как коннектор в Claude от Anthropic и редактируйте свои проекты Overleaf из любого разговора с Claude.",
    "chatgpt": "Добавьте MiLatexAI как коннектор в ChatGPT от OpenAI и делайте то же самое там, те же проекты, те же коммиты, та же история Overleaf."
   },
@@ -3287,7 +3463,7 @@
     },
     {
      "heading": "Независимый продукт и товарные знаки",
-     "body": "MiLatexAI является независимым инструментом. Он не связан с Overleaf или Digital Science, а также с Anthropic (Claude) или OpenAI (ChatGPT), не одобрен и не спонсируется ими. Overleaf, Claude, ChatGPT и другие названия являются товарными знаками соответствующих владельцев и используются исключительно для описания совместимости. Вы несете ответственность за использование MiLatexAI в соответствии с условиями обслуживания Overleaf и вашего поставщика ИИ, а также только с проектами, к которым вам предоставлен доступ."
+     "body": "MiLatexAI является независимым инструментом. Он не связан с Overleaf или Digital Science, а также с Anthropic (Claude) или OpenAI (ChatGPT), не одобрен и не спонсируется ими. Overleaf, Claude, ChatGPT и другие названия являются товарными знаками соответствующих владельцев и используются исключительно для описания совместимости. Вы несете ответственность за использование MiLatexAI в соответствии с условиями обслуживания Overleaf и вашего поставщика ИИ, а также только с проектами, к которым вам предоставлен доступ. MiLatexAI реализует открытый Model Context Protocol и допускает подключение из других MCP-совместимых ассистентов. Тестирование проводится только с Claude и ChatGPT; иные клиенты официально не поддерживаются."
     }
    ]
   },
@@ -3334,7 +3510,7 @@
    "manage_subscription": "Gestisci abbonamento"
   },
   "hero": {
-   "badge": "Funziona in Claude e ChatGPT",
+   "badge": "Funziona con Claude, ChatGPT e altri",
    "title": "Dall'idea alla pagina, senza copia-incolla.",
    "subtitle": "Chiedi a Claude o ChatGPT di modificare il tuo vero progetto Overleaf. Niente sezioni da incollare, niente file da scaricare, la tua AI lavora sul documento dal vivo, sempre la fonte di verità, e ogni modifica arriva su Overleaf come un vero commit Git.",
    "cta_primary": "Inizia ora",
@@ -3366,6 +3542,22 @@
    {
     "title": "Open source e verificabile",
     "desc": "L'intero connettore è pubblico su GitHub con licenza AGPL, così puoi leggere con precisione come gestisce il tuo token e i tuoi progetti prima di dargli fiducia."
+   },
+   {
+    "title": "Citazioni mai inventate",
+    "desc": "Richiedi una citazione tramite DOI o identificativo arXiv. MiLatexAI recupera il BibTeX reale dal registro ufficiale, elimina i duplicati e lo salva nel tuo .bib. Può anche segnalare riferimenti non funzionanti o inutilizzati."
+   },
+   {
+    "title": "Checkpoint e annullamento istantaneo",
+    "desc": "Salva un punto di ripristino con nome prima di una riscrittura importante e ripristina qualsiasi file in un solo passaggio. Ogni modifica è conservata nella cronologia Git del tuo progetto, senza alcun limite di 24 ore."
+   },
+   {
+    "title": "Pronto per i revisori con una sola richiesta",
+    "desc": "Ottieni un PDF con le modifiche evidenziate tra due versioni qualsiasi per la tua risposta ai revisori, oppure un pacchetto pronto per arXiv con la bibliografia precompilata richiesta da arXiv."
+   },
+   {
+    "title": "Figure e diagrammi dalla chat",
+    "desc": "Crea grafici matplotlib e diagrammi TikZ semplicemente descrivendoli. Il codice sorgente resta nel tuo progetto, quindi una modifica futura è a una frase di distanza. Una funzionalità Pro."
    }
   ],
   "how": {
@@ -3388,7 +3580,7 @@
   },
   "platforms": {
    "title": "Usa la tua AI preferita",
-   "subtitle": "MiLatexAI è un connettore Model Context Protocol, quindi funziona con l'assistente che già usi.",
+   "subtitle": "MiLatexAI è un connettore Model Context Protocol: funziona in Claude, ChatGPT e altri assistenti compatibili con MCP.",
    "claude": "Aggiungi MiLatexAI come connettore in Claude di Anthropic e modifica i tuoi progetti Overleaf da qualsiasi conversazione con Claude.",
    "chatgpt": "Aggiungi MiLatexAI come connettore in ChatGPT di OpenAI e fai lo stesso anche lì: stessi progetti, stessi commit, stessa cronologia Overleaf."
   },
@@ -3589,7 +3781,7 @@
     },
     {
      "heading": "Prodotto indipendente e marchi",
-     "body": "MiLatexAI è uno strumento indipendente. Non è affiliato, approvato o sponsorizzato da Overleaf o Digital Science, né da Anthropic (Claude) o OpenAI (ChatGPT). Overleaf, Claude, ChatGPT e altri nomi sono marchi dei rispettivi proprietari, utilizzati esclusivamente per descrivere la compatibilità. Sei responsabile dell'utilizzo di MiLatexAI nel rispetto dei termini di servizio di Overleaf e del tuo fornitore di IA, e solo con i progetti a cui sei autorizzato ad accedere."
+     "body": "MiLatexAI è uno strumento indipendente. Non è affiliato, approvato o sponsorizzato da Overleaf o Digital Science, né da Anthropic (Claude) o OpenAI (ChatGPT). Overleaf, Claude, ChatGPT e altri nomi sono marchi dei rispettivi proprietari, utilizzati esclusivamente per descrivere la compatibilità. Sei responsabile dell'utilizzo di MiLatexAI nel rispetto dei termini di servizio di Overleaf e del tuo fornitore di IA, e solo con i progetti a cui sei autorizzato ad accedere. MiLatexAI implementa il Model Context Protocol aperto e può connettersi da altri assistenti compatibili con MCP; è testato esclusivamente con Claude e ChatGPT e gli altri client non sono ufficialmente supportati."
     }
    ]
   },
