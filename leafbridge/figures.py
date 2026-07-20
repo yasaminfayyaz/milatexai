@@ -23,8 +23,8 @@ SRC_DIR = "figures/src"
 OUT_DIR = "figures"
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
 
-_HEADER_KEY = re.compile(r"^#\s*(figure|output|created|tool|code-sha256|output-sha256)\s*:\s*(.+?)\s*$")
-_HEADER_END = "# ========================"
+_HEADER_KEY = re.compile(r"^[#%]\s*(figure|output|created|tool|code-sha256|output-sha256)\s*:\s*(.+?)\s*$")
+_HEADER_END_BODY = "========================"
 
 
 class FigureError(Exception):
@@ -42,8 +42,8 @@ def slugify(name: str) -> str:
     return slug
 
 
-def src_path(slug: str) -> str:
-    return f"{SRC_DIR}/{slug}.py"
+def src_path(slug: str, src_ext: str = "py") -> str:
+    return f"{SRC_DIR}/{slug}.{src_ext}"
 
 
 def out_path(slug: str, ext: str = "pdf") -> str:
@@ -52,22 +52,25 @@ def out_path(slug: str, ext: str = "pdf") -> str:
 
 def build_header(
     slug: str, *, code_body: str = "", pdf_bytes: bytes = b"",
-    created: str | None = None, ext: str = "pdf",
+    created: str | None = None, ext: str = "pdf", comment: str = "#",
 ) -> str:
     """Header written above the code. The two sha256 lines are the provenance
     record: they prove later whether the code body and the committed PDF are
     still the pair this tool produced, or were changed outside Figure Studio."""
     created = created or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    c = comment
+    regen = ("run this file with matplotlib installed" if c == "#"
+             else "compile this TikZ source standalone")
     return (
-        "# === milatexai figure ===\n"
-        f"# figure: {slug}\n"
-        f"# output: {out_path(slug, ext)}\n"
-        f"# created: {created}\n"
-        "# tool: milatexai/1\n"
-        f"# code-sha256: {hashlib.sha256(code_body.encode('utf-8')).hexdigest()}\n"
-        f"# output-sha256: {hashlib.sha256(pdf_bytes).hexdigest()}\n"
-        f"# Regenerate: run this file with matplotlib installed; it writes {out_path(slug, ext)}\n"
-        f"{_HEADER_END}\n"
+        f"{c} === milatexai figure ===\n"
+        f"{c} figure: {slug}\n"
+        f"{c} output: {out_path(slug, ext)}\n"
+        f"{c} created: {created}\n"
+        f"{c} tool: milatexai/1\n"
+        f"{c} code-sha256: {hashlib.sha256(code_body.encode('utf-8')).hexdigest()}\n"
+        f"{c} output-sha256: {hashlib.sha256(pdf_bytes).hexdigest()}\n"
+        f"{c} Regenerate: {regen}; it produces {out_path(slug, ext)}\n"
+        f"{c} {_HEADER_END_BODY}\n"
     )
 
 
@@ -97,7 +100,7 @@ def scan_figures(repo: Path) -> list[FigureInfo]:
     if not src_dir.is_dir():
         return []
     found: list[FigureInfo] = []
-    for p in sorted(src_dir.glob("*.py")):
+    for p in sorted(list(src_dir.glob("*.py")) + list(src_dir.glob("*.tex"))):
         try:
             head = parse_header(p.read_text(encoding="utf-8", errors="replace"))
         except OSError:
@@ -115,7 +118,8 @@ def split_body(src_text: str) -> str | None:
     """The code below the header, or None if there is no header terminator."""
     lines = src_text.splitlines(keepends=True)
     for i, line in enumerate(lines):
-        if line.rstrip() == _HEADER_END:
+        s = line.rstrip()
+        if s in (f"# {_HEADER_END_BODY}", f"% {_HEADER_END_BODY}"):
             return "".join(lines[i + 1:])
     return None
 

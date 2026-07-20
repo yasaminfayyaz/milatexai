@@ -34,7 +34,10 @@ from fastmcp.server.dependencies import get_access_token
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
 
-from . import __version__, citations, figures, latex, paperstats, site, texcompile, texlocate, web
+from . import (
+    __version__, citations, figures, latex, paperstats, site, texcompile,
+    texlocate, tikz, web,
+)
 from .billing import Billing, plan_change_from_event
 from .capacity import CapacityGate
 from .config import ProjectConfig, default_data_dir
@@ -991,6 +994,67 @@ def create_hosted_server(
         try:
             png = artifact if fmt == "png" else figures.pdf_to_png(pdf)
         except Exception:  # noqa: BLE001  (preview is best-effort)
+            return note
+        return [note, Image(data=png, format="png")]
+
+    @mcp.tool
+    async def commit_tikz(
+        code: str, name: str, format: str = "png", project: str | None = None
+    ):
+        """Save an APPROVED TikZ diagram into the user's Overleaf project (Pro).
+        Give the tikzpicture code (a bare snippet is fine; it is wrapped in a
+        standalone document with pgfplots available). The server compiles it,
+        commits BOTH the source (figures/src/<name>.tex, editable forever) and
+        the rendered artifact (figures/<name>.png at 300 dpi, or .pdf), and
+        returns the rendered image. Show the user the result; on a compile error
+        you get the exact LaTeX errors to fix. Counts as one commit."""
+        try:
+            user = await app.user()
+            app.ensure_pro(user, "TikZ Studio (creating and editing TikZ diagrams)")
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            slug = figures.slugify(name)
+            fmt = (format or "png").strip().lower().lstrip(".")
+            if fmt not in ("pdf", "png"):
+                raise ToolError("format must be 'png' or 'pdf'.")
+            try:
+                pdf = await tikz.render_pdf(code)
+            except tikz.TikzError as exc:
+                raise ToolError(str(exc))
+            artifact = pdf if fmt == "pdf" else figures.pdf_to_png(pdf, dpi=300)
+            src_rel = figures.src_path(slug, "tex")
+            out_rel = figures.out_path(slug, fmt)
+            other_rel = figures.out_path(slug, "png" if fmt == "pdf" else "pdf")
+            body = code.rstrip("\n") + "\n"
+            file_body = figures.build_header(
+                slug, code_body=body, pdf_bytes=artifact, ext=fmt, comment="%") + body
+
+            def mutate(repo: Path) -> None:
+                src_t = safe_join(repo, src_rel)
+                out_t = safe_join(repo, out_rel)
+                src_t.parent.mkdir(parents=True, exist_ok=True)
+                out_t.parent.mkdir(parents=True, exist_ok=True)
+                write_text_exact(src_t, file_body)
+                write_bytes_exact(out_t, artifact)
+                sibling = safe_join(repo, other_rel)
+                if sibling.is_file():
+                    sibling.unlink()
+
+            result = await app.apply_and_push(
+                user, proj, mutate, f"TikZ {slug} (MiLatexAI TikZ Studio)"
+            )
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        from fastmcp.utilities.types import Image
+
+        note = (
+            f"{result}\n\nCommitted {src_rel} (editable TikZ source) and {out_rel}. "
+            f"Include it with \\includegraphics[width=\\linewidth]{{{out_rel}}} "
+            f"and \\label{{fig:{slug}}}. Below is the rendered diagram."
+        )
+        try:
+            png = artifact if fmt == "png" else figures.pdf_to_png(pdf)
+        except Exception:  # noqa: BLE001
             return note
         return [note, Image(data=png, format="png")]
 
