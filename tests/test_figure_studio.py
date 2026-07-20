@@ -284,7 +284,7 @@ def test_commit_figure_pro_commits_source_and_pdf(tmp_path):
     pdf = _fake_pdf()
     sandbox = FakeSandbox(pdf=pdf)
     mcp, _s, _t = _harness(tmp_path, sandbox=sandbox)
-    r = _call(mcp, "commit_figure", {"code": CODE, "name": "Energy vs Time"})
+    r = _call(mcp, "commit_figure", {"code": CODE, "name": "Energy vs Time", "format": "pdf"})
     text = _text(r)
     assert "figures/src/energy-vs-time.py" in text
     assert "fig:energy-vs-time" in text  # include-snippet suggested
@@ -307,7 +307,8 @@ def test_commit_figure_pro_commits_source_and_pdf(tmp_path):
 
 def test_commit_figure_png_format_and_switch_cleans_sibling(tmp_path):
     mcp, _s, _t = _harness(tmp_path)
-    r = _call(mcp, "commit_figure", {"code": CODE, "name": "speedup", "format": "png"})
+    # No format arg: PNG must be the DEFAULT.
+    r = _call(mcp, "commit_figure", {"code": CODE, "name": "speedup"})
     text = _text(r)
     assert "figures/speedup.png" in text
     verify = tmp_path / "v1"
@@ -384,7 +385,7 @@ def test_list_figures_lifecycle_including_deletion_memory(tmp_path):
     # Replace the PDF "outside Figure Studio" (as if the user uploaded their own)
     # and push; the listing must flag that the code is no longer ground truth.
     _call(mcp, "upload_file", {
-        "path": "figures/speedup.pdf",
+        "path": "figures/speedup.png",
         "content_base64": __import__("base64").b64encode(b"%PDF-external-edit").decode(),
     })
     listing = _text(_call(mcp, "list_figures", {}))

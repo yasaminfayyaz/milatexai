@@ -737,7 +737,7 @@ def create_hosted_server(
 
     @mcp.tool
     async def commit_figure(
-        code: str, name: str, format: str = "pdf", project: str | None = None
+        code: str, name: str, format: str = "png", project: str | None = None
     ):
         """Save an APPROVED matplotlib figure into the user's Overleaf project (Pro).
         FLOW: write the Python and render it YOURSELF in your own code-execution
@@ -747,9 +747,9 @@ def create_hosted_server(
         source (figures/src/<name>.py, so the figure stays editable forever) and the
         rendered artifact (figures/<name>.pdf or .png) in one push. The code MUST
         save exactly one file named figure.pdf in the working directory, e.g.
-        fig.savefig('figure.pdf'); seed any randomness. format: "pdf" (vector,
-        crispest in LaTeX) or "png" (300 dpi raster); match whichever the user
-        prefers or the project already uses for its \\includegraphics files.
+        fig.savefig('figure.pdf'); seed any randomness. format: "png" (default,
+        300 dpi, what most projects use) or "pdf" (vector) only when the user
+        asks for it or the project's \\includegraphics files are PDFs.
         Overwrites an existing figure with the same name; counts as one commit
         toward the monthly limit."""
         try:
@@ -758,7 +758,7 @@ def create_hosted_server(
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             slug = figures.slugify(name)
-            fmt = (format or "pdf").strip().lower().lstrip(".")
+            fmt = (format or "png").strip().lower().lstrip(".")
             if fmt not in ("pdf", "png"):
                 raise ToolError("format must be 'pdf' or 'png'.")
             if not app.sessions.enabled:
