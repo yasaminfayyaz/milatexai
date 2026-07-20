@@ -674,6 +674,36 @@ def render_og_image() -> str:
 </svg>"""
 
 
+INDEXNOW_KEY = "milatexai7f3e9c1a5b2d4e6f2026a8c4"
+
+
+def llms_txt() -> str:
+    """llms.txt: a concise, AI-readable description of the product (read by AI
+    assistants and AI search engines)."""
+    return (
+        "# MiLatexAI\n\n"
+        "> Edit your real Overleaf LaTeX projects by chatting with ChatGPT or Claude. "
+        "A remote MCP (Model Context Protocol) connector: read, edit, and compile your "
+        "paper; every change is a real Git commit in Overleaf's history.\n\n"
+        "Connector URL (add as a custom connector in Claude or ChatGPT): https://milatexai.com/mcp\n\n"
+        "Requirements: an Overleaf account with Git integration (a paid Overleaf feature) "
+        "plus Claude or ChatGPT (their free tiers work).\n"
+        "Pricing: Free tier (1 project, 25 write-commits/month, unlimited reads, best-effort); "
+        "Pro $4.99/month (unlimited, guaranteed). Overleaf is billed separately by Overleaf.\n\n"
+        "Features: conversational LaTeX editing pushed straight to Overleaf; every write is a "
+        "Git commit; compile checks with exact LaTeX errors; see rendered tables/figures as "
+        "images and fix layout; Figure Studio (Pro): create/edit matplotlib figures whose "
+        "source code is kept in the project for future edits.\n\n"
+        "## Links\n\n"
+        "- [Website](https://milatexai.com)\n"
+        "- [Setup guide](https://milatexai.com/#get-started)\n"
+        "- [Pricing](https://milatexai.com/#pricing)\n"
+        "- [FAQ](https://milatexai.com/#faq)\n"
+        "- [GitHub (AGPL, open source)](https://github.com/yasaminfayyaz/milatexai)\n"
+        "- [Support](mailto:support@milatexai.com)\n"
+    )
+
+
 def robots_txt() -> str:
     return "User-agent: *\nAllow: /\nSitemap: https://milatexai.com/sitemap.xml\n"
 

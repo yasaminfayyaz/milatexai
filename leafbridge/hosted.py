@@ -1134,6 +1134,15 @@ def create_hosted_server(
     async def robots(request: Request) -> Response:
         return Response(site.robots_txt(), media_type="text/plain")
 
+    @mcp.custom_route("/llms.txt", methods=["GET"])
+    async def llms(request: Request) -> Response:
+        return Response(site.llms_txt(), media_type="text/plain")
+
+    @mcp.custom_route(f"/{site.INDEXNOW_KEY}.txt", methods=["GET"])
+    async def indexnow_key(request: Request) -> Response:
+        # IndexNow ownership proof: the key file simply contains the key.
+        return Response(site.INDEXNOW_KEY, media_type="text/plain")
+
     @mcp.custom_route("/sitemap.xml", methods=["GET"])
     async def sitemap(request: Request) -> Response:
         return Response(site.sitemap_xml(), media_type="application/xml")
