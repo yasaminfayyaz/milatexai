@@ -521,11 +521,11 @@ function applyLang(lang) {{
     tagline = html.escape(str(en.get("brand_tagline", "")))
     # SEO <title> front-loads the high-intent search terms, then the brand
     # (people search "edit Overleaf with ChatGPT", not "MiLatexAI").
-    title = "Edit Overleaf with ChatGPT or Claude · MiLatexAI"
+    title = "Edit Overleaf with ChatGPT or Claude · MiLatexAI MCP Server"
     meta_desc = html.escape(
         "Edit your real Overleaf LaTeX papers by chatting with ChatGPT or Claude. "
-        "Read, edit, and fix compile errors; every change is a real Git commit. "
-        "Free tier plus Pro."
+        "A remote MCP (Model Context Protocol) server: read, edit, fix compile "
+        "errors, verified citations; every change is a real Git commit."
     )
     url = "https://milatexai.com/"
     og_image = "https://milatexai.com/og.svg"
@@ -535,9 +535,11 @@ function applyLang(lang) {{
         "@type": "SoftwareApplication",
         "name": "MiLatexAI",
         "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Web (Claude, ChatGPT)",
+        "operatingSystem": "Web (Claude, ChatGPT, and other MCP clients)",
         "url": "https://milatexai.com",
-        "description": str(en.get("hero", {}).get("subtitle", "")),
+        "description": ("A remote MCP (Model Context Protocol) server for Overleaf. "
+                        + str(en.get("hero", {}).get("subtitle", ""))),
+        "keywords": "Overleaf MCP server, Model Context Protocol, edit Overleaf with ChatGPT, edit Overleaf with Claude, LaTeX AI",
         "offers": [
             {"@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free"},
             {"@type": "Offer", "price": "4.99", "priceCurrency": "USD", "name": "Pro"},
@@ -557,7 +559,7 @@ function applyLang(lang) {{
     }, ensure_ascii=False)
     seo = f"""<title>{title}</title>
 <meta name='description' content='{meta_desc}'>
-<meta name='keywords' content='edit Overleaf with ChatGPT, edit Overleaf with Claude, Overleaf AI editor, ChatGPT Overleaf, Claude Overleaf, edit LaTeX with AI, Overleaf MCP connector, AI research paper editor, LaTeX AI assistant'>
+<meta name='keywords' content='edit Overleaf with ChatGPT, edit Overleaf with Claude, Overleaf MCP server, Overleaf MCP connector, Model Context Protocol Overleaf, remote MCP server LaTeX, MCP server for LaTeX, Overleaf AI editor, ChatGPT Overleaf, Claude Overleaf, edit LaTeX with AI, AI research paper editor, LaTeX AI assistant'>
 <link rel='canonical' href='{url}'>
 <meta name='robots' content='index,follow'>
 <meta name='theme-color' content='#0891b2'>
