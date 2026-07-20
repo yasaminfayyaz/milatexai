@@ -46,12 +46,13 @@ def src_path(slug: str) -> str:
     return f"{SRC_DIR}/{slug}.py"
 
 
-def out_path(slug: str) -> str:
-    return f"{OUT_DIR}/{slug}.pdf"
+def out_path(slug: str, ext: str = "pdf") -> str:
+    return f"{OUT_DIR}/{slug}.{ext}"
 
 
 def build_header(
-    slug: str, *, code_body: str = "", pdf_bytes: bytes = b"", created: str | None = None
+    slug: str, *, code_body: str = "", pdf_bytes: bytes = b"",
+    created: str | None = None, ext: str = "pdf",
 ) -> str:
     """Header written above the code. The two sha256 lines are the provenance
     record: they prove later whether the code body and the committed PDF are
@@ -60,12 +61,12 @@ def build_header(
     return (
         "# === milatexai figure ===\n"
         f"# figure: {slug}\n"
-        f"# output: {out_path(slug)}\n"
+        f"# output: {out_path(slug, ext)}\n"
         f"# created: {created}\n"
         "# tool: milatexai/1\n"
         f"# code-sha256: {hashlib.sha256(code_body.encode('utf-8')).hexdigest()}\n"
         f"# output-sha256: {hashlib.sha256(pdf_bytes).hexdigest()}\n"
-        f"# Regenerate: run this file with matplotlib installed; it writes {out_path(slug)}\n"
+        f"# Regenerate: run this file with matplotlib installed; it writes {out_path(slug, ext)}\n"
         f"{_HEADER_END}\n"
     )
 

@@ -736,23 +736,31 @@ def create_hosted_server(
     )
 
     @mcp.tool
-    async def commit_figure(code: str, name: str, project: str | None = None):
+    async def commit_figure(
+        code: str, name: str, format: str = "pdf", project: str | None = None
+    ):
         """Save an APPROVED matplotlib figure into the user's Overleaf project (Pro).
         FLOW: write the Python and render it YOURSELF in your own code-execution
         environment first, show the user the image, and only call this after they
         approve. The server re-runs the code in an isolated sandbox (matplotlib 3.8,
         numpy 1.26; no network, no pip, no other libraries) and commits BOTH the
         source (figures/src/<name>.py, so the figure stays editable forever) and the
-        rendered artifact (figures/<name>.pdf) in one push. The code MUST save
-        exactly one file named figure.pdf in the working directory, e.g.
-        fig.savefig('figure.pdf'); seed any randomness. Overwrites an existing
-        figure with the same name; counts as one commit toward the monthly limit."""
+        rendered artifact (figures/<name>.pdf or .png) in one push. The code MUST
+        save exactly one file named figure.pdf in the working directory, e.g.
+        fig.savefig('figure.pdf'); seed any randomness. format: "pdf" (vector,
+        crispest in LaTeX) or "png" (300 dpi raster); match whichever the user
+        prefers or the project already uses for its \\includegraphics files.
+        Overwrites an existing figure with the same name; counts as one commit
+        toward the monthly limit."""
         try:
             user = await app.user()
             app.ensure_pro(user, "Figure Studio (creating and editing matplotlib figures)")
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             slug = figures.slugify(name)
+            fmt = (format or "pdf").strip().lower().lstrip(".")
+            if fmt not in ("pdf", "png"):
+                raise ToolError("format must be 'pdf' or 'png'.")
             if not app.sessions.enabled:
                 raise ToolError("Figure Studio isn't available on this server right now.")
 
@@ -774,9 +782,15 @@ def create_hosted_server(
             if not pdf.startswith(b"%PDF"):
                 raise ToolError("The produced figure.pdf is not a valid PDF; fix the savefig call.")
 
-            src_rel, out_rel = figures.src_path(slug), figures.out_path(slug)
+            # The committed artifact: the vector PDF itself, or a 300-dpi PNG
+            # rasterized from that same PDF (identical drawing, user's format).
+            artifact = pdf if fmt == "pdf" else figures.pdf_to_png(pdf, dpi=300)
+            src_rel = figures.src_path(slug)
+            out_rel = figures.out_path(slug, fmt)
+            other_rel = figures.out_path(slug, "png" if fmt == "pdf" else "pdf")
             body = code.rstrip("\n") + "\n"
-            file_body = figures.build_header(slug, code_body=body, pdf_bytes=pdf) + body
+            file_body = figures.build_header(
+                slug, code_body=body, pdf_bytes=artifact, ext=fmt) + body
 
             def mutate(repo: Path) -> None:
                 src_t = safe_join(repo, src_rel)
@@ -784,7 +798,11 @@ def create_hosted_server(
                 src_t.parent.mkdir(parents=True, exist_ok=True)
                 out_t.parent.mkdir(parents=True, exist_ok=True)
                 write_text_exact(src_t, file_body)
-                write_bytes_exact(out_t, pdf)
+                write_bytes_exact(out_t, artifact)
+                # A format switch must not leave a stale sibling artifact behind.
+                sibling = safe_join(repo, other_rel)
+                if sibling.is_file():
+                    sibling.unlink()
 
             result = await app.apply_and_push(
                 user, proj, mutate, f"Figure {slug} (MiLatexAI Figure Studio)"
@@ -795,14 +813,14 @@ def create_hosted_server(
 
         note = (
             f"{result}\n\nCommitted {src_rel} (editable source) and {out_rel} "
-            f"({len(pdf)} bytes). Include it with:\n"
+            f"({len(artifact)} bytes). Include it with:\n"
             f"\\begin{{figure}}[t]\\centering\n"
             f"  \\includegraphics[width=\\linewidth]{{{out_rel}}}\n"
             f"  \\caption{{...}}\\label{{fig:{slug}}}\n\\end{{figure}}\n"
             "Below is the exact committed artifact."
         )
         try:
-            png = figures.pdf_to_png(pdf)
+            png = artifact if fmt == "png" else figures.pdf_to_png(pdf)
         except Exception:  # noqa: BLE001  (preview is best-effort)
             return note
         return [note, Image(data=png, format="png")]

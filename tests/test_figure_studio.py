@@ -305,6 +305,36 @@ def test_commit_figure_pro_commits_source_and_pdf(tmp_path):
     assert any("Image" in k for k in kinds)
 
 
+def test_commit_figure_png_format_and_switch_cleans_sibling(tmp_path):
+    mcp, _s, _t = _harness(tmp_path)
+    r = _call(mcp, "commit_figure", {"code": CODE, "name": "speedup", "format": "png"})
+    text = _text(r)
+    assert "figures/speedup.png" in text
+    verify = tmp_path / "v1"
+    _git(["-c", "core.autocrlf=false", "clone", (tmp_path / "remote.git").as_uri(), str(verify)], tmp_path)
+    png = (verify / "figures" / "speedup.png").read_bytes()
+    assert png[:8] == b"\x89PNG\r\n\x1a\n"
+    src = (verify / "figures" / "src" / "speedup.py").read_text()
+    assert "output: figures/speedup.png" in src
+    # In-sync state holds for PNG artifacts too.
+    listing = _text(_call(mcp, "list_figures", {}))
+    assert "in sync" in listing
+    # Switch back to pdf: the stale .png must be removed in the same commit.
+    _call(mcp, "commit_figure", {"code": CODE, "name": "speedup", "format": "pdf"})
+    verify2 = tmp_path / "v2"
+    _git(["-c", "core.autocrlf=false", "clone", (tmp_path / "remote.git").as_uri(), str(verify2)], tmp_path)
+    assert (verify2 / "figures" / "speedup.pdf").is_file()
+    assert not (verify2 / "figures" / "speedup.png").exists()
+
+
+def test_commit_figure_rejects_unknown_format(tmp_path):
+    mcp, _s, _t = _harness(tmp_path)
+    from fastmcp.exceptions import ToolError
+
+    with pytest.raises(ToolError, match="pdf.*png|png.*pdf"):
+        _call(mcp, "commit_figure", {"code": CODE, "name": "x9", "format": "svg"})
+
+
 def test_commit_figure_no_pdf_produced_lists_files(tmp_path):
     mcp, _s, _t = _harness(tmp_path, sandbox=FakeSandbox(pdf=None))
     from fastmcp.exceptions import ToolError
