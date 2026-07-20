@@ -125,7 +125,8 @@
     "availability": "Guaranteed · always on"
    },
    "note": "Reads are always free and unlimited. Free access is best-effort, as capacity allows. Every plan also needs an Overleaf account with Git integration, which is a paid Overleaf feature.",
-   "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away."
+   "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away.",
+   "lab": "Writing with a lab or research group? Ask about lab and department pricing:"
   },
   "faq": {
    "title": "Questions researchers ask",
@@ -437,7 +438,8 @@
     "availability": "保证可用 · 始终在线"
    },
    "note": "读取始终免费且不限量。免费访问为尽力而为，视容量情况而定。每种套餐还都需要一个开通了 Git 集成的 Overleaf 账户，而 Git 集成是 Overleaf 的付费功能。",
-   "capacity_note": "免费套餐依托闲置容量运行，在需求高峰期可能会短暂暂停。Pro 保证不间断访问，您永远不会被拒之门外。"
+   "capacity_note": "免费套餐依托闲置容量运行，在需求高峰期可能会短暂暂停。Pro 保证不间断访问，您永远不会被拒之门外。",
+   "lab": "与实验室或课题组一起写作？欢迎咨询实验室与院系定价："
   },
   "faq": {
    "title": "研究者常问的问题",
@@ -755,7 +757,8 @@
     "availability": "Garanti · toujours actif"
    },
    "note": "Les lectures sont toujours gratuites et illimitées. L'accès gratuit fonctionne au mieux, selon la capacité disponible. Chaque forfait nécessite également un compte Overleaf avec l'intégration Git, qui est une fonctionnalité payante d'Overleaf.",
-   "capacity_note": "L'offre gratuite fonctionne sur les capacités disponibles et peut être suspendue brièvement en cas de forte demande. Pro garantit un accès ininterrompu, vous n'êtes jamais refusé."
+   "capacity_note": "L'offre gratuite fonctionne sur les capacités disponibles et peut être suspendue brièvement en cas de forte demande. Pro garantit un accès ininterrompu, vous n'êtes jamais refusé.",
+   "lab": "Vous rédigez avec un laboratoire ou un groupe de recherche ? Renseignez-vous sur nos tarifs laboratoires et départements :"
   },
   "faq": {
    "title": "Les questions que se posent les chercheurs",
@@ -1073,7 +1076,8 @@
     "availability": "Garantizado · siempre activo"
    },
    "note": "Las lecturas son siempre gratuitas e ilimitadas. El acceso gratuito funciona según la capacidad disponible (best-effort). Todos los planes también requieren una cuenta de Overleaf con integración de Git, que es una función de pago de Overleaf.",
-   "capacity_note": "El plan gratuito funciona con capacidad sobrante y puede pausarse brevemente cuando la demanda es alta. Pro garantiza acceso ininterrumpido: nunca se te rechaza."
+   "capacity_note": "El plan gratuito funciona con capacidad sobrante y puede pausarse brevemente cuando la demanda es alta. Pro garantiza acceso ininterrumpido: nunca se te rechaza.",
+   "lab": "¿Escribes con un laboratorio o grupo de investigación? Pregunta por nuestros precios para laboratorios y departamentos:"
   },
   "faq": {
    "title": "Preguntas que hacen los investigadores",
@@ -1391,7 +1395,8 @@
     "availability": "Garantiert · immer verfügbar"
    },
    "note": "Lesevorgänge sind immer kostenlos und unbegrenzt. Der kostenlose Zugriff erfolgt nach dem Best-Effort-Prinzip, je nach verfügbarer Kapazität. Jeder Tarif setzt zudem ein Overleaf-Konto mit Git-Integration voraus, was eine kostenpflichtige Overleaf-Funktion ist.",
-   "capacity_note": "Der kostenlose Tarif nutzt freie Kapazitäten und kann bei hoher Nachfrage kurz pausieren. Pro garantiert ununterbrochenen Zugriff, Sie werden niemals abgewiesen."
+   "capacity_note": "Der kostenlose Tarif nutzt freie Kapazitäten und kann bei hoher Nachfrage kurz pausieren. Pro garantiert ununterbrochenen Zugriff, Sie werden niemals abgewiesen.",
+   "lab": "Sie schreiben mit einem Labor oder einer Forschungsgruppe? Fragen Sie nach unseren Preisen für Labore und Fachbereiche:"
   },
   "faq": {
    "title": "Fragen, die Forschende stellen",
@@ -1709,7 +1714,8 @@
     "availability": "保証付き · 常時稼働"
    },
    "note": "読み取りは常に無料かつ無制限です。無料アクセスは空き容量に応じたベストエフォート提供です。いずれのプランでも、Git integration付きのOverleafアカウントが別途必要であり、これはOverleafの有料機能です。",
-   "capacity_note": "無料プランは余剰容量で稼働しているため、需要が高いときは短時間停止する場合があります。Pro なら中断のないアクセスが保証され、締め出されることは決してありません。"
+   "capacity_note": "無料プランは余剰容量で稼働しているため、需要が高いときは短時間停止する場合があります。Pro なら中断のないアクセスが保証され、締め出されることは決してありません。",
+   "lab": "研究室やグループで執筆されていますか?研究室・学科向けの料金プランについてお気軽にお問い合わせください:"
   },
   "faq": {
    "title": "研究者からよくある質問",
@@ -2027,7 +2033,8 @@
     "availability": "Garantido · sempre ativo"
    },
    "note": "As leituras são sempre gratuitas e ilimitadas. O acesso gratuito opera conforme a capacidade disponível, sem garantias. Todo plano também exige uma conta Overleaf com integração Git, que é um recurso pago do Overleaf.",
-   "capacity_note": "O plano gratuito funciona com capacidade ociosa e pode pausar brevemente quando a demanda está alta. O Pro garante acesso ininterrupto, você nunca fica sem acesso."
+   "capacity_note": "O plano gratuito funciona com capacidade ociosa e pode pausar brevemente quando a demanda está alta. O Pro garante acesso ininterrupto, você nunca fica sem acesso.",
+   "lab": "Escrevendo com um laboratório ou grupo de pesquisa? Pergunte sobre nossos preços para laboratórios e departamentos:"
   },
   "faq": {
    "title": "Perguntas que os pesquisadores fazem",
@@ -2345,7 +2352,8 @@
     "availability": "مضمون · متاح دائماً"
    },
    "note": "عمليات القراءة مجانية وغير محدودة دائمًا. الوصول المجاني يعمل بأفضل جهد ممكن حسب توفر السعة. كما تحتاج كل باقة إلى حساب Overleaf مع تكامل Git، وهي ميزة مدفوعة في Overleaf.",
-   "capacity_note": "تعمل الخطة المجانية على السعة الفائضة وقد تتوقف مؤقتاً لفترة وجيزة عند ارتفاع الطلب. تضمن Pro وصولاً متواصلاً دون انقطاع، فلن تُحرم من الوصول أبداً."
+   "capacity_note": "تعمل الخطة المجانية على السعة الفائضة وقد تتوقف مؤقتاً لفترة وجيزة عند ارتفاع الطلب. تضمن Pro وصولاً متواصلاً دون انقطاع، فلن تُحرم من الوصول أبداً.",
+   "lab": "هل تكتب مع مختبر أو مجموعة بحثية؟ اسأل عن أسعار المختبرات والأقسام:"
   },
   "faq": {
    "title": "أسئلة يطرحها الباحثون",
@@ -2663,7 +2671,8 @@
     "availability": "सुनिश्चित · हमेशा उपलब्ध"
    },
    "note": "रीड्स हमेशा मुफ्त और असीमित होते हैं। फ्री एक्सेस बेस्ट-एफर्ट आधार पर है, जैसी क्षमता उपलब्ध हो। हर प्लान के लिए Git integration वाला एक Overleaf खाता भी आवश्यक है, जो Overleaf की एक सशुल्क सुविधा है।",
-   "capacity_note": "फ्री टियर अतिरिक्त क्षमता पर चलता है और मांग अधिक होने पर कुछ देर के लिए रुक सकता है। Pro निर्बाध पहुँच की गारंटी देता है, आपको कभी मना नहीं किया जाता।"
+   "capacity_note": "फ्री टियर अतिरिक्त क्षमता पर चलता है और मांग अधिक होने पर कुछ देर के लिए रुक सकता है। Pro निर्बाध पहुँच की गारंटी देता है, आपको कभी मना नहीं किया जाता।",
+   "lab": "लैब या रिसर्च ग्रुप के साथ लिख रहे हैं? लैब और डिपार्टमेंट प्राइसिंग के बारे में पूछें:"
   },
   "faq": {
    "title": "शोधकर्ताओं के सवाल",
@@ -2981,7 +2990,8 @@
     "availability": "보장 · 항상 이용 가능"
    },
    "note": "읽기는 항상 무료이며 무제한입니다. 무료 액세스는 용량이 허용하는 범위에서 최선을 다해 제공됩니다(best-effort). 모든 요금제에는 Git 연동이 포함된 Overleaf 계정도 필요하며, 이는 유료 Overleaf 기능입니다.",
-   "capacity_note": "무료 요금제는 여유 용량으로 운영되며 수요가 많을 때 잠시 중단될 수 있습니다. Pro는 끊김 없는 이용을 보장하므로 언제든 이용이 거부되지 않습니다."
+   "capacity_note": "무료 요금제는 여유 용량으로 운영되며 수요가 많을 때 잠시 중단될 수 있습니다. Pro는 끊김 없는 이용을 보장하므로 언제든 이용이 거부되지 않습니다.",
+   "lab": "연구실이나 연구 그룹과 함께 작업하시나요? 연구실 및 학과 단위 요금제를 문의해 주세요:"
   },
   "faq": {
    "title": "연구자들이 묻는 질문",
@@ -3299,7 +3309,8 @@
     "availability": "Гарантированно · всегда доступно"
    },
    "note": "Чтение всегда бесплатное и неограниченное. Бесплатный доступ предоставляется по мере наличия свободных мощностей, без гарантий. Для любого тарифа также нужен аккаунт Overleaf с интеграцией Git, а это платная функция Overleaf.",
-   "capacity_note": "Бесплатный тариф работает на свободных ресурсах и может ненадолго приостанавливаться при высокой нагрузке. Pro гарантирует бесперебойный доступ, вам никогда не откажут."
+   "capacity_note": "Бесплатный тариф работает на свободных ресурсах и может ненадолго приостанавливаться при высокой нагрузке. Pro гарантирует бесперебойный доступ, вам никогда не откажут.",
+   "lab": "Пишете вместе с лабораторией или научной группой? Узнайте о тарифах для лабораторий и кафедр:"
   },
   "faq": {
    "title": "Вопросы, которые задают исследователи",
@@ -3617,7 +3628,8 @@
     "availability": "Garantito · sempre attivo"
    },
    "note": "Le letture sono sempre gratuite e illimitate. L'accesso gratuito è best-effort, in base alla capacità disponibile. Ogni piano richiede inoltre un account Overleaf con integrazione Git, che è una funzionalità Overleaf a pagamento.",
-   "capacity_note": "Il piano gratuito funziona sulla capacità in eccesso e può sospendersi brevemente nei momenti di forte domanda. Pro garantisce un accesso senza interruzioni: non ti viene mai negato l'accesso."
+   "capacity_note": "Il piano gratuito funziona sulla capacità in eccesso e può sospendersi brevemente nei momenti di forte domanda. Pro garantisce un accesso senza interruzioni: non ti viene mai negato l'accesso.",
+   "lab": "Scrivi con un laboratorio o un gruppo di ricerca? Chiedici informazioni sui prezzi per laboratori e dipartimenti:"
   },
   "faq": {
    "title": "Le domande dei ricercatori",

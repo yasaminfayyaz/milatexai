@@ -429,6 +429,8 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   </div>
   {_node(en,'p','pricing.capacity_note','sub center small')}
   {_node(en,'p','pricing.note','sub center small')}
+  <p class='sub center small lab-line'><span data-i18n='pricing.lab'>{_t(en,'pricing.lab')}</span>
+    <a href='mailto:support@milatexai.com?subject=Lab%20pricing'>support@milatexai.com</a></p>
 </section>"""
 
     sec_points = "".join(
