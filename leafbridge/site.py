@@ -257,6 +257,34 @@ _SEE_ART = """<svg class='see-art' viewBox='0 0 640 300' role='img'
 </svg>"""
 
 
+# Mini illustrations for the feature cards (index-aligned with en.features).
+# Same visual system as the hero: CSS-var colors, language-neutral, decorative.
+_A = "var(--accent)"
+_M = "var(--muted)"
+_FEAT_ART = [
+    # 1 edit by conversation: chat bubble rewriting a text line
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><rect x='6' y='10' width='64' height='34' rx='10' fill='{_A}'/><path d='M22 44 L30 56 L36 44 Z' fill='{_A}'/><rect x='16' y='20' width='44' height='5' rx='2.5' fill='#fff' opacity='.9'/><rect x='16' y='30' width='30' height='5' rx='2.5' fill='#fff' opacity='.65'/><rect x='88' y='14' width='60' height='6' rx='3' fill='{_M}' opacity='.35'/><rect x='88' y='28' width='60' height='8' rx='4' fill='{_A}' opacity='.2'/><rect x='91' y='30' width='46' height='4' rx='2' fill='{_A}'/><rect x='88' y='44' width='48' height='6' rx='3' fill='{_M}' opacity='.35'/></svg>""",
+    # 2 straight to Overleaf: arrow flowing into a document
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><path d='M10 32 H86' stroke='{_A}' stroke-width='4' stroke-linecap='round' stroke-dasharray='2 8'/><path d='M80 22 L98 32 L80 42 Z' fill='{_A}'/><rect x='106' y='8' width='44' height='48' rx='8' fill='var(--card)' stroke='{_A}' stroke-width='2'/><rect x='114' y='18' width='28' height='4' rx='2' fill='{_M}' opacity='.5'/><rect x='114' y='28' width='28' height='4' rx='2' fill='{_A}'/><rect x='114' y='38' width='20' height='4' rx='2' fill='{_M}' opacity='.5'/></svg>""",
+    # 3 real git commits: commit graph with highlighted head
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><path d='M20 32 H140' stroke='{_M}' stroke-width='3' opacity='.4'/><circle cx='36' cy='32' r='8' fill='{_M}' opacity='.5'/><circle cx='72' cy='32' r='8' fill='{_M}' opacity='.5'/><circle cx='108' cy='32' r='11' fill='{_A}'/><path d='M103 32 l4 4 l7 -8' stroke='#fff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='140' cy='32' r='6' fill='none' stroke='{_M}' stroke-width='2' stroke-dasharray='3 3' opacity='.6'/></svg>""",
+    # 4 catch+fix errors: warning turning into a green check
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><path d='M34 12 L56 50 H12 Z' fill='none' stroke='#e5484d' stroke-width='3.5' stroke-linejoin='round'/><rect x='32' y='24' width='4' height='12' rx='2' fill='#e5484d'/><circle cx='34' cy='43' r='2.4' fill='#e5484d'/><path d='M70 32 H96' stroke='{_A}' stroke-width='3.5' stroke-linecap='round'/><path d='M90 24 L102 32 L90 40 Z' fill='{_A}'/><circle cx='128' cy='32' r='17' fill='#22c55e'/><path d='M119 32 l6 6 l12 -13' stroke='#fff' stroke-width='3.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>""",
+    # 5 token out of the chat: padlock apart from the chat bubble
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><rect x='12' y='14' width='56' height='30' rx='9' fill='{_M}' opacity='.3'/><path d='M26 44 L32 54 L38 44 Z' fill='{_M}' opacity='.3'/><rect x='20' y='23' width='38' height='4' rx='2' fill='var(--bg)'/><rect x='20' y='31' width='26' height='4' rx='2' fill='var(--bg)'/><rect x='100' y='28' width='40' height='26' rx='7' fill='{_A}'/><path d='M108 28 v-6 a12 12 0 0 1 24 0 v6' fill='none' stroke='{_A}' stroke-width='5'/><circle cx='120' cy='39' r='4' fill='#fff'/><rect x='118' y='41' width='4' height='7' rx='2' fill='#fff'/></svg>""",
+    # 6 open source: code brackets + magnifier
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><path d='M34 14 L16 32 L34 50' fill='none' stroke='{_A}' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M58 14 L76 32 L58 50' fill='none' stroke='{_A}' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M50 12 L42 52' stroke='{_M}' stroke-width='3.6' stroke-linecap='round' opacity='.6'/><circle cx='116' cy='30' r='15' fill='none' stroke='{_M}' stroke-width='3.6' opacity='.75'/><line x1='127' y1='41' x2='140' y2='54' stroke='{_M}' stroke-width='4.5' stroke-linecap='round' opacity='.75'/></svg>""",
+    # 7 verified citations: bib entry with a verified seal
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><rect x='10' y='10' width='84' height='44' rx='8' fill='var(--card)' stroke='var(--line)'/><text x='20' y='32' font-family='Georgia,serif' font-size='17' fill='{_A}'>@</text><rect x='36' y='22' width='46' height='5' rx='2.5' fill='{_M}' opacity='.55'/><rect x='20' y='38' width='62' height='5' rx='2.5' fill='{_M}' opacity='.35'/><circle cx='122' cy='32' r='16' fill='{_A}'/><path d='M114 32 l6 6 l11 -12' stroke='#fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M122 12 l3 5 M136 18 l-4 4 M142 32 l-6 0 M136 46 l-4 -4 M122 52 l0 -6 M108 46 l4 -4 M102 32 l6 0 M108 18 l4 4' stroke='{_A}' stroke-width='2' stroke-linecap='round' opacity='.5'/></svg>""",
+    # 8 checkpoints/undo: history clock with an undo arrow
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><circle cx='60' cy='32' r='21' fill='none' stroke='{_A}' stroke-width='4'/><path d='M60 20 V32 L70 38' fill='none' stroke='{_A}' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M96 44 a26 26 0 0 0 -6 -30' fill='none' stroke='{_M}' stroke-width='4' stroke-linecap='round' opacity='.7'/><path d='M84 10 L92 16 L84 22' fill='none' stroke='{_M}' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='.7'/><circle cx='124' cy='20' r='5' fill='{_A}' opacity='.5'/><circle cx='134' cy='34' r='5' fill='{_A}' opacity='.75'/><circle cx='124' cy='48' r='5' fill='{_A}'/></svg>""",
+    # 9 reviewer-ready: page with add/delete marked lines
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><rect x='24' y='6' width='52' height='52' rx='8' fill='var(--card)' stroke='var(--line)'/><rect x='32' y='16' width='36' height='4' rx='2' fill='{_M}' opacity='.4'/><rect x='32' y='26' width='36' height='5' rx='2.5' fill='#22c55e' opacity='.85'/><rect x='32' y='36' width='28' height='5' rx='2.5' fill='#e5484d' opacity='.75'/><line x1='32' y1='38.5' x2='60' y2='38.5' stroke='var(--bg)' stroke-width='1.6'/><rect x='32' y='46' width='36' height='4' rx='2' fill='{_M}' opacity='.4'/><path d='M92 32 H114' stroke='{_A}' stroke-width='3.5' stroke-linecap='round'/><path d='M108 24 L120 32 L108 40 Z' fill='{_A}'/><rect x='126' y='14' width='26' height='36' rx='6' fill='{_A}' opacity='.16'/><text x='131' y='38' font-family='Georgia,serif' font-size='14' fill='{_A}'>arX</text></svg>""",
+    # 10 figures from chat: bar chart + tikz node graph
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><rect x='14' y='34' width='9' height='18' rx='2' fill='{_A}' opacity='.5'/><rect x='28' y='24' width='9' height='28' rx='2' fill='{_A}' opacity='.75'/><rect x='42' y='14' width='9' height='38' rx='2' fill='{_A}'/><path d='M10 56 H60' stroke='{_M}' stroke-width='2.4' opacity='.5'/><circle cx='100' cy='18' r='8' fill='none' stroke='{_A}' stroke-width='3'/><circle cx='140' cy='28' r='8' fill='none' stroke='{_A}' stroke-width='3'/><circle cx='112' cy='48' r='8' fill='none' stroke='{_A}' stroke-width='3'/><path d='M107 21 L133 26 M104 26 L109 40 M119 45 L133 33' stroke='{_M}' stroke-width='2.6' opacity='.7'/></svg>""",
+]
+
+
 def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     content = content or load_content()
     en = content.get("en", _FALLBACK_EN)
@@ -310,7 +338,9 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
 </section>"""
 
     feature_cards = "".join(
-        f"<div class='card'>{_node(en,'h3',f'features.{i}.title')}{_node(en,'p',f'features.{i}.desc','muted')}</div>"
+        f"<div class='card'>"
+        f"<div class='feat-art'>{_FEAT_ART[i] if i < len(_FEAT_ART) else ''}</div>"
+        f"{_node(en,'h3',f'features.{i}.title')}{_node(en,'p',f'features.{i}.desc','muted')}</div>"
         for i in range(n_features)
     )
     features = f"""<section class='section' id='features'>
@@ -762,6 +792,8 @@ a{color:inherit;text-decoration:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
 .section.alt .card{background:var(--bg)}
 .card h3{margin:0 0 8px;font-size:17px}
+.feat-art{margin:0 0 14px}
+.feat-art svg{width:100%;max-width:170px;height:66px;display:block}
 .muted{color:var(--muted);margin:0}
 .pre{white-space:pre-line}
 .steps{list-style:none;padding:0;margin:34px auto 0;max-width:720px;display:grid;gap:16px}
