@@ -15,6 +15,16 @@ RUN curl -fsSL "https://github.com/tectonic-typesetting/tectonic/releases/downlo
     && chmod +x /usr/local/bin/tectonic \
     && tectonic --version
 
+# latexdiff (self-contained perl script; slim's perl-base suffices): the
+# tracked-changes PDF feature. Verified at build.
+ARG LATEXDIFF_VERSION=1.4.0
+RUN curl -fsSL "https://github.com/ftilmann/latexdiff/releases/download/${LATEXDIFF_VERSION}/latexdiff-${LATEXDIFF_VERSION}.tar.gz" \
+      | tar -xz -C /tmp \
+    && cp /tmp/latexdiff/latexdiff-so /usr/local/bin/latexdiff \
+    && chmod +x /usr/local/bin/latexdiff \
+    && rm -rf /tmp/latexdiff \
+    && latexdiff --version
+
 # Warm the package-bundle cache into an image layer, so the FIRST compile after a
 # cold start needs no network. (Runtime downloads of un-primed packages still work,
 # they're just not persisted past a scale-to-zero.)

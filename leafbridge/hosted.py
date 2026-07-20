@@ -23,6 +23,7 @@ import difflib
 import json
 import os
 import secrets
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, quote
@@ -35,8 +36,8 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
 
 from . import (
-    __version__, citations, figures, latex, paperstats, site, texcompile,
-    texlocate, tikz, web,
+    __version__, arxivprep, citations, figures, latex, paperstats, site,
+    texcompile, texdiff, texlocate, tikz, web,
 )
 from .billing import Billing, plan_change_from_event
 from .capacity import CapacityGate
@@ -243,6 +244,8 @@ class HostedApp:
         )
         # Figure Studio sandbox; disabled (no pool endpoint) is a valid state.
         self.sessions = sessions if sessions is not None else SessionsClient("")
+        # Short-lived download bundles (arXiv zips); ephemeral by design.
+        self.dl_dir = Path(tempfile.gettempdir()) / "mila_dl"
 
     def ensure_pro(self, user: User, feature: str) -> None:
         """Gate a paid-only feature. Admin and Pro pass; free users get a clear
@@ -729,6 +732,65 @@ def create_hosted_server(
         read the document first to find its number or label, then call this. Spanning
         figures return all pages; an unknown reference returns the list of figures."""
         return await _show_float("figure", figure, project)
+
+    # -- tracked changes + arXiv export ---------------------------------------
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def tracked_changes_pdf(ref: str, project: str | None = None):
+        """A tracked-changes PDF (latexdiff): additions and deletions between a
+        commit/checkpoint id (list_checkpoints / get_history) and the CURRENT
+        document, rendered as page images — what journals ask for in a revised
+        submission. Nothing is committed."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.open_repo(proj) as repo:
+                main = texcompile.find_main_tex(repo)
+                if not main:
+                    raise ToolError("Could not find a root .tex to diff.")
+                old = await app.worker.show_file(proj, ref.strip(), main)
+                pdf = await texdiff.diff_pdf(repo, main, old)
+            pngs = texdiff.pdf_pages_to_pngs(pdf)
+        except texdiff.TexDiffError as exc:
+            raise ToolError(str(exc))
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        from fastmcp.utilities.types import Image
+
+        note = (f"Tracked changes {ref} -> current ({len(pngs)} page(s) shown, "
+                "additions/deletions marked).")
+        return [note, *[Image(data=p, format="png") for p in pngs]]
+
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def arxiv_export(project: str | None = None) -> str:
+        """Prepare an arXiv-ready submission zip: flattens all \\input/\\include
+        into one main.tex, strips comment lines, includes the precompiled
+        bibliography (.bbl, which arXiv requires since it will not run bibtex),
+        referenced graphics, and any custom .cls/.bst/.sty. Returns a download
+        link (valid ~15 minutes)."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.open_repo(proj) as repo:
+                main = texcompile.find_main_tex(repo)
+                if not main:
+                    raise ToolError("Could not find a root .tex to export.")
+                bbl = await arxivprep.compile_bbl(repo, main)
+                blob, manifest = arxivprep.build_zip(repo, main, bbl)
+            app.dl_dir.mkdir(parents=True, exist_ok=True)
+            fname = secrets.token_urlsafe(10) + ".zip"
+            (app.dl_dir / fname).write_bytes(blob)
+            code = app.cipher.encrypt(json.dumps({"k": "dl", "f": fname}))
+            url = f"{app.base_url}/dl?code={quote(code, safe='')}"
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        files = "\n".join(f"  - {m}" for m in manifest)
+        bbl_note = "" if bbl else ("\nNOTE: no .bbl was produced (no bibliography or "
+                                   "the compile failed); arXiv may need it.")
+        return (f"arXiv submission bundle ready ({len(blob)} bytes):\n{files}{bbl_note}\n\n"
+                f"Download (about 15 minutes): {url}")
 
     # -- version safety: checkpoints, diffs, restores -------------------------
 
@@ -1415,6 +1477,27 @@ def create_hosted_server(
                 # 500 tells Stripe to retry the delivery later.
                 return Response("apply failed", status_code=500)
         return Response("ok", status_code=200)
+
+    @mcp.custom_route("/dl", methods=["GET"])
+    async def download(request: Request) -> Response:
+        from starlette.responses import FileResponse
+
+        code = request.query_params.get("code", "")
+        try:
+            data = json.loads(app.cipher.decrypt(code, ttl=900))
+            assert data.get("k") == "dl"
+            fname = os.path.basename(str(data["f"]))
+        except Exception:  # noqa: BLE001
+            return HTMLResponse(web.render_notice(
+                "Link expired", "This download link is invalid or has expired. "
+                "Run arxiv_export again for a fresh one.", icon="⏰"), status_code=400)
+        target = app.dl_dir / fname
+        if not target.is_file():
+            return HTMLResponse(web.render_notice(
+                "Bundle gone", "This bundle is no longer on the server (it restarted). "
+                "Run arxiv_export again.", icon="⏰"), status_code=410)
+        return FileResponse(target, filename="arxiv-submission.zip",
+                            media_type="application/zip")
 
     def _verified(request_code: str):
         """Return (user_id, email) for a valid capability code, else None. Codes
