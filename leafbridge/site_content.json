@@ -17,7 +17,7 @@
    "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project. No pasting sections, no downloading files, your AI works on the live document, always the ground truth, and every change lands in Overleaf as a real Git commit.",
    "cta_primary": "Get started",
    "cta_secondary": "See how it works",
-   "note": "What you need: an Overleaf account with Git integration (a paid Overleaf feature), plus Claude or ChatGPT (their free tiers work fine). MiLatexAI's own Free tier is best-effort as capacity allows; Pro is $4.99 a month for guaranteed access."
+   "note": "What you need: an Overleaf account with Git integration (a paid Overleaf feature), plus Claude or ChatGPT (their free tiers work fine). MiLatexAI's own Free tier is best-effort as capacity allows; Pro is $8.99 a month for guaranteed access."
   },
   "trust": "Your Overleaf Git token is entered on a secure web form, encrypted at rest, and never appears in the chat. The full connector is open source on GitHub under the AGPL license, so you can audit exactly what it does.",
   "features": [
@@ -111,7 +111,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "Unlimited",
     "features": [
@@ -137,7 +137,7 @@
     },
     {
      "q": "How much does MiLatexAI cost?",
-     "a": "MiLatexAI works with the free tiers of Claude and ChatGPT, and it has its own Free tier: 1 project, 25 write-commits a month, and unlimited reads, running on spare capacity. For guaranteed, unlimited access, Pro is $4.99 a month. Overleaf's Git integration is billed separately by Overleaf."
+     "a": "MiLatexAI works with the free tiers of Claude and ChatGPT, and it has its own Free tier: 1 project, 25 write-commits a month, and unlimited reads, running on spare capacity. For guaranteed, unlimited access, Pro is $8.99 a month. Overleaf's Git integration is billed separately by Overleaf."
     },
     {
      "q": "Is my Overleaf token safe?",
@@ -336,7 +336,7 @@
    "subtitle": "让 Claude 或 ChatGPT 直接编辑你真实的 Overleaf 项目。无需粘贴章节，无需下载文件，AI 始终在实时文档（也就是唯一权威的原稿）上工作，每一处改动都会作为一次真实的 Git 提交同步进 Overleaf。",
    "cta_primary": "开始使用",
    "cta_secondary": "了解工作原理",
-   "note": "你需要准备：一个开通了 Git 集成（Overleaf 的付费功能）的 Overleaf 账户，以及 Claude 或 ChatGPT（它们的免费版即可正常使用）。MiLatexAI 自己的 Free（免费）套餐会在容量允许的情况下尽力提供服务；Pro 为每月 $4.99，可保证稳定访问。"
+   "note": "你需要准备：一个开通了 Git 集成（Overleaf 的付费功能）的 Overleaf 账户，以及 Claude 或 ChatGPT（它们的免费版即可正常使用）。MiLatexAI 自己的 Free（免费）套餐会在容量允许的情况下尽力提供服务；Pro 为每月 $8.99，可保证稳定访问。"
   },
   "trust": "你的 Overleaf Git 令牌在一个安全的网页表单中输入，静态加密存储，绝不会出现在对话中。整个连接器在 GitHub 上以 AGPL 许可证开源，你可以完整审查它究竟做了什么。",
   "features": [
@@ -424,7 +424,7 @@
    },
    "pro": {
     "name": "专业版",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "无限制",
     "features": [
@@ -450,7 +450,7 @@
     },
     {
      "q": "MiLatexAI 收费多少？",
-     "a": "MiLatexAI 可搭配 Claude 和 ChatGPT 的免费版使用，并且它自己也有一个 Free（免费）套餐：1 个项目、每月 25 次写入提交、不限量读取，运行在闲置容量上。如需保证的、不限量的访问，Pro 为每月 $4.99。Overleaf 的 Git 集成由 Overleaf 单独计费。"
+     "a": "MiLatexAI 可搭配 Claude 和 ChatGPT 的免费版使用，并且它自己也有一个 Free（免费）套餐：1 个项目、每月 25 次写入提交、不限量读取，运行在闲置容量上。如需保证的、不限量的访问，Pro 为每月 $8.99。Overleaf 的 Git 集成由 Overleaf 单独计费。"
     },
     {
      "q": "我的 Overleaf 令牌安全吗？",
@@ -655,7 +655,7 @@
    "subtitle": "Demandez à Claude ou ChatGPT de modifier votre véritable projet Overleaf. Aucune section à coller, aucun fichier à télécharger, votre IA travaille sur le document en direct, toujours la source de vérité, et chaque modification arrive dans Overleaf sous la forme d'un véritable commit Git.",
    "cta_primary": "Commencer",
    "cta_secondary": "Voir le fonctionnement",
-   "note": "Ce dont vous avez besoin : un compte Overleaf avec l'intégration Git (une fonctionnalité payante d'Overleaf), ainsi que Claude ou ChatGPT (leurs offres gratuites conviennent parfaitement). L'offre Free de MiLatexAI fonctionne au mieux, selon la capacité disponible. Pro coûte $4.99 par mois pour un accès garanti."
+   "note": "Ce dont vous avez besoin : un compte Overleaf avec l'intégration Git (une fonctionnalité payante d'Overleaf), ainsi que Claude ou ChatGPT (leurs offres gratuites conviennent parfaitement). L'offre Free de MiLatexAI fonctionne au mieux, selon la capacité disponible. Pro coûte $8.99 par mois pour un accès garanti."
   },
   "trust": "Votre jeton Git Overleaf est saisi dans un formulaire web sécurisé, chiffré au repos et n'apparaît jamais dans la conversation. Le connecteur complet est open source sur GitHub sous licence AGPL, vous pouvez donc vérifier précisément ce qu'il fait.",
   "features": [
@@ -743,7 +743,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "Illimité",
     "features": [
@@ -769,7 +769,7 @@
     },
     {
      "q": "Combien coûte MiLatexAI ?",
-     "a": "MiLatexAI fonctionne avec les offres gratuites de Claude et ChatGPT, et il dispose de sa propre offre Free : 1 projet, 25 commits d'écriture par mois et des lectures illimitées, s'exécutant sur la capacité disponible. Pour un accès garanti et illimité, Pro coûte $4.99 par mois. L'intégration Git d'Overleaf est facturée séparément par Overleaf."
+     "a": "MiLatexAI fonctionne avec les offres gratuites de Claude et ChatGPT, et il dispose de sa propre offre Free : 1 projet, 25 commits d'écriture par mois et des lectures illimitées, s'exécutant sur la capacité disponible. Pour un accès garanti et illimité, Pro coûte $8.99 par mois. L'intégration Git d'Overleaf est facturée séparément par Overleaf."
     },
     {
      "q": "Mon jeton Overleaf est-il en sécurité ?",
@@ -974,7 +974,7 @@
    "subtitle": "Pídele a Claude o ChatGPT que edite tu proyecto real de Overleaf. Sin pegar secciones ni descargar archivos, tu IA trabaja sobre el documento en vivo, siempre la fuente de verdad, y cada cambio llega a Overleaf como un commit de Git real.",
    "cta_primary": "Empieza ahora",
    "cta_secondary": "Descubre cómo funciona",
-   "note": "Lo que necesitas: una cuenta de Overleaf con integración de Git (una función de pago de Overleaf), además de Claude o ChatGPT (sus niveles gratuitos funcionan sin problema). El nivel Free propio de MiLatexAI funciona según la capacidad disponible (best-effort); Pro cuesta $4.99 al mes y garantiza el acceso."
+   "note": "Lo que necesitas: una cuenta de Overleaf con integración de Git (una función de pago de Overleaf), además de Claude o ChatGPT (sus niveles gratuitos funcionan sin problema). El nivel Free propio de MiLatexAI funciona según la capacidad disponible (best-effort); Pro cuesta $8.99 al mes y garantiza el acceso."
   },
   "trust": "Tu token de Git de Overleaf se introduce en un formulario web seguro, se cifra en reposo y nunca aparece en el chat. El conector completo es de código abierto en GitHub bajo la licencia AGPL, así que puedes auditar exactamente lo que hace.",
   "features": [
@@ -1062,7 +1062,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "Ilimitado",
     "features": [
@@ -1088,7 +1088,7 @@
     },
     {
      "q": "¿Cuánto cuesta MiLatexAI?",
-     "a": "MiLatexAI funciona con los niveles gratuitos de Claude y ChatGPT, y tiene su propio nivel Free: 1 proyecto, 25 write-commits al mes y lecturas ilimitadas, funcionando con capacidad sobrante. Para un acceso garantizado e ilimitado, Pro cuesta $4.99 al mes. La integración de Git de Overleaf la factura Overleaf por separado."
+     "a": "MiLatexAI funciona con los niveles gratuitos de Claude y ChatGPT, y tiene su propio nivel Free: 1 proyecto, 25 write-commits al mes y lecturas ilimitadas, funcionando con capacidad sobrante. Para un acceso garantizado e ilimitado, Pro cuesta $8.99 al mes. La integración de Git de Overleaf la factura Overleaf por separado."
     },
     {
      "q": "¿Está seguro mi token de Overleaf?",
@@ -1293,7 +1293,7 @@
    "subtitle": "Lass Claude oder ChatGPT dein echtes Overleaf-Projekt bearbeiten. Keine Abschnitte einfügen, keine Dateien herunterladen, deine KI arbeitet direkt am lebenden Dokument, immer die maßgebliche Version, und jede Änderung landet als echter Git-Commit in Overleaf.",
    "cta_primary": "Loslegen",
    "cta_secondary": "So funktioniert's",
-   "note": "Was Sie brauchen: ein Overleaf-Konto mit Git-Integration (eine kostenpflichtige Overleaf-Funktion) sowie Claude oder ChatGPT (deren kostenlose Tarife reichen aus). Der eigene Free-Tarif von MiLatexAI arbeitet nach dem Best-Effort-Prinzip, je nach verfügbarer Kapazität. Pro kostet $4.99 pro Monat und garantiert den Zugriff."
+   "note": "Was Sie brauchen: ein Overleaf-Konto mit Git-Integration (eine kostenpflichtige Overleaf-Funktion) sowie Claude oder ChatGPT (deren kostenlose Tarife reichen aus). Der eigene Free-Tarif von MiLatexAI arbeitet nach dem Best-Effort-Prinzip, je nach verfügbarer Kapazität. Pro kostet $8.99 pro Monat und garantiert den Zugriff."
   },
   "trust": "Dein Overleaf-Git-Token wird über ein sicheres Webformular eingegeben, verschlüsselt gespeichert und erscheint nie im Chat. Der vollständige Connector ist auf GitHub unter der AGPL-Lizenz quelloffen, sodass du genau prüfen kannst, was er tut.",
   "features": [
@@ -1381,7 +1381,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "Unbegrenzt",
     "features": [
@@ -1407,7 +1407,7 @@
     },
     {
      "q": "Wie viel kostet MiLatexAI?",
-     "a": "MiLatexAI funktioniert mit den kostenlosen Tarifen von Claude und ChatGPT und verfügt über einen eigenen Free-Tarif: 1 Projekt, 25 Schreib-Commits pro Monat und unbegrenzte Lesevorgänge, betrieben mit freier Restkapazität. Für garantierten, unbegrenzten Zugriff kostet Pro $4.99 pro Monat. Die Git-Integration von Overleaf wird separat von Overleaf abgerechnet."
+     "a": "MiLatexAI funktioniert mit den kostenlosen Tarifen von Claude und ChatGPT und verfügt über einen eigenen Free-Tarif: 1 Projekt, 25 Schreib-Commits pro Monat und unbegrenzte Lesevorgänge, betrieben mit freier Restkapazität. Für garantierten, unbegrenzten Zugriff kostet Pro $8.99 pro Monat. Die Git-Integration von Overleaf wird separat von Overleaf abgerechnet."
     },
     {
      "q": "Ist mein Overleaf-Token sicher?",
@@ -1612,7 +1612,7 @@
    "subtitle": "Claude や ChatGPT に頼むだけで、あなたの本物の Overleaf プロジェクトをそのまま編集。セクションを貼り付けたり、ファイルをダウンロードしたりする必要はありません、AI は常に唯一の原本となるライブ文書を直接編集し、すべての変更が本物の Git コミットとして Overleaf に反映されます。",
    "cta_primary": "始める",
    "cta_secondary": "仕組みを見る",
-   "note": "必要なもの: Git integration付きのOverleafアカウント(これはOverleafの有料機能です)、およびClaudeまたはChatGPT(いずれも無料プランで問題なく利用できます)。MiLatexAI独自のFreeプランは、空き容量に応じたベストエフォート提供です。保証されたアクセスを求める場合、Proは月額$4.99です。"
+   "note": "必要なもの: Git integration付きのOverleafアカウント(これはOverleafの有料機能です)、およびClaudeまたはChatGPT(いずれも無料プランで問題なく利用できます)。MiLatexAI独自のFreeプランは、空き容量に応じたベストエフォート提供です。保証されたアクセスを求める場合、Proは月額$8.99です。"
   },
   "trust": "あなたのOverleaf Gitトークンは、安全なWebフォームから入力され、保存時に暗号化されます。チャット上に表示されることは一切ありません。コネクター全体はAGPLライセンスのもとGitHubでオープンソースとして公開されているため、実際の動作を正確に監査できます。",
   "features": [
@@ -1700,7 +1700,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "無制限",
     "features": [
@@ -1726,7 +1726,7 @@
     },
     {
      "q": "MiLatexAIの料金はいくらですか?",
-     "a": "MiLatexAIはClaudeとChatGPTの無料プランで動作し、独自のFreeプランも用意しています: 1プロジェクト、月25回の書き込みコミット、無制限の読み取りを、余剰容量で提供します。保証された無制限のアクセスを求める場合、Proは月額$4.99です。OverleafのGit integrationはOverleafによって別途請求されます。"
+     "a": "MiLatexAIはClaudeとChatGPTの無料プランで動作し、独自のFreeプランも用意しています: 1プロジェクト、月25回の書き込みコミット、無制限の読み取りを、余剰容量で提供します。保証された無制限のアクセスを求める場合、Proは月額$8.99です。OverleafのGit integrationはOverleafによって別途請求されます。"
     },
     {
      "q": "Overleafトークンは安全ですか？",
@@ -1931,7 +1931,7 @@
    "subtitle": "Peça ao Claude ou ao ChatGPT para editar seu projeto real no Overleaf. Sem colar seções, sem baixar arquivos, sua IA trabalha no documento ao vivo, sempre a fonte da verdade, e cada mudança chega ao Overleaf como um commit real no Git.",
    "cta_primary": "Começar",
    "cta_secondary": "Veja como funciona",
-   "note": "O que você precisa: uma conta Overleaf com integração Git (um recurso pago do Overleaf), além do Claude ou do ChatGPT (os planos gratuitos deles funcionam bem). O plano Free do próprio MiLatexAI opera conforme a capacidade disponível, sem garantias. O Pro custa $4.99 por mês e garante acesso."
+   "note": "O que você precisa: uma conta Overleaf com integração Git (um recurso pago do Overleaf), além do Claude ou do ChatGPT (os planos gratuitos deles funcionam bem). O plano Free do próprio MiLatexAI opera conforme a capacidade disponível, sem garantias. O Pro custa $8.99 por mês e garante acesso."
   },
   "trust": "Seu token Git do Overleaf é inserido em um formulário web seguro, criptografado em repouso e nunca aparece no chat. O conector completo é de código aberto no GitHub sob a licença AGPL, então você pode auditar exatamente o que ele faz.",
   "features": [
@@ -2019,7 +2019,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "Ilimitado",
     "features": [
@@ -2045,7 +2045,7 @@
     },
     {
      "q": "Quanto custa o MiLatexAI?",
-     "a": "O MiLatexAI funciona com os planos gratuitos do Claude e do ChatGPT, e tem o seu próprio plano Free: 1 projeto, 25 write-commits por mês e leituras ilimitadas, rodando com capacidade ociosa. Para acesso garantido e ilimitado, o Pro custa $4.99 por mês. A integração Git do Overleaf é cobrada separadamente pelo Overleaf."
+     "a": "O MiLatexAI funciona com os planos gratuitos do Claude e do ChatGPT, e tem o seu próprio plano Free: 1 projeto, 25 write-commits por mês e leituras ilimitadas, rodando com capacidade ociosa. Para acesso garantido e ilimitado, o Pro custa $8.99 por mês. A integração Git do Overleaf é cobrada separadamente pelo Overleaf."
     },
     {
      "q": "Meu token do Overleaf está seguro?",
@@ -2250,7 +2250,7 @@
    "subtitle": "اطلب من Claude أو ChatGPT تعديل مشروعك الحقيقي على Overleaf. لا لصق للأقسام، ولا تنزيل للملفات، يعمل الذكاء الاصطناعي مباشرةً على المستند الحيّ، وهو دائمًا المرجع الموثوق الوحيد، ويصل كل تغيير إلى Overleaf كـ commit حقيقي في Git.",
    "cta_primary": "ابدأ الآن",
    "cta_secondary": "شاهد كيف يعمل",
-   "note": "ما تحتاج إليه: حساب Overleaf مع تكامل Git (وهي ميزة مدفوعة في Overleaf)، بالإضافة إلى Claude أو ChatGPT (تعمل باقاتهما المجانية بشكل جيد). الباقة المجانية الخاصة بـ MiLatexAI تعمل بأفضل جهد ممكن حسب توفر السعة، أما Pro فتكلفتها $4.99 شهريًا مقابل وصول مضمون."
+   "note": "ما تحتاج إليه: حساب Overleaf مع تكامل Git (وهي ميزة مدفوعة في Overleaf)، بالإضافة إلى Claude أو ChatGPT (تعمل باقاتهما المجانية بشكل جيد). الباقة المجانية الخاصة بـ MiLatexAI تعمل بأفضل جهد ممكن حسب توفر السعة، أما Pro فتكلفتها $8.99 شهريًا مقابل وصول مضمون."
   },
   "trust": "يُدخَل رمز Git الخاص بـ Overleaf عبر نموذج ويب آمن، ويُشفَّر أثناء التخزين، ولا يظهر أبداً في المحادثة. الموصّل بالكامل مفتوح المصدر على GitHub بموجب رخصة AGPL، بحيث يمكنك مراجعة ما يفعله بالضبط.",
   "features": [
@@ -2338,7 +2338,7 @@
    },
    "pro": {
     "name": "احترافي",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "غير محدود",
     "features": [
@@ -2364,7 +2364,7 @@
     },
     {
      "q": "كم تبلغ تكلفة MiLatexAI؟",
-     "a": "يعمل MiLatexAI مع الباقات المجانية لكل من Claude وChatGPT، وله باقته المجانية الخاصة: 1 مشروع، و25 عملية كتابة (write-commits) شهريًا، وعمليات قراءة غير محدودة، تعمل على السعة الفائضة. للحصول على وصول مضمون وغير محدود، تكلفة Pro هي $4.99 شهريًا. يُحاسب على تكامل Git في Overleaf بشكل منفصل من قِبل Overleaf."
+     "a": "يعمل MiLatexAI مع الباقات المجانية لكل من Claude وChatGPT، وله باقته المجانية الخاصة: 1 مشروع، و25 عملية كتابة (write-commits) شهريًا، وعمليات قراءة غير محدودة، تعمل على السعة الفائضة. للحصول على وصول مضمون وغير محدود، تكلفة Pro هي $8.99 شهريًا. يُحاسب على تكامل Git في Overleaf بشكل منفصل من قِبل Overleaf."
     },
     {
      "q": "هل رمز Overleaf الخاص بي آمن؟",
@@ -2569,7 +2569,7 @@
    "subtitle": "Claude या ChatGPT से कहें कि वे आपके असली Overleaf प्रोजेक्ट को सीधे एडिट करें। न कोई सेक्शन पेस्ट करना, न फ़ाइलें डाउनलोड करना, आपका AI लाइव डॉक्यूमेंट पर ही काम करता है, जो हमेशा असली और आधिकारिक प्रति रहती है, और हर बदलाव Overleaf में एक असली Git commit बनकर पहुँचता है।",
    "cta_primary": "शुरू करें",
    "cta_secondary": "देखें यह कैसे काम करता है",
-   "note": "आपको जो चाहिए: Git integration वाला एक Overleaf खाता (यह Overleaf की एक सशुल्क सुविधा है), साथ ही Claude या ChatGPT (इनके फ्री टियर ठीक से काम करते हैं)। MiLatexAI का अपना Free टियर क्षमता उपलब्ध होने पर बेस्ट-एफर्ट आधार पर चलता है; गारंटीड पहुँच के लिए Pro की कीमत $4.99 प्रति माह है।"
+   "note": "आपको जो चाहिए: Git integration वाला एक Overleaf खाता (यह Overleaf की एक सशुल्क सुविधा है), साथ ही Claude या ChatGPT (इनके फ्री टियर ठीक से काम करते हैं)। MiLatexAI का अपना Free टियर क्षमता उपलब्ध होने पर बेस्ट-एफर्ट आधार पर चलता है; गारंटीड पहुँच के लिए Pro की कीमत $8.99 प्रति माह है।"
   },
   "trust": "आपका Overleaf Git टोकन एक सुरक्षित वेब फ़ॉर्म पर दर्ज किया जाता है, संग्रहण के समय एन्क्रिप्ट किया जाता है, और चैट में कभी दिखाई नहीं देता। पूरा कनेक्टर GitHub पर AGPL लाइसेंस के तहत ओपन सोर्स है, इसलिए आप ठीक-ठीक जाँच सकते हैं कि यह क्या करता है।",
   "features": [
@@ -2657,7 +2657,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "असीमित",
     "features": [
@@ -2683,7 +2683,7 @@
     },
     {
      "q": "MiLatexAI की कीमत कितनी है?",
-     "a": "MiLatexAI, Claude और ChatGPT के फ्री टियर के साथ काम करता है, और इसका अपना Free टियर भी है: 1 प्रोजेक्ट, प्रति माह 25 write-commits, और असीमित रीड्स, जो अतिरिक्त क्षमता पर चलता है। गारंटीड, असीमित पहुँच के लिए, Pro की कीमत $4.99 प्रति माह है। Overleaf का Git integration, Overleaf द्वारा अलग से बिल किया जाता है।"
+     "a": "MiLatexAI, Claude और ChatGPT के फ्री टियर के साथ काम करता है, और इसका अपना Free टियर भी है: 1 प्रोजेक्ट, प्रति माह 25 write-commits, और असीमित रीड्स, जो अतिरिक्त क्षमता पर चलता है। गारंटीड, असीमित पहुँच के लिए, Pro की कीमत $8.99 प्रति माह है। Overleaf का Git integration, Overleaf द्वारा अलग से बिल किया जाता है।"
     },
     {
      "q": "क्या मेरा Overleaf टोकन सुरक्षित है?",
@@ -2888,7 +2888,7 @@
    "subtitle": "Claude나 ChatGPT에게 실제 Overleaf 프로젝트를 직접 편집하도록 맡기세요. 섹션을 붙여넣거나 파일을 내려받을 필요 없이, AI가 언제나 유일한 원본인 실시간 문서에서 바로 작업하고, 모든 변경 사항은 실제 Git 커밋으로 Overleaf에 그대로 반영됩니다.",
    "cta_primary": "시작하기",
    "cta_secondary": "작동 방식 보기",
-   "note": "필요한 것: Git 연동(유료 Overleaf 기능)이 포함된 Overleaf 계정, 그리고 Claude 또는 ChatGPT(무료 등급으로도 문제없이 작동합니다). MiLatexAI 자체의 Free 등급은 여유 용량이 허용하는 범위에서 최선을 다해 제공됩니다(best-effort). Pro는 보장된 액세스를 위해 월 $4.99입니다."
+   "note": "필요한 것: Git 연동(유료 Overleaf 기능)이 포함된 Overleaf 계정, 그리고 Claude 또는 ChatGPT(무료 등급으로도 문제없이 작동합니다). MiLatexAI 자체의 Free 등급은 여유 용량이 허용하는 범위에서 최선을 다해 제공됩니다(best-effort). Pro는 보장된 액세스를 위해 월 $8.99입니다."
   },
   "trust": "Overleaf Git 토큰은 안전한 웹 양식에 입력되어 저장 시 암호화되며, 채팅에는 절대 나타나지 않습니다. 전체 커넥터는 AGPL 라이선스로 GitHub에 오픈 소스로 공개되어 있어, 정확히 어떻게 작동하는지 직접 검증할 수 있습니다.",
   "features": [
@@ -2976,7 +2976,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "무제한",
     "features": [
@@ -3002,7 +3002,7 @@
     },
     {
      "q": "MiLatexAI 이용료는 얼마인가요?",
-     "a": "MiLatexAI는 Claude와 ChatGPT의 무료 등급에서 작동하며, 자체 Free 등급도 제공합니다: 프로젝트 1개, 월 25회 쓰기 커밋(write-commits), 무제한 읽기를 여유 용량에서 실행합니다. 보장된 무제한 액세스를 원하면 Pro는 월 $4.99입니다. Overleaf의 Git 연동은 Overleaf에서 별도로 청구됩니다."
+     "a": "MiLatexAI는 Claude와 ChatGPT의 무료 등급에서 작동하며, 자체 Free 등급도 제공합니다: 프로젝트 1개, 월 25회 쓰기 커밋(write-commits), 무제한 읽기를 여유 용량에서 실행합니다. 보장된 무제한 액세스를 원하면 Pro는 월 $8.99입니다. Overleaf의 Git 연동은 Overleaf에서 별도로 청구됩니다."
     },
     {
      "q": "제 Overleaf 토큰은 안전한가요?",
@@ -3207,7 +3207,7 @@
    "subtitle": "Попросите Claude или ChatGPT отредактировать ваш настоящий проект в Overleaf. Никакой вставки разделов, никаких скачанных файлов, ИИ работает прямо с живым документом, который всегда остаётся единственным источником истины, а каждое изменение попадает в Overleaf настоящим Git-коммитом.",
    "cta_primary": "Начать",
    "cta_secondary": "Посмотреть, как это работает",
-   "note": "Что вам нужно: аккаунт Overleaf с интеграцией Git (платная функция Overleaf), а также Claude или ChatGPT (их бесплатные тарифы вполне подходят). Собственный тариф Free от MiLatexAI работает по мере наличия свободных мощностей, без гарантий. Pro стоит $4.99 в месяц и дает гарантированный доступ."
+   "note": "Что вам нужно: аккаунт Overleaf с интеграцией Git (платная функция Overleaf), а также Claude или ChatGPT (их бесплатные тарифы вполне подходят). Собственный тариф Free от MiLatexAI работает по мере наличия свободных мощностей, без гарантий. Pro стоит $8.99 в месяц и дает гарантированный доступ."
   },
   "trust": "Ваш Git-токен Overleaf вводится в защищённой веб-форме, хранится в зашифрованном виде и никогда не появляется в чате. Полный код коннектора открыт на GitHub под лицензией AGPL, поэтому вы можете точно проверить, что именно он делает.",
   "features": [
@@ -3295,7 +3295,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "Без ограничений",
     "features": [
@@ -3321,7 +3321,7 @@
     },
     {
      "q": "Сколько стоит MiLatexAI?",
-     "a": "MiLatexAI работает с бесплатными тарифами Claude и ChatGPT, и у него есть собственный тариф Free: 1 проект, 25 коммитов на запись в месяц и неограниченное чтение, работающие на свободных мощностях. Для гарантированного неограниченного доступа тариф Pro стоит $4.99 в месяц. Интеграция Git в Overleaf оплачивается отдельно через Overleaf."
+     "a": "MiLatexAI работает с бесплатными тарифами Claude и ChatGPT, и у него есть собственный тариф Free: 1 проект, 25 коммитов на запись в месяц и неограниченное чтение, работающие на свободных мощностях. Для гарантированного неограниченного доступа тариф Pro стоит $8.99 в месяц. Интеграция Git в Overleaf оплачивается отдельно через Overleaf."
     },
     {
      "q": "Безопасен ли мой токен Overleaf?",
@@ -3526,7 +3526,7 @@
    "subtitle": "Chiedi a Claude o ChatGPT di modificare il tuo vero progetto Overleaf. Niente sezioni da incollare, niente file da scaricare, la tua AI lavora sul documento dal vivo, sempre la fonte di verità, e ogni modifica arriva su Overleaf come un vero commit Git.",
    "cta_primary": "Inizia ora",
    "cta_secondary": "Scopri come funziona",
-   "note": "Cosa ti serve: un account Overleaf con integrazione Git (una funzionalità Overleaf a pagamento), più Claude o ChatGPT (i loro piani gratuiti funzionano senza problemi). Il piano Free di MiLatexAI è best-effort, in base alla capacità disponibile; Pro costa $4.99 al mese per un accesso garantito."
+   "note": "Cosa ti serve: un account Overleaf con integrazione Git (una funzionalità Overleaf a pagamento), più Claude o ChatGPT (i loro piani gratuiti funzionano senza problemi). Il piano Free di MiLatexAI è best-effort, in base alla capacità disponibile; Pro costa $8.99 al mese per un accesso garantito."
   },
   "trust": "Il tuo token Git di Overleaf viene inserito in un modulo web sicuro, cifrato a riposo e non compare mai nella chat. L'intero connettore è open source su GitHub con licenza AGPL, così puoi verificare esattamente ciò che fa.",
   "features": [
@@ -3614,7 +3614,7 @@
    },
    "pro": {
     "name": "Pro",
-    "price": "$4.99",
+    "price": "$8.99",
     "period": "/mo",
     "badge": "Illimitato",
     "features": [
@@ -3640,7 +3640,7 @@
     },
     {
      "q": "Quanto costa MiLatexAI?",
-     "a": "MiLatexAI funziona con i piani gratuiti di Claude e ChatGPT e ha un proprio piano Free: 1 progetto, 25 commit di scrittura al mese e letture illimitate, con esecuzione sulla capacità disponibile. Per un accesso garantito e illimitato, Pro costa $4.99 al mese. L'integrazione Git di Overleaf viene fatturata separatamente da Overleaf."
+     "a": "MiLatexAI funziona con i piani gratuiti di Claude e ChatGPT e ha un proprio piano Free: 1 progetto, 25 commit di scrittura al mese e letture illimitate, con esecuzione sulla capacità disponibile. Per un accesso garantito e illimitato, Pro costa $8.99 al mese. L'integrazione Git di Overleaf viene fatturata separatamente da Overleaf."
     },
     {
      "q": "Il mio token Overleaf è al sicuro?",

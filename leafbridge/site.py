@@ -84,7 +84,7 @@ _FALLBACK_EN = {
                          "features": ["1 connected project", "25 write-commits / month", "Unlimited reads & compile checks"],
                          "cta": "Get started",
                          "availability": "Best-effort · subject to capacity"},
-                "pro": {"name": "Pro", "price": "$4.99", "period": "/mo", "badge": "Unlimited",
+                "pro": {"name": "Pro", "price": "$8.99", "period": "/mo", "badge": "Unlimited",
                         "features": ["Unlimited projects", "Unlimited commits", "Priority support"],
                         "cta": "Get started",
                         "availability": "Guaranteed · always on"},
@@ -531,7 +531,7 @@ function applyLang(lang) {{
     )
     url = "https://milatexai.com/"
     og_image = "https://milatexai.com/og.svg"
-    price = html.escape(str(en.get("pricing", {}).get("pro", {}).get("price", "$4.99")))
+    price = html.escape(str(en.get("pricing", {}).get("pro", {}).get("price", "$8.99")))
     jsonld = json.dumps({
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
@@ -544,7 +544,7 @@ function applyLang(lang) {{
         "keywords": "Overleaf MCP server, Model Context Protocol, edit Overleaf with ChatGPT, edit Overleaf with Claude, LaTeX AI",
         "offers": [
             {"@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free"},
-            {"@type": "Offer", "price": "4.99", "priceCurrency": "USD", "name": "Pro"},
+            {"@type": "Offer", "price": "8.99", "priceCurrency": "USD", "name": "Pro"},
         ],
         "sameAs": ["https://github.com/yasaminfayyaz/milatexai"],
     }, ensure_ascii=False)
@@ -659,8 +659,8 @@ def render_account(
     else:
         icon, heading = "💳", "You're on the Free plan"
         body = ("Upgrade to Pro for unlimited projects and unlimited write-commits, "
-                "$4.99/mo. Reads stay free and unlimited either way.")
-        upgrade = (_form("/account/upgrade", "Upgrade to Pro · $4.99/mo")
+                "$8.99/mo. Reads stay free and unlimited either way.")
+        upgrade = (_form("/account/upgrade", "Upgrade to Pro · $8.99/mo")
                    if billing_enabled else
                    "<p class='muted'>Upgrades are briefly unavailable, please try again soon.</p>")
         actions = f"{upgrade}{signout}"
@@ -723,7 +723,7 @@ def llms_txt() -> str:
         "Requirements: an Overleaf account with Git integration (a paid Overleaf feature) "
         "plus Claude or ChatGPT (their free tiers work).\n"
         "Pricing: Free tier (1 project, 25 write-commits/month, unlimited reads, best-effort); "
-        "Pro $4.99/month (unlimited, guaranteed). Overleaf is billed separately by Overleaf.\n\n"
+        "Pro $8.99/month (unlimited, guaranteed). Overleaf is billed separately by Overleaf.\n\n"
         "Features: conversational LaTeX editing pushed straight to Overleaf; every write is a "
         "Git commit; compile checks with exact LaTeX errors; see rendered tables/figures as "
         "images and fix layout; Figure Studio (Pro): create/edit matplotlib figures whose "

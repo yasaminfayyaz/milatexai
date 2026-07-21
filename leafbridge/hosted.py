@@ -253,7 +253,7 @@ class HostedApp:
         if user.is_admin or user.plan == "pro":
             return
         raise ToolError(
-            f"{feature} is a Pro feature ($4.99/mo, unlimited projects and "
+            f"{feature} is a Pro feature ($8.99/mo, unlimited projects and "
             "commits included). Run `upgrade` to unlock it."
         )
 
@@ -532,7 +532,7 @@ def create_hosted_server(
     @mcp.tool
     async def upgrade() -> str:
         """Upgrade to MiLatexAI Pro (unlimited projects + unlimited write-commits,
-        $4.99/mo, local currency where available). Returns a secure Stripe checkout
+        $8.99/mo, local currency where available). Returns a secure Stripe checkout
         link; your plan updates automatically once payment completes."""
         try:
             user = await app.user()
