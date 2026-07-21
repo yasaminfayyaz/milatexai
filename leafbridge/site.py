@@ -564,7 +564,7 @@ function applyLang(lang) {{
 <meta name='keywords' content='edit Overleaf with ChatGPT, edit Overleaf with Claude, Overleaf MCP server, Overleaf MCP connector, Model Context Protocol Overleaf, remote MCP server LaTeX, MCP server for LaTeX, Overleaf AI editor, ChatGPT Overleaf, Claude Overleaf, edit LaTeX with AI, AI research paper editor, LaTeX AI assistant'>
 <link rel='canonical' href='{url}'>
 <meta name='robots' content='index,follow'>
-<meta name='theme-color' content='#0891b2'>
+<meta name='theme-color' content='#89ecda'>
 <meta property='og:type' content='website'>
 <meta property='og:site_name' content='MiLatexAI'>
 <meta property='og:title' content='{title}'>
@@ -701,8 +701,8 @@ def render_og_image() -> str:
     """A 1200x630 social preview image (SVG) referenced by og:image."""
     return """<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'>
 <rect width='1200' height='630' fill='#0b0d12'/>
-<rect x='0' y='0' width='1200' height='8' fill='#0891b2'/>
-<text x='90' y='300' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='96' font-weight='800' fill='#ffffff'>Mi<tspan fill='#0891b2'>LaTeX</tspan>AI</text>
+<rect x='0' y='0' width='1200' height='8' fill='#89ecda'/>
+<text x='90' y='300' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='96' font-weight='800' fill='#ffffff'>Mi<tspan fill='#89ecda'>LaTeX</tspan>AI</text>
 <text x='94' y='378' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='42' fill='#c7cdd8'>Edit your Overleaf papers by talking to your AI.</text>
 <text x='94' y='452' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='30' fill='#7b8496'>Works with Claude &amp; ChatGPT  ·  milatexai.com</text>
 </svg>"""
@@ -753,7 +753,7 @@ def sitemap_xml() -> str:
 
 
 _CSS = """
-:root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#0891b2;--accent2:#0d9488;--radius:14px}
+:root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#89ecda;--accent2:#57cfae;--radius:14px}
 @media (prefers-color-scheme:dark){:root{--bg:#0b0d12;--fg:#e9ecf2;--muted:#9aa3b2;--line:#20242e;--card:#12151c}}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -767,8 +767,8 @@ a{color:inherit;text-decoration:none}
 .links a{color:var(--muted)}.links a:hover{color:var(--fg)}
 .navactions{display:flex;align-items:center;gap:12px}
 .lang select{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:14px}
-.btn{display:inline-block;background:var(--accent);color:#fff;padding:12px 20px;border-radius:10px;font-weight:600;border:0;cursor:pointer;font-size:15px}
-.btn:hover{background:#0e7490}
+.btn{display:inline-block;background:var(--accent);color:#0b3b33;padding:12px 20px;border-radius:10px;font-weight:600;border:0;cursor:pointer;font-size:15px}
+.btn:hover{background:#5fd9bf}
 .btn-sm{padding:8px 14px;font-size:14px}
 .btn-lg{padding:15px 30px;font-size:17px}
 .btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
@@ -802,7 +802,7 @@ a{color:inherit;text-decoration:none}
 .pre{white-space:pre-line}
 .steps{list-style:none;padding:0;margin:34px auto 0;max-width:720px;display:grid;gap:16px}
 .step{display:flex;gap:16px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
-.num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--accent);color:#0b3b33;display:flex;align-items:center;justify-content:center;font-weight:700}
 .step h3{margin:0 0 4px;font-size:16px}
 .connect-url{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:26px;flex-wrap:wrap}
 .connect-url code{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:15px}
@@ -826,7 +826,7 @@ a{color:inherit;text-decoration:none}
 .plan{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column}
 .section.alt .plan{background:var(--card)}
 .plan.featured{border-color:var(--accent);box-shadow:0 8px 40px color-mix(in srgb,var(--accent) 18%,transparent)}
-.ribbon{position:absolute;top:-11px;inset-inline-end:20px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px}
+.ribbon{color:#0b3b33;position:absolute;top:-11px;inset-inline-end:20px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px}
 .plan h3{font-size:18px;margin:0 0 6px}
 .avail{font-size:12px;font-weight:600;color:var(--muted);margin:0 0 10px;letter-spacing:.01em}
 .avail.pro{color:var(--accent)}
