@@ -42,16 +42,25 @@ class _SecurityHeaders:
     def __init__(self, app):
         self.app = app
 
+    # Static, per-process-identical pages: cache hard at the Cloudflare edge so
+    # crawler/visitor hits are served without waking this scale-to-zero app.
+    _EDGE_CACHED = {"/", "/llms.txt", "/robots.txt", "/sitemap.xml", "/og.svg"}
+
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
+        path = scope.get("path", "")
 
         async def _send(message):
             if message["type"] == "http.response.start":
-                message.setdefault("headers", []).append(
-                    (b"referrer-policy", b"no-referrer")
-                )
+                headers = message.setdefault("headers", [])
+                headers.append((b"referrer-policy", b"no-referrer"))
+                if path in self._EDGE_CACHED and scope.get("method") == "GET":
+                    # s-maxage: shared caches (Cloudflare) keep it 6h; browsers 10m.
+                    headers.append((b"cache-control", b"public, max-age=600, s-maxage=21600"))
+                else:
+                    headers.append((b"cache-control", b"no-store"))
             await send(message)
 
         await self.app(scope, receive, _send)
