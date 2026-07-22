@@ -210,6 +210,20 @@ class AccountService:
         await self.store.upsert_user(user)
         await self._clear_project_token_overrides(user_id)
 
+    async def update_project_token(self, user_id: str, project_ref: str, token: str):
+        """Replace the per-project access token of an ALREADY-connected project
+        (GitHub / GitLab / Bitbucket / self-hosted) WITHOUT re-entering its URL.
+        The account-level Overleaf token is never touched here. ``_select`` raises
+        ProjectNotConnected if the ref isn't one of this user's projects — that is
+        the auth scope: a user can only update their OWN projects."""
+        if not token or "PASTE" in token:
+            raise ServiceError("A real access token is required.")
+        projects = await self.store.list_projects(user_id)
+        proj = self._select(projects, project_ref)
+        proj.token_encrypted = self.cipher.encrypt(token)
+        await self.store.put_project(proj)
+        return proj
+
     async def revoke_token(self, user_id: str) -> None:
         """Revoke the stored token — the AI can no longer reach any project until a
         new token is set. Projects stay in the list; re-add a token to restore."""
