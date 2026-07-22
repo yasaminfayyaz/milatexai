@@ -81,7 +81,7 @@ _FALLBACK_EN = {
               "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"},
     "pricing": {"title": "Simple pricing", "subtitle": "Start free. Upgrade when you need more.",
                 "free": {"name": "Free", "price": "$0", "period": "/mo",
-                         "features": ["1 connected project", "25 write-commits / month", "Unlimited reads & compile checks"],
+                         "features": ["1 connected project", "10 write-commits / month", "Unlimited reads & compile checks"],
                          "cta": "Get started",
                          "availability": "Best-effort · subject to capacity"},
                 "pro": {"name": "Pro", "price": "$8.99", "period": "/mo", "badge": "Unlimited",
@@ -727,7 +727,7 @@ def llms_txt() -> str:
         "GitHub, GitLab, or Bitbucket, any repo and a free access token (GitHub fine-grained "
         "PAT with Contents read/write, GitLab project or personal access token, or Bitbucket "
         "app password). You paste a repository URL and access token on a secure web form.\n"
-        "Pricing: Free tier (1 project, 25 write-commits/month, unlimited reads, best-effort); "
+        "Pricing: Free tier (1 project, 10 write-commits/month, unlimited reads, best-effort); "
         "Pro $8.99/month (unlimited, guaranteed). Overleaf's Git integration is billed "
         "separately by Overleaf; GitHub/GitLab/Bitbucket need only a free access token.\n\n"
         "Features: conversational LaTeX editing committed and pushed straight to the default "

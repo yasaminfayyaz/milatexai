@@ -101,7 +101,7 @@
     "period": "",
     "features": [
      "1 connected project (Overleaf or Git)",
-     "25 write-commits per month",
+     "10 write-commits per month",
      "Unlimited reads",
      "Works with Claude and ChatGPT",
      "Encrypted token storage"
@@ -137,7 +137,7 @@
     },
     {
      "q": "How much does MiLatexAI cost?",
-     "a": "MiLatexAI works with the free tiers of Claude and ChatGPT, and it has its own Free tier: 1 project, 25 write-commits a month, and unlimited reads, running on spare capacity. For guaranteed, unlimited access, Pro is $8.99 a month. If you connect Overleaf, its Git integration is billed separately by Overleaf; GitHub, GitLab, and Bitbucket need only a free access token."
+     "a": "MiLatexAI works with the free tiers of Claude and ChatGPT, and it has its own Free tier: 1 project, 10 write-commits a month, and unlimited reads, running on spare capacity. For guaranteed, unlimited access, Pro is $8.99 a month. If you connect Overleaf, its Git integration is billed separately by Overleaf; GitHub, GitLab, and Bitbucket need only a free access token."
     },
     {
      "q": "Is my access token safe?",
@@ -152,8 +152,8 @@
      "a": "Both Anthropic's Claude and OpenAI's ChatGPT. MiLatexAI is a Model Context Protocol connector, so you add it in whichever assistant you already use."
     },
     {
-     "q": "What happens if I hit the 25-commit limit?",
-     "a": "Reads always stay free and unlimited. Once you reach 25 write-commits in a month on the Free plan, you can wait for the counter to reset next month or move to Pro for unlimited commits."
+     "q": "What happens if I hit the 10-commit limit?",
+     "a": "Reads always stay free and unlimited. Once you reach 10 write-commits in a month on the Free plan, you can wait for the counter to reset next month or move to Pro for unlimited commits."
     },
     {
      "q": "Is it really open source?",
@@ -414,7 +414,7 @@
     "period": "",
     "features": [
      "1 个已连接的项目（Overleaf 或 Git）",
-     "每月 25 次写入提交",
+     "每月 10 次写入提交",
      "无限次阅读",
      "支持 Claude 与 ChatGPT",
      "加密存储令牌"
@@ -450,7 +450,7 @@
     },
     {
      "q": "MiLatexAI 收费多少？",
-     "a": "MiLatexAI 可搭配 Claude 和 ChatGPT 的免费版使用，并且它自己也有一个 Free（免费）套餐：1 个项目、每月 25 次写入提交、不限量读取，运行在闲置容量上。如需保证的、不限量的访问，Pro 为每月 $8.99。如果你连接 Overleaf，它的 Git 集成由 Overleaf 单独计费；GitHub、GitLab 和 Bitbucket 只需要一个免费的访问令牌。"
+     "a": "MiLatexAI 可搭配 Claude 和 ChatGPT 的免费版使用，并且它自己也有一个 Free（免费）套餐：1 个项目、每月 10 次写入提交、不限量读取，运行在闲置容量上。如需保证的、不限量的访问，Pro 为每月 $8.99。如果你连接 Overleaf，它的 Git 集成由 Overleaf 单独计费；GitHub、GitLab 和 Bitbucket 只需要一个免费的访问令牌。"
     },
     {
      "q": "我的访问令牌安全吗？",
@@ -465,8 +465,8 @@
      "a": "同时支持 Anthropic 的 Claude 和 OpenAI 的 ChatGPT。MiLatexAI 是一个 Model Context Protocol 连接器，你可以在自己已经在用的那个助手中添加它。"
     },
     {
-     "q": "如果我达到 25 次提交的上限会怎样？",
-     "a": "读取始终保持免费且不限量。在 Free 套餐上，一旦你在一个月内达到 25 次写入提交，你可以等待计数器在下个月重置，或升级到 Pro 以获得不限量提交。"
+     "q": "如果我达到 10 次提交的上限会怎样？",
+     "a": "读取始终保持免费且不限量。在 Free 套餐上，一旦你在一个月内达到 10 次写入提交，你可以等待计数器在下个月重置，或升级到 Pro 以获得不限量提交。"
     },
     {
      "q": "它真的是开源的吗？",
@@ -733,7 +733,7 @@
     "period": "",
     "features": [
      "1 projet connecté (Overleaf ou Git)",
-     "25 commits d'écriture par mois",
+     "10 commits d'écriture par mois",
      "Lectures illimitées",
      "Compatible avec Claude et ChatGPT",
      "Stockage du jeton chiffré"
@@ -769,7 +769,7 @@
     },
     {
      "q": "Combien coûte MiLatexAI ?",
-     "a": "MiLatexAI fonctionne avec les offres gratuites de Claude et ChatGPT, et il dispose de sa propre offre Free : 1 projet, 25 commits d'écriture par mois et des lectures illimitées, s'exécutant sur la capacité disponible. Pour un accès garanti et illimité, Pro coûte $8.99 par mois. Si vous connectez Overleaf, son intégration Git est facturée séparément par Overleaf ; GitHub, GitLab et Bitbucket ne nécessitent qu'un jeton d'accès gratuit."
+     "a": "MiLatexAI fonctionne avec les offres gratuites de Claude et ChatGPT, et il dispose de sa propre offre Free : 1 projet, 10 commits d'écriture par mois et des lectures illimitées, s'exécutant sur la capacité disponible. Pour un accès garanti et illimité, Pro coûte $8.99 par mois. Si vous connectez Overleaf, son intégration Git est facturée séparément par Overleaf ; GitHub, GitLab et Bitbucket ne nécessitent qu'un jeton d'accès gratuit."
     },
     {
      "q": "Mon jeton d'accès est-il en sécurité ?",
@@ -784,8 +784,8 @@
      "a": "Aussi bien Claude d'Anthropic que ChatGPT d'OpenAI. MiLatexAI est un connecteur Model Context Protocol, vous l'ajoutez donc dans l'assistant que vous utilisez déjà."
     },
     {
-     "q": "Que se passe-t-il si j'atteins la limite de 25 commits ?",
-     "a": "Les lectures restent toujours gratuites et illimitées. Une fois que vous atteignez 25 commits d'écriture dans un mois sur le forfait Free, vous pouvez attendre que le compteur se réinitialise le mois suivant ou passer à Pro pour des commits illimités."
+     "q": "Que se passe-t-il si j'atteins la limite de 10 commits ?",
+     "a": "Les lectures restent toujours gratuites et illimitées. Une fois que vous atteignez 10 commits d'écriture dans un mois sur le forfait Free, vous pouvez attendre que le compteur se réinitialise le mois suivant ou passer à Pro pour des commits illimités."
     },
     {
      "q": "Est-ce vraiment open source ?",
@@ -1052,7 +1052,7 @@
     "period": "",
     "features": [
      "1 proyecto conectado (Overleaf o Git)",
-     "25 commits de escritura al mes",
+     "10 commits de escritura al mes",
      "Lecturas ilimitadas",
      "Compatible con Claude y ChatGPT",
      "Almacenamiento de token cifrado"
@@ -1088,7 +1088,7 @@
     },
     {
      "q": "¿Cuánto cuesta MiLatexAI?",
-     "a": "MiLatexAI funciona con los niveles gratuitos de Claude y ChatGPT, y tiene su propio nivel Free: 1 proyecto, 25 write-commits al mes y lecturas ilimitadas, funcionando con capacidad sobrante. Para un acceso garantizado e ilimitado, Pro cuesta $8.99 al mes. Si conectas Overleaf, su integración de Git la factura Overleaf por separado; GitHub, GitLab y Bitbucket solo necesitan un token de acceso gratuito."
+     "a": "MiLatexAI funciona con los niveles gratuitos de Claude y ChatGPT, y tiene su propio nivel Free: 1 proyecto, 10 write-commits al mes y lecturas ilimitadas, funcionando con capacidad sobrante. Para un acceso garantizado e ilimitado, Pro cuesta $8.99 al mes. Si conectas Overleaf, su integración de Git la factura Overleaf por separado; GitHub, GitLab y Bitbucket solo necesitan un token de acceso gratuito."
     },
     {
      "q": "¿Está seguro mi token de acceso?",
@@ -1103,8 +1103,8 @@
      "a": "Tanto con Claude de Anthropic como con ChatGPT de OpenAI. MiLatexAI es un conector del Model Context Protocol, así que lo añades en el asistente que ya utilices."
     },
     {
-     "q": "¿Qué ocurre si alcanzo el límite de 25 commits?",
-     "a": "Las lecturas siempre son gratuitas e ilimitadas. Una vez que alcanzas los 25 write-commits en un mes con el plan Free, puedes esperar a que el contador se reinicie el mes siguiente o pasar a Pro para tener commits ilimitados."
+     "q": "¿Qué ocurre si alcanzo el límite de 10 commits?",
+     "a": "Las lecturas siempre son gratuitas e ilimitadas. Una vez que alcanzas los 10 write-commits en un mes con el plan Free, puedes esperar a que el contador se reinicie el mes siguiente o pasar a Pro para tener commits ilimitados."
     },
     {
      "q": "¿Es realmente de código abierto?",
@@ -1371,7 +1371,7 @@
     "period": "",
     "features": [
      "1 verbundenes Projekt (Overleaf oder Git)",
-     "25 Schreib-Commits pro Monat",
+     "10 Schreib-Commits pro Monat",
      "Unbegrenztes Lesen",
      "Funktioniert mit Claude und ChatGPT",
      "Verschlüsselte Token-Speicherung"
@@ -1407,7 +1407,7 @@
     },
     {
      "q": "Wie viel kostet MiLatexAI?",
-     "a": "MiLatexAI funktioniert mit den kostenlosen Tarifen von Claude und ChatGPT und verfügt über einen eigenen Free-Tarif: 1 Projekt, 25 Schreib-Commits pro Monat und unbegrenzte Lesevorgänge, betrieben mit freier Restkapazität. Für garantierten, unbegrenzten Zugriff kostet Pro $8.99 pro Monat. Wenn Sie Overleaf verbinden, wird dessen Git-Integration separat von Overleaf abgerechnet; für GitHub, GitLab und Bitbucket ist nur ein kostenloses Zugriffstoken nötig."
+     "a": "MiLatexAI funktioniert mit den kostenlosen Tarifen von Claude und ChatGPT und verfügt über einen eigenen Free-Tarif: 1 Projekt, 10 Schreib-Commits pro Monat und unbegrenzte Lesevorgänge, betrieben mit freier Restkapazität. Für garantierten, unbegrenzten Zugriff kostet Pro $8.99 pro Monat. Wenn Sie Overleaf verbinden, wird dessen Git-Integration separat von Overleaf abgerechnet; für GitHub, GitLab und Bitbucket ist nur ein kostenloses Zugriffstoken nötig."
     },
     {
      "q": "Ist mein Zugriffstoken sicher?",
@@ -1422,8 +1422,8 @@
      "a": "Sowohl mit Anthropics Claude als auch mit OpenAIs ChatGPT. MiLatexAI ist ein Connector für das Model Context Protocol, du fügst ihn also in dem Assistenten hinzu, den du bereits nutzt."
     },
     {
-     "q": "Was passiert, wenn ich das Limit von 25 Commits erreiche?",
-     "a": "Lesevorgänge bleiben immer kostenlos und unbegrenzt. Sobald Sie im Free-Tarif 25 Schreib-Commits in einem Monat erreichen, können Sie warten, bis der Zähler im nächsten Monat zurückgesetzt wird, oder zu Pro für unbegrenzte Commits wechseln."
+     "q": "Was passiert, wenn ich das Limit von 10 Commits erreiche?",
+     "a": "Lesevorgänge bleiben immer kostenlos und unbegrenzt. Sobald Sie im Free-Tarif 10 Schreib-Commits in einem Monat erreichen, können Sie warten, bis der Zähler im nächsten Monat zurückgesetzt wird, oder zu Pro für unbegrenzte Commits wechseln."
     },
     {
      "q": "Ist es wirklich quelloffen?",
@@ -1690,7 +1690,7 @@
     "period": "",
     "features": [
      "接続できるプロジェクト1件(Overleaf または Git)",
-     "書き込みコミット月25回",
+     "書き込みコミット月10回",
      "読み取り無制限",
      "ClaudeとChatGPTに対応",
      "トークンの暗号化保存"
@@ -1726,7 +1726,7 @@
     },
     {
      "q": "MiLatexAIの料金はいくらですか?",
-     "a": "MiLatexAI は Claude と ChatGPT の無料プランで動作し、独自の Free プランも用意しています: 1プロジェクト、月25回の書き込みコミット、無制限の読み取りを、余剰容量で提供します。保証された無制限のアクセスを求める場合、Pro は月額 $8.99 です。Overleaf を接続する場合、その Git integration は Overleaf によって別途請求されます。GitHub、GitLab、Bitbucket は無料のアクセストークンだけで十分です。"
+     "a": "MiLatexAI は Claude と ChatGPT の無料プランで動作し、独自の Free プランも用意しています: 1プロジェクト、月10回の書き込みコミット、無制限の読み取りを、余剰容量で提供します。保証された無制限のアクセスを求める場合、Pro は月額 $8.99 です。Overleaf を接続する場合、その Git integration は Overleaf によって別途請求されます。GitHub、GitLab、Bitbucket は無料のアクセストークンだけで十分です。"
     },
     {
      "q": "アクセストークンは安全ですか？",
@@ -1741,8 +1741,8 @@
      "a": "AnthropicのClaudeとOpenAIのChatGPTの両方です。MiLatexAIはModel Context Protocolのコネクターなので、すでにお使いのアシスタントに追加できます。"
     },
     {
-     "q": "月25コミットの上限に達したらどうなりますか？",
-     "a": "読み取りは常に無料かつ無制限のままです。Freeプランで月25回の書き込みコミットに達した場合、翌月にカウンターがリセットされるのを待つか、無制限のコミットを求めてProに移行できます。"
+     "q": "月10コミットの上限に達したらどうなりますか？",
+     "a": "読み取りは常に無料かつ無制限のままです。Freeプランで月10回の書き込みコミットに達した場合、翌月にカウンターがリセットされるのを待つか、無制限のコミットを求めてProに移行できます。"
     },
     {
      "q": "本当にオープンソースですか？",
@@ -2009,7 +2009,7 @@
     "period": "",
     "features": [
      "1 projeto conectado (Overleaf ou Git)",
-     "25 commits de escrita por mês",
+     "10 commits de escrita por mês",
      "Leituras ilimitadas",
      "Funciona com Claude e ChatGPT",
      "Armazenamento de token criptografado"
@@ -2045,7 +2045,7 @@
     },
     {
      "q": "Quanto custa o MiLatexAI?",
-     "a": "O MiLatexAI funciona com os planos gratuitos do Claude e do ChatGPT, e tem o seu próprio plano Free: 1 projeto, 25 write-commits por mês e leituras ilimitadas, rodando com capacidade ociosa. Para acesso garantido e ilimitado, o Pro custa $8.99 por mês. Se você conectar o Overleaf, a integração Git dele é cobrada separadamente pelo Overleaf; GitHub, GitLab e Bitbucket precisam apenas de um token de acesso gratuito."
+     "a": "O MiLatexAI funciona com os planos gratuitos do Claude e do ChatGPT, e tem o seu próprio plano Free: 1 projeto, 10 write-commits por mês e leituras ilimitadas, rodando com capacidade ociosa. Para acesso garantido e ilimitado, o Pro custa $8.99 por mês. Se você conectar o Overleaf, a integração Git dele é cobrada separadamente pelo Overleaf; GitHub, GitLab e Bitbucket precisam apenas de um token de acesso gratuito."
     },
     {
      "q": "Meu token de acesso está seguro?",
@@ -2060,8 +2060,8 @@
      "a": "Tanto o Claude, da Anthropic, quanto o ChatGPT, da OpenAI. O MiLatexAI é um conector do Model Context Protocol, então você o adiciona no assistente que já usa."
     },
     {
-     "q": "O que acontece se eu atingir o limite de 25 commits?",
-     "a": "As leituras permanecem sempre gratuitas e ilimitadas. Assim que você atingir 25 write-commits em um mês no plano Free, você pode esperar o contador reiniciar no mês seguinte ou migrar para o Pro para ter commits ilimitados."
+     "q": "O que acontece se eu atingir o limite de 10 commits?",
+     "a": "As leituras permanecem sempre gratuitas e ilimitadas. Assim que você atingir 10 write-commits em um mês no plano Free, você pode esperar o contador reiniciar no mês seguinte ou migrar para o Pro para ter commits ilimitados."
     },
     {
      "q": "É realmente de código aberto?",
@@ -2328,7 +2328,7 @@
     "period": "",
     "features": [
      "مشروع واحد متصل (Overleaf أو Git)",
-     "25 التزام كتابة شهرياً",
+     "10 التزام كتابة شهرياً",
      "قراءات غير محدودة",
      "يعمل مع Claude و ChatGPT",
      "تخزين مشفّر للرمز"
@@ -2364,7 +2364,7 @@
     },
     {
      "q": "كم تبلغ تكلفة MiLatexAI؟",
-     "a": "يعمل MiLatexAI مع الباقات المجانية لكل من Claude وChatGPT، وله باقته المجانية الخاصة: مشروع واحد، و25 التزام كتابة (write-commits) شهريًا، وعمليات قراءة غير محدودة، تعمل على السعة الفائضة. للحصول على وصول مضمون وغير محدود، تكلفة Pro هي $8.99 شهريًا. إذا وصّلت Overleaf، فيُحاسَب على تكامل Git الخاص به بشكل منفصل من قِبل Overleaf؛ أما GitHub وGitLab وBitbucket فلا تحتاج إلا إلى رمز وصول مجاني."
+     "a": "يعمل MiLatexAI مع الباقات المجانية لكل من Claude وChatGPT، وله باقته المجانية الخاصة: مشروع واحد، و10 التزام كتابة (write-commits) شهريًا، وعمليات قراءة غير محدودة، تعمل على السعة الفائضة. للحصول على وصول مضمون وغير محدود، تكلفة Pro هي $8.99 شهريًا. إذا وصّلت Overleaf، فيُحاسَب على تكامل Git الخاص به بشكل منفصل من قِبل Overleaf؛ أما GitHub وGitLab وBitbucket فلا تحتاج إلا إلى رمز وصول مجاني."
     },
     {
      "q": "هل رمز الوصول الخاص بي آمن؟",
@@ -2379,8 +2379,8 @@
      "a": "مع كل من Claude من Anthropic و ChatGPT من OpenAI. MiLatexAI موصّل يعتمد على بروتوكول MCP، لذا تضيفه في أي مساعد تستخدمه بالفعل."
     },
     {
-     "q": "ماذا يحدث إذا بلغت حدّ 25 التزاماً؟",
-     "a": "تبقى عمليات القراءة مجانية وغير محدودة دائمًا. بمجرد وصولك إلى 25 عملية كتابة (write-commits) في الشهر ضمن الباقة المجانية، يمكنك الانتظار حتى يُعاد ضبط العدّاد في الشهر التالي أو الانتقال إلى Pro للحصول على عمليات كتابة غير محدودة."
+     "q": "ماذا يحدث إذا بلغت حدّ 10 التزاماً؟",
+     "a": "تبقى عمليات القراءة مجانية وغير محدودة دائمًا. بمجرد وصولك إلى 10 عملية كتابة (write-commits) في الشهر ضمن الباقة المجانية، يمكنك الانتظار حتى يُعاد ضبط العدّاد في الشهر التالي أو الانتقال إلى Pro للحصول على عمليات كتابة غير محدودة."
     },
     {
      "q": "هل هو فعلاً مفتوح المصدر؟",
@@ -2647,7 +2647,7 @@
     "period": "",
     "features": [
      "1 जुड़ा हुआ प्रोजेक्ट (Overleaf या Git)",
-     "प्रति माह 25 write-commits",
+     "प्रति माह 10 write-commits",
      "असीमित पढ़ना",
      "Claude और ChatGPT के साथ काम करता है",
      "एन्क्रिप्टेड टोकन संग्रहण"
@@ -2683,7 +2683,7 @@
     },
     {
      "q": "MiLatexAI की कीमत कितनी है?",
-     "a": "MiLatexAI, Claude और ChatGPT के फ्री टियर के साथ काम करता है, और इसका अपना Free टियर भी है: 1 प्रोजेक्ट, प्रति माह 25 write-commits, और असीमित रीड्स, जो अतिरिक्त क्षमता पर चलता है। गारंटीड, असीमित पहुँच के लिए, Pro की कीमत $8.99 प्रति माह है। यदि आप Overleaf कनेक्ट करते हैं, तो उसका Git integration, Overleaf द्वारा अलग से बिल किया जाता है; GitHub, GitLab, और Bitbucket के लिए केवल एक मुफ़्त एक्सेस टोकन चाहिए।"
+     "a": "MiLatexAI, Claude और ChatGPT के फ्री टियर के साथ काम करता है, और इसका अपना Free टियर भी है: 1 प्रोजेक्ट, प्रति माह 10 write-commits, और असीमित रीड्स, जो अतिरिक्त क्षमता पर चलता है। गारंटीड, असीमित पहुँच के लिए, Pro की कीमत $8.99 प्रति माह है। यदि आप Overleaf कनेक्ट करते हैं, तो उसका Git integration, Overleaf द्वारा अलग से बिल किया जाता है; GitHub, GitLab, और Bitbucket के लिए केवल एक मुफ़्त एक्सेस टोकन चाहिए।"
     },
     {
      "q": "क्या मेरा एक्सेस टोकन सुरक्षित है?",
@@ -2698,8 +2698,8 @@
      "a": "Anthropic के Claude और OpenAI के ChatGPT दोनों के साथ। MiLatexAI एक Model Context Protocol कनेक्टर है, इसलिए आप इसे उसी असिस्टेंट में जोड़ते हैं जिसे आप पहले से इस्तेमाल करते हैं।"
     },
     {
-     "q": "अगर मैं 25-commit की सीमा तक पहुँच जाऊँ तो क्या होगा?",
-     "a": "रीड्स हमेशा मुफ्त और असीमित रहते हैं। Free प्लान पर किसी महीने में 25 write-commits तक पहुँचने के बाद, आप अगले महीने काउंटर के रीसेट होने का इंतज़ार कर सकते हैं या असीमित commits के लिए Pro पर जा सकते हैं।"
+     "q": "अगर मैं 10-commit की सीमा तक पहुँच जाऊँ तो क्या होगा?",
+     "a": "रीड्स हमेशा मुफ्त और असीमित रहते हैं। Free प्लान पर किसी महीने में 10 write-commits तक पहुँचने के बाद, आप अगले महीने काउंटर के रीसेट होने का इंतज़ार कर सकते हैं या असीमित commits के लिए Pro पर जा सकते हैं।"
     },
     {
      "q": "क्या यह सचमुच ओपन सोर्स है?",
@@ -2966,7 +2966,7 @@
     "period": "",
     "features": [
      "연결된 프로젝트 1개(Overleaf 또는 Git)",
-     "월 25회 쓰기 커밋",
+     "월 10회 쓰기 커밋",
      "무제한 읽기",
      "Claude 및 ChatGPT와 함께 작동",
      "암호화된 토큰 저장"
@@ -3002,7 +3002,7 @@
     },
     {
      "q": "MiLatexAI 이용료는 얼마인가요?",
-     "a": "MiLatexAI는 Claude와 ChatGPT의 무료 등급에서 작동하며, 자체 Free 등급도 제공합니다: 프로젝트 1개, 월 25회 쓰기 커밋(write-commits), 무제한 읽기를 여유 용량에서 실행합니다. 보장된 무제한 액세스를 원하면 Pro는 월 $8.99입니다. Overleaf를 연결하는 경우 Git 연동은 Overleaf에서 별도로 청구되며, GitHub, GitLab, Bitbucket은 무료 액세스 토큰만 있으면 됩니다."
+     "a": "MiLatexAI는 Claude와 ChatGPT의 무료 등급에서 작동하며, 자체 Free 등급도 제공합니다: 프로젝트 1개, 월 10회 쓰기 커밋(write-commits), 무제한 읽기를 여유 용량에서 실행합니다. 보장된 무제한 액세스를 원하면 Pro는 월 $8.99입니다. Overleaf를 연결하는 경우 Git 연동은 Overleaf에서 별도로 청구되며, GitHub, GitLab, Bitbucket은 무료 액세스 토큰만 있으면 됩니다."
     },
     {
      "q": "제 액세스 토큰은 안전한가요?",
@@ -3017,8 +3017,8 @@
      "a": "Anthropic의 Claude와 OpenAI의 ChatGPT 모두와 작동합니다. MiLatexAI는 Model Context Protocol 커넥터이므로, 이미 사용 중인 어시스턴트에 추가하면 됩니다."
     },
     {
-     "q": "25회 커밋 한도에 도달하면 어떻게 되나요?",
-     "a": "읽기는 항상 무료이며 무제한으로 유지됩니다. Free 요금제에서 한 달에 25회 쓰기 커밋(write-commits)에 도달하면, 다음 달에 카운터가 초기화될 때까지 기다리거나 무제한 커밋을 위해 Pro로 전환할 수 있습니다."
+     "q": "10회 커밋 한도에 도달하면 어떻게 되나요?",
+     "a": "읽기는 항상 무료이며 무제한으로 유지됩니다. Free 요금제에서 한 달에 10회 쓰기 커밋(write-commits)에 도달하면, 다음 달에 카운터가 초기화될 때까지 기다리거나 무제한 커밋을 위해 Pro로 전환할 수 있습니다."
     },
     {
      "q": "정말로 오픈 소스인가요?",
@@ -3285,7 +3285,7 @@
     "period": "",
     "features": [
      "1 подключённый проект (Overleaf или Git)",
-     "25 коммитов с изменениями в месяц",
+     "10 коммитов с изменениями в месяц",
      "Неограниченное чтение",
      "Работает с Claude и ChatGPT",
      "Зашифрованное хранение токена"
@@ -3321,7 +3321,7 @@
     },
     {
      "q": "Сколько стоит MiLatexAI?",
-     "a": "MiLatexAI работает с бесплатными тарифами Claude и ChatGPT, и у него есть собственный тариф Free: 1 проект, 25 коммитов на запись в месяц и неограниченное чтение, работающие на свободных мощностях. Для гарантированного неограниченного доступа тариф Pro стоит $8.99 в месяц. Если вы подключаете Overleaf, его интеграция Git оплачивается отдельно через Overleaf; для GitHub, GitLab и Bitbucket нужен только бесплатный токен доступа."
+     "a": "MiLatexAI работает с бесплатными тарифами Claude и ChatGPT, и у него есть собственный тариф Free: 1 проект, 10 коммитов на запись в месяц и неограниченное чтение, работающие на свободных мощностях. Для гарантированного неограниченного доступа тариф Pro стоит $8.99 в месяц. Если вы подключаете Overleaf, его интеграция Git оплачивается отдельно через Overleaf; для GitHub, GitLab и Bitbucket нужен только бесплатный токен доступа."
     },
     {
      "q": "Безопасен ли мой токен доступа?",
@@ -3336,8 +3336,8 @@
      "a": "И с Claude от Anthropic, и с ChatGPT от OpenAI. MiLatexAI, это коннектор Model Context Protocol, поэтому вы добавляете его в тот ассистент, которым уже пользуетесь."
     },
     {
-     "q": "Что произойдёт, если я достигну лимита в 25 коммитов?",
-     "a": "Чтение всегда остается бесплатным и неограниченным. Как только вы достигнете 25 коммитов на запись за месяц на тарифе Free, вы можете подождать сброса счетчика в следующем месяце или перейти на Pro для неограниченного числа коммитов."
+     "q": "Что произойдёт, если я достигну лимита в 10 коммитов?",
+     "a": "Чтение всегда остается бесплатным и неограниченным. Как только вы достигнете 10 коммитов на запись за месяц на тарифе Free, вы можете подождать сброса счетчика в следующем месяце или перейти на Pro для неограниченного числа коммитов."
     },
     {
      "q": "Это действительно открытый код?",
@@ -3604,7 +3604,7 @@
     "period": "",
     "features": [
      "1 progetto collegato (Overleaf o Git)",
-     "25 commit di scrittura al mese",
+     "10 commit di scrittura al mese",
      "Letture illimitate",
      "Compatibile con Claude e ChatGPT",
      "Archiviazione del token cifrata"
@@ -3640,7 +3640,7 @@
     },
     {
      "q": "Quanto costa MiLatexAI?",
-     "a": "MiLatexAI funziona con i piani gratuiti di Claude e ChatGPT e ha un proprio piano Free: 1 progetto, 25 commit di scrittura al mese e letture illimitate, con esecuzione sulla capacità in eccesso. Per un accesso garantito e illimitato, Pro costa $8.99 al mese. Se colleghi Overleaf, la sua integrazione Git viene fatturata separatamente da Overleaf; GitHub, GitLab e Bitbucket richiedono solo un token di accesso gratuito."
+     "a": "MiLatexAI funziona con i piani gratuiti di Claude e ChatGPT e ha un proprio piano Free: 1 progetto, 10 commit di scrittura al mese e letture illimitate, con esecuzione sulla capacità in eccesso. Per un accesso garantito e illimitato, Pro costa $8.99 al mese. Se colleghi Overleaf, la sua integrazione Git viene fatturata separatamente da Overleaf; GitHub, GitLab e Bitbucket richiedono solo un token di accesso gratuito."
     },
     {
      "q": "Il mio token di accesso è al sicuro?",
@@ -3655,8 +3655,8 @@
      "a": "Sia con Claude di Anthropic sia con ChatGPT di OpenAI. MiLatexAI è un connettore Model Context Protocol, quindi lo aggiungi nell'assistente che già usi."
     },
     {
-     "q": "Cosa succede se raggiungo il limite di 25 commit?",
-     "a": "Le letture restano sempre gratuite e illimitate. Una volta raggiunti i 25 commit di scrittura in un mese con il piano Free, puoi attendere che il contatore si azzeri il mese successivo oppure passare a Pro per commit illimitati."
+     "q": "Cosa succede se raggiungo il limite di 10 commit?",
+     "a": "Le letture restano sempre gratuite e illimitate. Una volta raggiunti i 10 commit di scrittura in un mese con il piano Free, puoi attendere che il contatore si azzeri il mese successivo oppure passare a Pro per commit illimitati."
     },
     {
      "q": "È davvero open source?",

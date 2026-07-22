@@ -90,11 +90,11 @@ async def test_resolve_errors():
 async def test_commit_metering_free_limit_and_reset():
     svc = make_service()
     await svc.get_or_create_user("u1", "a@b.com")
-    for _ in range(25):
+    for _ in range(10):
         await svc.check_commit_allowed("u1", "2026-07")
         await svc.record_commit("u1", "2026-07")
     with pytest.raises(LimitExceeded):
-        await svc.check_commit_allowed("u1", "2026-07")  # 26th blocked
+        await svc.check_commit_allowed("u1", "2026-07")  # 11th blocked
     # New month resets.
     await svc.check_commit_allowed("u1", "2026-08")
 

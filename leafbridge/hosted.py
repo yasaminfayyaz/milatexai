@@ -355,7 +355,7 @@ class HostedApp:
             return f"No change made: {result.message}"
         used = await self.service.record_commit(user.user_id, month)
         return (
-            f"Done. Committed {result.hash} and pushed to Overleaf — live in "
+            f"Done. Committed {result.hash} and pushed — live in "
             f"{proj.name!r}. (commit {used} this month)"
         )
 
