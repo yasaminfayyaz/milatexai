@@ -87,6 +87,8 @@ class AzureTableStore(Store):
             token_encrypted=e.get("token_encrypted", ""),
             git_username=e.get("git_username", "git"),
             git_url=(e.get("git_url") or None),
+            # Older rows predate multi-provider — default them to Overleaf.
+            provider=(e.get("provider") or "overleaf"),
         )
 
     async def list_projects(self, user_id: str) -> list[Project]:
@@ -116,6 +118,7 @@ class AzureTableStore(Store):
                 "token_encrypted": project.token_encrypted,
                 "git_username": project.git_username,
                 "git_url": project.git_url or "",
+                "provider": project.provider or "overleaf",
             },
             mode=UpdateMode.REPLACE,
         )

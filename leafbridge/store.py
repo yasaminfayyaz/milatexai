@@ -84,11 +84,17 @@ class User:
 @dataclass
 class Project:
     user_id: str
-    project_id: str  # Overleaf project id (24-hex)
+    project_id: str  # Overleaf project id (24-hex), or a provider project_key
     name: str
     token_encrypted: str = ""  # optional per-project override; "" -> use account token
     git_username: str = "git"
     git_url: str | None = None  # override for self-hosted Overleaf / testing
+    # Which service this repo lives on. Defaults to "overleaf" so every existing
+    # record (and everything that omits it) stays an Overleaf project. For
+    # non-Overleaf repos the per-repo token lives in ``token_encrypted`` (there
+    # is no shared account token), so ``provider`` also decides which projects
+    # the account-token backfill/clear logic may touch.
+    provider: str = "overleaf"
 
 
 def monthly_commit_limit(user: User) -> int | None:

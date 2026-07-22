@@ -438,13 +438,17 @@ def create_hosted_server(
     async def connect_project(
         overleaf_url: str, token: str, name: str | None = None
     ) -> str:
-        """Connect one of your Overleaf projects (run once per project). The Git
+        """Connect one of your LaTeX repositories (run once per repo). The Git
         token is stored ENCRYPTED and never shown again. Prefer start_connect,
         which keeps your token out of the chat.
 
         Args:
-            overleaf_url: Your project URL, https://www.overleaf.com/project/<id>.
-            token: Your Overleaf Git token (Account Settings > Git Integration).
+            overleaf_url: The repository URL — an Overleaf project
+                (https://www.overleaf.com/project/<id>), or a GitHub, GitLab,
+                Bitbucket, or self-hosted HTTPS Git repo URL.
+            token: The matching access token. Overleaf: Account Settings > Git
+                Integration. GitHub: a fine-grained PAT with Contents read/write.
+                GitLab: a project access token with read/write repository.
             name: A short label for the project (optional).
         """
         try:
@@ -473,22 +477,30 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if not projects:
-            return "No projects connected yet. Use connect_project with your Overleaf link + Git token."
+            return ("No projects connected yet. Use connect_project with your "
+                    "Overleaf, GitHub, or GitLab repo link + its access token.")
         return "\n".join(f"- {p.name}  (id {p.project_id})" for p in projects)
 
     @mcp.tool
-    async def add_project(overleaf_url: str, name: str | None = None) -> str:
-        """Give the AI access to ANOTHER of your Overleaf projects. Reuses the
-        Overleaf token you already saved — you only provide the project link, no
-        token needed. (Run start_connect first if you've never connected one.)
+    async def add_project(
+        overleaf_url: str, name: str | None = None, token: str | None = None
+    ) -> str:
+        """Give the AI access to ANOTHER of your LaTeX repositories. For an
+        Overleaf project this reuses the Overleaf token you already saved — just
+        the project link, no token needed. For a GitHub, GitLab, Bitbucket, or
+        self-hosted Git repo you must also pass that repo's access token. (Run
+        start_connect first if you've never connected one.)
 
         Args:
-            overleaf_url: The project URL, https://www.overleaf.com/project/<id>.
+            overleaf_url: The repository URL — an Overleaf project, or a GitHub,
+                GitLab, Bitbucket, or self-hosted HTTPS Git repo URL.
             name: A short label for the project (optional).
+            token: The repo's access token — required for non-Overleaf repos,
+                omit for Overleaf (the saved account token is reused).
         """
         try:
             user = await app.user()
-            proj = await app.service.add_project(user.user_id, overleaf_url, name)
+            proj = await app.service.add_project(user.user_id, overleaf_url, name, token=token)
         except AlreadyConnected as exc:
             return str(exc)
         except Exception as exc:  # noqa: BLE001
@@ -1611,7 +1623,9 @@ def create_hosted_server(
                 url = field("overleaf_url")
                 if not url:
                     return await show("Please provide the project link.", 400)
-                await app.service.add_project(user_id, url, field("name") or None)
+                await app.service.add_project(
+                    user_id, url, field("name") or None, token=field("token") or None
+                )
             elif action == "remove":
                 await app.service.store.delete_project(user_id, field("project_id"))
             else:
