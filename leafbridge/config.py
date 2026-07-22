@@ -12,11 +12,14 @@ requests to ``git.overleaf.com`` using your own token.
 
 from __future__ import annotations
 
+import hashlib
+import ipaddress
 import json
 import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import urlsplit
 
 try:  # optional convenience: load a local .env if python-dotenv is installed
     from dotenv import load_dotenv
@@ -78,6 +81,250 @@ def extract_project_id(url_or_id: str) -> str:
         )
     # group(1) when a labelled pattern matched, else group(0) for the fallback.
     return m.group(m.lastindex or 0).lower()
+
+
+# -- multi-provider identity parsing + SSRF trust boundary -------------------
+#
+# Overleaf stays the DEFAULT. These additions let a hosted user connect a
+# GitHub / GitLab / Bitbucket / self-hosted HTTPS Git repo too — "at the end of
+# the day it's just Git", so the git worker is unchanged; only the identity
+# parsing and the SSRF guard live here. ``extract_project_id`` above is left
+# untouched so every Overleaf path behaves byte-for-byte as before.
+
+# Hosts allowed as remote Git origins for the HOSTED service by default.
+# Self-hosters opt additional hosts in via LEAFBRIDGE_GIT_HOST_ALLOWLIST.
+_DEFAULT_GIT_HOST_ALLOWLIST = frozenset(
+    {
+        "github.com",
+        "www.github.com",
+        "gitlab.com",
+        "bitbucket.org",
+        "git.overleaf.com",
+    }
+)
+
+
+@dataclass(frozen=True)
+class RepoTarget:
+    """The parsed identity of a repository the user pasted.
+
+    ``clone_url`` is ``None`` for Overleaf (the git worker synthesises the
+    default ``https://git.overleaf.com/<id>`` URL); for every other provider it
+    is the tokenless HTTPS clone URL. ``project_key`` is a filesystem-safe,
+    stable id used as the stored ``Project.project_id`` (and the clone dir name).
+    """
+
+    provider: str  # "overleaf" | "github" | "gitlab" | "bitbucket" | "git"
+    clone_url: str | None
+    project_key: str
+    git_username: str
+    default_name: str
+
+
+def _git_host_allowlist() -> set[str]:
+    """The effective host allowlist (built-ins + env), read fresh each call so a
+    self-hoster's ``LEAFBRIDGE_GIT_HOST_ALLOWLIST`` change takes effect at once."""
+    hosts = {h.lower() for h in _DEFAULT_GIT_HOST_ALLOWLIST}
+    for extra in os.environ.get("LEAFBRIDGE_GIT_HOST_ALLOWLIST", "").split(","):
+        extra = extra.strip().lower()
+        if extra:
+            hosts.add(extra)
+    return hosts
+
+
+def _host_allowed(host: str) -> bool:
+    allow = _git_host_allowlist()
+    if host in allow:
+        return True
+    # Overleaf Cloud is one account across every subdomain, so *.overleaf.com is
+    # always trusted.
+    return host == "overleaf.com" or host.endswith(".overleaf.com")
+
+
+def validate_remote_git_url(url: str) -> None:
+    """Reject anything unsafe to hand to git as a remote (raises ``ConfigError``).
+
+    This is the SSRF trust boundary for the HOSTED service: only ``https://``
+    URLs, without embedded credentials, to a non-IP host on the allowlist are
+    accepted. The local single-user ``load_settings`` path deliberately does NOT
+    route through here (it still allows ``file://`` remotes for tests).
+    """
+    if not url or not isinstance(url, str):
+        raise ConfigError("Empty git url.")
+    parts = urlsplit(url.strip())
+    if parts.scheme.lower() != "https":
+        raise ConfigError(
+            "Only https:// Git URLs are allowed "
+            f"(got {parts.scheme or 'no'}:// scheme)."
+        )
+    # Embedded credentials (user:pass@host) are never allowed — the token is
+    # injected per-request by ProjectConfig.authed_url, never persisted in a URL.
+    if parts.username is not None or parts.password is not None or "@" in parts.netloc:
+        raise ConfigError("Git URL must not embed credentials (user:pass@host).")
+    host = (parts.hostname or "").lower()
+    if not host:
+        raise ConfigError("Git URL has no host.")
+    if (
+        host == "localhost"
+        or host.endswith(".localhost")
+        or host.endswith(".internal")
+        or host.endswith(".local")
+    ):
+        raise ConfigError(f"Refusing internal host {host!r}.")
+    # Reject ALL bare-IP hosts (the simplest safe rule): this covers IPv4/IPv6
+    # loopback, private, link-local (incl. the 169.254.169.254 metadata IP),
+    # reserved, multicast, unspecified, and IPv4-mapped IPv6 in one stroke.
+    try:
+        ipaddress.ip_address(host)
+    except ValueError:
+        pass  # not an IP literal — good, it's a domain name
+    else:
+        raise ConfigError(f"Refusing bare IP host {host!r}; use a domain name.")
+    if not _host_allowed(host):
+        raise ConfigError(
+            f"Host {host!r} is not on the allowed Git host list. Allowed: "
+            "github.com, gitlab.com, bitbucket.org, and *.overleaf.com — add "
+            "more via the LEAFBRIDGE_GIT_HOST_ALLOWLIST env var."
+        )
+
+
+def _slug(text: str) -> str:
+    """Lowercase, collapse every run of non-alphanumerics to a single '-'."""
+    s = re.sub(r"[^A-Za-z0-9]+", "-", text).strip("-").lower()
+    return s or "repo"
+
+
+def _shorthash(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
+
+
+def _repo_path(path: str) -> str:
+    """Normalise a URL path to ``owner/.../repo``: drop leading/trailing slashes,
+    any ``/tree/…`` / ``/blob/…`` / GitLab ``/-/…`` web suffix, and a ``.git``
+    suffix."""
+    p = path.strip("/")
+    for marker in ("/-/", "/tree/", "/blob/"):
+        idx = p.find(marker)
+        if idx != -1:
+            p = p[:idx]
+    if p[-4:].lower() == ".git":
+        p = p[:-4]
+    return p.strip("/")
+
+
+def _two_segments(path: str, host: str) -> tuple[str, str]:
+    p = _repo_path(path)
+    segs = [s for s in p.split("/") if s]
+    if len(segs) < 2:
+        raise ConfigError(
+            f"Could not parse an owner/repo from the {host} URL. Expected "
+            f"https://{host}/<owner>/<repo>."
+        )
+    return segs[0], segs[1]
+
+
+def _overleaf_target(pid: str) -> RepoTarget:
+    return RepoTarget(
+        provider="overleaf",
+        clone_url=None,
+        project_key=pid,
+        git_username="git",
+        default_name=pid[:8],
+    )
+
+
+def parse_repo_target(url_or_id: str) -> RepoTarget:
+    """Parse whatever the user pasted into a :class:`RepoTarget`.
+
+    Overleaf is the default: a bare 24-hex id or any ``*.overleaf.com`` URL maps
+    to ``provider="overleaf"`` with ``clone_url=None``. GitHub / GitLab /
+    Bitbucket get their canonical HTTPS clone URL and per-provider git username.
+    Any other host is treated as a generic self-hosted Git remote and is only
+    accepted if it passes :func:`validate_remote_git_url`.
+    """
+    raw = (url_or_id or "").strip()
+    if not raw:
+        raise ConfigError("Empty repository url/id.")
+
+    parts = urlsplit(raw)
+    scheme = parts.scheme.lower()
+    # A bare token (no scheme, no slash) can only be an Overleaf project id.
+    if not scheme and "/" not in raw:
+        return _overleaf_target(extract_project_id(raw))
+    # Give scheme-less "host/owner/repo" input a host by assuming https; the
+    # clone URLs we build below are always https regardless.
+    if not scheme:
+        parts = urlsplit("https://" + raw)
+    host = (parts.hostname or "").lower()
+    path = parts.path or ""
+
+    # -- Overleaf (the default) --------------------------------------------
+    # Exact host match (not a substring) so a look-alike like
+    # ``overleaf.com.evil.com`` is NOT classified as Overleaf.
+    if host == "overleaf.com" or host.endswith(".overleaf.com"):
+        return _overleaf_target(extract_project_id(raw))
+
+    # -- GitHub ------------------------------------------------------------
+    if host in ("github.com", "www.github.com"):
+        owner, repo = _two_segments(path, "github.com")
+        return RepoTarget(
+            provider="github",
+            clone_url=f"https://github.com/{owner}/{repo}.git",
+            # Fold a hash of the canonical (case-normalised) identity into the key
+            # so distinct repos that _slug collapses together (my-lib / my_lib /
+            # my.lib) stay distinct, while GitHub's case-insensitivity dedups.
+            project_key=_slug(f"github-{owner}-{repo}")
+            + "-"
+            + _shorthash(f"github.com/{owner.lower()}/{repo.lower()}"),
+            git_username="x-access-token",
+            default_name=repo,
+        )
+
+    # -- GitLab (subgroup paths preserved) ---------------------------------
+    if host == "gitlab.com":
+        sub = _repo_path(path)
+        segs = [s for s in sub.split("/") if s]
+        if len(segs) < 2:
+            raise ConfigError(
+                "Could not parse a group/repo from the gitlab.com URL. Expected "
+                "https://gitlab.com/<group>[/<subgroup>…]/<repo>."
+            )
+        sub = "/".join(segs)
+        return RepoTarget(
+            provider="gitlab",
+            clone_url=f"https://gitlab.com/{sub}.git",
+            project_key="gitlab-"
+            + _slug(sub)
+            + "-"
+            + _shorthash("gitlab.com/" + sub.lower()),
+            git_username="oauth2",
+            default_name=segs[-1],
+        )
+
+    # -- Bitbucket ---------------------------------------------------------
+    if host == "bitbucket.org":
+        workspace, repo = _two_segments(path, "bitbucket.org")
+        return RepoTarget(
+            provider="bitbucket",
+            clone_url=f"https://bitbucket.org/{workspace}/{repo}.git",
+            project_key=_slug(f"bitbucket-{workspace}-{repo}")
+            + "-"
+            + _shorthash(f"bitbucket.org/{workspace.lower()}/{repo.lower()}"),
+            git_username="x-token-auth",
+            default_name=repo,
+        )
+
+    # -- generic self-hosted HTTPS Git remote ------------------------------
+    clean = _repo_path(path)
+    clone_url = f"https://{host}/{clean}.git" if clean else f"https://{host}"
+    validate_remote_git_url(clone_url)  # allowlist is the gate for generic hosts
+    return RepoTarget(
+        provider="git",
+        clone_url=clone_url,
+        project_key="git-" + _shorthash(host + "/" + clean),
+        git_username="git",
+        default_name=(clean.rsplit("/", 1)[-1] if clean else host),
+    )
 
 
 @dataclass(frozen=True)

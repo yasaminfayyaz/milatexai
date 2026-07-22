@@ -9,7 +9,18 @@ from __future__ import annotations
 import html
 
 BRAND = "MiLatexAI"
-TAGLINE = "Edit your Overleaf projects from your AI assistant."
+TAGLINE = "Edit your Overleaf, GitHub, or GitLab LaTeX projects from your AI assistant."
+
+# Shown under the token field on every connect/manage form: how to create a
+# token per provider (Overleaf first).
+_TOKEN_HINT = (
+    "<p class='hint'>Overleaf: Account Settings → "
+    "<a href='https://www.overleaf.com/user/settings' target='_blank' rel='noopener'>Git Integration</a>. "
+    "GitHub: a fine-grained personal access token with Contents read/write. "
+    "GitLab: a project access token with the read/write repository scope.</p>"
+)
+# Placeholder that leads with an Overleaf URL, then the other providers.
+_REPO_PLACEHOLDER = "https://www.overleaf.com/project/… · GitHub · GitLab · Bitbucket URL"
 
 _STYLE = """
 :root { color-scheme: light dark; }
@@ -89,16 +100,26 @@ def render_connect_form(
     has_token: bool = False,
 ) -> str:
     err_html = f"<div class='error'>{html.escape(error)}</div>" if error else ""
+    # The token field is ALWAYS shown: non-Overleaf repos carry a per-repo token,
+    # so a saved Overleaf token can't stand in for them. For a returning user the
+    # field is optional — leaving it blank reuses the saved Overleaf token, but
+    # only for an Overleaf project.
     if has_token:
-        # Returning user: the account already has a saved Overleaf token, so don't
-        # ask for it again — just take the project link.
         who = (
             f"<p class='muted'>Signed in as {html.escape(email)}. "
-            "Using your saved Overleaf token, no need to enter it again.</p>"
+            "Leave the token blank to reuse your saved Overleaf token for an "
+            "Overleaf project; for GitHub, GitLab, or Bitbucket paste that repo's "
+            "access token.</p>"
             if email
-            else "<p class='muted'>Using your saved Overleaf token, no need to enter it again.</p>"
+            else "<p class='muted'>Leave the token blank to reuse your saved Overleaf "
+            "token for an Overleaf project; for GitHub, GitLab, or Bitbucket paste "
+            "that repo's access token.</p>"
         )
-        token_field = ""
+        token_field = (
+            "<label for='token'>Git access token <span class='muted'>(optional for Overleaf)</span></label>"
+            "<input id='token' name='token' type='password' placeholder='olp_… · github_pat_… · glpat-…'>"
+            + _TOKEN_HINT
+        )
         note = ("<div class='note'>🔒 This link is single-use and expires 15 minutes after "
                 "you generated it. The AI only ever touches the projects you add here.</div>")
     else:
@@ -109,10 +130,9 @@ def render_connect_form(
             else "<p class='muted'>Your token is stored encrypted and never shown again.</p>"
         )
         token_field = (
-            "<label for='token'>Overleaf Git token</label>"
-            "<input id='token' name='token' type='password' placeholder='olp_…' required>"
-            "<p class='hint'>Create one in Overleaf → Account Settings → "
-            "<a href='https://www.overleaf.com/user/settings' target='_blank' rel='noopener'>Git Integration</a>.</p>"
+            "<label for='token'>Git access token</label>"
+            "<input id='token' name='token' type='password' placeholder='olp_… · github_pat_… · glpat-…' required>"
+            + _TOKEN_HINT
         )
         note = ("<div class='note'>🔒 This link is single-use and expires 15 minutes after you "
                 "generated it. Your Git token is encrypted before it touches disk, it is never "
@@ -120,15 +140,16 @@ def render_connect_form(
     return _page(
         f"Connect a project · {BRAND}",
         f"""{_brand_header()}
-<h1>Connect an Overleaf project</h1>
+<h1>Connect an Overleaf, GitHub, or GitLab project</h1>
 {who}
 {err_html}
 <form method='post' action='/connect' autocomplete='off'>
   <input type='hidden' name='code' value='{html.escape(code, quote=True)}'>
-  <label for='overleaf_url'>Overleaf project link</label>
+  <label for='overleaf_url'>Repository link</label>
   <input id='overleaf_url' name='overleaf_url' inputmode='url'
-         placeholder='https://www.overleaf.com/project/…'
+         placeholder='{html.escape(_REPO_PLACEHOLDER, quote=True)}'
          value='{html.escape(overleaf_url, quote=True)}' required>
+  <p class='hint'>An Overleaf, GitHub, GitLab, Bitbucket, or self-hosted HTTPS Git URL.</p>
   {token_field}
   <label for='name'>Label <span class='muted'>(optional)</span></label>
   <input id='name' name='name' placeholder='e.g. thesis'
@@ -188,15 +209,20 @@ def render_manage_projects(code: str, projects, *, email: str = "", error: str |
         f"""{_brand_header()}
 <h1>Your projects</h1>
 <p class='muted'>The AI can only touch the projects listed here, nothing else in
-  your Overleaf account. Add or remove any time; no token needed.</p>
+  your Overleaf, GitHub, or GitLab account. Add or remove any time. Overleaf
+  reuses your saved token; GitHub, GitLab, and Bitbucket need that repo's token.</p>
 {err_html}
 <div class='proj-list'>{rows}</div>
 <form method='post' action='/projects' autocomplete='off'>
   <input type='hidden' name='code' value='{codeq}'>
   <input type='hidden' name='action' value='add'>
-  <label for='overleaf_url'>Add a project, Overleaf link</label>
+  <label for='overleaf_url'>Add a repository link</label>
   <input id='overleaf_url' name='overleaf_url' inputmode='url'
-         placeholder='https://www.overleaf.com/project/…' required>
+         placeholder='{html.escape(_REPO_PLACEHOLDER, quote=True)}' required>
+  <label for='token'>Access token
+    <span class='muted'>(required for GitHub / GitLab / Bitbucket)</span></label>
+  <input id='token' name='token' type='password'
+         placeholder='leave blank to reuse your Overleaf token'>
   <label for='name'>Label <span class='muted'>(optional)</span></label>
   <input id='name' name='name' placeholder='e.g. thesis'>
   <button type='submit'>Add project</button>
@@ -245,7 +271,8 @@ def render_landing() -> str:
         f"""{_brand_header()}
 <h1>{html.escape(TAGLINE)}</h1>
 <p class='muted'>{BRAND} is a connector that lets Claude or ChatGPT read and edit your real
-   Overleaf projects over Overleaf's Git integration.</p>
+   Overleaf projects over Overleaf's Git integration — and, the same way, your
+   GitHub, GitLab, Bitbucket, or self-hosted Git LaTeX repositories.</p>
 <div class='note'>To get started, add {BRAND} as a connector in Claude or ChatGPT, then run
    <b>start_connect</b> to link a project. There's nothing to configure on this
    page directly.</div>""",

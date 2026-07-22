@@ -94,7 +94,7 @@ def test_connect_get_shows_form_for_valid_code(harness):
     with TestClient(mcp.http_app()) as client:
         r = client.get("/connect", params={"code": code})
     assert r.status_code == 200
-    assert "Connect an Overleaf project" in r.text
+    assert "Connect an Overleaf" in r.text  # Overleaf-first heading
     assert "web@example.com" in r.text  # signed-in-as line
     assert "name='token'" in r.text
     assert "type='password'" in r.text  # token field is masked
@@ -137,7 +137,7 @@ def test_connect_post_stores_encrypted_token_and_succeeds(harness):
     assert cipher.decrypt(user.overleaf_token_encrypted) == "olp_realtoken123"
 
 
-def test_connect_get_hides_token_when_account_has_token(harness):
+def test_connect_get_makes_token_optional_when_account_has_token(harness):
     _store, cipher, mcp = harness
     code = mint_connect_code(cipher, "user_web", "web@example.com")
     with TestClient(mcp.http_app()) as client:
@@ -145,11 +145,14 @@ def test_connect_get_hides_token_when_account_has_token(harness):
         client.post("/connect", data={
             "code": code, "overleaf_url": OVERLEAF_URL,
             "token": "olp_realtoken123", "name": "first"})
-        # Re-opening /connect must NOT ask for the token again.
+        # Re-opening /connect still shows the token field (a GitHub/GitLab repo
+        # needs its own token) but tells the user it's OPTIONAL for Overleaf —
+        # leaving it blank reuses the saved Overleaf token.
         r = client.get("/connect", params={"code": code})
     assert r.status_code == 200
-    assert "Using your saved Overleaf token" in r.text
-    assert "name='token'" not in r.text
+    assert "reuse your saved Overleaf token" in r.text
+    assert "name='token'" in r.text  # always shown now (per-repo tokens)
+    assert "(optional for Overleaf)" in r.text
 
 
 def test_connect_post_reuses_saved_token_for_second_project():

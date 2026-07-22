@@ -10,7 +10,13 @@ against :class:`InMemoryStore`.
 
 from __future__ import annotations
 
-from .config import ConfigError, ProjectConfig, extract_project_id
+from .config import (
+    ConfigError,
+    ProjectConfig,
+    extract_project_id,
+    parse_repo_target,
+    validate_remote_git_url,
+)
 from .store import (
     Project,
     Store,
@@ -79,65 +85,119 @@ class AccountService:
         name: str | None = None,
         git_url: str | None = None,
     ) -> Project:
-        """Store a user's Overleaf project with its token ENCRYPTED. Enforces the
-        per-plan project limit (updating an already-connected project is free)."""
+        """Connect a repository with its token ENCRYPTED, enforcing the per-plan
+        project limit (updating an already-connected project is free).
+
+        Overleaf (the default) keeps its account-level token semantics: the token
+        is stored once on the user and reused by later Overleaf projects. Every
+        other provider (GitHub / GitLab / Bitbucket / self-hosted Git) uses a
+        per-connection token stored on the project itself; its clone URL is
+        validated against the SSRF allowlist first."""
         user = await self.store.get_user(user_id)
         if user is None:
             raise ServiceError("Unknown user; sign in first.")
-        if not token or "PASTE" in token:
-            raise ServiceError("A real Overleaf Git token is required.")
         try:
-            pid = extract_project_id(overleaf_url_or_id)
+            target = parse_repo_target(overleaf_url_or_id)
         except ConfigError as exc:
             raise ServiceError(str(exc)) from exc
+        if not token or "PASTE" in token:
+            raise ServiceError(self._token_required_msg(target.provider))
 
-        # The Overleaf Git token is account-level — store it once on the user so
-        # later projects can be added without pasting it again.
-        user.overleaf_token_encrypted = self.cipher.encrypt(token)
-        await self.store.upsert_user(user)
+        if target.provider == "overleaf":
+            # The Overleaf Git token is account-level — store it once on the user
+            # so later Overleaf projects can be added without pasting it again.
+            user.overleaf_token_encrypted = self.cipher.encrypt(token)
+            await self.store.upsert_user(user)
+            await self._enforce_project_limit(user, target.project_key)
+            project = Project(
+                user_id=user_id, project_id=target.project_key,
+                name=(name or target.default_name),
+                token_encrypted="", git_url=git_url,  # empty -> uses account token
+                provider="overleaf",
+            )
+            await self.store.put_project(project)
+            return project
 
-        await self._enforce_project_limit(user, pid)
+        # Non-Overleaf: the token is per-connection (there is no shared account
+        # token). Validate the remote before we ever hand it to git.
+        validate_remote_git_url(target.clone_url)
+        await self._enforce_project_limit(user, target.project_key)
         project = Project(
-            user_id=user_id, project_id=pid, name=(name or pid[:8]),
-            token_encrypted="", git_url=git_url,  # empty -> uses the account token
+            user_id=user_id, project_id=target.project_key,
+            name=(name or target.default_name),
+            token_encrypted=self.cipher.encrypt(token),
+            git_username=target.git_username, git_url=target.clone_url,
+            provider=target.provider,
         )
         await self.store.put_project(project)
         return project
 
     async def add_project(
         self, user_id: str, overleaf_url_or_id: str, name: str | None = None,
-        git_url: str | None = None,
+        git_url: str | None = None, token: str | None = None,
     ) -> Project:
-        """Add another project for an already-onboarded user, REUSING their stored
-        account token (no token needed — only the URL)."""
+        """Add another repository for an already-onboarded user.
+
+        For Overleaf this REUSES the stored account token (no token needed — only
+        the URL). For every other provider a per-repo ``token`` is required, since
+        there is no shared account token to fall back on."""
         user = await self.store.get_user(user_id)
         if user is None:
             raise ServiceError("Unknown user; sign in first.")
-        if not await self._account_token_enc(user):
-            raise ServiceError(
-                "Connect your first project (with your Overleaf token) before "
-                "adding more."
-            )
         try:
-            pid = extract_project_id(overleaf_url_or_id)
+            target = parse_repo_target(overleaf_url_or_id)
         except ConfigError as exc:
             raise ServiceError(str(exc)) from exc
-        dup = next(
-            (p for p in await self.store.list_projects(user_id) if p.project_id == pid),
-            None,
+
+        if target.provider == "overleaf":
+            if not await self._account_token_enc(user):
+                raise ServiceError(
+                    "Connect your first project (with your Overleaf token) before "
+                    "adding more."
+                )
+            self._reject_duplicate(await self.store.list_projects(user_id), target.project_key)
+            await self._enforce_project_limit(user, target.project_key)
+            project = Project(
+                user_id=user_id, project_id=target.project_key,
+                name=(name or target.default_name),
+                token_encrypted="", git_url=git_url, provider="overleaf",
+            )
+            await self.store.put_project(project)
+            return project
+
+        # Non-Overleaf: a per-repo token is mandatory.
+        if not token or "PASTE" in token:
+            raise ServiceError(self._token_required_msg(target.provider))
+        validate_remote_git_url(target.clone_url)
+        self._reject_duplicate(await self.store.list_projects(user_id), target.project_key)
+        await self._enforce_project_limit(user, target.project_key)
+        project = Project(
+            user_id=user_id, project_id=target.project_key,
+            name=(name or target.default_name),
+            token_encrypted=self.cipher.encrypt(token),
+            git_username=target.git_username, git_url=target.clone_url,
+            provider=target.provider,
         )
+        await self.store.put_project(project)
+        return project
+
+    @staticmethod
+    def _token_required_msg(provider: str) -> str:
+        if provider == "overleaf":
+            return "A real Overleaf Git token is required."
+        label = {
+            "github": "GitHub", "gitlab": "GitLab", "bitbucket": "Bitbucket",
+        }.get(provider, "Git")
+        return f"A real {label} access token is required for this repository."
+
+    @staticmethod
+    def _reject_duplicate(projects: list[Project], project_key: str) -> None:
+        dup = next((p for p in projects if p.project_id == project_key), None)
         if dup is not None:
             raise AlreadyConnected(
                 f"'{dup.name}' is already one of your connected projects, so you can "
                 "edit it right now. No need to add it again."
             )
-        await self._enforce_project_limit(user, pid)
-        project = Project(
-            user_id=user_id, project_id=pid, name=(name or pid[:8]),
-            token_encrypted="", git_url=git_url,
-        )
-        await self.store.put_project(project)
-        return project
 
     async def set_token(self, user_id: str, token: str) -> None:
         """Change the user's Overleaf token (applies to all their projects)."""
@@ -181,20 +241,26 @@ class AccountService:
             )
 
     async def _account_token_enc(self, user: User) -> str:
-        """The user's encrypted account token, backfilling once from a legacy
-        per-project token (for projects connected before account tokens existed)."""
+        """The user's encrypted account Overleaf token, backfilling once from a
+        legacy per-project token (for Overleaf projects connected before account
+        tokens existed). A non-Overleaf project's per-repo token is NEVER adopted
+        as the account token."""
         if user.overleaf_token_encrypted:
             return user.overleaf_token_encrypted
         for p in await self.store.list_projects(user.user_id):
-            if p.token_encrypted:
+            if p.token_encrypted and p.provider == "overleaf":
                 user.overleaf_token_encrypted = p.token_encrypted
                 await self.store.upsert_user(user)
                 return p.token_encrypted
         return ""
 
     async def _clear_project_token_overrides(self, user_id: str) -> None:
+        """Clear per-project token overrides so all Overleaf projects fall back to
+        the (new/revoked) account token. Only Overleaf projects are touched: a
+        non-Overleaf project's ``token_encrypted`` is its ONLY credential, so
+        changing/revoking the Overleaf account token must not wipe it."""
         for p in await self.store.list_projects(user_id):
-            if p.token_encrypted:
+            if p.token_encrypted and p.provider == "overleaf":
                 p.token_encrypted = ""
                 await self.store.put_project(p)
 
