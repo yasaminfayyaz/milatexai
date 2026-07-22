@@ -132,6 +132,47 @@ def test_legacy_per_project_token_still_resolves_and_backfills():
     assert asyncio.run(svc.resolve_project("u", "second")).token == "olp_legacy"
 
 
+# --- service: per-project token update -------------------------------------
+
+GH_URL = "https://github.com/owner/repo"
+
+
+def test_update_project_token_replaces_repo_token_and_leaves_account_alone():
+    svc = _svc()
+    _admin_user(svc)
+    # Overleaf project holds the account token; a GitHub repo holds its own.
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "thesis"))
+    asyncio.run(svc.connect_project("u", GH_URL, "ghp_old", "gh"))
+    acct_before = asyncio.run(svc.store.get_user("u")).overleaf_token_encrypted
+    proj = asyncio.run(svc.update_project_token("u", "gh", "ghp_new"))
+    assert svc.cipher.decrypt(proj.token_encrypted) == "ghp_new"
+    # The new token takes effect immediately via resolve_project.authed_url().
+    cfg = asyncio.run(svc.resolve_project("u", "gh"))
+    assert cfg.authed_url() == "https://x-access-token:ghp_new@github.com/owner/repo.git"
+    # The account-level Overleaf token is untouched.
+    assert asyncio.run(svc.store.get_user("u")).overleaf_token_encrypted == acct_before
+    assert asyncio.run(svc.resolve_project("u", "thesis")).token == "olp_tok"
+
+
+def test_update_project_token_rejects_empty_and_paste():
+    svc = _svc()
+    _admin_user(svc)
+    asyncio.run(svc.connect_project("u", GH_URL, "ghp_old", "gh"))
+    with pytest.raises(ServiceError):
+        asyncio.run(svc.update_project_token("u", "gh", ""))
+    with pytest.raises(ServiceError):
+        asyncio.run(svc.update_project_token("u", "gh", "PASTE_your_token_here"))
+
+
+def test_update_project_token_foreign_ref_is_out_of_scope():
+    svc = _svc()
+    _admin_user(svc)
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "first"))
+    # A project the user does not have -> ProjectNotConnected (auth scope).
+    with pytest.raises(ProjectNotConnected):
+        asyncio.run(svc.update_project_token("u", "nope", "ghp_new"))
+
+
 # --- web routes ------------------------------------------------------------
 
 def _server():
@@ -175,6 +216,34 @@ def test_manage_projects_and_token_routes_end_to_end():
         assert client.get("/token", params={"code": code}).status_code == 200
         assert client.post("/token", data={"code": code, "action": "revoke"}).status_code == 200
     assert asyncio.run(store.get_user("u")).overleaf_token_encrypted == ""
+
+
+def test_projects_route_set_token_updates_and_escapes():
+    store, cipher, mcp = _server()
+    code = mint_connect_code(cipher, "u", "e@x.com")
+    with TestClient(mcp.http_app()) as client:
+        # Onboard an Overleaf account token, then connect a GitHub repo.
+        client.post("/connect", data={
+            "code": code, "overleaf_url": URL1, "token": "olp_tok", "name": "first"})
+        client.post("/projects", data={
+            "code": code, "action": "add",
+            "overleaf_url": "https://github.com/owner/repo",
+            "token": "ghp_old", "name": "gh"})
+        gh = next(p for p in asyncio.run(store.list_projects("u")) if p.name == "gh")
+
+        # Update just that repo's token, no URL re-entry.
+        r = client.post("/projects", data={
+            "code": code, "action": "set_token",
+            "project_id": gh.project_id, "token": "ghp_new"})
+        assert r.status_code == 200
+        updated = next(p for p in asyncio.run(store.list_projects("u")) if p.name == "gh")
+        assert cipher.decrypt(updated.token_encrypted) == "ghp_new"
+        # The account token is left alone.
+        assert cipher.decrypt(asyncio.run(store.get_user("u")).overleaf_token_encrypted) == "olp_tok"
+        # The submitted secret is never echoed back into the page.
+        assert "ghp_new" not in r.text
+        # Interpolated values are HTML-escaped: no raw injection breaks out.
+        assert "<script>" not in r.text
 
 
 def test_token_form_never_echoes_token():

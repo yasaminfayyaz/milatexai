@@ -60,8 +60,13 @@ button:hover { background: #008779; }
 .btn-danger { width: auto; margin: 0; padding: 8px 14px; font-size: 13px; background: #e5484d; }
 .btn-danger:hover { background: #c93b40; }
 .proj-list { margin: 14px 0 4px; }
-.proj-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #e6e9ef; }
+.proj-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 12px 0; border-bottom: 1px solid #e6e9ef; }
 @media (prefers-color-scheme: dark) { .proj-row { border-color: #2a2e37; } }
+.proj-actions { display: flex; align-items: flex-start; gap: 8px; }
+.tok-update summary { cursor: pointer; font-size: 13px; color: #00a693; padding: 8px 0; list-style: none; }
+.tok-update summary::-webkit-details-marker { display: none; }
+.tok-update input { margin: 0 0 6px; }
+.tok-update button { width: auto; margin: 0; padding: 8px 14px; font-size: 13px; }
 .hint { font-size: 12px; color: #6b7280; margin: 5px 0 0; }
 .hint a { color: #00a693; }
 .note {
@@ -192,14 +197,24 @@ def render_manage_projects(code: str, projects, *, email: str = "", error: str |
     err_html = f"<div class='error'>{html.escape(error)}</div>" if error else ""
     rows = ""
     for p in projects:
+        codeh = html.escape(code, quote=True)
+        pidh = html.escape(p.project_id, quote=True)
         rows += (
             "<div class='proj-row'><span><b>"
             f"{html.escape(p.name)}</b><br><small class='muted'>{html.escape(p.project_id)}</small></span>"
+            "<div class='proj-actions'>"
+            "<details class='tok-update'><summary>Update token</summary>"
+            "<form method='post' action='/projects' autocomplete='off' style='margin:8px 0 0'>"
+            f"<input type='hidden' name='code' value='{codeh}'>"
+            "<input type='hidden' name='action' value='set_token'>"
+            f"<input type='hidden' name='project_id' value='{pidh}'>"
+            "<input name='token' type='password' placeholder='new access token' required>"
+            "<button type='submit'>Save token</button></form></details>"
             "<form method='post' action='/projects' style='margin:0'>"
-            f"<input type='hidden' name='code' value='{html.escape(code, quote=True)}'>"
+            f"<input type='hidden' name='code' value='{codeh}'>"
             "<input type='hidden' name='action' value='remove'>"
-            f"<input type='hidden' name='project_id' value='{html.escape(p.project_id, quote=True)}'>"
-            "<button class='btn-danger' type='submit'>Remove</button></form></div>"
+            f"<input type='hidden' name='project_id' value='{pidh}'>"
+            "<button class='btn-danger' type='submit'>Remove</button></form></div></div>"
         )
     if not rows:
         rows = "<p class='muted'>No projects connected yet.</p>"
@@ -210,7 +225,9 @@ def render_manage_projects(code: str, projects, *, email: str = "", error: str |
 <h1>Your projects</h1>
 <p class='muted'>The AI can only touch the projects listed here, nothing else in
   your Overleaf, GitHub, or GitLab account. Add or remove any time. Overleaf
-  reuses your saved token; GitHub, GitLab, and Bitbucket need that repo's token.</p>
+  reuses your saved token; GitHub, GitLab, and Bitbucket need that repo's token.
+  Got a repo's token wrong? Use “Update token” on its row to fix it in place — no
+  need to re-add the project.</p>
 {err_html}
 <div class='proj-list'>{rows}</div>
 <form method='post' action='/projects' autocomplete='off'>

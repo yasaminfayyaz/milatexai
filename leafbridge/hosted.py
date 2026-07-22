@@ -1674,6 +1674,8 @@ def create_hosted_server(
                 )
             elif action == "remove":
                 await app.service.store.delete_project(user_id, field("project_id"))
+            elif action == "set_token":
+                await app.service.update_project_token(user_id, field("project_id"), field("token"))
             else:
                 return await show("Unknown action.", 400)
         except AlreadyConnected as exc:
