@@ -739,15 +739,47 @@ def llms_txt() -> str:
 
 
 def robots_txt() -> str:
-    return "User-agent: *\nAllow: /\nSitemap: https://milatexai.com/sitemap.xml\n"
+    # Two goals: stay discoverable to the crawlers that bring users (search
+    # engines + AI assistants), and stop the ones that only cost us origin hits.
+    #
+    # Note this only governs *polite* crawlers. Malicious scanners ignore
+    # robots.txt entirely; those are blocked at the Cloudflare edge (WAF / Bot
+    # Fight Mode), not here.
+    #
+    # Blocked: backlink/SEO scrapers that add no discovery value for us.
+    # Allowed (via the "*" group): Googlebot, Bingbot, and AI crawlers such as
+    # GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot,
+    # Google-Extended — we *want* assistants and search to see the site.
+    return (
+        "# SEO/backlink scrapers that add nothing but load - keep them out.\n"
+        "User-agent: AhrefsBot\n"
+        "User-agent: SemrushBot\n"
+        "User-agent: MJ12bot\n"
+        "User-agent: DotBot\n"
+        "User-agent: DataForSeoBot\n"
+        "User-agent: PetalBot\n"
+        "Disallow: /\n"
+        "\n"
+        "# Everyone else (search engines + AI assistants) is welcome on the public\n"
+        "# pages, but stay off dynamic endpoints that wake the origin container.\n"
+        "User-agent: *\n"
+        "Disallow: /account\n"
+        "Disallow: /connect\n"
+        "Disallow: /mcp\n"
+        "Allow: /\n"
+        "\n"
+        "Sitemap: https://milatexai.com/sitemap.xml\n"
+    )
 
 
 def sitemap_xml() -> str:
+    # Only the public marketing page belongs here. /account is a private,
+    # per-user page (nothing to index) and is served dynamically, so listing it
+    # just invites crawlers to wake the scale-to-zero container for no benefit.
     return (
         "<?xml version='1.0' encoding='UTF-8'?>\n"
         "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>\n"
         "  <url><loc>https://milatexai.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n"
-        "  <url><loc>https://milatexai.com/account</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>\n"
         "</urlset>\n"
     )
 
