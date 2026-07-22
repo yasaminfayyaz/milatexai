@@ -43,7 +43,7 @@ body {
   box-shadow: 0 8px 40px rgba(0,0,0,.08); padding: 32px;
 }
 .brand { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
-.brand span { color: #89ecda; }
+.brand span { color: #00a693; }
 h1 { font-size: 21px; margin: 18px 0 6px; letter-spacing: -.01em; }
 .muted { color: #6b7280; font-size: 14px; margin: 0 0 20px; }
 label { display: block; font-size: 13px; font-weight: 600; margin: 16px 0 6px; }
@@ -51,19 +51,19 @@ input {
   width: 100%; padding: 11px 12px; font-size: 15px; border: 1px solid #d7dbe0;
   border-radius: 9px; background: #fff; color: #1a1d21; font-family: inherit;
 }
-input:focus { outline: 2px solid #89ecda; outline-offset: 1px; border-color: #89ecda; }
+input:focus { outline: 2px solid #00a693; outline-offset: 1px; border-color: #00a693; }
 button {
   width: 100%; margin-top: 22px; padding: 12px; font-size: 15px; font-weight: 600;
-  color: #0b3b33; background: #89ecda; border: 0; border-radius: 9px; cursor: pointer;
+  color: #0b3b33; background: #00a693; border: 0; border-radius: 9px; cursor: pointer;
 }
-button:hover { background: #5fd9bf; }
+button:hover { background: #008779; }
 .btn-danger { width: auto; margin: 0; padding: 8px 14px; font-size: 13px; background: #e5484d; }
 .btn-danger:hover { background: #c93b40; }
 .proj-list { margin: 14px 0 4px; }
 .proj-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #e6e9ef; }
 @media (prefers-color-scheme: dark) { .proj-row { border-color: #2a2e37; } }
 .hint { font-size: 12px; color: #6b7280; margin: 5px 0 0; }
-.hint a { color: #89ecda; }
+.hint a { color: #00a693; }
 .note {
   margin-top: 22px; padding: 12px 14px; background: #f5f7fb; border: 1px solid #e6e9ef;
   border-radius: 9px; font-size: 12.5px; color: #6b7280;

@@ -9,7 +9,7 @@ while the plan stays a flat USD price with no per-currency bookkeeping.
 from __future__ import annotations
 
 PRO_BASE_CURRENCY = "usd"
-PRO_UNIT_AMOUNT = 899  # 4.99 in minor units (cents)
+PRO_UNIT_AMOUNT = 899  # 8.99 in minor units (cents)
 PRO_INTERVAL = "month"
 
 
