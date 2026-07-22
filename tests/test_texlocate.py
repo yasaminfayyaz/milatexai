@@ -4,6 +4,25 @@ from __future__ import annotations
 
 from leafbridge import texlocate
 
+
+def test_page_count_and_render_pages(tmp_path):
+    """page_count reports the right total and render_pages returns clamped PNGs
+    (the machinery behind the show_page tool)."""
+    import fitz  # PyMuPDF
+
+    doc = fitz.open()
+    for i in range(3):
+        doc.new_page().insert_text((72, 72), f"Page {i + 1}")
+    p = tmp_path / "doc.pdf"
+    doc.save(str(p))
+    doc.close()
+
+    assert texlocate.page_count(str(p)) == 3
+    pngs = texlocate.render_pages(str(p), [2])
+    assert len(pngs) == 1 and pngs[0][:8] == b"\x89PNG\r\n\x1a\n"  # PNG magic bytes
+    assert texlocate.render_pages(str(p), [99]) == []  # out-of-range page is clamped out
+
+
 # A representative instrumented .aux (as produced by Tectonic): four floats,
 # the last a longtable that spans pages 3-5.
 SAMPLE_AUX = r"""
