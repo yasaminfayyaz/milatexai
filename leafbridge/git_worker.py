@@ -39,7 +39,7 @@ SYNC_TTL_SECONDS = 15.0
 # Bump git's HTTP post buffer so larger pushes don't fail (Overleaf tip).
 _POST_BUFFER = str(20 * 1024 * 1024)
 
-_COMMIT_NAME = "LeafBridge"
+_COMMIT_NAME = "MiLatexAI"
 _COMMIT_EMAIL = "leafbridge@users.noreflect"
 
 # Overleaf's Git bridge throttles rapid pushes. Absorb it: space pushes out, and

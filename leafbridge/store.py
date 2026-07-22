@@ -21,7 +21,7 @@ from cryptography.fernet import Fernet, InvalidToken
 
 # Free-tier limits (admins and "pro" are unlimited).
 FREE_PROJECT_LIMIT = 1
-FREE_MONTHLY_COMMITS = 25
+FREE_MONTHLY_COMMITS = 10
 
 
 class StoreError(Exception):

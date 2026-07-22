@@ -43,7 +43,7 @@ You will also need **Claude or ChatGPT**. Their free tiers work fine.
 
 ## Pricing
 
-- **Free:** 1 connected project, 25 write-commits per month, unlimited reads. Runs on spare capacity (best-effort).
+- **Free:** 1 connected project, 10 write-commits per month, unlimited reads. Runs on spare capacity (best-effort).
 - **Pro, $8.99/mo:** unlimited projects, unlimited write-commits, guaranteed access.
 
 Reads are always free and unlimited. If you connect Overleaf, its own subscription is separate and billed by Overleaf; GitHub, GitLab, and Bitbucket need only a free access token. Manage billing inside your assistant or at [milatexai.com/account](https://milatexai.com/account).

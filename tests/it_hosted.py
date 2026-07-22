@@ -134,7 +134,7 @@ async def run():
 
         # --- metering: push Alice to the monthly cap, next edit is blocked ---
         identity["id"], identity["email"] = USER1, EMAIL1
-        await store.increment_usage(USER1, _month(), 24)  # 1 (done) + 24 = 25 = cap
+        await store.increment_usage(USER1, _month(), 9)  # 1 (done) + 9 = 10 = cap
         try:
             await c.call_tool("edit_file",
                               {"path": "main.tex", "old_string": "Rewritten by MiLatexAI.", "new_string": "x"})
