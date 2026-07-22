@@ -1,4 +1,4 @@
-"""LeafBridge MCP server (Phase 1: local, single user, no auth).
+"""MiLatexAI MCP server (Phase 1: local, single user, no auth).
 
 Exposes the read / structure / edit / write / history / search tools described in
 the design plan, backed by the Overleaf Git bridge. Run it with::
@@ -36,7 +36,7 @@ from . import latex
 from . import texcompile
 
 INSTRUCTIONS = """\
-LeafBridge edits the user's real Overleaf projects over Overleaf's Git bridge.
+MiLatexAI edits the user's real Overleaf projects over Overleaf's Git bridge.
 
 Key facts to work well:
 - Every write tool (edit_file, write_file, delete_file) commits AND pushes
@@ -68,10 +68,10 @@ class _State:
                 settings = load_settings()
                 worker = GitWorker(settings.data_dir)
             except ConfigError as exc:
-                raise ToolError(f"LeafBridge is not configured yet: {exc}") from exc
+                raise ToolError(f"MiLatexAI is not configured yet: {exc}") from exc
             except OSError as exc:
                 raise ToolError(
-                    f"LeafBridge could not initialize its cache directory: {exc}"
+                    f"MiLatexAI could not initialize its cache directory: {exc}"
                 ) from exc
             # Assign both only on full success, so a failed init never leaves a
             # half-constructed singleton that bricks the session.
@@ -124,7 +124,7 @@ def _wrap_fs_errors(exc: Exception) -> ToolError:
     return ToolError(f"Unexpected error: {exc}")
 
 
-mcp = FastMCP(name="LeafBridge", instructions=INSTRUCTIONS, version=__version__)
+mcp = FastMCP(name="MiLatexAI", instructions=INSTRUCTIONS, version=__version__)
 
 
 # --------------------------------------------------------------------------- #
@@ -133,7 +133,7 @@ mcp = FastMCP(name="LeafBridge", instructions=INSTRUCTIONS, version=__version__)
 
 @mcp.tool
 async def list_projects() -> str:
-    """List the Overleaf projects connected to this LeafBridge server."""
+    """List the Overleaf projects connected to this MiLatexAI server."""
     settings, _ = STATE.load()
     lines = ["Connected Overleaf projects:"]
     for p in settings.projects:
@@ -376,7 +376,7 @@ async def edit_file(
         write_text_exact(target, content.replace(old_string, new_string, 1))
 
     result = await _apply_and_push(
-        proj, worker, mutate, f"Edit {path} (via LeafBridge)",
+        proj, worker, mutate, f"Edit {path} (via MiLatexAI)",
         guard_path=path, allow_shrink=allow_shrink,
     )
     if result.startswith("Done"):
@@ -407,7 +407,7 @@ async def write_file(
         write_text_exact(target, content)
 
     return await _apply_and_push(
-        proj, worker, mutate, f"Write {path} (via LeafBridge)",
+        proj, worker, mutate, f"Write {path} (via MiLatexAI)",
         guard_path=path, allow_shrink=allow_shrink,
     )
 
@@ -430,7 +430,7 @@ async def delete_file(path: str, project: str | None = None) -> str:
             raise PathError(f"{path} is a directory; only files can be deleted.")
         target.unlink()
 
-    return await _apply_and_push(proj, worker, mutate, f"Delete {path} (via LeafBridge)")
+    return await _apply_and_push(proj, worker, mutate, f"Delete {path} (via MiLatexAI)")
 
 
 # Cap on how many bytes upload_file will accept, from either source.
@@ -516,7 +516,7 @@ async def upload_file(
         write_bytes_exact(target, data)
 
     return await _apply_and_push(
-        proj, worker, mutate, f"Upload {path} ({len(data)} bytes, via LeafBridge)"
+        proj, worker, mutate, f"Upload {path} ({len(data)} bytes, via MiLatexAI)"
     )
 
 
