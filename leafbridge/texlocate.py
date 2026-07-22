@@ -210,6 +210,17 @@ def render_pages(pdf_path: str, pages: list[int], dpi: int = 150) -> list[bytes]
     return out
 
 
+def page_count(pdf_path: str) -> int:
+    """Number of pages in a PDF (used to validate a requested page number)."""
+    import fitz  # PyMuPDF
+
+    doc = fitz.open(pdf_path)
+    try:
+        return doc.page_count
+    finally:
+        doc.close()
+
+
 def _main() -> None:
     import sys
     tex = sys.argv[1]

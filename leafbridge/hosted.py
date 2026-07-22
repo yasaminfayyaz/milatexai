@@ -745,6 +745,52 @@ def create_hosted_server(
         figures return all pages; an unknown reference returns the list of figures."""
         return await _show_float("figure", figure, project)
 
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def show_page(page: int = 1, project: str | None = None):
+        """Show a rendered IMAGE of a compiled PDF page so you can SEE the actual
+        layout — margins, spacing, line breaks, overfull/underfull boxes, float
+        placement, page breaks, and overall styling — none of which the LaTeX source
+        alone reveals.
+
+        Use this SPARINGLY, and ONLY when the user asks how the document LOOKS on the
+        page (margins, spacing, layout, overflow, "does this fit", styling), or when
+        you are diagnosing a visual problem you cannot judge from the source. Do NOT
+        call it routinely or after every edit — each call compiles the project and
+        returns a full-page image. To inspect a single table or figure, prefer
+        show_table / show_figure, which crop to just that float.
+
+        page: the 1-based page number to show (default 1)."""
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            exe = texcompile.tectonic_path()
+            if not exe:
+                raise ToolError("The LaTeX engine is unavailable on the server right now.")
+            async with app.worker.open_repo(proj) as repo:
+                main = texcompile.find_main_tex(repo)
+                if not main:
+                    raise ToolError("Could not find a root .tex to compile.")
+                res = await asyncio.to_thread(texlocate.compile_and_locate, str(repo), main, exe)
+                if not res.pdf_path:
+                    raise ToolError(
+                        "The project did not produce a PDF, so it likely has compile "
+                        "errors. Run check_compile to see them."
+                    )
+                total = await asyncio.to_thread(texlocate.page_count, res.pdf_path)
+                if page < 1 or page > total:
+                    raise ToolError(
+                        f"Page {page} is out of range; the document has {total} page(s)."
+                    )
+                imgs = await asyncio.to_thread(texlocate.render_pages, res.pdf_path, [page])
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        if not imgs:
+            raise ToolError("That page rendered empty; nothing to show.")
+        from fastmcp.utilities.types import Image
+
+        return [f"Page {page} of {total}.", *[Image(data=b, format="png") for b in imgs]]
+
     # -- tracked changes + arXiv export ---------------------------------------
 
     @mcp.tool(annotations={"readOnlyHint": True})
