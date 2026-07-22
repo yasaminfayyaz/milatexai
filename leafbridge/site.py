@@ -34,29 +34,29 @@ RTL_LANGS = {"ar"}
 # --- content loading -------------------------------------------------------
 
 _FALLBACK_EN = {
-    "brand_tagline": "Edit your Overleaf papers by talking to your AI.",
+    "brand_tagline": "Edit your Overleaf, GitHub, GitLab, or Bitbucket papers by talking to your AI.",
     "nav": {"features": "Features", "how": "How it works", "pricing": "Pricing",
             "faq": "FAQ", "privacy": "Privacy", "terms": "Terms",
             "get_started": "Get started", "manage_subscription": "Manage subscription"},
     "hero": {"badge": "Works with Claude & ChatGPT",
-             "title": "Your AI can now edit your real Overleaf projects.",
-             "subtitle": "MiLatexAI connects Claude or ChatGPT to your Overleaf LaTeX projects over Git. Ask in plain language; changes go live in Overleaf.",
+             "title": "Your AI can now edit your real Overleaf projects and Git repositories.",
+             "subtitle": "MiLatexAI connects Claude or ChatGPT to your Overleaf, GitHub, GitLab, or Bitbucket LaTeX projects over Git. Ask in plain language; changes are committed to your default branch.",
              "cta_primary": "Get started", "cta_secondary": "See how it works",
-             "note": "Your Overleaf token is entered on a secure web page, never in the chat."},
+             "note": "Your Git access token is entered on a secure web page, never in the chat."},
     "trust": "Encrypted tokens · Open-source (AGPL) · Your documents are never stored.",
     "features": [
-        {"title": "Edit by conversation", "desc": "Ask your AI to rewrite a section, fix a table, or add a figure, it edits the actual .tex and pushes to Overleaf."},
-        {"title": "Real Git commits", "desc": "Every change is a commit you can see and revert in your Overleaf history."},
+        {"title": "Edit by conversation", "desc": "Ask your AI to rewrite a section, fix a table, or add a figure, it edits the actual .tex and pushes to Overleaf or your Git repo."},
+        {"title": "Real Git commits", "desc": "Every change is a commit you can see and revert in your Overleaf or Git history."},
         {"title": "Claude and ChatGPT", "desc": "Add one connector; use whichever assistant you prefer."},
-        {"title": "Token stays out of chat", "desc": "You paste your Overleaf Git token into a secure web form; it is encrypted and never appears in the transcript."},
+        {"title": "Token stays out of chat", "desc": "You paste your Git access token into a secure web form; it is encrypted and never appears in the transcript."},
         {"title": "Reads are free", "desc": "Reading files, sections and history is unlimited. Only writes count toward your plan."},
         {"title": "Compile check", "desc": "Ask it to verify the project still builds before you trust an edit."},
     ],
     "how": {"title": "Three steps", "subtitle": "You're editing in minutes.",
             "steps": [
                 {"title": "Add the connector", "desc": "Add MiLatexAI in Claude or ChatGPT and sign in."},
-                {"title": "Connect a project", "desc": "Run start_connect, open the secure link, and paste your Overleaf Git token, it's encrypted, never shown in chat."},
-                {"title": "Ask for edits", "desc": "Tell your AI what to change. It edits the LaTeX and pushes it live to Overleaf."},
+                {"title": "Connect a project", "desc": "Run start_connect, open the secure link, and paste your repository URL and access token, it's encrypted, never shown in chat."},
+                {"title": "Ask for edits", "desc": "Tell your AI what to change. It edits the LaTeX and pushes it live to your default branch."},
             ]},
     "platforms": {"title": "One connector, two assistants", "subtitle": "MiLatexAI speaks the Model Context Protocol (MCP).",
                   "claude": "Add as a custom connector in Claude.",
@@ -68,13 +68,13 @@ _FALLBACK_EN = {
               "claude_steps": [
                   "Open Settings → Connectors → Add custom connector.",
                   "Paste the connector URL above and sign in.",
-                  "Run start_connect and paste your Overleaf Git token on the secure page.",
+                  "Run start_connect and paste your repository URL and access token on the secure page.",
                   "Ask Claude to read a section or edit your paper."],
               "chatgpt_title": "In ChatGPT",
               "chatgpt_steps": [
                   "In Settings → Connectors, enable Developer mode, then Add custom connector.",
                   "Paste the connector URL above and authorize access.",
-                  "Run start_connect and paste your token on the secure page.",
+                  "Run start_connect and paste your repository URL and token on the secure page.",
                   "Ask ChatGPT to edit your paper."],
               "chatgpt_note": "Adding a custom connector needs ChatGPT Plus or higher; full editing works best on Business or Enterprise. See the guide.",
               "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
@@ -91,8 +91,8 @@ _FALLBACK_EN = {
                 "note": "Reads are always free on every plan.",
                 "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away."},
     "faq": {"title": "Frequently asked questions", "items": [
-        {"q": "Is my Overleaf token safe?", "a": "You enter it on a secure web page, not in the chat. It's encrypted at rest and only used to sync your connected projects over Git."},
-        {"q": "Do you see my documents?", "a": "We don't store your document contents. Edits flow through Overleaf's Git integration; we keep only your account email, your encrypted token, and a commit counter."},
+        {"q": "Is my access token safe?", "a": "You enter it on a secure web page, not in the chat. It's encrypted at rest and only used to sync your connected projects over Git."},
+        {"q": "Do you see my documents?", "a": "We don't store your document contents. Edits flow through your Git provider; we keep only your account email, your encrypted token, and a commit counter."},
         {"q": "Which assistants work?", "a": "Anthropic Claude and OpenAI ChatGPT, via the Model Context Protocol."},
         {"q": "What happens at the free limit?", "a": "Reads stay free and unlimited. New write-commits resume next month, or you can upgrade to Pro."},
         {"q": "Is it open source?", "a": "Yes, the code is public under the AGPL license, so you can audit exactly what it does."},
@@ -100,32 +100,32 @@ _FALLBACK_EN = {
     ]},
     "security": {"title": "Built to be trusted", "subtitle": "Security and transparency first.",
                  "points": [
-                     {"title": "Encrypted tokens", "desc": "Your Overleaf Git token is encrypted at rest with authenticated encryption."},
+                     {"title": "Encrypted tokens", "desc": "Your Git access token is encrypted at rest with authenticated encryption."},
                      {"title": "No document storage", "desc": "We never store your paper's contents, only account metadata and an encrypted token."},
-                     {"title": "Only your projects", "desc": "MiLatexAI can only touch the specific Overleaf projects you connect."},
+                     {"title": "Only your projects", "desc": "MiLatexAI can only touch the specific Overleaf projects or Git repositories you connect."},
                      {"title": "Open source", "desc": "The full source is public under the AGPL, so anyone can verify it."},
                  ]},
     "cta": {"title": "Ready to write faster?", "subtitle": "Add MiLatexAI and connect your first project in minutes.",
             "button": "Get started"},
-    "footer": {"blurb": "MiLatexAI connects your AI assistant to your Overleaf projects.",
+    "footer": {"blurb": "MiLatexAI connects your AI assistant to your Overleaf projects and Git repositories.",
                "rights": "© 2026 MiLatexAI. All rights reserved.",
                "language_label": "Language", "contact_label": "Contact",
                "contact_value": "support@milatexai.com"},
     "privacy": {"title": "Privacy Policy", "updated_label": "Last updated: July 2026",
                 "intro": "This policy explains what MiLatexAI collects and how it is handled.",
                 "sections": [
-                    {"heading": "What we collect", "body": "Your account email (from single sign-on), an encrypted copy of the Overleaf Git token you provide, and a monthly commit counter."},
-                    {"heading": "What we do not collect", "body": "We do not store the contents of your Overleaf documents."},
+                    {"heading": "What we collect", "body": "Your account email (from single sign-on), an encrypted copy of the Git access token you provide, and a monthly commit counter."},
+                    {"heading": "What we do not collect", "body": "We do not store the contents of your Overleaf or Git-hosted documents."},
                     {"heading": "How tokens are secured", "body": "Tokens are encrypted at rest and decrypted only transiently to sync the projects you connect."},
-                    {"heading": "Third parties", "body": "Sign-in is handled by WorkOS; hosting is on Microsoft Azure; edits sync through Overleaf's Git service."},
+                    {"heading": "Third parties", "body": "Sign-in is handled by WorkOS; hosting is on Microsoft Azure; edits sync through your Git provider (Overleaf, GitHub, GitLab, or Bitbucket)."},
                     {"heading": "Retention and deletion", "body": "Disconnecting a project deletes its stored token. Contact us to delete your account."},
                     {"heading": "Contact", "body": "Questions? support@milatexai.com."},
                 ]},
     "terms": {"title": "Terms of Service", "updated_label": "Last updated: July 2026",
               "intro": "By using MiLatexAI you agree to these terms.",
               "sections": [
-                  {"heading": "The service", "body": "MiLatexAI lets AI assistants read and edit the Overleaf projects you connect."},
-                  {"heading": "Your account and tokens", "body": "You are responsible for your Overleaf account and the tokens you provide."},
+                  {"heading": "The service", "body": "MiLatexAI lets AI assistants read and edit the Overleaf projects or Git repositories you connect."},
+                  {"heading": "Your account and tokens", "body": "You are responsible for your Overleaf, GitHub, GitLab, or Bitbucket account and the tokens you provide."},
                   {"heading": "Acceptable use", "body": "Use the service lawfully and only with projects you are authorized to edit."},
                   {"heading": "Availability and warranty", "body": "The service is provided “as is” without warranty of any kind."},
                   {"heading": "Open-source code", "body": "The software is licensed under the AGPL; the source is publicly available."},
@@ -564,7 +564,7 @@ function applyLang(lang) {{
 <meta name='keywords' content='edit Overleaf with ChatGPT, edit Overleaf with Claude, Overleaf MCP server, Overleaf MCP connector, Model Context Protocol Overleaf, remote MCP server LaTeX, MCP server for LaTeX, Overleaf AI editor, ChatGPT Overleaf, Claude Overleaf, edit LaTeX with AI, AI research paper editor, LaTeX AI assistant'>
 <link rel='canonical' href='{url}'>
 <meta name='robots' content='index,follow'>
-<meta name='theme-color' content='#89ecda'>
+<meta name='theme-color' content='#00a693'>
 <meta property='og:type' content='website'>
 <meta property='og:site_name' content='MiLatexAI'>
 <meta property='og:title' content='{title}'>
@@ -675,8 +675,9 @@ def render_account(
         nudge = (
             "<div class='acct-nudge'><b>Next step: start editing</b><br>"
             "Editing happens inside your assistant. Add MiLatexAI as a connector in "
-            "Claude or ChatGPT, then connect an Overleaf project (this needs an "
-            "Overleaf plan with Git integration). It takes about two minutes. "
+            "Claude or ChatGPT, then connect an Overleaf project or a GitHub, GitLab, "
+            "or Bitbucket repository (Overleaf needs a plan with Git integration; the "
+            "others just need a repo and a free access token). It takes about two minutes. "
             "<a href='/#get-started'>See the setup guide</a>.</div>"
         )
 
@@ -701,8 +702,8 @@ def render_og_image() -> str:
     """A 1200x630 social preview image (SVG) referenced by og:image."""
     return """<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'>
 <rect width='1200' height='630' fill='#0b0d12'/>
-<rect x='0' y='0' width='1200' height='8' fill='#89ecda'/>
-<text x='90' y='300' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='96' font-weight='800' fill='#ffffff'>Mi<tspan fill='#89ecda'>LaTeX</tspan>AI</text>
+<rect x='0' y='0' width='1200' height='8' fill='#00a693'/>
+<text x='90' y='300' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='96' font-weight='800' fill='#ffffff'>Mi<tspan fill='#00a693'>LaTeX</tspan>AI</text>
 <text x='94' y='378' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='42' fill='#c7cdd8'>Edit your Overleaf papers by talking to your AI.</text>
 <text x='94' y='452' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='30' fill='#7b8496'>Works with Claude &amp; ChatGPT  ·  milatexai.com</text>
 </svg>"""
@@ -716,18 +717,24 @@ def llms_txt() -> str:
     assistants and AI search engines)."""
     return (
         "# MiLatexAI\n\n"
-        "> Edit your real Overleaf LaTeX projects by chatting with ChatGPT or Claude. "
+        "> Edit your real Overleaf LaTeX projects, plus GitHub, GitLab, Bitbucket, and "
+        "allowlisted self-hosted Git repositories, by chatting with ChatGPT or Claude. "
         "A remote MCP (Model Context Protocol) connector: read, edit, and compile your "
-        "paper; every change is a real Git commit in Overleaf's history.\n\n"
+        "paper; every change is a real Git commit on your repository's default branch.\n\n"
         "Connector URL (add as a custom connector in Claude or ChatGPT): https://milatexai.com/mcp\n\n"
-        "Requirements: an Overleaf account with Git integration (a paid Overleaf feature) "
-        "plus Claude or ChatGPT (their free tiers work).\n"
+        "Requirements: a repository you can push to, plus Claude or ChatGPT (their free tiers "
+        "work). For Overleaf, an account with Git integration (a paid Overleaf feature); for "
+        "GitHub, GitLab, or Bitbucket, any repo and a free access token (GitHub fine-grained "
+        "PAT with Contents read/write, GitLab project or personal access token, or Bitbucket "
+        "app password). You paste a repository URL and access token on a secure web form.\n"
         "Pricing: Free tier (1 project, 25 write-commits/month, unlimited reads, best-effort); "
-        "Pro $8.99/month (unlimited, guaranteed). Overleaf is billed separately by Overleaf.\n\n"
-        "Features: conversational LaTeX editing pushed straight to Overleaf; every write is a "
-        "Git commit; compile checks with exact LaTeX errors; see rendered tables/figures as "
-        "images and fix layout; Figure Studio (Pro): create/edit matplotlib figures whose "
-        "source code is kept in the project for future edits.\n\n"
+        "Pro $8.99/month (unlimited, guaranteed). Overleaf's Git integration is billed "
+        "separately by Overleaf; GitHub/GitLab/Bitbucket need only a free access token.\n\n"
+        "Features: conversational LaTeX editing committed and pushed straight to the default "
+        "branch on Overleaf, GitHub, GitLab, or Bitbucket; every write is a Git commit; "
+        "compile checks with exact LaTeX errors; see rendered tables/figures as images and "
+        "fix layout; Figure Studio (Pro): create/edit matplotlib figures whose source code "
+        "is kept in the project for future edits. No pull-request flow or branch picker yet.\n\n"
         "## Links\n\n"
         "- [Website](https://milatexai.com)\n"
         "- [Setup guide](https://milatexai.com/#get-started)\n"
@@ -785,7 +792,7 @@ def sitemap_xml() -> str:
 
 
 _CSS = """
-:root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#89ecda;--accent2:#57cfae;--radius:14px}
+:root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#00a693;--accent2:#007f6e;--radius:14px}
 @media (prefers-color-scheme:dark){:root{--bg:#0b0d12;--fg:#e9ecf2;--muted:#9aa3b2;--line:#20242e;--card:#12151c}}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -800,7 +807,7 @@ a{color:inherit;text-decoration:none}
 .navactions{display:flex;align-items:center;gap:12px}
 .lang select{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:14px}
 .btn{display:inline-block;background:var(--accent);color:#0b3b33;padding:12px 20px;border-radius:10px;font-weight:600;border:0;cursor:pointer;font-size:15px}
-.btn:hover{background:#5fd9bf}
+.btn:hover{background:#008779}
 .btn-sm{padding:8px 14px;font-size:14px}
 .btn-lg{padding:15px 30px;font-size:17px}
 .btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}

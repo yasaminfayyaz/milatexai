@@ -1,6 +1,6 @@
 {
  "en": {
-  "brand_tagline": "Talk to your AI. Edit your real Overleaf paper.",
+  "brand_tagline": "Talk to your AI. Edit your real Overleaf project or Git repository.",
   "nav": {
    "features": "Features",
    "how": "How it works",
@@ -14,24 +14,24 @@
   "hero": {
    "badge": "Works with Claude, ChatGPT, and more",
    "title": "From thought to paper, no copy-paste.",
-   "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project. No pasting sections, no downloading files, your AI works on the live document, always the ground truth, and every change lands in Overleaf as a real Git commit.",
+   "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project, or any GitHub, GitLab, Bitbucket, or allowlisted self-hosted Git repository. No pasting sections, no downloading files, your AI works on the live document, always the ground truth, and every change lands on your default branch as a real Git commit.",
    "cta_primary": "Get started",
    "cta_secondary": "See how it works",
-   "note": "What you need: an Overleaf account with Git integration (a paid Overleaf feature), plus Claude or ChatGPT (their free tiers work fine). MiLatexAI's own Free tier is best-effort as capacity allows; Pro is $8.99 a month for guaranteed access."
+   "note": "What you need: a repository you can push to, plus Claude or ChatGPT (their free tiers work fine). For Overleaf that means an account with Git integration (a paid Overleaf feature); for GitHub, GitLab, or Bitbucket, any repo and a free access token will do. MiLatexAI's own Free tier is best-effort as capacity allows; Pro is $8.99 a month for guaranteed access."
   },
-  "trust": "Your Overleaf Git token is entered on a secure web form, encrypted at rest, and never appears in the chat. The full connector is open source on GitHub under the AGPL license, so you can audit exactly what it does.",
+  "trust": "Your Git access token is entered on a secure web form, encrypted at rest, and never appears in the chat. The full connector is open source on GitHub under the AGPL license, so you can audit exactly what it does.",
   "features": [
    {
     "title": "Edit by conversation",
-    "desc": "Ask your AI to tighten an abstract, rewrite a paragraph, or clean up a proof. It reads and edits the actual LaTeX in your Overleaf project, not a copy."
+    "desc": "Ask your AI to tighten an abstract, rewrite a paragraph, or clean up a proof. It reads and edits the actual LaTeX in your Overleaf project or Git repository, not a copy."
    },
    {
-    "title": "Changes go straight to Overleaf",
-    "desc": "Edits are pushed to your project over Overleaf's Git integration, so your paper updates in place. No copy-pasting between a chat window and your editor."
+    "title": "Changes go straight to Overleaf or Git",
+    "desc": "Edits are committed and pushed to the default branch of your Overleaf project, or your GitHub, GitLab, or Bitbucket repository, so your paper updates in place. No copy-pasting between a chat window and your editor."
    },
    {
     "title": "Every write is a real Git commit",
-    "desc": "Each change is a genuine commit in your Overleaf history. You can see it, review the diff, and roll it back exactly like any other commit. Nothing happens silently."
+    "desc": "Each change is a genuine commit on the default branch of your Overleaf project or Git repository. You can see it, review the diff, and roll it back exactly like any other commit. Nothing happens silently."
    },
    {
     "title": "Catch and fix compile errors",
@@ -39,7 +39,7 @@
    },
    {
     "title": "Your token stays out of the chat",
-    "desc": "You paste your Overleaf Git token into a secure web form, never into the conversation. It is encrypted at rest and never written to the transcript."
+    "desc": "You paste your Git access token into a secure web form, never into the conversation. It is encrypted at rest and never written to the transcript."
    },
    {
     "title": "Open source and auditable",
@@ -77,20 +77,20 @@
      "desc": "Add MiLatexAI as a connector in Claude or ChatGPT and sign in with single sign-on, handled by WorkOS."
     },
     {
-     "title": "Paste your Overleaf token securely",
-     "desc": "Run start_connect to get a one-time link to milatexai.com/connect, then paste your Overleaf Git token into the web form. Git access is a paid Overleaf feature, so you need an Overleaf plan that includes Git integration. Your token is encrypted immediately and never appears in the chat."
+     "title": "Paste your repo URL and token securely",
+     "desc": "Run start_connect to get a one-time link to milatexai.com/connect, then paste your repository URL and access token into the web form. For Overleaf, Git access is a paid Overleaf feature, so you need a plan that includes Git integration; for GitHub, GitLab, or Bitbucket, any repo you can push to plus a free access token works. Your token is encrypted immediately and never appears in the chat."
     },
     {
      "title": "Ask the AI to edit your paper",
-     "desc": "In plain language, ask it to list files, read sections, rewrite LaTeX, add figures, or check that it compiles. Your changes are committed live to Overleaf."
+     "desc": "In plain language, ask it to list files, read sections, rewrite LaTeX, add figures, or check that it compiles. Your changes are committed live to your default branch."
     }
    ]
   },
   "platforms": {
    "title": "Bring your own AI",
-   "subtitle": "MiLatexAI is a Model Context Protocol connector: it works in Claude, ChatGPT, and other MCP-compatible assistants.",
-   "claude": "Add MiLatexAI as a connector in Anthropic's Claude and edit your Overleaf projects from any Claude conversation.",
-   "chatgpt": "Add MiLatexAI as a connector in OpenAI's ChatGPT and do the same there, same projects, same commits, same Overleaf history."
+   "subtitle": "MiLatexAI is a Model Context Protocol connector: it works in Claude, ChatGPT, and other MCP-compatible assistants, on your Overleaf projects and GitHub, GitLab, or Bitbucket repositories.",
+   "claude": "Add MiLatexAI as a connector in Anthropic's Claude and edit your Overleaf projects or Git repositories from any Claude conversation.",
+   "chatgpt": "Add MiLatexAI as a connector in OpenAI's ChatGPT and do the same there, same projects, same commits, same Git history."
   },
   "pricing": {
    "title": "Simple pricing",
@@ -100,7 +100,7 @@
     "price": "$0",
     "period": "",
     "features": [
-     "1 connected Overleaf project",
+     "1 connected project (Overleaf or Git)",
      "25 write-commits per month",
      "Unlimited reads",
      "Works with Claude and ChatGPT",
@@ -124,7 +124,7 @@
     "cta": "Get started",
     "availability": "Guaranteed · always on"
    },
-   "note": "Reads are always free and unlimited. Free access is best-effort, as capacity allows. Every plan also needs an Overleaf account with Git integration, which is a paid Overleaf feature.",
+   "note": "Reads are always free and unlimited. Free access is best-effort, as capacity allows. You bring your own repository: Overleaf needs an account with Git integration (a paid Overleaf feature), while GitHub, GitLab, and Bitbucket just need a repo and a free access token.",
    "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away.",
    "lab": "Writing with a lab or research group? Ask about lab and department pricing:"
   },
@@ -133,19 +133,19 @@
    "items": [
     {
      "q": "Do I need a paid Overleaf plan?",
-     "a": "For your own projects, yes. MiLatexAI works through Overleaf's Git integration, which is a paid Overleaf feature, so you need an Overleaf plan that includes Git, or a project shared with you from a premium or group account. Quick test: if you can create an Overleaf Git token in your Overleaf Account Settings, you are all set."
+     "a": "Only for Overleaf. Overleaf works through its Git integration, which is a paid Overleaf feature, so for your own Overleaf projects you need a plan that includes Git, or a project shared with you from a premium or group account. GitHub, GitLab, and Bitbucket need no paid plan at all: any repository you can push to works with a free access token (a GitHub fine-grained PAT with Contents read and write, a GitLab project or personal access token, or a Bitbucket app password)."
     },
     {
      "q": "How much does MiLatexAI cost?",
-     "a": "MiLatexAI works with the free tiers of Claude and ChatGPT, and it has its own Free tier: 1 project, 25 write-commits a month, and unlimited reads, running on spare capacity. For guaranteed, unlimited access, Pro is $8.99 a month. Overleaf's Git integration is billed separately by Overleaf."
+     "a": "MiLatexAI works with the free tiers of Claude and ChatGPT, and it has its own Free tier: 1 project, 25 write-commits a month, and unlimited reads, running on spare capacity. For guaranteed, unlimited access, Pro is $8.99 a month. If you connect Overleaf, its Git integration is billed separately by Overleaf; GitHub, GitLab, and Bitbucket need only a free access token."
     },
     {
-     "q": "Is my Overleaf token safe?",
-     "a": "You paste your token into a secure web form at milatexai.com/connect, never into the chat. It is encrypted at rest with authenticated encryption and is never written into the conversation transcript."
+     "q": "Is my access token safe?",
+     "a": "You paste your Git access token into a secure web form at milatexai.com/connect, never into the chat. It is encrypted at rest with authenticated encryption and is never written into the conversation transcript."
     },
     {
      "q": "Can you see my documents?",
-     "a": "We don't store your document contents. MiLatexAI reads and edits your files in the moment to carry out a request, but the only things we keep are your account email, your encrypted Overleaf token, and a monthly commit counter."
+     "a": "We don't store your document contents. MiLatexAI reads and edits your files in the moment to carry out a request, but the only things we keep are your account email, your encrypted access token, and a monthly commit counter."
     },
     {
      "q": "Which AI assistants does it work with?",
@@ -165,11 +165,11 @@
     },
     {
      "q": "Does it touch projects I didn't connect?",
-     "a": "No. MiLatexAI only accesses the specific Overleaf projects you connect with the token you provide. It has no visibility into anything else in your Overleaf account."
+     "a": "No. MiLatexAI only accesses the specific Overleaf projects or Git repositories you connect with the token you provide. It has no visibility into anything else in your account."
     },
     {
-     "q": "Will my changes show up in Overleaf history?",
-     "a": "Yes. Every write is a real Git commit pushed over Overleaf's Git integration, so it appears in your project history where you can review the diff or revert it."
+     "q": "Will my changes show up in the project history?",
+     "a": "Yes. Every write is a real Git commit pushed to the default branch of your Overleaf project or Git repository, so it appears in the history where you can review the diff or revert it."
     },
     {
      "q": "Can it fix my LaTeX errors, not just write?",
@@ -183,7 +183,7 @@
    "points": [
     {
      "title": "Your token is encrypted",
-     "desc": "Overleaf Git tokens are encrypted at rest with authenticated encryption, and are entered on a web form rather than in the chat."
+     "desc": "Git access tokens are encrypted at rest with authenticated encryption, and are entered on a web form rather than in the chat."
     },
     {
      "title": "We don't store your documents",
@@ -191,7 +191,7 @@
     },
     {
      "title": "Only the projects you connect",
-     "desc": "Access is limited to the specific Overleaf projects you choose to connect. Nothing else in your account is reachable."
+     "desc": "Access is limited to the specific Overleaf projects or Git repositories you choose to connect. Nothing else in your account is reachable."
     },
     {
      "title": "Open source, run on Azure",
@@ -201,25 +201,25 @@
   },
   "cta": {
    "title": "Start editing your paper by talking to your AI",
-   "subtitle": "Add MiLatexAI to Claude or ChatGPT, connect an Overleaf project (Overleaf's Git integration is a paid feature), and start editing. Reads are always free and unlimited.",
+   "subtitle": "Add MiLatexAI to Claude or ChatGPT, connect an Overleaf project or a GitHub, GitLab, or Bitbucket repository (Overleaf's Git integration is a paid feature; the others just need a free access token), and start editing. Reads are always free and unlimited.",
    "button": "Get started"
   },
   "footer": {
-   "blurb": "MiLatexAI connects Claude and ChatGPT to your real Overleaf projects over Git, so you can read, edit, and compile your LaTeX just by talking to your AI. Open source under the AGPL license.",
+   "blurb": "MiLatexAI connects Claude and ChatGPT to your real Overleaf projects and GitHub, GitLab, or Bitbucket repositories over Git, so you can read, edit, and compile your LaTeX just by talking to your AI. Open source under the AGPL license.",
    "rights": "© 2026 MiLatexAI. All rights reserved.",
    "language_label": "Language",
    "contact_label": "Support",
    "contact_value": "support@milatexai.com",
-   "disclaimer": "MiLatexAI is an independent product, not affiliated with or endorsed by Overleaf, Claude, or ChatGPT. All trademarks belong to their owners."
+   "disclaimer": "MiLatexAI is an independent product, not affiliated with or endorsed by Overleaf, GitHub, GitLab, Bitbucket, Claude, or ChatGPT. All trademarks belong to their owners."
   },
   "privacy": {
    "title": "Privacy Policy",
    "updated_label": "Last updated: July 2026",
-   "intro": "This policy explains, in plain language, what MiLatexAI collects, what it deliberately does not collect, and how your Overleaf token is protected. MiLatexAI is a small, independent product, and we try to touch as little of your data as possible.",
+   "intro": "This policy explains, in plain language, what MiLatexAI collects, what it deliberately does not collect, and how your Git access token is protected. MiLatexAI is a small, independent product, and we try to touch as little of your data as possible.",
    "sections": [
     {
      "heading": "What we collect",
-     "body": "We collect only three things: your account email address (provided through single sign-on), your Overleaf Git token in encrypted form, and a counter of how many write-commits you've made in the current month. That is the complete list."
+     "body": "We collect only three things: your account email address (provided through single sign-on), your Git access token in encrypted form, and a counter of how many write-commits you've made in the current month. That is the complete list."
     },
     {
      "heading": "What we do NOT collect",
@@ -227,11 +227,11 @@
     },
     {
      "heading": "How your token is secured",
-     "body": "Your Overleaf Git token is entered into a web form at milatexai.com/connect, never into the chat, and is encrypted at rest using authenticated encryption. It is used only to access the specific projects you connect, and is never shown in the conversation transcript."
+     "body": "Your Git access token is entered into a web form at milatexai.com/connect, never into the chat, and is encrypted at rest using authenticated encryption. It is used only to access the specific projects you connect, and is never shown in the conversation transcript."
     },
     {
      "heading": "Third parties we rely on",
-     "body": "Sign-in is handled by WorkOS AuthKit, which authenticates you and provides your email. Hosting is on Microsoft Azure in the Canada region. Your projects live on Overleaf, and MiLatexAI communicates with them over Overleaf's Git integration. We do not sell your data or share it beyond what these providers require to run the service."
+     "body": "Sign-in is handled by WorkOS AuthKit, which authenticates you and provides your email. Hosting is on Microsoft Azure in the Canada region. Your projects live on Overleaf, GitHub, GitLab, Bitbucket, or your own Git host, and MiLatexAI communicates with them over Git. We do not sell your data or share it beyond what these providers require to run the service."
     },
     {
      "heading": "Data retention and deletion",
@@ -254,15 +254,15 @@
    "sections": [
     {
      "heading": "The service",
-     "body": "MiLatexAI is a connector that lets AI assistants such as Anthropic's Claude and OpenAI's ChatGPT read, edit, and compile your Overleaf LaTeX projects over Overleaf's Git integration, through the Model Context Protocol. You direct the AI in plain language, and your changes are pushed to your Overleaf project as Git commits."
+     "body": "MiLatexAI is a connector that lets AI assistants such as Anthropic's Claude and OpenAI's ChatGPT read, edit, and compile your LaTeX projects on Overleaf, GitHub, GitLab, Bitbucket, or an allowlisted self-hosted Git host, over Git, through the Model Context Protocol. You direct the AI in plain language, and your changes are committed and pushed to your repository's default branch."
     },
     {
      "heading": "Acceptable use",
-     "body": "Use MiLatexAI only with Overleaf projects and accounts you are authorized to access. Do not use it to break Overleaf's terms, to infringe others' rights, or to attempt to disrupt or defeat the security of the service. You are responsible for reviewing the changes your AI assistant makes before relying on them."
+     "body": "Use MiLatexAI only with projects, repositories, and accounts you are authorized to access. Do not use it to break Overleaf's, GitHub's, GitLab's, or Bitbucket's terms, to infringe others' rights, or to attempt to disrupt or defeat the security of the service. You are responsible for reviewing the changes your AI assistant makes before relying on them."
     },
     {
-     "heading": "Your Overleaf account and tokens",
-     "body": "You are responsible for keeping your Overleaf Git token valid and for the actions taken under it through the connector. We encrypt the token you provide and use it only to access the projects you connect, but you remain in control of your own Overleaf account and its permissions."
+     "heading": "Your account and tokens",
+     "body": "You are responsible for keeping your Git access token valid and for the actions taken under it through the connector. We encrypt the token you provide and use it only to access the projects you connect, but you remain in control of your own Overleaf, GitHub, GitLab, or Bitbucket account and its permissions."
     },
     {
      "heading": "Availability and \"as is\"",
@@ -270,7 +270,7 @@
     },
     {
      "heading": "Limitation of liability",
-     "body": "To the maximum extent permitted by law, MiLatexAI and its maintainers are not liable for any indirect, incidental, or consequential damages, or for lost data or lost work, arising from your use of the service. Always keep your own copies and rely on Overleaf's Git history to review and revert changes."
+     "body": "To the maximum extent permitted by law, MiLatexAI and its maintainers are not liable for any indirect, incidental, or consequential damages, or for lost data or lost work, arising from your use of the service. Always keep your own copies and rely on your repository's Git history to review and revert changes."
     },
     {
      "heading": "Open-source code",
@@ -290,7 +290,7 @@
     },
     {
      "heading": "Independent product and trademarks",
-     "body": "MiLatexAI is an independent tool. It is not affiliated with, endorsed by, or sponsored by Overleaf or Digital Science, nor by Anthropic (Claude) or OpenAI (ChatGPT). Overleaf, Claude, ChatGPT and other names are trademarks of their respective owners, used only to describe compatibility. You are responsible for using MiLatexAI in line with Overleaf's and your AI provider's own terms of service, and only with projects you are authorized to access. MiLatexAI implements the open Model Context Protocol and may connect from other MCP-compatible assistants; it is tested only with Claude and ChatGPT, and other clients are not officially supported."
+     "body": "MiLatexAI is an independent tool. It is not affiliated with, endorsed by, or sponsored by Overleaf or Digital Science, GitHub, GitLab, or Bitbucket, nor by Anthropic (Claude) or OpenAI (ChatGPT). Overleaf, GitHub, GitLab, Bitbucket, Claude, ChatGPT and other names are trademarks of their respective owners, used only to describe compatibility. You are responsible for using MiLatexAI in line with the terms of service of Overleaf, your Git host, and your AI provider, and only with projects you are authorized to access. MiLatexAI implements the open Model Context Protocol and may connect from other MCP-compatible assistants; it is tested only with Claude and ChatGPT, and other clients are not officially supported."
     }
    ]
   },
@@ -303,14 +303,14 @@
    "claude_steps": [
     "Open Settings → Connectors → Add custom connector.",
     "Paste the connector URL above and sign in.",
-    "Run start_connect and paste your Overleaf Git token on the secure page.",
+    "Run start_connect and paste your repository URL and access token on the secure page.",
     "Ask Claude to read a section or edit your paper."
    ],
    "chatgpt_title": "In ChatGPT",
    "chatgpt_steps": [
     "In Settings → Connectors, enable Developer mode, then Add custom connector.",
     "Paste the connector URL above and authorize access.",
-    "Run start_connect and paste your token on the secure page.",
+    "Run start_connect and paste your repository URL and token on the secure page.",
     "Ask ChatGPT to edit your paper."
    ],
    "chatgpt_note": "Works on ChatGPT, including its free plan. See the guide.",
