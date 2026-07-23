@@ -360,6 +360,32 @@ class HostedApp:
         )
 
 
+def _resolve_main_tex(repo: Path, tex: str | None) -> str:
+    """Which .tex to compile: an explicit project-relative path if given, else the
+    auto-detected root document. Lets a caller target a specific document when a
+    project holds more than one .tex."""
+    if tex:
+        p = safe_join(repo, tex)  # raises PathError on traversal (caller wraps it)
+        if not p.is_file() or p.suffix.lower() != ".tex":
+            avail = [
+                q.relative_to(repo).as_posix()
+                for q in sorted(repo.rglob("*.tex"))
+                if ".git" not in q.parts
+            ]
+            raise ToolError(
+                f"No .tex file at {tex!r}. Available .tex files: "
+                + (", ".join(avail) if avail else "(none)")
+            )
+        return p.relative_to(repo).as_posix()
+    main = texcompile.find_main_tex(repo)
+    if not main:
+        raise ToolError(
+            'Could not auto-detect a root .tex. Pass tex="path/to/file.tex" '
+            "(list_files shows the .tex files)."
+        )
+    return main
+
+
 def create_hosted_server(
     *,
     store: Store | None = None,
@@ -661,21 +687,23 @@ def create_hosted_server(
             raise _wrap(exc)
 
     @mcp.tool(annotations={"readOnlyHint": True})
-    async def check_compile(project: str | None = None) -> str:
+    async def check_compile(project: str | None = None, tex: str | None = None) -> str:
         """Compile a project with a local LaTeX engine and report whether it builds,
         with the exact LaTeX errors and warnings. Use this whenever the user asks
         why their paper won't compile, why they're getting errors, or wants to
         verify a project builds. After it reports errors you can read the offending
-        file, fix them with edit_file, and run this again to confirm."""
+        file, fix them with edit_file, and run this again to confirm.
+
+        tex: project-relative path of the .tex to compile (e.g. "paper2/main.tex").
+        Omit to auto-detect the root document; pass it when the project has more
+        than one document and you need a specific one (list_files shows them)."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             float_map = ""
             async with app.worker.open_repo(proj) as repo:
-                main = texcompile.find_main_tex(repo)
-                if not main:
-                    raise ToolError("Could not find a root .tex to compile.")
+                main = _resolve_main_tex(repo, tex)
                 res = await texcompile.compile_project(repo, main)
                 if res.ok:
                     float_map = await _float_map(repo, main)
@@ -746,7 +774,7 @@ def create_hosted_server(
         return await _show_float("figure", figure, project)
 
     @mcp.tool(annotations={"readOnlyHint": True})
-    async def show_page(page: int = 1, project: str | None = None):
+    async def show_page(page: int = 1, project: str | None = None, tex: str | None = None):
         """Show a rendered IMAGE of a compiled PDF page so you can SEE the actual
         layout — margins, spacing, line breaks, overfull/underfull boxes, float
         placement, page breaks, and overall styling — none of which the LaTeX source
@@ -759,7 +787,9 @@ def create_hosted_server(
         returns a full-page image. To inspect a single table or figure, prefer
         show_table / show_figure, which crop to just that float.
 
-        page: the 1-based page number to show (default 1)."""
+        page: the 1-based page number to show (default 1).
+        tex: project-relative path of the .tex to compile; omit to auto-detect the
+        root document, pass it when the project holds more than one document."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -768,9 +798,7 @@ def create_hosted_server(
             if not exe:
                 raise ToolError("The LaTeX engine is unavailable on the server right now.")
             async with app.worker.open_repo(proj) as repo:
-                main = texcompile.find_main_tex(repo)
-                if not main:
-                    raise ToolError("Could not find a root .tex to compile.")
+                main = _resolve_main_tex(repo, tex)
                 res = await asyncio.to_thread(texlocate.compile_and_locate, str(repo), main, exe)
                 if not res.pdf_path:
                     raise ToolError(
