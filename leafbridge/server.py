@@ -376,7 +376,7 @@ async def edit_file(
         write_text_exact(target, content.replace(old_string, new_string, 1))
 
     result = await _apply_and_push(
-        proj, worker, mutate, f"Edit {path} (via MiLatexAI)",
+        proj, worker, mutate, f"Edit {path}",
         guard_path=path, allow_shrink=allow_shrink,
     )
     if result.startswith("Done"):
@@ -407,7 +407,7 @@ async def write_file(
         write_text_exact(target, content)
 
     return await _apply_and_push(
-        proj, worker, mutate, f"Write {path} (via MiLatexAI)",
+        proj, worker, mutate, f"Write {path}",
         guard_path=path, allow_shrink=allow_shrink,
     )
 
@@ -430,7 +430,7 @@ async def delete_file(path: str, project: str | None = None) -> str:
             raise PathError(f"{path} is a directory; only files can be deleted.")
         target.unlink()
 
-    return await _apply_and_push(proj, worker, mutate, f"Delete {path} (via MiLatexAI)")
+    return await _apply_and_push(proj, worker, mutate, f"Delete {path}")
 
 
 # Cap on how many bytes upload_file will accept, from either source.
@@ -516,7 +516,7 @@ async def upload_file(
         write_bytes_exact(target, data)
 
     return await _apply_and_push(
-        proj, worker, mutate, f"Upload {path} ({len(data)} bytes, via MiLatexAI)"
+        proj, worker, mutate, f"Upload {path} ({len(data)} bytes)"
     )
 
 

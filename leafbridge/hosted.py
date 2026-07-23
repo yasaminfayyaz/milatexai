@@ -912,7 +912,7 @@ def create_hosted_server(
                 write_text_exact(safe_join(repo, path), old)
 
             return await app.apply_and_push(
-                user, proj, mutate, f"Restore {path} from {ref} (MiLatexAI)",
+                user, proj, mutate, f"Restore {path} from {ref}",
                 guard_path=path, allow_shrink=True,
             )
         except Exception as exc:  # noqa: BLE001
@@ -957,7 +957,7 @@ def create_hosted_server(
                 write_text_exact(t, cur + sep + entry.rstrip("\n") + "\n")
 
             result = await app.apply_and_push(
-                user, proj, mutate, f"Add citation {key} (MiLatexAI)"
+                user, proj, mutate, f"Add citation {key}"
             )
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
@@ -1081,8 +1081,7 @@ def create_hosted_server(
             out_rel = figures.out_path(slug, fmt)
             other_rel = figures.out_path(slug, "png" if fmt == "pdf" else "pdf")
             body = code.rstrip("\n") + "\n"
-            file_body = figures.build_header(
-                slug, code_body=body, pdf_bytes=artifact, ext=fmt) + body
+            file_body = body
 
             def mutate(repo: Path) -> None:
                 src_t = safe_join(repo, src_rel)
@@ -1097,7 +1096,7 @@ def create_hosted_server(
                     sibling.unlink()
 
             result = await app.apply_and_push(
-                user, proj, mutate, f"Figure {slug} (MiLatexAI Figure Studio)"
+                user, proj, mutate, f"Figure {slug}"
             )
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
@@ -1146,8 +1145,7 @@ def create_hosted_server(
             out_rel = figures.out_path(slug, fmt)
             other_rel = figures.out_path(slug, "png" if fmt == "pdf" else "pdf")
             body = code.rstrip("\n") + "\n"
-            file_body = figures.build_header(
-                slug, code_body=body, pdf_bytes=artifact, ext=fmt, comment="%") + body
+            file_body = body
 
             def mutate(repo: Path) -> None:
                 src_t = safe_join(repo, src_rel)
@@ -1161,7 +1159,7 @@ def create_hosted_server(
                     sibling.unlink()
 
             result = await app.apply_and_push(
-                user, proj, mutate, f"TikZ {slug} (MiLatexAI TikZ Studio)"
+                user, proj, mutate, f"TikZ {slug}"
             )
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
@@ -1256,7 +1254,7 @@ def create_hosted_server(
 
         try:
             result = await app.apply_and_push(
-                user, proj, mutate, f"Edit {path} (MiLatexAI)",
+                user, proj, mutate, f"Edit {path}",
                 guard_path=path, allow_shrink=allow_shrink,
             )
         except Exception as exc:  # noqa: BLE001
@@ -1289,7 +1287,7 @@ def create_hosted_server(
 
         try:
             return await app.apply_and_push(
-                user, proj, mutate, f"Write {path} (MiLatexAI)",
+                user, proj, mutate, f"Write {path}",
                 guard_path=path, allow_shrink=allow_shrink,
             )
         except Exception as exc:  # noqa: BLE001
@@ -1314,7 +1312,7 @@ def create_hosted_server(
             target.unlink()
 
         try:
-            return await app.apply_and_push(user, proj, mutate, f"Delete {path} (MiLatexAI)")
+            return await app.apply_and_push(user, proj, mutate, f"Delete {path}")
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
@@ -1341,7 +1339,7 @@ def create_hosted_server(
 
         try:
             return await app.apply_and_push(
-                user, proj, mutate, f"Upload {path} ({len(data)} bytes, MiLatexAI)"
+                user, proj, mutate, f"Upload {path} ({len(data)} bytes)"
             )
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
