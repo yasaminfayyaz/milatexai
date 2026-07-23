@@ -114,7 +114,7 @@ def test_commit_tikz_commits_source_and_png(tmp_path, monkeypatch):
     verify = tmp_path / "v"
     _git(["-c", "core.autocrlf=false", "clone", (tmp_path / "remote.git").as_uri(), str(verify)], tmp_path)
     src = (verify / "figures" / "src" / "flow-chart.tex").read_text()
-    assert src.startswith("% === milatexai figure ===") and SNIPPET in src
+    assert "milatexai figure" not in src and SNIPPET in src
     assert (verify / "figures" / "flow-chart.png").read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
     assert any("Image" in type(b).__name__ for b in r.content)
 

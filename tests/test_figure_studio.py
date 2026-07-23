@@ -296,8 +296,8 @@ def test_commit_figure_pro_commits_source_and_pdf(tmp_path):
     # otherwise be "helpfully" CRLF-converted by a default Windows checkout).
     _git(["-c", "core.autocrlf=false", "clone", (tmp_path / "remote.git").as_uri(), str(verify)], tmp_path)
     src = (verify / "figures" / "src" / "energy-vs-time.py").read_text()
-    assert src.startswith("# === milatexai figure ===")
-    assert "figure: energy-vs-time" in src
+    # No attribution header: the committed source is exactly the user's code.
+    assert "milatexai figure" not in src and "code-sha256" not in src
     assert CODE.strip() in src
     assert (verify / "figures" / "energy-vs-time.pdf").read_bytes() == pdf
     # An image block came back (committed-artifact preview).
@@ -316,10 +316,10 @@ def test_commit_figure_png_format_and_switch_cleans_sibling(tmp_path):
     png = (verify / "figures" / "speedup.png").read_bytes()
     assert png[:8] == b"\x89PNG\r\n\x1a\n"
     src = (verify / "figures" / "src" / "speedup.py").read_text()
-    assert "output: figures/speedup.png" in src
-    # In-sync state holds for PNG artifacts too.
+    assert "milatexai figure" not in src and CODE.strip() in src
+    # No provenance header, so the figure lists (as untracked).
     listing = _text(_call(mcp, "list_figures", {}))
-    assert "in sync" in listing
+    assert "speedup" in listing
     # Switch back to pdf: the stale .png must be removed in the same commit.
     _call(mcp, "commit_figure", {"code": CODE, "name": "speedup", "format": "pdf"})
     verify2 = tmp_path / "v2"
@@ -381,15 +381,7 @@ def test_list_figures_lifecycle_including_deletion_memory(tmp_path):
     assert "No Figure Studio figures" in _text(_call(mcp, "list_figures", {}))
     _call(mcp, "commit_figure", {"code": CODE, "name": "speedup"})
     listing = _text(_call(mcp, "list_figures", {}))
-    assert "speedup" in listing and "in sync" in listing
-    # Replace the PDF "outside Figure Studio" (as if the user uploaded their own)
-    # and push; the listing must flag that the code is no longer ground truth.
-    _call(mcp, "upload_file", {
-        "path": "figures/speedup.png",
-        "content_base64": __import__("base64").b64encode(b"%PDF-external-edit").decode(),
-    })
-    listing = _text(_call(mcp, "list_figures", {}))
-    assert "NOT ground truth" in listing
+    assert "speedup" in listing  # listed (untracked — no provenance header)
     # Delete the source through the normal tool, then the listing must remember it.
     _call(mcp, "delete_file", {"path": "figures/src/speedup.py"})
     listing = _text(_call(mcp, "list_figures", {}))
