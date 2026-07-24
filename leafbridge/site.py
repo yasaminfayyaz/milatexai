@@ -787,6 +787,7 @@ def sitemap_xml() -> str:
         "<?xml version='1.0' encoding='UTF-8'?>\n"
         "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>\n"
         "  <url><loc>https://milatexai.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n"
+        "  <url><loc>https://milatexai.com/tools/bibtex</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
         "</urlset>\n"
     )
 

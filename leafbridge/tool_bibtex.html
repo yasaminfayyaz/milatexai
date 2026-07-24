@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free BibTeX Cleaner &amp; DOI Autocomplete — MiLatexAI</title>
+<meta name="description" content="Clean, dedupe, and fix a .bib file in your browser. Auto-completes missing fields from DOIs via Crossref. Free, no login, nothing uploaded.">
+<style>
+:root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#00a693;--accent2:#007f6e;--warn:#b5680a;--err:#c0392b;--ok:#0b7a63;--radius:12px}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0d12;--fg:#e9ecf2;--muted:#9aa3b2;--line:#20242e;--card:#12151c;--warn:#e0a24a;--err:#ef6b60;--ok:#3fcaab}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 64px}
+.brand{font-weight:800;font-size:18px;letter-spacing:-.02em}
+.brand span{color:var(--accent)}
+h1{font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;margin:18px 0 8px}
+.sub{color:var(--muted);margin:0 0 18px;max-width:70ch}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+label.io{display:block;font-size:13px;font-weight:600;margin:0 0 6px;color:var(--muted)}
+textarea{width:100%;min-height:340px;padding:12px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);color:var(--fg);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
+textarea:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:14px 0}
+.opt{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--fg)}
+.btn{appearance:none;border:0;border-radius:10px;padding:11px 18px;font-size:15px;font-weight:700;cursor:pointer;background:var(--accent);color:#04231d}
+.btn:hover{background:var(--accent2);color:#fff}
+.btn.secondary{background:transparent;color:var(--fg);border:1px solid var(--line);font-weight:600}
+.btn.secondary:hover{border-color:var(--accent);color:var(--accent);background:transparent}
+.btn:disabled{opacity:.5;cursor:default}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.summary{margin:16px 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.err{background:color-mix(in srgb,var(--err) 16%,transparent);color:var(--err)}
+.chip.muted{background:var(--card);color:var(--muted)}
+.issues{margin:6px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);font-size:13.5px;max-height:200px;overflow:auto}
+.issues div{padding:2px 0}
+.issues .w{color:var(--warn)} .issues .e{color:var(--err)} .issues .k{font-family:ui-monospace,monospace;color:var(--fg)}
+.cta{margin:34px 0 0;padding:20px 22px;border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:16px;background:color-mix(in srgb,var(--accent) 8%,var(--card))}
+.cta b{font-size:16px}
+.cta p{margin:6px 0 14px;color:var(--muted);font-size:14.5px}
+.note{margin-top:26px;color:var(--muted);font-size:12.5px}
+a{color:var(--accent)}
+.hidden{display:none}
+.faq{margin-top:40px;border-top:1px solid var(--line);padding-top:20px}
+.faq h2{font-size:19px;margin:0 0 12px}
+.faq dt{font-weight:700;margin-top:14px}
+.faq dd{margin:4px 0 0;color:var(--muted);font-size:14.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Mi<span>LaTeX</span>AI</div>
+  <h1>BibTeX Cleaner &amp; DOI Autocomplete</h1>
+  <p class="sub">Paste a <code>.bib</code> file. It gets parsed, de-duplicated, consistently formatted, and validated — and missing fields are filled in from each entry's DOI. Everything runs in your browser: <b>nothing is uploaded, no login, free.</b></p>
+
+  <div class="grid">
+    <div>
+      <label class="io" for="in">Your .bib <span id="dropHint" style="font-weight:400">— or drop a file</span></label>
+      <textarea id="in" spellcheck="false" placeholder="@article{smith2021,
+  title={A study of things},
+  author={Smith, Jane and Doe, John},
+  journal={Nature},
+  year={2021},
+  doi={10.1038/nature12373}
+}"></textarea>
+    </div>
+    <div>
+      <label class="io" for="out">Cleaned .bib</label>
+      <textarea id="out" spellcheck="false" readonly placeholder="Cleaned output appears here."></textarea>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label class="opt"><input type="checkbox" id="optDedupe" checked> De-duplicate</label>
+    <label class="opt"><input type="checkbox" id="optSort" checked> Sort entries by key</label>
+    <label class="opt"><input type="checkbox" id="optSortFields"> Sort fields</label>
+    <label class="opt"><input type="checkbox" id="optStrip" checked> Drop empty fields</label>
+    <label class="opt"><input type="checkbox" id="optBrace" checked> Protect Title Capitals</label>
+    <label class="opt"><input type="checkbox" id="optLower" checked> Lowercase keys/types</label>
+  </div>
+
+  <div class="btnrow">
+    <button class="btn" id="clean">Clean</button>
+    <button class="btn secondary" id="doi">Complete missing fields via DOI</button>
+    <button class="btn secondary" id="copy" disabled>Copy</button>
+    <button class="btn secondary" id="download" disabled>Download .bib</button>
+  </div>
+
+  <ul class="summary" id="summary"></ul>
+  <div class="issues hidden" id="issues"></div>
+
+  <div class="cta">
+    <b>Cleaning one file is nice. Fixing your whole paper is better.</b>
+    <p>MiLatexAI connects Claude or ChatGPT to your real Overleaf project or GitHub/GitLab repo — ask it to tidy citations, fix errors, and rewrite sections, and every change is a real Git commit.</p>
+    <a class="btn" href="https://milatexai.com/#get-started">Add the connector →</a>
+  </div>
+
+  <div class="faq">
+    <h2>About this tool</h2>
+    <dl>
+      <dt>Is my .bib uploaded anywhere?</dt>
+      <dd>No. All parsing and cleaning happen in your browser. DOI autocomplete calls the public Crossref API directly from your browser — your library is never sent to our servers.</dd>
+      <dt>What does &ldquo;Protect Title Capitals&rdquo; do?</dt>
+      <dd>BibTeX lowercases title words unless they're wrapped in braces. This wraps acronyms and all-caps words (e.g. <code>DNA</code>, <code>NASA</code>) in <code>{}</code> so they keep their capitalization.</dd>
+      <dt>Where does DOI autocomplete get data?</dt>
+      <dd>The free Crossref REST API (and DataCite for Zenodo-style DOIs). No API key, no cost, rate-limited politely.</dd>
+    </dl>
+  </div>
+
+  <p class="note">Free BibTeX cleaner by <a href="https://milatexai.com">MiLatexAI</a>. Runs entirely client-side.</p>
+</div>
+
+<script>
+"use strict";
+/* ===================== BibTeX engine (dependency-free) ===================== */
+
+const ENTRY_META = new Set(["string","preamble","comment"]);
+
+// Required fields by entry type (for validation warnings). Not exhaustive; the
+// common cases researchers hit. "author OR editor" handled specially below.
+const REQUIRED = {
+  article:{req:["author","title","journal","year"]},
+  book:{req:["title","publisher","year"],alt:[["author","editor"]]},
+  inproceedings:{req:["author","title","booktitle","year"]},
+  incollection:{req:["author","title","booktitle","publisher","year"]},
+  phdthesis:{req:["author","title","school","year"]},
+  mastersthesis:{req:["author","title","school","year"]},
+  techreport:{req:["author","title","institution","year"]},
+  misc:{req:[]},
+  online:{req:[]},
+  unpublished:{req:["author","title","note"]},
+};
+
+function parseBib(text){
+  const out=[]; const notes=[]; let i=0; const n=text.length;
+  const ws=/\s/;
+  const skip=()=>{ while(i<n && ws.test(text[i])) i++; };
+  while(i<n){
+    while(i<n && text[i]!=="@") i++;
+    if(i>=n) break;
+    i++; // @
+    let type="";
+    while(i<n && /[a-zA-Z]/.test(text[i])){ type+=text[i]; i++; }
+    type=type.toLowerCase();
+    skip();
+    const open=text[i];
+    if(open!=="{" && open!=="("){ continue; }
+    const close = open==="{" ? "}" : ")";
+    i++;
+    if(type==="comment"){ // skip balanced body
+      let d=1; while(i<n && d>0){ if(text[i]===open)d++; else if(text[i]===close)d--; i++; }
+      continue;
+    }
+    if(type==="string" || type==="preamble"){
+      let d=1,raw=""; while(i<n && d>0){ if(text[i]===open)d++; else if(text[i]===close){d--; if(!d)break;} raw+=text[i]; i++; }
+      i++; out.push({type,meta:true,raw:raw.trim()});
+      continue;
+    }
+    // entry
+    skip();
+    let key="";
+    while(i<n && text[i]!=="," && text[i]!==close && !ws.test(text[i])){ key+=text[i]; i++; }
+    skip();
+    const fields=[]; const seen={};
+    while(i<n && text[i]!==close){
+      if(text[i]===","){ i++; skip(); continue; }
+      let fn="";
+      while(i<n && text[i]!=="=" && text[i]!=="," && text[i]!==close && !ws.test(text[i])){ fn+=text[i]; i++; }
+      skip();
+      if(text[i]!=="="){ // malformed; recover to next comma
+        while(i<n && text[i]!=="," && text[i]!==close) i++;
+        continue;
+      }
+      i++; skip();
+      const val=readValue(close);
+      const name=fn.toLowerCase().trim();
+      if(name){ if(name in seen){ notes.push({key,level:"w",msg:"duplicate field '"+name+"' (kept first)"}); }
+        else { seen[name]=1; fields.push({name,value:val}); } }
+      skip();
+    }
+    if(text[i]===close) i++;
+    if(!key) notes.push({key:"(?)",level:"w",msg:"entry with no citation key"});
+    out.push({type,key,fields});
+  }
+  return {entries:out,notes};
+
+  function readValue(close){
+    // Handle concatenation a # b by joining resolved chunks into one string.
+    let parts=[];
+    for(;;){
+      skip();
+      if(text[i]==="{"){
+        let d=1,v=""; i++;
+        while(i<n && d>0){ const c=text[i]; if(c==="{")d++; else if(c==="}"){d--; if(!d){i++;break;}} v+=c; i++; }
+        parts.push(v);
+      } else if(text[i]==='"'){
+        let v=""; i++;
+        while(i<n && text[i]!=='"'){ if(text[i]==="{"){ let d=1; v+="{"; i++; while(i<n&&d>0){const c=text[i]; if(c==="{")d++; else if(c==="}")d--; v+=c; i++;} continue;} v+=text[i]; i++; }
+        i++; parts.push(v);
+      } else {
+        let v="";
+        while(i<n && text[i]!=="," && text[i]!==close && text[i]!=="#" && !ws.test(text[i])){ v+=text[i]; i++; }
+        parts.push(v);
+      }
+      skip();
+      if(text[i]==="#"){ i++; continue; }
+      break;
+    }
+    return parts.join("").replace(/\s+/g," ").trim();
+  }
+}
+
+// --- normalization helpers ---
+function normDOI(d){ if(!d) return ""; return d.trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i,"").replace(/^doi:/i,"").toLowerCase(); }
+function normTitleKey(t){ return (t||"").toLowerCase().replace(/[{}\\$]/g,"").replace(/[^a-z0-9]+/g," ").trim(); }
+function field(e,name){ const f=(e.fields||[]).find(x=>x.name===name); return f?f.value:""; }
+function setField(e,name,val){ const f=e.fields.find(x=>x.name===name); if(f)f.value=val; else e.fields.push({name,value:val}); }
+
+// Wrap ALL-CAPS / acronym words in a title with braces to protect capitalization.
+function protectTitle(t){
+  if(!t) return t;
+  const _let=t.replace(/[^A-Za-z]/g,"");
+  if(_let.length && _let===_let.toUpperCase()) return t; // whole title all-caps: can't isolate acronyms, leave as-is
+  // don't touch anything already inside braces
+  return t.replace(/(\{[^{}]*\}|[^\s{}]+)/g,(tok)=>{
+    if(tok[0]==="{") return tok;                 // already protected
+    const core=tok.replace(/[^A-Za-z]/g,"");
+    if(core.length>=2 && core===core.toUpperCase() && /[A-Z]/.test(core)){
+      // e.g. DNA, NASA, RNA-seq -> protect the whole token
+      return "{"+tok+"}";
+    }
+    // internal capital after first letter (e.g. LaTeX, iPhone) -> protect
+    if(core.length>=2 && /[a-z][A-Z]/.test(tok)){ return "{"+tok+"}"; }
+    return tok;
+  });
+}
+
+function titleCaseIfShouting(t){
+  const letters=t.replace(/[^A-Za-z]/g,"");
+  if(letters.length>3 && letters===letters.toUpperCase()){
+    return t.toLowerCase().replace(/(^|[\s{(])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+  }
+  return t;
+}
+
+// Month macro normalization -> standard bibtex 3-letter macro (unbraced).
+const MONTHS={january:"jan",february:"feb",march:"mar",april:"apr",may:"may",june:"jun",july:"jul",august:"aug",september:"sep",october:"oct",november:"nov",december:"dec",
+  jan:"jan",feb:"feb",mar:"mar",apr:"apr",jun:"jun",jul:"jul",aug:"aug",sep:"sep",sept:"sep",oct:"oct",nov:"nov",dec:"dec",
+  "1":"jan","2":"feb","3":"mar","4":"apr","5":"may","6":"jun","7":"jul","8":"aug","9":"sep","10":"oct","11":"nov","12":"dec",
+  "01":"jan","02":"feb","03":"mar","04":"apr","05":"may","06":"jun","07":"jul","08":"aug","09":"sep"};
+
+function dedupe(entries){
+  const kept=[]; const byKey={}; const byDoi={}; const byTitle={}; let merged=0;
+  for(const e of entries){
+    if(e.meta){ kept.push(e); continue; }
+    const doi=normDOI(field(e,"doi"));
+    const tk=normTitleKey(field(e,"title"));
+    let dup=null;
+    if(doi && byDoi[doi]) dup=byDoi[doi];
+    else if(e.key && byKey[e.key.toLowerCase()]) dup=byKey[e.key.toLowerCase()];
+    else if(tk && tk.length>8 && byTitle[tk]) dup=byTitle[tk];
+    if(dup){ // merge: fill fields dup is missing
+      for(const f of e.fields){ if(!field(dup,f.name)) dup.fields.push({name:f.name,value:f.value}); }
+      merged++; continue;
+    }
+    kept.push(e);
+    if(e.key) byKey[e.key.toLowerCase()]=e;
+    if(doi) byDoi[doi]=e;
+    if(tk && tk.length>8) byTitle[tk]=e;
+  }
+  return {entries:kept,merged};
+}
+
+function validate(e){
+  const issues=[]; const spec=REQUIRED[e.type];
+  if(!spec) return issues;
+  for(const r of spec.req){ if(!field(e,r)) issues.push({key:e.key,level:"w",msg:"@"+e.type+" is missing '"+r+"'"}); }
+  if(spec.alt){ for(const group of spec.alt){ if(!group.some(g=>field(e,g))) issues.push({key:e.key,level:"w",msg:"@"+e.type+" needs one of: "+group.join(" / ")}); } }
+  return issues;
+}
+
+function formatEntry(e,opt){
+  if(e.meta){ return "@"+e.type+"{"+e.raw+"}"; }
+  const type = opt.lower ? e.type.toLowerCase() : e.type;
+  const key = e.key || "";
+  let fields=e.fields.slice();
+  if(opt.strip) fields=fields.filter(f=>String(f.value).trim()!=="");
+  if(opt.sortFields) fields.sort((a,b)=>a.name<b.name?-1:a.name>b.name?1:0);
+  const pad=Math.max(0,...fields.map(f=>f.name.length));
+  const lines=fields.map(f=>{
+    let v=f.value;
+    if(f.name==="month"){ const mm=MONTHS[String(v).toLowerCase().trim()]; if(mm) return "  "+f.name.padEnd(pad)+" = "+mm+","; }
+    return "  "+f.name.padEnd(pad)+" = {"+v+"},";
+  });
+  // drop trailing comma on last field for cleanliness
+  if(lines.length) lines[lines.length-1]=lines[lines.length-1].replace(/,\s*$/,"");
+  return "@"+type+"{"+key+",\n"+lines.join("\n")+"\n}";
+}
+
+function clean(text,opt){
+  const {entries,notes}=parseBib(text);
+  let list=entries;
+  let mergedCount=0;
+  if(opt.dedupe){ const d=dedupe(list); list=d.entries; mergedCount=d.merged; }
+  // field-level fixes
+  let braced=0, monthsFixed=0, allcaps=0;
+  for(const e of list){
+    if(e.meta) continue;
+    if(opt.lower && e.key) e.key=e.key; // keys kept as-is by convention (renaming breaks \cite)
+    let t=field(e,"title");
+    if(t){
+      const before=t;
+      const letters=t.replace(/[^A-Za-z]/g,"");
+      if(letters.length>3 && letters===letters.toUpperCase()){
+        // ALL-CAPS title: un-shouting is ambiguous (would turn DNA->Dna), so
+        // flag it for the user to review rather than guess.
+        allcaps++;
+        notes.push({key:e.key,level:"w",msg:"title is ALL-CAPS — BibTeX may lose its capitalization; review it"});
+      } else if(opt.brace){
+        const p=protectTitle(t); if(p!==t){ braced++; t=p; }
+      }
+      if(t!==before) setField(e,"title",t);
+    }
+    const m=field(e,"month"); if(m && MONTHS[String(m).toLowerCase().trim()]) monthsFixed++;
+  }
+  // validation
+  const issues=[...notes];
+  for(const e of list){ if(!e.meta) issues.push(...validate(e)); }
+  // sort (metas first, then by key)
+  if(opt.sort){
+    const metas=list.filter(e=>e.meta); const ents=list.filter(e=>!e.meta);
+    ents.sort((a,b)=>(a.key||"").toLowerCase()<(b.key||"").toLowerCase()?-1:1);
+    list=[...metas,...ents];
+  }
+  const outText=list.map(e=>formatEntry(e,opt)).join("\n\n")+ (list.length?"\n":"");
+  const nEntries=list.filter(e=>!e.meta).length;
+  return {text:outText,entries:list,stats:{nEntries,merged:mergedCount,braced,monthsFixed,allcaps,issues}};
+}
+
+// Expose for testing
+window.BIB={parseBib,clean,dedupe,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field};
+
+/* ===================== DOI autocomplete ===================== */
+function bibtexFromDoiRecord(bt){ // parse a single-entry bibtex string returned by crossref
+  const p=parseBib(bt); return p.entries.find(e=>!e.meta)||null;
+}
+async function fetchDoiBibtex(doi){
+  const url="https://api.crossref.org/works/"+encodeURIComponent(doi)+"/transform/application/x-bibtex?mailto=support@milatexai.com";
+  const r=await fetch(url,{headers:{"Accept":"application/x-bibtex"}});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.text();
+}
+async function findDoiByTitle(title){
+  const url="https://api.crossref.org/works?rows=1&select=DOI,title&query.bibliographic="+encodeURIComponent(title)+"&mailto=support@milatexai.com";
+  const r=await fetch(url); if(!r.ok) return null;
+  const j=await r.json(); const it=(j.message&&j.message.items&&j.message.items[0]); if(!it) return null;
+  const got=normTitleKey((it.title&&it.title[0])||""); const want=normTitleKey(title);
+  // require a close match to avoid wrong DOIs
+  if(got && want && (got.startsWith(want.slice(0,Math.min(want.length,30)))||want.startsWith(got.slice(0,Math.min(got.length,30))))) return it.DOI;
+  return null;
+}
+const FILLABLE=["author","title","journal","year","volume","number","pages","publisher","booktitle","month"];
+async function completeViaDoi(entries,onProgress){
+  let filled=0, found=0, lookedUp=0;
+  const ents=entries.filter(e=>!e.meta);
+  for(let idx=0;idx<ents.length;idx++){
+    const e=ents[idx];
+    let doi=normDOI(field(e,"doi"));
+    if(!doi){ const t=field(e,"title"); if(t && t.length>10){ try{ lookedUp++; const d=await findDoiByTitle(t); if(d){ doi=normDOI(d); setField(e,"doi",doi); found++; } }catch(_){ } await sleep(350); } }
+    if(!doi) { onProgress&&onProgress(idx+1,ents.length); continue; }
+    try{
+      const bt=await fetchDoiBibtex(doi);
+      const rec=bibtexFromDoiRecord(bt);
+      if(rec){ for(const nm of FILLABLE){ if(!field(e,nm)){ const v=field(rec,nm); if(v){ setField(e,nm,v); filled++; } } } }
+    }catch(_){ }
+    await sleep(350); // polite: ~3 req/s
+    onProgress&&onProgress(idx+1,ents.length);
+  }
+  return {filled,found,lookedUp};
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ===================== UI ===================== */
+const $=id=>document.getElementById(id);
+function opts(){ return {dedupe:$("optDedupe").checked,sort:$("optSort").checked,sortFields:$("optSortFields").checked,strip:$("optStrip").checked,brace:$("optBrace").checked,lower:$("optLower").checked}; }
+let lastEntries=null;
+
+function renderSummary(s){
+  const u=$("summary"); u.innerHTML="";
+  const add=(t,cls)=>{const li=document.createElement("li");li.className="chip"+(cls?" "+cls:"");li.textContent=t;u.appendChild(li);};
+  add(s.nEntries+" entr"+(s.nEntries===1?"y":"ies"));
+  if(s.merged) add(s.merged+" duplicate"+(s.merged===1?"":"s")+" merged");
+  if(s.braced) add(s.braced+" title"+(s.braced===1?"":"s")+" brace-protected");
+  if(s.allcaps) add(s.allcaps+" ALL-CAPS title"+(s.allcaps===1?"":"s")+" flagged","warn");
+  if(s.monthsFixed) add(s.monthsFixed+" month"+(s.monthsFixed===1?"":"s")+" normalized");
+  const errs=s.issues.filter(x=>x.level==="e").length, warns=s.issues.filter(x=>x.level==="w").length;
+  if(warns) add(warns+" warning"+(warns===1?"":"s"),"warn");
+  if(errs) add(errs+" error"+(errs===1?"":"s"),"err");
+  if(!s.merged&&!warns&&!errs) add("looks clean ✓");
+  // issue list
+  const box=$("issues");
+  if(s.issues.length){ box.classList.remove("hidden"); box.innerHTML=s.issues.map(x=>'<div class="'+(x.level==="e"?"e":"w")+'"><span class="k">'+esc(x.key||"")+'</span> — '+esc(x.msg)+'</div>').join(""); }
+  else box.classList.add("hidden");
+}
+function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+function runClean(){
+  const src=$("in").value;
+  const res=clean(src,opts());
+  $("out").value=res.text;
+  lastEntries=res.entries;
+  renderSummary(res.stats);
+  $("copy").disabled=!res.text.trim();
+  $("download").disabled=!res.text.trim();
+}
+$("clean").onclick=runClean;
+$("copy").onclick=async()=>{ try{ await navigator.clipboard.writeText($("out").value); $("copy").textContent="Copied ✓"; setTimeout(()=>$("copy").textContent="Copy",1200); }catch(_){}};
+$("download").onclick=()=>{ const b=new Blob([$("out").value],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="cleaned.bib"; a.click(); };
+$("doi").onclick=async()=>{
+  const src=$("in").value; if(!src.trim()) return;
+  const parsed=clean(src,opts()); // clean first so we work on tidy entries
+  const btn=$("doi"); btn.disabled=true; const label=btn.textContent;
+  try{
+    const r=await completeViaDoi(parsed.entries,(d,t)=>{ btn.textContent="Looking up "+d+"/"+t+"…"; });
+    // re-run formatting & validation on the enriched entries
+    const opt=opts(); const issues=[]; for(const e of parsed.entries){ if(!e.meta) issues.push(...validate(e)); }
+    $("out").value=parsed.entries.map(e=>formatEntry(e,opt)).join("\n\n")+"\n";
+    lastEntries=parsed.entries;
+    const s=parsed.stats; s.issues=issues;
+    renderSummary(s);
+    const u=$("summary"); const add=(t)=>{const li=document.createElement("li");li.className="chip";li.textContent=t;u.appendChild(li);};
+    if(r.filled) add(r.filled+" field"+(r.filled===1?"":"s")+" filled from DOI");
+    if(r.found) add(r.found+" DOI"+(r.found===1?"":"s")+" found by title");
+    $("copy").disabled=false; $("download").disabled=false;
+  }catch(e){ alert("DOI lookup failed: "+e.message); }
+  finally{ btn.disabled=false; btn.textContent=label; }
+};
+// file drop
+const inEl=$("in");
+["dragover","drop"].forEach(ev=>inEl.addEventListener(ev,e=>e.preventDefault()));
+inEl.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f){ const rd=new FileReader(); rd.onload=()=>{inEl.value=rd.result; runClean();}; rd.readAsText(f); }});
+</script>
+</body>
+</html>

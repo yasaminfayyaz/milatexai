@@ -1386,6 +1386,15 @@ def create_hosted_server(
             _pages["home"] = site.render_site()
         return HTMLResponse(_pages["home"])
 
+    @mcp.custom_route("/tools/bibtex", methods=["GET"])
+    async def bibtex_tool(request: Request) -> Response:
+        # Static, client-side BibTeX cleaner. Edge-cached (see asgi._EDGE_CACHED),
+        # so it never wakes this container — a $0 marketing surface.
+        if "bibtex_tool" not in _pages:
+            from . import tool_bibtex
+            _pages["bibtex_tool"] = tool_bibtex.render_bibtex_tool()
+        return HTMLResponse(_pages["bibtex_tool"])
+
     @mcp.custom_route("/account", methods=["GET"])
     async def account(request: Request) -> Response:
         status = request.query_params.get("status")

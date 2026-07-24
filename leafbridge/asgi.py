@@ -44,7 +44,7 @@ class _SecurityHeaders:
 
     # Static, per-process-identical pages: cache hard at the Cloudflare edge so
     # crawler/visitor hits are served without waking this scale-to-zero app.
-    _EDGE_CACHED = {"/", "/llms.txt", "/robots.txt", "/sitemap.xml", "/og.svg"}
+    _EDGE_CACHED = {"/", "/llms.txt", "/robots.txt", "/sitemap.xml", "/og.svg", "/tools/bibtex"}
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
