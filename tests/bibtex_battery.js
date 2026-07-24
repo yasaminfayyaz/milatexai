@@ -86,6 +86,23 @@
   d = B.dedupe(B.parseBib("@article{a, title={Alpha}}\n@article{b, title={Beta}}").entries);
   eq("dedupe.noFalseMerge", d.merged, 0);
 
+  // ---- fuzzy possible-duplicate flagging (flag for review, never auto-merge) ----
+  // different keys, one title has a subtitle, same author+year -> flagged, both kept
+  c = B.clean("@article{a1, title={Deep learning for vision}, author={Smith, J}, journal={J}, year={2020}}\n@article{a2, title={Deep learning for vision: a comprehensive review}, author={Smith, J}, journal={J}, year={2020}}", { dedupe: true, sort: false, strip: true, brace: false, lower: true });
+  eq("fuzzy.keepsBoth", c.stats.nEntries, 2);
+  ok("fuzzy.flags", c.stats.possibleDupes >= 1 && c.stats.issues.some(function (x) { return /possible duplicate/.test(x.msg); }), JSON.stringify(c.stats.issues));
+  // genuinely different references -> not flagged
+  c = B.clean("@article{x, title={Quantum error correction codes}, author={Alice, A}, year={2019}}\n@article{y, title={A history of medieval poetry}, author={Bob, B}, year={2001}}", { dedupe: true, sort: false, strip: true, brace: false, lower: true });
+  eq("fuzzy.noFalsePositive", c.stats.possibleDupes, 0);
+  // same title but conflicting DOIs -> kept separate, not merged, not flagged
+  c = B.clean("@article{p, title={Deep learning study today}, doi={10.1/aaa}}\n@article{q, title={Deep learning study today}, doi={10.1/bbb}}", { dedupe: true, sort: false, strip: true, brace: false, lower: true });
+  eq("fuzzy.conflictDOI.keepsBoth", c.stats.nEntries, 2);
+  eq("fuzzy.conflictDOI.notMerged", c.stats.merged, 0);
+  eq("fuzzy.conflictDOI.notFlagged", c.stats.possibleDupes, 0);
+  // firstAuthorLast parsing (both bibtex author styles)
+  eq("firstAuthorLast.comma", B.firstAuthorLast("Smith, Jane and Doe, John"), "smith");
+  eq("firstAuthorLast.natural", B.firstAuthorLast("Jane Smith and John Doe"), "smith");
+
   // ---- validate ----
   e = B.parseBib("@article{v, title={T}, year={2020}}").entries[0];
   iss = B.validate(e);

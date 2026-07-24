@@ -259,7 +259,11 @@ function dedupe(entries){
     let dup=null;
     if(doi && byDoi[doi]) dup=byDoi[doi];
     else if(e.key && byKey[e.key.toLowerCase()]) dup=byKey[e.key.toLowerCase()];
-    else if(tk && tk.length>8 && byTitle[tk]) dup=byTitle[tk];
+    else if(tk && tk.length>8 && byTitle[tk]){
+      const cand=byTitle[tk], cdoi=normDOI(field(cand,"doi"));
+      // same title but DIFFERENT DOIs => authoritatively different; keep separate
+      if(!(doi && cdoi && doi!==cdoi)) dup=cand;
+    }
     if(dup){ // merge: fill fields dup is missing
       for(const f of e.fields){ if(!field(dup,f.name)) dup.fields.push({name:f.name,value:f.value}); }
       merged++; continue;
@@ -270,6 +274,37 @@ function dedupe(entries){
     if(tk && tk.length>8) byTitle[tk]=e;
   }
   return {entries:kept,merged};
+}
+
+// First author's last name, normalized. Handles "Last, First" and "First Last".
+function firstAuthorLast(a){
+  if(!a) return "";
+  const first=String(a).split(/\s+and\s+/i)[0].trim();
+  let last;
+  if(first.indexOf(",")>=0) last=first.split(",")[0];
+  else { const parts=first.split(/\s+/).filter(Boolean); last=parts[parts.length-1]||""; }
+  return last.replace(/[{}\\.]/g,"").toLowerCase().trim();
+}
+function _titleWords(t){ return new Set(normTitleKey(t).split(" ").filter(w=>w.length>3)); }
+function _jaccard(a,b){ if(!a.size||!b.size) return 0; let x=0; a.forEach(w=>{ if(b.has(w)) x++; }); return x/(a.size+b.size-x); }
+// Entries that LOOK like the same reference despite different keys/titles — near-
+// identical titles, or same first author + year + overlapping title. These are
+// FLAGGED for review, never auto-merged (a wrong merge drops a real citation).
+function fuzzyDupes(entries){
+  const ents=entries.filter(e=>!e.meta);
+  const info=ents.map(e=>({key:e.key||"(no key)",words:_titleWords(field(e,"title")),author:firstAuthorLast(field(e,"author")),year:String(field(e,"year")||"").replace(/\D/g,"").slice(0,4),doi:normDOI(field(e,"doi"))}));
+  const out=[];
+  for(let a=0;a<info.length;a++){ for(let b=a+1;b<info.length;b++){
+    const x=info[a],y=info[b];
+    if(x.doi && y.doi) continue; // both carry DOIs => authoritative identities
+    const sim=_jaccard(x.words,y.words);
+    const sameAY=x.author && y.author && x.author===y.author && x.year && x.year===y.year;
+    let reason=null;
+    if(x.words.size>=2 && y.words.size>=2 && sim>=0.8) reason="near-identical titles";
+    else if(sameAY && sim>=0.5) reason="same first author + year, similar title";
+    if(reason) out.push({a:x.key,b:y.key,reason:reason,sim:Math.round(sim*100)});
+  }}
+  return out;
 }
 
 function validate(e){
@@ -324,6 +359,12 @@ function clean(text,opt){
     }
     const m=field(e,"month"); if(m && MONTHS[String(m).toLowerCase().trim()]) monthsFixed++;
   }
+  // possible (fuzzy) duplicates -> FLAG for review, never auto-merge
+  let possibleDupes=0;
+  if(opt.dedupe){
+    const fz=fuzzyDupes(list); possibleDupes=fz.length;
+    for(const p of fz){ notes.push({key:p.a+" / "+p.b,level:"w",msg:"possible duplicate ("+p.reason+", ~"+p.sim+"% title overlap) — review; not auto-merged"}); }
+  }
   // validation
   const issues=[...notes];
   for(const e of list){ if(!e.meta) issues.push(...validate(e)); }
@@ -335,11 +376,11 @@ function clean(text,opt){
   }
   const outText=list.map(e=>formatEntry(e,opt)).join("\n\n")+ (list.length?"\n":"");
   const nEntries=list.filter(e=>!e.meta).length;
-  return {text:outText,entries:list,stats:{nEntries,merged:mergedCount,braced,monthsFixed,allcaps,issues}};
+  return {text:outText,entries:list,stats:{nEntries,merged:mergedCount,braced,monthsFixed,allcaps,possibleDupes,issues}};
 }
 
 // Expose for testing
-window.BIB={parseBib,clean,dedupe,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field};
+window.BIB={parseBib,clean,dedupe,fuzzyDupes,firstAuthorLast,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field};
 
 /* ===================== DOI autocomplete ===================== */
 function bibtexFromDoiRecord(bt){ // parse a single-entry bibtex string returned by crossref
@@ -391,6 +432,7 @@ function renderSummary(s){
   const add=(t,cls)=>{const li=document.createElement("li");li.className="chip"+(cls?" "+cls:"");li.textContent=t;u.appendChild(li);};
   add(s.nEntries+" entr"+(s.nEntries===1?"y":"ies"));
   if(s.merged) add(s.merged+" duplicate"+(s.merged===1?"":"s")+" merged");
+  if(s.possibleDupes) add(s.possibleDupes+" possible duplicate"+(s.possibleDupes===1?"":"s")+" flagged","warn");
   if(s.braced) add(s.braced+" title"+(s.braced===1?"":"s")+" brace-protected");
   if(s.allcaps) add(s.allcaps+" ALL-CAPS title"+(s.allcaps===1?"":"s")+" flagged","warn");
   if(s.monthsFixed) add(s.monthsFixed+" month"+(s.monthsFixed===1?"":"s")+" normalized");
