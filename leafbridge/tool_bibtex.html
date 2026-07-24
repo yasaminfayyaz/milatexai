@@ -52,7 +52,7 @@ a{color:var(--accent)}
 <div class="wrap">
   <div class="brand">Mi<span>LaTeX</span>AI</div>
   <h1>BibTeX Cleaner &amp; DOI Autocomplete</h1>
-  <p class="sub">Paste your <code>.bib</code> file and hit Clean. It fixes the formatting, removes duplicate entries, and flags likely mistakes. It can also look up missing fields (author, year, journal) from each paper's DOI. It runs entirely in your browser, so nothing is uploaded and there is no sign-up. <b>Free to use.</b></p>
+  <p class="sub">Paste your <code>.bib</code> file and hit Clean. It fixes the formatting, removes duplicate entries, and flags likely mistakes. Missing a DOI? It looks one up from the title and authors, and only fills it in when it is confident it found the right paper. It also completes missing fields like author, year, and journal from the DOI. It runs entirely in your browser, so nothing is uploaded and there is no sign-up. <b>Free to use.</b></p>
 
   <div class="grid">
     <div>
@@ -82,7 +82,7 @@ a{color:var(--accent)}
 
   <div class="btnrow">
     <button class="btn" id="clean">Clean</button>
-    <button class="btn secondary" id="doi">Complete missing fields via DOI</button>
+    <button class="btn secondary" id="doi">Find missing DOIs and fill fields</button>
     <button class="btn secondary" id="copy" disabled>Copy</button>
     <button class="btn secondary" id="download" disabled>Download .bib</button>
   </div>
@@ -103,6 +103,8 @@ a{color:var(--accent)}
       <dd>No. All parsing and cleaning happen in your browser. DOI lookups go straight from your browser to the public Crossref API, so your library is never sent to our servers.</dd>
       <dt>What does &ldquo;Protect Title Capitals&rdquo; do?</dt>
       <dd>BibTeX lowercases title words unless they're wrapped in braces. This wraps acronyms and all-caps words (e.g. <code>DNA</code>, <code>NASA</code>) in <code>{}</code> so they keep their capitalization.</dd>
+      <dt>How does it find a missing DOI?</dt>
+      <dd>It searches Crossref by your entry's title and first author, then checks the top matches against your title, author, and year. It only writes a DOI when a match clears a confidence bar, so it will leave a DOI blank rather than guess wrong. Some works have no DOI at all (many books, theses, and older papers), and those stay blank.</dd>
       <dt>Where does DOI autocomplete get data?</dt>
       <dd>The free Crossref REST API (and DataCite for Zenodo-style DOIs). No API key, no cost, rate-limited politely.</dd>
     </dl>
@@ -380,7 +382,7 @@ function clean(text,opt){
 }
 
 // Expose for testing
-window.BIB={parseBib,clean,dedupe,fuzzyDupes,firstAuthorLast,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field};
+window.BIB={parseBib,clean,dedupe,fuzzyDupes,firstAuthorLast,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field,pickBestDoi,stripTex};
 
 /* ===================== DOI autocomplete ===================== */
 function bibtexFromDoiRecord(bt){ // parse a single-entry bibtex string returned by crossref
@@ -392,14 +394,44 @@ async function fetchDoiBibtex(doi){
   if(!r.ok) throw new Error("HTTP "+r.status);
   return await r.text();
 }
-async function findDoiByTitle(title){
-  const url="https://api.crossref.org/works?rows=1&select=DOI,title&query.bibliographic="+encodeURIComponent(title)+"&mailto=support@milatexai.com";
+function stripTex(s){ return String(s||"").replace(/\\[a-zA-Z]+\s*/g," ").replace(/[{}$\\]/g," ").replace(/\s+/g," ").trim(); }
+// Choose the DOI of the Crossref candidate that confidently matches this entry,
+// or null. Robust on purpose: a wrong DOI cites the wrong paper. Accepts only a
+// near-identical title, or a fully-contained title backed by author and/or year.
+function pickBestDoi(entry, items){
+  const wantWords=_titleWords(stripTex(field(entry,"title")));
+  if(wantWords.size<2) return null; // too little to match on safely
+  const author=firstAuthorLast(field(entry,"author"));
+  const year=String(field(entry,"year")||"").replace(/\D/g,"").slice(0,4);
+  let bestDoi=null, bestRank=0;
+  for(const it of (items||[])){
+    if(!it || !it.DOI) continue;
+    const cw=_titleWords(stripTex((it.title&&it.title[0])||""));
+    if(!cw.size) continue;
+    let inter=0; wantWords.forEach(w=>{ if(cw.has(w)) inter++; });
+    const contain=inter/wantWords.size;                       // entry-title words found in candidate
+    const jac=inter/(wantWords.size+cw.size-inter);
+    const aMatch=!!author && (it.author||[]).some(a=>String(a.family||"").toLowerCase().replace(/[^a-z]/g,"")===author.replace(/[^a-z]/g,""));
+    let cy=""; if(it.issued && it.issued["date-parts"] && it.issued["date-parts"][0]) cy=String(it.issued["date-parts"][0][0]||"");
+    const yMatch=!!year && !!cy && Math.abs((+year)-(+cy))<=1;
+    let rank=0;
+    if(jac>=0.85) rank=3;                                      // near-identical titles
+    else if(contain>=0.9 && aMatch && yMatch) rank=3;         // title fully present + author + year
+    else if(contain>=0.9 && wantWords.size>=4 && (aMatch||yMatch)) rank=2;
+    else if(contain>=0.9 && wantWords.size>=5) rank=2;        // long, specific title fully present
+    if(rank>bestRank){ bestRank=rank; bestDoi=it.DOI; }
+  }
+  return bestRank>=2 ? bestDoi : null;
+}
+async function findDoi(entry){
+  const title=stripTex(field(entry,"title"));
+  if(title.length<8) return null;
+  const author=firstAuthorLast(field(entry,"author"));
+  let url="https://api.crossref.org/works?rows=5&select=DOI,title,author,issued&mailto=support@milatexai.com&query.bibliographic="+encodeURIComponent(title);
+  if(author) url+="&query.author="+encodeURIComponent(author);
   const r=await fetch(url); if(!r.ok) return null;
-  const j=await r.json(); const it=(j.message&&j.message.items&&j.message.items[0]); if(!it) return null;
-  const got=normTitleKey((it.title&&it.title[0])||""); const want=normTitleKey(title);
-  // require a close match to avoid wrong DOIs
-  if(got && want && (got.startsWith(want.slice(0,Math.min(want.length,30)))||want.startsWith(got.slice(0,Math.min(got.length,30))))) return it.DOI;
-  return null;
+  const j=await r.json();
+  return pickBestDoi(entry, (j.message&&j.message.items)||[]);
 }
 const FILLABLE=["author","title","journal","year","volume","number","pages","publisher","booktitle","month"];
 async function completeViaDoi(entries,onProgress){
@@ -408,7 +440,7 @@ async function completeViaDoi(entries,onProgress){
   for(let idx=0;idx<ents.length;idx++){
     const e=ents[idx];
     let doi=normDOI(field(e,"doi"));
-    if(!doi){ const t=field(e,"title"); if(t && t.length>10){ try{ lookedUp++; const d=await findDoiByTitle(t); if(d){ doi=normDOI(d); setField(e,"doi",doi); found++; } }catch(_){ } await sleep(350); } }
+    if(!doi){ if(_titleWords(field(e,"title")).size>=2){ try{ lookedUp++; const d=await findDoi(e); if(d){ doi=normDOI(d); setField(e,"doi",doi); found++; } }catch(_){ } await sleep(350); } }
     if(!doi) { onProgress&&onProgress(idx+1,ents.length); continue; }
     try{
       const bt=await fetchDoiBibtex(doi);
@@ -473,7 +505,7 @@ $("doi").onclick=async()=>{
     renderSummary(s);
     const u=$("summary"); const add=(t)=>{const li=document.createElement("li");li.className="chip";li.textContent=t;u.appendChild(li);};
     if(r.filled) add(r.filled+" field"+(r.filled===1?"":"s")+" filled from DOI");
-    if(r.found) add(r.found+" DOI"+(r.found===1?"":"s")+" found by title");
+    if(r.found) add(r.found+" missing DOI"+(r.found===1?"":"s")+" found and added");
     $("copy").disabled=false; $("download").disabled=false;
   }catch(e){ alert("DOI lookup failed: "+e.message); }
   finally{ btn.disabled=false; btn.textContent=label; }

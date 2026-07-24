@@ -152,5 +152,32 @@
   eq("roundtrip.title", B.field(re, "title"), "A Title");
   eq("roundtrip.year", B.field(re, "year"), "2019");
 
+  // ---- DOI finder scoring (pickBestDoi): robust, must never return a wrong DOI ----
+  var de = B.parseBib("@article{k, title={Deep learning for image recognition}, author={Smith, Jane}, year={2020}}").entries[0];
+  // near-identical title -> accept
+  eq("doi.strongTitle", B.pickBestDoi(de, [{ DOI: "10.1/aaa", title: ["Deep learning for image recognition"], author: [{ family: "Smith" }], issued: { "date-parts": [[2020]] } }]), "10.1/aaa");
+  // clearly different paper -> refuse (blank beats wrong)
+  eq("doi.rejectWrong", B.pickBestDoi(de, [{ DOI: "10.1/bbb", title: ["A completely different paper on frogs"], author: [{ family: "Jones" }], issued: { "date-parts": [[1999]] } }]), null);
+  // no candidates -> null
+  eq("doi.empty", B.pickBestDoi(de, []), null);
+  // picks the confident one out of several
+  eq("doi.picksBest", B.pickBestDoi(de, [
+    { DOI: "10.1/x", title: ["Unrelated"], author: [{ family: "X" }], issued: { "date-parts": [[2001]] } },
+    { DOI: "10.1/right", title: ["Deep learning for image recognition"], author: [{ family: "Smith" }], issued: { "date-parts": [[2020]] } }
+  ]), "10.1/right");
+  // candidate has a subtitle, entry title fully contained, author + year agree -> accept
+  var de2 = B.parseBib("@article{k, title={Learning image recognition}, author={Smith, Jane}, year={2020}}").entries[0];
+  eq("doi.subtitleCorroborated", B.pickBestDoi(de2, [{ DOI: "10.1/ccc", title: ["Learning image recognition with deep nets"], author: [{ family: "Smith" }], issued: { "date-parts": [[2020]] } }]), "10.1/ccc");
+  // same subset title but no author/year to corroborate -> refuse
+  var de3 = B.parseBib("@misc{k, title={Learning image recognition}}").entries[0];
+  eq("doi.subsetNoCorroboration", B.pickBestDoi(de3, [{ DOI: "10.1/ddd", title: ["Learning image recognition with deep nets in medicine"] }]), null);
+  // author matches but the year is decades off -> refuse (likely a different work)
+  eq("doi.yearMismatch", B.pickBestDoi(de2, [{ DOI: "10.1/eee", title: ["Learning image recognition with deep nets"], author: [{ family: "Smith" }], issued: { "date-parts": [[1990]] } }]), null);
+  // a one-word title is too little to match on safely
+  var de4 = B.parseBib("@article{k, title={Networks}, author={Smith, J}, year={2020}}").entries[0];
+  eq("doi.needsTwoWords", B.pickBestDoi(de4, [{ DOI: "10.1/fff", title: ["Networks"], author: [{ family: "Smith" }], issued: { "date-parts": [[2020]] } }]), null);
+  // stripTex cleans LaTeX before matching
+  eq("stripTex.cleans", B.stripTex("The {DNA} \\emph{sequence}"), "The DNA sequence");
+
   return JSON.stringify({ pass: pass, fail: fail, total: pass + fail, failures: R });
 })();
