@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free BibTeX Cleaner &amp; DOI Autocomplete — MiLatexAI</title>
+<title>Free BibTeX Cleaner &amp; DOI Autocomplete | MiLatexAI</title>
 <meta name="description" content="Clean, dedupe, and fix a .bib file in your browser. Auto-completes missing fields from DOIs via Crossref. Free, no login, nothing uploaded.">
 <style>
 :root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#00a693;--accent2:#007f6e;--warn:#b5680a;--err:#c0392b;--ok:#0b7a63;--radius:12px}
@@ -52,11 +52,11 @@ a{color:var(--accent)}
 <div class="wrap">
   <div class="brand">Mi<span>LaTeX</span>AI</div>
   <h1>BibTeX Cleaner &amp; DOI Autocomplete</h1>
-  <p class="sub">Paste a <code>.bib</code> file. It gets parsed, de-duplicated, consistently formatted, and validated — and missing fields are filled in from each entry's DOI. Everything runs in your browser: <b>nothing is uploaded, no login, free.</b></p>
+  <p class="sub">Paste your <code>.bib</code> file and hit Clean. It fixes the formatting, removes duplicate entries, and flags likely mistakes. It can also look up missing fields (author, year, journal) from each paper's DOI. It runs entirely in your browser, so nothing is uploaded and there is no sign-up. <b>Free to use.</b></p>
 
   <div class="grid">
     <div>
-      <label class="io" for="in">Your .bib <span id="dropHint" style="font-weight:400">— or drop a file</span></label>
+      <label class="io" for="in">Your .bib <span id="dropHint" style="font-weight:400">(or drop a file here)</span></label>
       <textarea id="in" spellcheck="false" placeholder="@article{smith2021,
   title={A study of things},
   author={Smith, Jane and Doe, John},
@@ -91,8 +91,8 @@ a{color:var(--accent)}
   <div class="issues hidden" id="issues"></div>
 
   <div class="cta">
-    <b>Cleaning one file is nice. Fixing your whole paper is better.</b>
-    <p>MiLatexAI connects Claude or ChatGPT to your real Overleaf project or GitHub/GitLab repo — ask it to tidy citations, fix errors, and rewrite sections, and every change is a real Git commit.</p>
+    <b>Want to fix the whole paper, not just the bibliography?</b>
+    <p>MiLatexAI connects Claude or ChatGPT to your real Overleaf project or a GitHub/GitLab repo. Ask it to tidy your citations, fix compile errors, or rewrite a section, and every change is committed straight to your repo.</p>
     <a class="btn" href="https://milatexai.com/#get-started">Add the connector →</a>
   </div>
 
@@ -100,7 +100,7 @@ a{color:var(--accent)}
     <h2>About this tool</h2>
     <dl>
       <dt>Is my .bib uploaded anywhere?</dt>
-      <dd>No. All parsing and cleaning happen in your browser. DOI autocomplete calls the public Crossref API directly from your browser — your library is never sent to our servers.</dd>
+      <dd>No. All parsing and cleaning happen in your browser. DOI lookups go straight from your browser to the public Crossref API, so your library is never sent to our servers.</dd>
       <dt>What does &ldquo;Protect Title Capitals&rdquo; do?</dt>
       <dd>BibTeX lowercases title words unless they're wrapped in braces. This wraps acronyms and all-caps words (e.g. <code>DNA</code>, <code>NASA</code>) in <code>{}</code> so they keep their capitalization.</dd>
       <dt>Where does DOI autocomplete get data?</dt>
@@ -287,7 +287,7 @@ function firstAuthorLast(a){
 }
 function _titleWords(t){ return new Set(normTitleKey(t).split(" ").filter(w=>w.length>3)); }
 function _jaccard(a,b){ if(!a.size||!b.size) return 0; let x=0; a.forEach(w=>{ if(b.has(w)) x++; }); return x/(a.size+b.size-x); }
-// Entries that LOOK like the same reference despite different keys/titles — near-
+// Entries that LOOK like the same reference despite different keys/titles: near-
 // identical titles, or same first author + year + overlapping title. These are
 // FLAGGED for review, never auto-merged (a wrong merge drops a real citation).
 function fuzzyDupes(entries){
@@ -351,7 +351,7 @@ function clean(text,opt){
         // ALL-CAPS title: un-shouting is ambiguous (would turn DNA->Dna), so
         // flag it for the user to review rather than guess.
         allcaps++;
-        notes.push({key:e.key,level:"w",msg:"title is ALL-CAPS — BibTeX may lose its capitalization; review it"});
+        notes.push({key:e.key,level:"w",msg:"title is ALL-CAPS, so BibTeX may lose its capitalization. Worth checking."});
       } else if(opt.brace){
         const p=protectTitle(t); if(p!==t){ braced++; t=p; }
       }
@@ -363,7 +363,7 @@ function clean(text,opt){
   let possibleDupes=0;
   if(opt.dedupe){
     const fz=fuzzyDupes(list); possibleDupes=fz.length;
-    for(const p of fz){ notes.push({key:p.a+" / "+p.b,level:"w",msg:"possible duplicate ("+p.reason+", ~"+p.sim+"% title overlap) — review; not auto-merged"}); }
+    for(const p of fz){ notes.push({key:p.a+" / "+p.b,level:"w",msg:"possible duplicate ("+p.reason+", ~"+p.sim+"% title overlap). Not merged, so check it."}); }
   }
   // validation
   const issues=[...notes];
@@ -442,7 +442,7 @@ function renderSummary(s){
   if(!s.merged&&!warns&&!errs) add("looks clean ✓");
   // issue list
   const box=$("issues");
-  if(s.issues.length){ box.classList.remove("hidden"); box.innerHTML=s.issues.map(x=>'<div class="'+(x.level==="e"?"e":"w")+'"><span class="k">'+esc(x.key||"")+'</span> — '+esc(x.msg)+'</div>').join(""); }
+  if(s.issues.length){ box.classList.remove("hidden"); box.innerHTML=s.issues.map(x=>'<div class="'+(x.level==="e"?"e":"w")+'"><span class="k">'+esc(x.key||"")+'</span>: '+esc(x.msg)+'</div>').join(""); }
   else box.classList.add("hidden");
 }
 function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
