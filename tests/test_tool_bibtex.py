@@ -13,6 +13,7 @@ from leafbridge import tool_bibtex
 
 _HTML = tool_bibtex.render_bibtex_tool()
 _BATTERY = (Path(__file__).with_name("bibtex_battery.js")).read_text(encoding="utf-8")
+_BATTERY_DIR = Path(__file__).with_name("batteries")
 
 
 def _engine_js() -> str:
@@ -26,13 +27,30 @@ def _engine_js() -> str:
     return "var window = {};\n" + js[:ui]
 
 
-def test_engine_passes_full_battery():
+def _run_battery(battery_js: str) -> dict:
     quickjs = pytest.importorskip("quickjs")
     ctx = quickjs.Context()
     ctx.eval(_engine_js())
-    res = json.loads(ctx.eval(_BATTERY))
+    return json.loads(ctx.eval(battery_js))
+
+
+def test_engine_passes_full_battery():
+    res = _run_battery(_BATTERY)
     assert res["fail"] == 0, res["failures"]
     assert res["pass"] >= 45, f"expected many assertions, ran {res['pass']}"
+
+
+@pytest.mark.parametrize(
+    "battery",
+    sorted(_BATTERY_DIR.glob("*.js")),
+    ids=lambda p: p.stem.replace("batt_", ""),
+)
+def test_engine_battery_file(battery: Path):
+    """Exhaustive per-function and end-to-end batteries, one file per function.
+    Each is a self-contained IIFE run against the real engine in QuickJS."""
+    res = _run_battery(battery.read_text(encoding="utf-8"))
+    assert res["fail"] == 0, f"{battery.name}: {res['failures']}"
+    assert res["pass"] >= 20, f"{battery.name}: only {res['pass']} assertions ran"
 
 
 def test_page_is_self_contained_and_static():

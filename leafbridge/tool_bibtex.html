@@ -228,11 +228,14 @@ function protectTitle(t){
   return t.replace(/(\{[^{}]*\}|[^\s{}]+)/g,(tok)=>{
     if(tok[0]==="{") return tok;                 // already protected
     const core=tok.replace(/[^A-Za-z]/g,"");
-    if(core.length>=2 && core===core.toUpperCase() && /[A-Z]/.test(core)){
-      // e.g. DNA, NASA, RNA-seq -> protect the whole token
+    const runs=tok.match(/[A-Za-z]+/g)||[];      // maximal letter runs (splits on hyphens, digits, dots)
+    // whole merged core is an acronym (DNA, NASA, U.S.A.), or any letter run is
+    // an acronym (RNA-seq, COVID-19, Anti-CRISPR) -> protect the whole token
+    if((core.length>=2 && core===core.toUpperCase() && /[A-Z]/.test(core)) ||
+       runs.some(r=>r.length>=2 && r===r.toUpperCase())){
       return "{"+tok+"}";
     }
-    // internal capital after first letter (e.g. LaTeX, iPhone) -> protect
+    // internal capital after first letter (e.g. LaTeX, iPhone, mRNA) -> protect
     if(core.length>=2 && /[a-z][A-Z]/.test(tok)){ return "{"+tok+"}"; }
     return tok;
   });
@@ -382,7 +385,7 @@ function clean(text,opt){
 }
 
 // Expose for testing
-window.BIB={parseBib,clean,dedupe,fuzzyDupes,firstAuthorLast,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field,pickBestDoi,stripTex};
+window.BIB={parseBib,clean,dedupe,fuzzyDupes,firstAuthorLast,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field,pickBestDoi,stripTex,normTitleKey,_titleWords,_jaccard,setField,bibtexFromDoiRecord};
 
 /* ===================== DOI autocomplete ===================== */
 function bibtexFromDoiRecord(bt){ // parse a single-entry bibtex string returned by crossref
