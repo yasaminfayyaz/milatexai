@@ -23,7 +23,7 @@ def _engine_js() -> str:
     assert m, "no <script> block in the tool"
     js = m.group(1)
     ui = js.find("/* ===================== UI")
-    assert ui > 0, "UI marker not found — engine/UI split changed"
+    assert ui > 0, "UI marker not found: engine/UI split changed"
     return "var window = {};\n" + js[:ui]
 
 
