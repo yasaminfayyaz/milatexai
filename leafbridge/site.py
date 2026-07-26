@@ -315,6 +315,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <nav class='links'>
     <a href='#features' data-i18n='nav.features'>{_t(en,'nav.features')}</a>
     <a href='#how' data-i18n='nav.how'>{_t(en,'nav.how')}</a>
+    <a href='#tools'>Free tools</a>
     <a href='#pricing' data-i18n='nav.pricing'>{_t(en,'nav.pricing')}</a>
     <a href='#faq' data-i18n='nav.faq'>{_t(en,'nav.faq')}</a>
     <a href='/account' data-i18n='nav.manage_subscription'>{_t(en,'nav.manage_subscription')}</a>
@@ -345,6 +346,18 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     )
     features = f"""<section class='section' id='features'>
   <div class='grid'>{feature_cards}</div>
+</section>"""
+
+    tools = """<section class='section' id='tools'>
+  <h2 class='h2'>Free tools for researchers</h2>
+  <p class='sub'>Small utilities that run right in your browser. No login, nothing uploaded.</p>
+  <div class='grid'>
+    <div class='card'>
+      <h3>BibTeX Cleaner, DOI Finder &amp; Duplicate Remover</h3>
+      <p class='muted'>Clean a .bib file, find missing DOIs, remove duplicate entries, protect title capitals, and fix url and howpublished fields.</p>
+      <a class='btn' href='/tools/bibtex'>Open the free tool</a>
+    </div>
+  </div>
 </section>"""
 
     see = f"""<section class='section see' id='see'>
@@ -588,6 +601,7 @@ function applyLang(lang) {{
 <main>
 {hero}
 {features}
+{tools}
 {see}
 {how}
 {get_started}
