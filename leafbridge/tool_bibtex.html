@@ -3,8 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free BibTeX Cleaner &amp; DOI Autocomplete | MiLatexAI</title>
-<meta name="description" content="Clean, dedupe, and fix a .bib file in your browser. Auto-completes missing fields from DOIs via Crossref. Free, no login, nothing uploaded.">
+<title>Free Online BibTeX Cleaner, DOI Finder &amp; Duplicate Remover | MiLatexAI</title>
+<meta name="description" content="Free online BibTeX cleaner and fixer. Find missing DOIs, remove duplicate entries, fix formatting, protect title capitals, and convert url and howpublished fields. Runs in your browser: no login, nothing uploaded.">
+<link rel="canonical" href="https://milatexai.com/tools/bibtex">
+<meta name="keywords" content="bibtex cleaner, bibtex fixer, find doi, add missing doi, remove duplicate bibtex entries, deduplicate bibtex, bibtex url howpublished, clean bib file online, bibtex validator, biblatex, overleaf">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MiLatexAI">
+<meta property="og:title" content="Free BibTeX Cleaner, DOI Finder &amp; Duplicate Remover">
+<meta property="og:description" content="Clean a .bib file, find missing DOIs, remove duplicate entries, and fix url and howpublished fields. Free, in your browser, no login.">
+<meta property="og:url" content="https://milatexai.com/tools/bibtex">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "BibTeX Cleaner and DOI Finder",
+      "url": "https://milatexai.com/tools/bibtex",
+      "applicationCategory": "Reference",
+      "operatingSystem": "Any (web browser)",
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+      "description": "Free online tool to clean a BibTeX .bib file: find missing DOIs, remove duplicate entries, fix formatting, protect title capitals, and convert url and howpublished fields. Runs entirely in the browser.",
+      "publisher": {"@type": "Organization", "name": "MiLatexAI", "url": "https://milatexai.com"}
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type":"Question","name":"How do I find a missing DOI for a BibTeX entry?","acceptedAnswer":{"@type":"Answer","text":"Paste your .bib and click Find missing DOIs and fill fields. It searches Crossref by your title and first author, checks each match against your title, author, and year, and only fills in a DOI when it is confident. It leaves one blank rather than guess wrong. Some works, such as many books, theses, and older papers, have no DOI at all."}},
+        {"@type":"Question","name":"How do I remove duplicate entries from a .bib file?","acceptedAnswer":{"@type":"Answer","text":"Click Clean with De-duplicate on. It merges entries that share a DOI, citation key, or title, and it flags likely duplicates that use different keys so you can check those yourself."}},
+        {"@type":"Question","name":"My URL does not show up in the bibliography. Which URL button do I use?","acceptedAnswer":{"@type":"Answer","text":"It depends on your bibliography style. biblatex and modern styles read a plain url field. Classic BibTeX styles like plain, abbrv, unsrt, and alpha ignore the url field, so the link only shows if it sits in howpublished or note as a url macro. The tool converts between the two forms in one click, and the macro form needs the url or hyperref package in your preamble."}},
+        {"@type":"Question","name":"Is my .bib file uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. All parsing and cleaning happen in your browser. DOI lookups go straight from your browser to Crossref, so your library is never sent to our servers."}},
+        {"@type":"Question","name":"Does it work with both BibTeX and biblatex?","acceptedAnswer":{"@type":"Answer","text":"Yes. It cleans standard .bib files used by both, and it can convert URL fields to suit either a classic BibTeX style or biblatex."}}
+      ]
+    }
+  ]
+}
+</script>
 <style>
 :root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#00a693;--accent2:#007f6e;--warn:#b5680a;--err:#c0392b;--ok:#0b7a63;--radius:12px}
 @media (prefers-color-scheme:dark){:root{--bg:#0b0d12;--fg:#e9ecf2;--muted:#9aa3b2;--line:#20242e;--card:#12151c;--warn:#e0a24a;--err:#ef6b60;--ok:#3fcaab}}
@@ -51,7 +86,7 @@ a{color:var(--accent)}
 <body>
 <div class="wrap">
   <div class="brand">Mi<span>LaTeX</span>AI</div>
-  <h1>BibTeX Cleaner &amp; DOI Autocomplete</h1>
+  <h1>Free BibTeX Cleaner, DOI Finder, and Duplicate Remover</h1>
   <p class="sub">Paste your <code>.bib</code> file and hit Clean. It fixes the formatting, removes duplicate entries, and flags likely mistakes. Missing a DOI? It looks one up from the title and authors, and only fills it in when it is confident it found the right paper. It also completes missing fields like author, year, and journal from the DOI. It runs entirely in your browser, so nothing is uploaded and there is no sign-up. <b>Free to use.</b></p>
 
   <div class="grid">
@@ -101,16 +136,20 @@ a{color:var(--accent)}
   <div class="faq">
     <h2>About this tool</h2>
     <dl>
-      <dt>Is my .bib uploaded anywhere?</dt>
-      <dd>No. All parsing and cleaning happen in your browser. DOI lookups go straight from your browser to the public Crossref API, so your library is never sent to our servers.</dd>
-      <dt>What does &ldquo;Protect Title Capitals&rdquo; do?</dt>
-      <dd>BibTeX lowercases title words unless they're wrapped in braces. This wraps acronyms and all-caps words (e.g. <code>DNA</code>, <code>NASA</code>) in <code>{}</code> so they keep their capitalization.</dd>
-      <dt>How does it find a missing DOI?</dt>
-      <dd>It searches Crossref by your entry's title and first author, then checks the top matches against your title, author, and year. It only writes a DOI when a match clears a confidence bar, so it will leave a DOI blank rather than guess wrong. Some works have no DOI at all (many books, theses, and older papers), and those stay blank.</dd>
-      <dt>Where does DOI autocomplete get data?</dt>
-      <dd>Crossref for most works, and DataCite for Zenodo-style DOIs.</dd>
+      <dt>How do I find a missing DOI for a BibTeX entry?</dt>
+      <dd>Paste your <code>.bib</code> and click <b>Find missing DOIs and fill fields</b>. It searches Crossref by your title and first author, checks each match against your title, author, and year, and only fills in a DOI when it is confident. It leaves one blank rather than guess wrong. Some works, such as many books, theses, and older papers, have no DOI at all.</dd>
+      <dt>How do I remove duplicate entries from a .bib file?</dt>
+      <dd>Click <b>Clean</b> with De-duplicate on. It merges entries that share a DOI, citation key, or title, and it flags likely duplicates that use different keys so you can check those yourself.</dd>
       <dt>My URL does not show up in the bibliography. Which URL button do I use?</dt>
-      <dd>It depends on your style. biblatex and modern styles read a plain <code>url</code> field, so use <b>URLs to url field</b>. Classic BibTeX styles (plain, abbrv, unsrt, alpha) ignore the <code>url</code> field, so the link only appears if it is in <code>howpublished</code> or <code>note</code> as <code>\url{...}</code>. Use <b>URLs to \url{} in note</b> for those. Both buttons move the link so it lives in one place, not two. The <code>\url</code> form needs <code>\usepackage{url}</code> or <code>hyperref</code> in your preamble.</dd>
+      <dd>It depends on your style. biblatex and modern styles read a plain <code>url</code> field, so use <b>URLs to url field</b>. Classic BibTeX styles (plain, abbrv, unsrt, alpha) ignore the <code>url</code> field, so the link only appears if it is in <code>howpublished</code> or <code>note</code> as <code>\url{...}</code>. Use <b>URLs to \url{} in note</b> for those. Both buttons keep the link in one place. The <code>\url</code> form needs <code>\usepackage{url}</code> or <code>hyperref</code> in your preamble.</dd>
+      <dt>Is my .bib file uploaded anywhere?</dt>
+      <dd>No. All parsing and cleaning happen in your browser. DOI lookups go straight from your browser to Crossref, so your library is never sent to our servers.</dd>
+      <dt>What does &ldquo;Protect Title Capitals&rdquo; do?</dt>
+      <dd>BibTeX lowercases title words unless they are wrapped in braces. This wraps acronyms and all-caps words (e.g. <code>DNA</code>, <code>NASA</code>, <code>RNA-seq</code>) in <code>{}</code> so they keep their capitalization.</dd>
+      <dt>Where does the DOI data come from?</dt>
+      <dd>Crossref for most works, and DataCite for Zenodo-style DOIs.</dd>
+      <dt>Does it work with both BibTeX and biblatex?</dt>
+      <dd>Yes. It cleans standard <code>.bib</code> files used by both, and it can convert URL fields to suit either a classic BibTeX style or biblatex.</dd>
     </dl>
   </div>
 

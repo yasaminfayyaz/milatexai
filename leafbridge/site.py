@@ -479,6 +479,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <nav class='foot-links'>
     <a href='#privacy' data-i18n='nav.privacy'>{_t(en,'nav.privacy')}</a>
     <a href='#terms' data-i18n='nav.terms'>{_t(en,'nav.terms')}</a>
+    <a href='/tools/bibtex'>Free BibTeX cleaner</a>
     <a href='https://github.com/yasaminfayyaz/milatexai' target='_blank' rel='noopener'>GitHub</a>
     <a href='mailto:support@milatexai.com'><span data-i18n='footer.contact_label'>{_t(en,'footer.contact_label')}</span></a>
   </nav>
