@@ -28,14 +28,14 @@ Full setup guide: **[milatexai.com/#get-started](https://milatexai.com/#get-star
 
 You connect a repository by pasting its URL and an access token. What that takes depends on the host:
 
-**Overleaf — Git integration (a paid Overleaf feature).** MiLatexAI works through Overleaf's **Git integration**, which is a **premium (paid) feature** on Overleaf. To use it on your own Overleaf projects you need one of:
+**Overleaf Git integration (a paid Overleaf feature).** MiLatexAI works through Overleaf's **Git integration**, which is a **premium (paid) feature** on Overleaf. To use it on your own Overleaf projects you need one of:
 
 - An Overleaf **paid plan** (Standard or Professional), or
 - A project shared with you from a **premium or group/institutional** account that includes Git integration.
 
 Quick test: if you can create a Git token under **Overleaf, Account Settings, Git Integration**, you are good to go. Free-only Overleaf accounts cannot create Git tokens.
 
-**GitHub, GitLab, Bitbucket, or self-hosted Git — no paid plan needed.** Any repository you can push to works with a free access token: a **GitHub** fine-grained PAT with **Contents read/write**, a **GitLab** project or personal access token, or a **Bitbucket** app password. Self-hosted HTTPS Git repos are supported when allowlisted.
+**GitHub, GitLab, Bitbucket, or self-hosted Git: no paid plan needed.** Any repository you can push to works with a free access token: a **GitHub** fine-grained PAT with **Contents read/write**, a **GitLab** project or personal access token, or a **Bitbucket** app password. Self-hosted HTTPS Git repos are supported when allowlisted.
 
 You will also need **Claude or ChatGPT**. Their free tiers work fine.
 

@@ -1,6 +1,6 @@
 """Azure Table Storage backend for the multi-tenant :class:`~leafbridge.store.Store`.
 
-Three tables — users, projects, usage — holding only account metadata, the
+Three tables (users, projects, usage) holding only account metadata, the
 ENCRYPTED Overleaf token, and a commit counter. Never any document content.
 
 Auth is via the storage connection string (from Container Apps secret / Key
@@ -87,7 +87,7 @@ class AzureTableStore(Store):
             token_encrypted=e.get("token_encrypted", ""),
             git_username=e.get("git_username", "git"),
             git_url=(e.get("git_url") or None),
-            # Older rows predate multi-provider — default them to Overleaf.
+            # Older rows predate multi-provider, default them to Overleaf.
             provider=(e.get("provider") or "overleaf"),
         )
 

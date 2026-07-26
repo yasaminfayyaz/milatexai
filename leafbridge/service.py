@@ -1,5 +1,5 @@
 """Phase 2 hosted business logic: onboarding, per-user project resolution, and
-usage metering — sitting on top of the encrypted :mod:`store`.
+usage metering, sitting on top of the encrypted :mod:`store`.
 
 This is the multi-tenant brain: given an authenticated WorkOS user, connect
 their Overleaf project (token encrypted), resolve it back to a
@@ -104,7 +104,7 @@ class AccountService:
             raise ServiceError(self._token_required_msg(target.provider))
 
         if target.provider == "overleaf":
-            # The Overleaf Git token is account-level — store it once on the user
+            # The Overleaf Git token is account-level, store it once on the user
             # so later Overleaf projects can be added without pasting it again.
             user.overleaf_token_encrypted = self.cipher.encrypt(token)
             await self.store.upsert_user(user)
@@ -138,7 +138,7 @@ class AccountService:
     ) -> Project:
         """Add another repository for an already-onboarded user.
 
-        For Overleaf this REUSES the stored account token (no token needed — only
+        For Overleaf this REUSES the stored account token (no token needed, only
         the URL). For every other provider a per-repo ``token`` is required, since
         there is no shared account token to fall back on."""
         user = await self.store.get_user(user_id)
@@ -214,7 +214,7 @@ class AccountService:
         """Replace the per-project access token of an ALREADY-connected project
         (GitHub / GitLab / Bitbucket / self-hosted) WITHOUT re-entering its URL.
         The account-level Overleaf token is never touched here. ``_select`` raises
-        ProjectNotConnected if the ref isn't one of this user's projects — that is
+        ProjectNotConnected if the ref isn't one of this user's projects, that is
         the auth scope: a user can only update their OWN projects."""
         if not token or "PASTE" in token:
             raise ServiceError("A real access token is required.")
@@ -225,7 +225,7 @@ class AccountService:
         return proj
 
     async def revoke_token(self, user_id: str) -> None:
-        """Revoke the stored token — the AI can no longer reach any project until a
+        """Revoke the stored token, the AI can no longer reach any project until a
         new token is set. Projects stay in the list; re-add a token to restore."""
         user = await self.store.get_user(user_id)
         if user is not None and user.overleaf_token_encrypted:

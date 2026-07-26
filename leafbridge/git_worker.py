@@ -243,7 +243,7 @@ class GitWorker:
     async def _clone(self, project: ProjectConfig) -> None:
         path = self.repo_path(project)
         if path.exists():
-            # Stale/partial dir — remove and re-clone.
+            # Stale/partial dir, remove and re-clone.
             await asyncio.to_thread(_rmtree, path)
         # Prefer a shallow clone (polite), but fall back to a full clone if the
         # server doesn't support shallow fetch (Overleaf's Git bridge is custom).
@@ -335,7 +335,7 @@ class GitWorker:
         authed: bool,
     ) -> str:
         env = dict(os.environ)
-        # Never prompt for credentials interactively — fail fast instead of hang.
+        # Never prompt for credentials interactively, fail fast instead of hang.
         env["GIT_TERMINAL_PROMPT"] = "0"
         env["GCM_INTERACTIVE"] = "never"
         cmd = [

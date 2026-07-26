@@ -44,7 +44,7 @@ def test_add_project_reuses_account_token_no_token_needed():
     svc = _svc()
     _admin_user(svc)
     asyncio.run(svc.connect_project("u", URL1, "olp_tok", "first"))
-    # Add a SECOND project with only a URL — no token argument at all.
+    # Add a SECOND project with only a URL, no token argument at all.
     p2 = asyncio.run(svc.add_project("u", URL2, "second"))
     assert p2.project_id == HEX2
     assert p2.token_encrypted == ""  # relies on the account token
@@ -252,7 +252,7 @@ def test_token_form_never_echoes_token():
     with TestClient(mcp.http_app()) as client:
         client.post("/connect", data={
             "code": code, "overleaf_url": URL1, "token": "olp_tok", "name": "first"})
-        # A rejected token (contains PASTE) re-renders the form — the submitted
+        # A rejected token (contains PASTE) re-renders the form, the submitted
         # value must never be echoed back into the HTML.
         r = client.post("/token", data={
             "code": code, "action": "set", "token": "PASTE_secret_xyz"})

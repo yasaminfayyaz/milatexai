@@ -11,7 +11,7 @@ Spend comes from Azure Cost Management (via the Container App's managed identity
 which holds Cost Management Reader); revenue from Stripe. Both are in the Stripe/
 Azure settlement currency (CAD here), so ``starter`` is in that same currency.
 Values are cached (~15 min) because the cost query is slow and rate-limited, and
-the gate fails OPEN (serve free users) if the signals can't be fetched — the
+the gate fails OPEN (serve free users) if the signals can't be fetched, the
 manual kill-switch remains the hard backstop.
 """
 

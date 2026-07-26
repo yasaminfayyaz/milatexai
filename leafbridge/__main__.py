@@ -1,11 +1,11 @@
-"""``python -m leafbridge`` — start the LeafBridge MCP server.
+"""``python -m leafbridge`` starts the LeafBridge MCP server.
 
 Two transports:
 
-* ``--stdio``  — the server is launched by the client (Claude Code / Claude
+* ``--stdio``: the server is launched by the client (Claude Code / Claude
   Desktop) and talks over stdin/stdout. Easiest for local use: no port, no
   separate process to keep running.
-* (default) ``--http`` — Streamable HTTP at ``http://<host>:<port>/mcp/``, for
+* (default) ``--http``: Streamable HTTP at ``http://<host>:<port>/mcp/``, for
   remote connectors (a tunnel today, the hosted service in Phase 2) and ChatGPT.
 """
 
@@ -21,7 +21,7 @@ from .server import mcp
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="leafbridge",
-        description="LeafBridge — edit your Overleaf projects from Claude/ChatGPT.",
+        description="LeafBridge: edit your Overleaf projects from Claude/ChatGPT.",
     )
     parser.add_argument(
         "--stdio",
@@ -40,7 +40,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.stdio and not args.http:
-        # IMPORTANT: in stdio mode stdout is the JSON-RPC channel — never print
+        # IMPORTANT: in stdio mode stdout is the JSON-RPC channel, never print
         # to stdout here. Diagnostics go to stderr only.
         print("LeafBridge starting over stdio …", file=sys.stderr)
         mcp.run(show_banner=False)  # default transport is stdio
@@ -48,7 +48,7 @@ def main() -> None:
 
     url = f"http://{args.host}:{args.port}/mcp/"
     print("=" * 60)
-    print("  LeafBridge — Overleaf AI Connector (local HTTP mode)")
+    print("  LeafBridge: Overleaf AI Connector (local HTTP mode)")
     print("=" * 60)
     print(f"  MCP endpoint:  {url}")
     print("  • Claude Code:  claude mcp add --transport http leafbridge " + url)

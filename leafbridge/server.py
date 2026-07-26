@@ -114,7 +114,7 @@ def _mini_diff(old: str, new: str, path: str, max_lines: int = 40) -> str:
 
 def _wrap_fs_errors(exc: Exception) -> ToolError:
     if isinstance(exc, ToolError):
-        return exc  # already a clean, user-facing message — don't re-wrap
+        return exc  # already a clean, user-facing message, don't re-wrap
     if isinstance(exc, (PathError, ConfigError)):
         return ToolError(str(exc))
     if isinstance(exc, PushConflict):
@@ -298,7 +298,7 @@ async def _apply_and_push(
     """Serialize per project: sync to remote, mutate on disk, commit + push.
 
     If ``guard_path`` is given, refuse (before committing) a mutation that shrinks
-    that file by more than half — a safety net against accidental large content
+    that file by more than half, a safety net against accidental large content
     loss (e.g. a too-greedy replacement). The caller can pass ``allow_shrink`` to
     override when the reduction is intentional.
     """
@@ -328,7 +328,7 @@ async def _apply_and_push(
     if not result.committed:
         return f"No change made: {result.message}"
     return (
-        f"Done. Committed {result.hash} and pushed to Overleaf — the change is now "
+        f"Done. Committed {result.hash} and pushed to Overleaf. The change is now "
         f"live in {proj.name!r} and visible in its history.\n{_overleaf_url(proj)}"
     )
 
@@ -438,7 +438,7 @@ MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 
 
 def _read_local_upload(source_path: str) -> bytes:
-    """Read upload bytes from a local file path — HARDENED.
+    """Read upload bytes from a local file path, HARDENED.
 
     Reading an arbitrary local path and pushing it to Overleaf is an
     exfiltration vector (a prompt-injected call could push projects.json / SSH

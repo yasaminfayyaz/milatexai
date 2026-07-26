@@ -121,7 +121,7 @@ def find_sections(text: str) -> list[Section]:
 
     for idx, code in enumerate(code_lines):
         if in_verbatim is not None:
-            # Inside a code listing — ignore everything until it closes.
+            # Inside a code listing, ignore everything until it closes.
             if f"\\end{{{in_verbatim}}}" in lines[idx]:
                 in_verbatim = None
             continue
@@ -153,7 +153,7 @@ def find_sections(text: str) -> list[Section]:
             while pos < len(code) and code[pos].isspace():
                 pos += 1
             if pos >= len(code) or code[pos] != "{":
-                # No brace title on this line — could be a multi-line title;
+                # No brace title on this line, could be a multi-line title;
                 # join a few following code lines and retry once.
                 joined = code[pos:] + "".join(
                     " " + code_lines[j] for j in range(idx + 1, min(idx + 4, len(code_lines)))

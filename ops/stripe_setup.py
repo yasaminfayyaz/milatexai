@@ -9,7 +9,7 @@ STRIPE_WEBHOOK_SECRET into .env if they aren't already there.
 
 Re-runnable: an existing Price (matched by lookup_key) and webhook (matched by
 URL) are reused. NOTE: Stripe only returns a webhook's signing secret at creation
-time, so if the endpoint already exists this script cannot recover the secret —
+time, so if the endpoint already exists this script cannot recover the secret,
 delete it in the dashboard and re-run to mint a fresh one.
 """
 

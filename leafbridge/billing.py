@@ -1,7 +1,7 @@
 """Stripe billing for MiLatexAI Pro.
 
 Onboarding mirrors the token-out-of-chat pattern: the authenticated user runs an
-`upgrade` (or `manage_subscription`) tool and gets a secure Stripe-hosted link —
+`upgrade` (or `manage_subscription`) tool and gets a secure Stripe-hosted link,
 Checkout or the customer portal. Stripe then calls our ``/stripe/webhook``, which
 flips the user between free and pro in the store. Card details only ever touch
 Stripe's hosted pages, never us and never the chat.

@@ -1,4 +1,4 @@
-# Research notes — verified API facts (as of 2026-07-10)
+# Research notes, verified API facts (as of 2026-07-10)
 
 These are the load‑bearing external facts LeafBridge is built on, verified against
 current docs. Re‑check anything version‑sensitive before Phase 2/3.
@@ -14,7 +14,7 @@ current docs. Re‑check anything version‑sensitive before Phase 2/3.
   **1 year**, **max 10** per account.
 - **Tier:** Git integration is a **premium/paid** feature on Overleaf Cloud;
   **not available on free accounts** (institutional site licenses often include it).
-- **Branch:** new repos default to **`main`**, older repos to **`master`** — detect,
+- **Branch:** new repos default to **`main`**, older repos to **`master`**, detect,
   never hardcode. (LeafBridge detects via `symbolic-ref`.)
 - **Concurrency:** the web editor **auto‑commits**, so the remote advances on its
   own. Always **pull then push**; non‑fast‑forward pushes are rejected;
@@ -25,7 +25,7 @@ current docs. Re‑check anything version‑sensitive before Phase 2/3.
 - Sources: docs.overleaf.com → *Integrations → Git integration* (+ *authentication‑tokens*,
   *advanced‑git‑operations*); github.com/overleaf/overleaf wiki.
 
-## Claude custom connectors (remote MCP + OAuth) — for Phase 2
+## Claude custom connectors (remote MCP + OAuth), for Phase 2
 
 - **Transport:** Streamable HTTP, single endpoint (convention `/mcp`; POST+GET,
   DELETE ends a session). Legacy standalone HTTP+SSE is deprecated.
@@ -41,7 +41,7 @@ current docs. Re‑check anything version‑sensitive before Phase 2/3.
   **`401` + `WWW-Authenticate: Bearer … resource_metadata=…`** to trigger the sign‑in
   card. Returning a 200 with an "please sign in" error body does **not** trigger OAuth.
 - **Spec version:** `2025-11-25` is current; a `2026-07-28` release candidate (goes
-  stateless, removes the `initialize` handshake) is imminent — **re‑verify after it
+  stateless, removes the `initialize` handshake) is imminent, **re‑verify after it
   ratifies.**
 - **Directory listing** requires a Team/Enterprise org with directory access; submit
   via `claude.ai/admin-settings/directory/submissions/new`.
@@ -63,7 +63,7 @@ current docs. Re‑check anything version‑sensitive before Phase 2/3.
 
 ## FastMCP (the framework we use)
 
-- **`fastmcp==3.x`** (built against 3.4.4), Python **3.10–3.13**, Apache‑2.0.
+- **`fastmcp==3.x`** (built against 3.4.4), Python **3.10-3.13**, Apache‑2.0.
 - Server: `from fastmcp import FastMCP; mcp = FastMCP(name=…, instructions=…, version=…, auth=…)`;
   tools via **`@mcp.tool`** (typed args + docstring drive the schema).
 - Run HTTP: `mcp.run(transport="http", host=…, port=…)`; production ASGI:
@@ -72,7 +72,7 @@ current docs. Re‑check anything version‑sensitive before Phase 2/3.
 - Auth (resource server): `FastMCP(auth=…)` with `JWTVerifier` (JWKS/issuer/audience),
   `RemoteAuthProvider` (adds protected‑resource discovery + DCR when the IdP supports it),
   or `OAuthProxy` (for non‑DCR IdPs). Prebuilt providers incl. Auth0, Azure/Entra, WorkOS,
-  Descope, Google, GitHub. FastMCP does **not** mint tokens — an external IdP is the auth server.
+  Descope, Google, GitHub. FastMCP does **not** mint tokens, an external IdP is the auth server.
 - Per‑user identity inside a tool: `from fastmcp.server.dependencies import get_access_token`
   → `AccessToken.claims` (e.g. `sub`, `email`) is the per‑user lookup key.
 - Sources: pypi.org/project/fastmcp; gofastmcp.com (quickstart, running-server, auth/*).

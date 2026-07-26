@@ -4,10 +4,10 @@ Overleaf tokens), and monthly usage counters.
 This replaces Phase 1's plaintext ``projects.json``. The interface is
 backend-agnostic: :class:`InMemoryStore` for dev/tests, and (later) an Azure
 Table Storage backend for production. Tokens are encrypted at rest via
-:class:`TokenCipher` — in production the key comes from Azure Key Vault; for
+:class:`TokenCipher`, in production the key comes from Azure Key Vault; for
 local dev it is read from ``LEAFBRIDGE_ENC_KEY`` or generated ephemerally.
 
-Nothing here stores document contents — only account metadata, an encrypted
+Nothing here stores document contents, only account metadata, an encrypted
 token, and a commit counter, exactly as the design plan promises.
 """
 
@@ -60,7 +60,7 @@ class TokenCipher:
 
     def decrypt(self, token: str, ttl: int | None = None) -> str:
         """Decrypt ciphertext. If ``ttl`` (seconds) is given, tokens older than
-        that are rejected (Fernet embeds a timestamp) — used for expiring
+        that are rejected (Fernet embeds a timestamp), used for expiring
         capability codes, not for tokens at rest."""
         try:
             return self._fernet.decrypt(token.encode(), ttl=ttl).decode()
@@ -76,7 +76,7 @@ class User:
     is_admin: bool = False
     stripe_customer_id: str | None = None
     # The Overleaf Git token is account-level (one token reaches all of a user's
-    # projects), so it lives on the user. Projects added later reuse it — no need
+    # projects), so it lives on the user. Projects added later reuse it, no need
     # to paste the token again. Encrypted with TokenCipher.
     overleaf_token_encrypted: str = ""
 

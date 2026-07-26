@@ -78,7 +78,7 @@ def main():
     if _failures:
         print(f"AZURE STORE TEST FAILED: {_failures}")
         return 1
-    print("AZURE STORE TEST PASSED — persistence works against real Azure Table Storage.")
+    print("AZURE STORE TEST PASSED, persistence works against real Azure Table Storage.")
     return 0
 
 

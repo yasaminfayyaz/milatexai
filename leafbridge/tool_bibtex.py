@@ -1,7 +1,7 @@
 """The free client-side BibTeX cleaner served at ``/tools/bibtex``.
 
 Fully static, self-contained HTML + JS (no external assets, no server compute):
-Cloudflare serves it from the edge, so it never wakes the container — a $0
+Cloudflare serves it from the edge, so it never wakes the container, a $0
 faceless marketing surface that funnels to the MiLatexAI connector. The markup
 lives in ``tool_bibtex.html`` beside this module (same pattern as
 ``site_content.json``), so its JS can be unit-tested directly.

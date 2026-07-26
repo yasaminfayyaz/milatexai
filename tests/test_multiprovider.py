@@ -258,7 +258,7 @@ async def test_add_github_requires_token():
     await _admin(svc)
     await svc.connect_project("u", OVERLEAF_URL, "olp_tok", "thesis")
     # add_project reuses the Overleaf token for Overleaf, but a GitHub repo needs
-    # its own token — omitting it is an error, not a silent Overleaf-token reuse.
+    # its own token, omitting it is an error, not a silent Overleaf-token reuse.
     with pytest.raises(ServiceError):
         await svc.add_project("u", "https://github.com/owner/repo", "gh")
     p = await svc.add_project("u", "https://github.com/owner/repo", "gh", token="ghp_tok")

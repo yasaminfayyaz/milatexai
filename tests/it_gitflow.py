@@ -46,7 +46,7 @@ We did science.
 \end{document}
 """
 
-# Every byte value, incl. 0x0d (CR), 0x0a (LF), 0x00 — a binary upload must
+# Every byte value, incl. 0x0d (CR), 0x0a (LF), 0x00, a binary upload must
 # survive the git round-trip byte-for-byte.
 BLOB = bytes(range(256)) * 4
 
@@ -221,7 +221,7 @@ async def run() -> None:
         except Exception as e:  # noqa: BLE001
             check("disabled for safety" in str(e), "upload_file source_path gated off by default")
 
-        # Compile check — only if a LaTeX engine is available on this machine.
+        # Compile check, only if a LaTeX engine is available on this machine.
         from leafbridge import texcompile
 
         if texcompile.tectonic_path():
@@ -271,7 +271,7 @@ def main() -> int:
         for f in _failures:
             print(f"  - {f}")
         return 1
-    print("INTEGRATION TEST PASSED — the full Overleaf-style git flow works.")
+    print("INTEGRATION TEST PASSED, the full Overleaf-style git flow works.")
     return 0
 
 

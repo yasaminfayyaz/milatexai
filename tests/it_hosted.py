@@ -171,7 +171,7 @@ def main():
     if _failures:
         print(f"HOSTED TEST FAILED: {_failures}")
         return 1
-    print("HOSTED TEST PASSED — multi-tenant auth, isolation, edits, and metering all work.")
+    print("HOSTED TEST PASSED, multi-tenant auth, isolation, edits, and metering all work.")
     return 0
 
 

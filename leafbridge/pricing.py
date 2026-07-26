@@ -1,6 +1,6 @@
 """Pro-plan pricing.
 
-The Pro plan is one simple price — **USD $8.99 / month** — everywhere. Stripe's
+The Pro plan is one simple price of **USD $8.99 / month** everywhere. Stripe's
 Adaptive Pricing presents the equivalent in the customer's local currency at
 checkout (automatic FX), so researchers around the world see a familiar amount
 while the plan stays a flat USD price with no per-currency bookkeeping.
@@ -14,7 +14,7 @@ PRO_INTERVAL = "month"
 
 
 def currency_options() -> dict[str, dict[str, int]]:
-    """No fixed per-currency amounts — an empty map lets Stripe Adaptive Pricing
+    """No fixed per-currency amounts: an empty map lets Stripe Adaptive Pricing
     convert the USD price into the customer's local currency at checkout."""
     return {}
 

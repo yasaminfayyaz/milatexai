@@ -53,7 +53,7 @@ def verify_session(
         raise SessionError("Malformed session cookie.") from exc
     if not isinstance(data, dict) or data.get("k") != _KIND:
         # A connect code (or anything else) signed with the same key is not a
-        # login session — reject rather than silently accept.
+        # login session, reject rather than silently accept.
         raise SessionError("Not a login session.")
     user_id = data.get("u")
     if not user_id:

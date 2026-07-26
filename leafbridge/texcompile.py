@@ -1,7 +1,7 @@
 """Optional LaTeX compile-check via the Tectonic engine.
 
 If a ``tectonic`` binary is available, LeafBridge can build a project locally and
-report whether it compiles plus any hard errors — so an edit can be verified
+report whether it compiles plus any hard errors, so an edit can be verified
 before (or after) it reaches Overleaf. Entirely optional: with no engine
 installed the check degrades to a clear message rather than failing.
 

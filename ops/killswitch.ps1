@@ -1,16 +1,16 @@
 <#
-    MiLatexAI cost kill-switch — MANUAL EMERGENCY BACKSTOP.
+    MiLatexAI cost kill-switch, MANUAL EMERGENCY BACKSTOP.
 
     Day-to-day cost control is now automatic and per-user: the app serves paid
     users + admin always, and free users only while spend < starter + 80% of
     Stripe revenue (see leafbridge/capacity.py). This script is the last-resort
-    full stop for a genuine runaway — note it takes EVERYONE down, including
+    full stop for a genuine runaway, note it takes EVERYONE down, including
     paying users, so prefer letting the capacity gate do its job.
 
     A one-command way to instantly stop the hosted server's compute cost if you
     ever get a budget alert. It works by deactivating the app's active revision,
     which drops it to zero replicas (~$0 compute) while LEAVING ingress, the
-    milatexai.com custom domain, and the TLS certificate fully intact — so
+    milatexai.com custom domain, and the TLS certificate fully intact, so
     reviving is a single command with nothing to re-bind.
 
     Usage (from this folder):

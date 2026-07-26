@@ -381,7 +381,7 @@ def test_list_figures_lifecycle_including_deletion_memory(tmp_path):
     assert "No Figure Studio figures" in _text(_call(mcp, "list_figures", {}))
     _call(mcp, "commit_figure", {"code": CODE, "name": "speedup"})
     listing = _text(_call(mcp, "list_figures", {}))
-    assert "speedup" in listing  # listed (untracked — no provenance header)
+    assert "speedup" in listing  # listed (untracked, no provenance header)
     # Delete the source through the normal tool, then the listing must remember it.
     _call(mcp, "delete_file", {"path": "figures/src/speedup.py"})
     listing = _text(_call(mcp, "list_figures", {}))

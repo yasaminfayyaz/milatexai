@@ -9,8 +9,8 @@ in the conversation.
 
 The code is a Fernet token (reusing the deployment's :class:`TokenCipher` key):
 authenticated encryption gives us tamper-proofing for free, and Fernet's embedded
-timestamp gives us expiry. The code is NOT a secret in the credential sense — it
-only authorizes *setting the user's own* Overleaf token — but it is still bound to
+timestamp gives us expiry. The code is NOT a secret in the credential sense, it
+only authorizes *setting the user's own* Overleaf token, but it is still bound to
 one user and expires quickly, and we enforce best-effort single use on top.
 """
 

@@ -29,7 +29,7 @@ except Exception:  # pragma: no cover - dotenv is optional
     pass
 
 
-# A Mongo ObjectId — Overleaf project ids are 24 lowercase hex characters.
+# A Mongo ObjectId, Overleaf project ids are 24 lowercase hex characters.
 _OBJECT_ID = re.compile(r"[0-9a-f]{24}", re.IGNORECASE)
 
 # Overleaf's default Git bridge host.
@@ -46,7 +46,7 @@ def extract_project_id(url_or_id: str) -> str:
     Accepts a raw id, a normal project URL
     (``https://www.overleaf.com/project/<id>``), or a Git URL
     (``https://git.overleaf.com/<id>``). Raises ``ConfigError`` if no id is
-    found — notably, read/write *share* links such as
+    found, notably, read/write *share* links such as
     ``https://www.overleaf.com/1234567890abcdef`` do **not** contain the project
     id and cannot be used with Git; the user must use the ``/project/<id>`` URL.
     """
@@ -86,7 +86,7 @@ def extract_project_id(url_or_id: str) -> str:
 # -- multi-provider identity parsing + SSRF trust boundary -------------------
 #
 # Overleaf stays the DEFAULT. These additions let a hosted user connect a
-# GitHub / GitLab / Bitbucket / self-hosted HTTPS Git repo too — "at the end of
+# GitHub / GitLab / Bitbucket / self-hosted HTTPS Git repo too, "at the end of
 # the day it's just Git", so the git worker is unchanged; only the identity
 # parsing and the SSRF guard live here. ``extract_project_id`` above is left
 # untouched so every Overleaf path behaves byte-for-byte as before.
@@ -157,7 +157,7 @@ def validate_remote_git_url(url: str) -> None:
             "Only https:// Git URLs are allowed "
             f"(got {parts.scheme or 'no'}:// scheme)."
         )
-    # Embedded credentials (user:pass@host) are never allowed — the token is
+    # Embedded credentials (user:pass@host) are never allowed, the token is
     # injected per-request by ProjectConfig.authed_url, never persisted in a URL.
     if parts.username is not None or parts.password is not None or "@" in parts.netloc:
         raise ConfigError("Git URL must not embed credentials (user:pass@host).")
@@ -177,13 +177,13 @@ def validate_remote_git_url(url: str) -> None:
     try:
         ipaddress.ip_address(host)
     except ValueError:
-        pass  # not an IP literal — good, it's a domain name
+        pass  # not an IP literal, good, it's a domain name
     else:
         raise ConfigError(f"Refusing bare IP host {host!r}; use a domain name.")
     if not _host_allowed(host):
         raise ConfigError(
             f"Host {host!r} is not on the allowed Git host list. Allowed: "
-            "github.com, gitlab.com, bitbucket.org, and *.overleaf.com — add "
+            "github.com, gitlab.com, bitbucket.org, and *.overleaf.com, add "
             "more via the LEAFBRIDGE_GIT_HOST_ALLOWLIST env var."
         )
 

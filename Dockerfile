@@ -1,4 +1,4 @@
-# MiLatexAI hosted server — Streamable HTTP MCP at /mcp/
+# MiLatexAI hosted server, Streamable HTTP MCP at /mcp/
 FROM python:3.12-slim
 
 # git: the git worker shells out to it. curl: fetch Tectonic at build time.
@@ -6,7 +6,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends git ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Tectonic — a self-contained LaTeX engine that fetches TeX packages on demand.
+# Tectonic, a self-contained LaTeX engine that fetches TeX packages on demand.
 # Far smaller than a TeX Live install (~5 GB), so it suits a scale-to-zero image.
 # Pinned static musl build (no shared-lib deps), extracted straight to PATH.
 ARG TECTONIC_VERSION=0.16.9

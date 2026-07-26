@@ -146,7 +146,7 @@ def test_connect_get_makes_token_optional_when_account_has_token(harness):
             "code": code, "overleaf_url": OVERLEAF_URL,
             "token": "olp_realtoken123", "name": "first"})
         # Re-opening /connect still shows the token field (a GitHub/GitLab repo
-        # needs its own token) but tells the user it's OPTIONAL for Overleaf —
+        # needs its own token) but tells the user it's OPTIONAL for Overleaf,
         # leaving it blank reuses the saved Overleaf token.
         r = client.get("/connect", params={"code": code})
     assert r.status_code == 200
@@ -208,7 +208,7 @@ def test_connect_link_reusable_within_ttl(harness):
         first = client.post("/connect", data=payload)
         second = client.post("/connect", data=payload)
     # Codes are reusable within their TTL (the manage forms submit repeatedly);
-    # re-submitting the same project just updates it — no duplicate.
+    # re-submitting the same project just updates it, no duplicate.
     assert first.status_code == 200
     assert second.status_code == 200
     assert len(_projects(store, "user_web")) == 1

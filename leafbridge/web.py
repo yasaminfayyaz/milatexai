@@ -107,7 +107,7 @@ def render_connect_form(
     err_html = f"<div class='error'>{html.escape(error)}</div>" if error else ""
     # The token field is ALWAYS shown: non-Overleaf repos carry a per-repo token,
     # so a saved Overleaf token can't stand in for them. For a returning user the
-    # field is optional — leaving it blank reuses the saved Overleaf token, but
+    # field is optional, leaving it blank reuses the saved Overleaf token, but
     # only for an Overleaf project.
     if has_token:
         who = (
@@ -226,7 +226,7 @@ def render_manage_projects(code: str, projects, *, email: str = "", error: str |
 <p class='muted'>The AI can only touch the projects listed here, nothing else in
   your Overleaf, GitHub, or GitLab account. Add or remove any time. Overleaf
   reuses your saved token; GitHub, GitLab, and Bitbucket need that repo's token.
-  Got a repo's token wrong? Use “Update token” on its row to fix it in place — no
+  Got a repo's token wrong? Use “Update token” on its row to fix it in place. No
   need to re-add the project.</p>
 {err_html}
 <div class='proj-list'>{rows}</div>
@@ -288,7 +288,7 @@ def render_landing() -> str:
         f"""{_brand_header()}
 <h1>{html.escape(TAGLINE)}</h1>
 <p class='muted'>{BRAND} is a connector that lets Claude or ChatGPT read and edit your real
-   Overleaf projects over Overleaf's Git integration — and, the same way, your
+   Overleaf projects over Overleaf's Git integration, and, the same way, your
    GitHub, GitLab, Bitbucket, or self-hosted Git LaTeX repositories.</p>
 <div class='note'>To get started, add {BRAND} as a connector in Claude or ChatGPT, then run
    <b>start_connect</b> to link a project. There's nothing to configure on this

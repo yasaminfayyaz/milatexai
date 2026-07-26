@@ -5,7 +5,7 @@ Differences from the local Phase-1 ``server.py``:
 * Auth via WorkOS AuthKit (``AuthKitProvider``). Every tool call carries a
   verified user identity.
 * Each user's Overleaf token is fetched from the encrypted store (decrypted
-  transiently) via :class:`~leafbridge.service.AccountService` — no
+  transiently) via :class:`~leafbridge.service.AccountService`, no
   ``projects.json``.
 * Users onboard from inside Claude with ``connect_project`` (paste link + token),
   so no web pages are required yet.
@@ -69,7 +69,7 @@ INSTRUCTIONS = """\
 MiLatexAI edits the signed-in user's real Overleaf projects over Overleaf's Git
 bridge. If the user has no project connected yet, just proceed with their request:
 any file tool returns a secure link where they paste their Overleaf Git token
-(never in chat) — relay that link and ask them to come back. Refer to a project
+(never in chat), relay that link and ask them to come back. Refer to a project
 by its name; list_projects shows the connected ones. Whenever the user wants to
 check, view, change, update, rotate, or revoke their Overleaf token, use
 change_token (it returns a secure link; the token itself can't be shown in chat).
@@ -177,7 +177,7 @@ def _identity_from_token() -> tuple[str, str]:
 def workos_email_resolver(api_key: str):
     """An async ``(user_id) -> email`` lookup against the WorkOS Management API,
     for when the access token doesn't carry an email claim. Returns "" on any
-    problem — email is nice-to-have, never load-bearing for a request."""
+    problem, email is nice-to-have, never load-bearing for a request."""
 
     async def resolve(user_id: str) -> str:
         if not api_key or not user_id.startswith("user_"):
@@ -233,7 +233,7 @@ class HostedApp:
         self.web_auth = web_auth if web_auth is not None else WorkOSWebAuth(
             api_key="", client_id=""
         )
-        # Disabled billing (no Stripe env) is a valid state — the tools just say so.
+        # Disabled billing (no Stripe env) is a valid state, the tools just say so.
         self.billing = billing if billing is not None else Billing(
             api_key="", price_id="", webhook_secret="",
             success_url="", cancel_url="", portal_return_url="",
@@ -306,7 +306,7 @@ class HostedApp:
 
     async def resolve_or_onboard(self, user: User, project: str | None) -> ProjectConfig:
         """Resolve the caller's project. If they have NONE connected yet, don't
-        just error — hand back a secure connect link so onboarding happens on the
+        just error, hand back a secure connect link so onboarding happens on the
         first action, without anyone needing to know the start_connect tool."""
         try:
             return await self.service.resolve_project(user.user_id, project)
@@ -318,7 +318,7 @@ class HostedApp:
             url = f"{self.base_url}/connect?code={quote(code, safe='')}"
             raise ToolError(
                 "You haven't connected an Overleaf project yet. Open this secure "
-                "link to connect one — you enter your Overleaf Git token there, "
+                "link to connect one, you enter your Overleaf Git token there, "
                 f"never in this chat:\n\n{url}\n\nOnce it's connected, ask me again."
             )
 
@@ -355,7 +355,7 @@ class HostedApp:
             return f"No change made: {result.message}"
         used = await self.service.record_commit(user.user_id, month)
         return (
-            f"Done. Committed {result.hash} and pushed — live in "
+            f"Done. Committed {result.hash} and pushed. It is live in "
             f"{proj.name!r}. (commit {used} this month)"
         )
 
@@ -454,7 +454,7 @@ def create_hosted_server(
         url = f"{app.base_url}/connect?code={quote(code, safe='')}"
         return (
             "Open this link in your browser to connect an Overleaf project "
-            "securely — your Git token stays out of this chat:\n\n"
+            "securely, your Git token stays out of this chat:\n\n"
             f"{url}\n\n"
             "The link works once and expires in 15 minutes. After connecting, come "
             "back here and ask me to list your files or edit your paper."
@@ -469,7 +469,7 @@ def create_hosted_server(
         which keeps your token out of the chat.
 
         Args:
-            overleaf_url: The repository URL — an Overleaf project
+            overleaf_url: The repository URL, an Overleaf project
                 (https://www.overleaf.com/project/<id>), or a GitHub, GitLab,
                 Bitbucket, or self-hosted HTTPS Git repo URL.
             token: The matching access token. Overleaf: Account Settings > Git
@@ -512,16 +512,16 @@ def create_hosted_server(
         overleaf_url: str, name: str | None = None, token: str | None = None
     ) -> str:
         """Give the AI access to ANOTHER of your LaTeX repositories. For an
-        Overleaf project this reuses the Overleaf token you already saved — just
+        Overleaf project this reuses the Overleaf token you already saved, just
         the project link, no token needed. For a GitHub, GitLab, Bitbucket, or
         self-hosted Git repo you must also pass that repo's access token. (Run
         start_connect first if you've never connected one.)
 
         Args:
-            overleaf_url: The repository URL — an Overleaf project, or a GitHub,
+            overleaf_url: The repository URL, an Overleaf project, or a GitHub,
                 GitLab, Bitbucket, or self-hosted HTTPS Git repo URL.
             name: A short label for the project (optional).
-            token: The repo's access token — required for non-Overleaf repos,
+            token: The repo's access token, required for non-Overleaf repos,
                 omit for Overleaf (the saved account token is reused).
         """
         try:
@@ -536,7 +536,7 @@ def create_hosted_server(
     @mcp.tool
     async def manage_projects() -> str:
         """Get a secure link to view, add, or remove the Overleaf projects the AI
-        can access. No token needed — the AI only ever touches projects you list."""
+        can access. No token needed. The AI only ever touches projects you list."""
         try:
             user = await app.user()
             code = mint_connect_code(app.cipher, user.user_id, user.email)
@@ -544,7 +544,7 @@ def create_hosted_server(
             raise _wrap(exc)
         url = f"{app.base_url}/projects?code={quote(code, safe='')}"
         return (
-            "Manage which Overleaf projects the AI can access here — add or remove "
+            "Manage which Overleaf projects the AI can access here, add or remove "
             f"any time, no token needed:\n\n{url}\n\nThe link is valid for 15 minutes."
         )
 
@@ -577,7 +577,7 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if user.is_admin:
-            return "You're an admin — you already have unlimited access."
+            return "You're an admin. You already have unlimited access."
         if user.plan == "pro":
             return "You're already on Pro. Use manage_subscription to view or cancel."
         if not app.billing.enabled:
@@ -588,7 +588,7 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         return (
-            "Complete your upgrade to Pro here (secure Stripe checkout — your card "
+            "Complete your upgrade to Pro here (secure Stripe checkout, your card "
             "never touches this chat):\n\n"
             f"{url}\n\n"
             "Your plan switches to Pro automatically once payment goes through."
@@ -776,14 +776,14 @@ def create_hosted_server(
     @mcp.tool(annotations={"readOnlyHint": True})
     async def show_page(page: int = 1, project: str | None = None, tex: str | None = None):
         """Show a rendered IMAGE of a compiled PDF page so you can SEE the actual
-        layout — margins, spacing, line breaks, overfull/underfull boxes, float
-        placement, page breaks, and overall styling — none of which the LaTeX source
+        layout, margins, spacing, line breaks, overfull/underfull boxes, float
+        placement, page breaks, and overall styling, none of which the LaTeX source
         alone reveals.
 
         Use this SPARINGLY, and ONLY when the user asks how the document LOOKS on the
         page (margins, spacing, layout, overflow, "does this fit", styling), or when
         you are diagnosing a visual problem you cannot judge from the source. Do NOT
-        call it routinely or after every edit — each call compiles the project and
+        call it routinely or after every edit, each call compiles the project and
         returns a full-page image. To inspect a single table or figure, prefer
         show_table / show_figure, which crop to just that float.
 
@@ -825,7 +825,7 @@ def create_hosted_server(
     async def tracked_changes_pdf(ref: str, project: str | None = None):
         """A tracked-changes PDF (latexdiff): additions and deletions between a
         commit/checkpoint id (list_checkpoints / get_history) and the CURRENT
-        document, rendered as page images — what journals ask for in a revised
+        document, rendered as page images, what journals ask for in a revised
         submission. Nothing is committed."""
         try:
             user = await app.user()
@@ -1377,7 +1377,7 @@ def create_hosted_server(
     # the one-time connect code minted by start_connect, so the Overleaf token is
     # typed into a browser form (over HTTPS) instead of the chat transcript.
 
-    # The marketing site + /account are static per process — render once, cache.
+    # The marketing site + /account are static per process, render once, cache.
     _pages: dict[str, str] = {}
 
     @mcp.custom_route("/", methods=["GET"])
@@ -1389,7 +1389,7 @@ def create_hosted_server(
     @mcp.custom_route("/tools/bibtex", methods=["GET"])
     async def bibtex_tool(request: Request) -> Response:
         # Static, client-side BibTeX cleaner. Edge-cached (see asgi._EDGE_CACHED),
-        # so it never wakes this container — a $0 marketing surface.
+        # so it never wakes this container, a $0 marketing surface.
         if "bibtex_tool" not in _pages:
             from . import tool_bibtex
             _pages["bibtex_tool"] = tool_bibtex.render_bibtex_tool()
@@ -1415,7 +1415,7 @@ def create_hosted_server(
 
     # -- website sign-in (WorkOS AuthKit) so a user can manage billing on the web
     # with the SAME account as the connector. The session cookie is signed,
-    # HttpOnly, and SameSite=Lax — Lax also stops a cross-site POST from carrying
+    # HttpOnly, and SameSite=Lax, Lax also stops a cross-site POST from carrying
     # it, which is the CSRF guard for the billing actions below.
 
     @mcp.custom_route("/login", methods=["GET"])
@@ -1438,7 +1438,7 @@ def create_hosted_server(
         params = request.query_params
         if params.get("error"):
             # Don't reflect the provider's error_description (attacker-controllable
-            # query text on our own domain) — show a fixed message.
+            # query text on our own domain), show a fixed message.
             return HTMLResponse(web.render_notice(
                 "Sign-in failed",
                 "Sign-in was cancelled or could not be completed. Please try again.",
@@ -1594,7 +1594,7 @@ def create_hosted_server(
 
     def _verified(request_code: str):
         """Return (user_id, email) for a valid capability code, else None. Codes
-        are valid for their TTL and reusable within it — the manage/token forms
+        are valid for their TTL and reusable within it, the manage/token forms
         submit several times per session."""
         try:
             return verify_connect_code(app.cipher, request_code)
@@ -1625,7 +1625,7 @@ def create_hosted_server(
             return _expired()
         user_id, email = ident
         # If the account already has a saved token, this is an "add another
-        # project" case — render the form WITHOUT the token field.
+        # project" case, render the form WITHOUT the token field.
         await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
         has = await app.service.has_token(user_id)
         return HTMLResponse(

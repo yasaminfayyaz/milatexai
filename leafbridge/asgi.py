@@ -83,8 +83,8 @@ def build_app():
     # stateless_http=True: ChatGPT's Streamable HTTP client issues DELETE /mcp
     # after a tool call, which makes a *stateful* FastMCP session 404 with
     # "Session terminated" (the single most common FastMCP<->ChatGPT failure).
-    # This server holds no per-session memory — all state is per-user in the
-    # store — so stateless mode is safe here and keeps Claude working too.
+    # This server holds no per-session memory, all state is per-user in the
+    # store, so stateless mode is safe here and keeps Claude working too.
     return mcp.http_app(
         stateless_http=True, middleware=[_CORS, Middleware(_SecurityHeaders)]
     )

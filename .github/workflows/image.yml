@@ -1,7 +1,7 @@
 name: build-image
 
 # Builds the MiLatexAI container and publishes it to GitHub Container Registry
-# (ghcr.io) — free. Azure Container Apps pulls the resulting public image.
+# (ghcr.io), free. Azure Container Apps pulls the resulting public image.
 
 on:
   push:

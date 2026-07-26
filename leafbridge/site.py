@@ -756,7 +756,7 @@ def robots_txt() -> str:
     # Blocked: backlink/SEO scrapers that add no discovery value for us.
     # Allowed (via the "*" group): Googlebot, Bingbot, and AI crawlers such as
     # GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot,
-    # Google-Extended — we *want* assistants and search to see the site.
+    # Google-Extended, we *want* assistants and search to see the site.
     return (
         "# SEO/backlink scrapers that add nothing but load - keep them out.\n"
         "User-agent: AhrefsBot\n"

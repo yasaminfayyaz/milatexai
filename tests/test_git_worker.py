@@ -6,7 +6,7 @@ push. The worker now (a) spaces pushes out and (b) backs off + retries any
 networked op that comes back rate-limited, instead of failing the edit.
 
 These tests exercise that logic in isolation by stubbing the low-level ``_git``
-call — no real network, no real repo.
+call, no real network, no real repo.
 """
 
 from __future__ import annotations
