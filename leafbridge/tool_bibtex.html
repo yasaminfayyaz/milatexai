@@ -83,6 +83,8 @@ a{color:var(--accent)}
   <div class="btnrow">
     <button class="btn" id="clean">Clean</button>
     <button class="btn secondary" id="doi">Find missing DOIs and fill fields</button>
+    <button class="btn secondary" id="urlField" title="For biblatex and modern styles: move links into a plain url field">URLs &#8594; url field</button>
+    <button class="btn secondary" id="urlHow" title="For classic BibTeX styles that ignore the url field: move links into howpublished/note as \url{}">URLs &#8594; \url{} in note</button>
     <button class="btn secondary" id="copy" disabled>Copy</button>
     <button class="btn secondary" id="download" disabled>Download .bib</button>
   </div>
@@ -107,6 +109,8 @@ a{color:var(--accent)}
       <dd>It searches Crossref by your entry's title and first author, then checks the top matches against your title, author, and year. It only writes a DOI when a match clears a confidence bar, so it will leave a DOI blank rather than guess wrong. Some works have no DOI at all (many books, theses, and older papers), and those stay blank.</dd>
       <dt>Where does DOI autocomplete get data?</dt>
       <dd>The free Crossref REST API (and DataCite for Zenodo-style DOIs). No API key, no cost, rate-limited politely.</dd>
+      <dt>My URL does not show up in the bibliography. Which URL button do I use?</dt>
+      <dd>It depends on your style. biblatex and modern styles read a plain <code>url</code> field, so use <b>URLs to url field</b>. Classic BibTeX styles (plain, abbrv, unsrt, alpha) ignore the <code>url</code> field, so the link only appears if it is in <code>howpublished</code> or <code>note</code> as <code>\url{...}</code>. Use <b>URLs to \url{} in note</b> for those. Both buttons move the link so it lives in one place, not two. The <code>\url</code> form needs <code>\usepackage{url}</code> or <code>hyperref</code> in your preamble.</dd>
     </dl>
   </div>
 
@@ -384,8 +388,68 @@ function clean(text,opt){
   return {text:outText,entries:list,stats:{nEntries,merged:mergedCount,braced,monthsFixed,allcaps,possibleDupes,issues}};
 }
 
+/* ===================== URL field conversion =====================
+   Classic BibTeX styles (plain, abbrv, unsrt, alpha) ignore a `url` field, so
+   people paste the link into howpublished/note as \url{...}. biblatex and modern
+   styles want a plain `url` field instead. These convert between the two forms
+   without duplicating the link. */
+function delField(e,name){ e.fields=(e.fields||[]).filter(f=>f.name!==name); }
+function looksLikeUrl(s){ return /^(https?:\/\/|ftp:\/\/|www\.)\S+$/i.test(String(s||"").trim()); }
+// Pull a URL out of a value that may be bare, \url{...}, or \href{...}{...}.
+function extractUrl(val){
+  const s=String(val||"");
+  let m=s.match(/\\url\{([^}]*)\}/i); if(m) return m[1].trim();
+  m=s.match(/\\href\{([^}]*)\}/i); if(m) return m[1].trim();
+  const t=s.trim(); if(looksLikeUrl(t)) return t;
+  m=s.match(/(https?:\/\/|ftp:\/\/|www\.)\S+/i); if(m) return m[0].replace(/[.,;)]+$/,"");
+  return "";
+}
+// Remove the URL / \url{} / \href{} portion, returning leftover text (trimmed).
+// A leftover that is just a connector ("Available at", "Online at") is dropped too.
+function stripUrlFrom(val){
+  let s=String(val||"");
+  s=s.replace(/\\url\{[^}]*\}/ig," ").replace(/\\href\{[^}]*\}\{[^}]*\}/ig," ").replace(/\\href\{[^}]*\}/ig," ");
+  s=s.replace(/(https?:\/\/|ftp:\/\/|www\.)\S+/ig," ");
+  s=s.replace(/\s+/g," ").replace(/^[\s,;.]+|[\s,;.]+$/g,"").trim();
+  if(/^(available(\s+(at|online|from))?|online(\s+at)?|accessed(\s+(at|on))?|retrieved(\s+from)?|url|link)[:\s]*$/i.test(s)) return "";
+  return s;
+}
+// Move any URL into a clean `url` field and drop it from howpublished/note.
+function urlToField(entry){
+  if(entry.meta) return false;
+  let url=field(entry,"url"), changed=false;
+  if(!url){
+    for(const src of ["howpublished","note"]){
+      const u=extractUrl(field(entry,src));
+      if(u){ url=u; setField(entry,"url",u); changed=true; break; }
+    }
+  }
+  if(!url) return changed;
+  for(const src of ["howpublished","note"]){
+    const v=field(entry,src); if(!v) continue;
+    if(extractUrl(v)===url || v.indexOf(url)>=0){
+      const rest=stripUrlFrom(v);
+      if(rest){ if(rest!==v){ setField(entry,src,rest); changed=true; } }
+      else { delField(entry,src); changed=true; }
+    }
+  }
+  return changed;
+}
+// Move a `url` field into howpublished (misc/online) or note as \url{}; drop `url`.
+function urlToHowpublished(entry){
+  if(entry.meta) return false;
+  const url=field(entry,"url"); if(!url) return false;
+  const t=(entry.type||"").toLowerCase();
+  const target=(t==="misc"||t==="online"||t==="electronic"||t==="www")?"howpublished":"note";
+  const existing=field(entry,target);
+  if(!existing) setField(entry,target,"\\url{"+url+"}");
+  else if(existing.indexOf(url)<0) setField(entry,target,existing.trim()+" \\url{"+url+"}");
+  delField(entry,"url");
+  return true;
+}
+
 // Expose for testing
-window.BIB={parseBib,clean,dedupe,fuzzyDupes,firstAuthorLast,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field,pickBestDoi,stripTex,normTitleKey,_titleWords,_jaccard,setField,bibtexFromDoiRecord};
+window.BIB={parseBib,clean,dedupe,fuzzyDupes,firstAuthorLast,validate,protectTitle,titleCaseIfShouting,normDOI,formatEntry,field,pickBestDoi,stripTex,normTitleKey,_titleWords,_jaccard,setField,bibtexFromDoiRecord,extractUrl,stripUrlFrom,looksLikeUrl,urlToField,urlToHowpublished};
 
 /* ===================== DOI autocomplete ===================== */
 function bibtexFromDoiRecord(bt){ // parse a single-entry bibtex string returned by crossref
@@ -513,6 +577,23 @@ $("doi").onclick=async()=>{
   }catch(e){ alert("DOI lookup failed: "+e.message); }
   finally{ btn.disabled=false; btn.textContent=label; }
 };
+function runUrlConvert(mode){
+  const src=$("in").value; if(!src.trim()) return;
+  const {entries}=parseBib(src);
+  let n=0;
+  for(const e of entries){ if(e.meta) continue; if(mode==="field"?urlToField(e):urlToHowpublished(e)) n++; }
+  const opt=opts();
+  $("out").value=entries.map(e=>formatEntry(e,opt)).join("\n\n")+(entries.length?"\n":"");
+  lastEntries=entries;
+  renderSummary({nEntries:entries.filter(e=>!e.meta).length,merged:0,braced:0,allcaps:0,monthsFixed:0,possibleDupes:0,issues:[]});
+  const u=$("summary"); const li=document.createElement("li"); li.className="chip";
+  li.textContent = n===0 ? "no URLs to move" : (n+" URL"+(n===1?"":"s")+(mode==="field"?" moved to a url field":" moved to \\url{} in howpublished/note"));
+  u.appendChild(li);
+  if(mode==="how" && n) { const w=document.createElement("li"); w.className="chip warn"; w.textContent="remember \\usepackage{url} or hyperref"; u.appendChild(w); }
+  const has=!!$("out").value.trim(); $("copy").disabled=!has; $("download").disabled=!has;
+}
+$("urlField").onclick=()=>runUrlConvert("field");
+$("urlHow").onclick=()=>runUrlConvert("how");
 // file drop
 const inEl=$("in");
 ["dragover","drop"].forEach(ev=>inEl.addEventListener(ev,e=>e.preventDefault()));
