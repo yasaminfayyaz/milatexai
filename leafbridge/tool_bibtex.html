@@ -108,7 +108,7 @@ a{color:var(--accent)}
       <dt>How does it find a missing DOI?</dt>
       <dd>It searches Crossref by your entry's title and first author, then checks the top matches against your title, author, and year. It only writes a DOI when a match clears a confidence bar, so it will leave a DOI blank rather than guess wrong. Some works have no DOI at all (many books, theses, and older papers), and those stay blank.</dd>
       <dt>Where does DOI autocomplete get data?</dt>
-      <dd>The free Crossref REST API (and DataCite for Zenodo-style DOIs). No API key, no cost, rate-limited politely.</dd>
+      <dd>Crossref for most works, and DataCite for Zenodo-style DOIs.</dd>
       <dt>My URL does not show up in the bibliography. Which URL button do I use?</dt>
       <dd>It depends on your style. biblatex and modern styles read a plain <code>url</code> field, so use <b>URLs to url field</b>. Classic BibTeX styles (plain, abbrv, unsrt, alpha) ignore the <code>url</code> field, so the link only appears if it is in <code>howpublished</code> or <code>note</code> as <code>\url{...}</code>. Use <b>URLs to \url{} in note</b> for those. Both buttons move the link so it lives in one place, not two. The <code>\url</code> form needs <code>\usepackage{url}</code> or <code>hyperref</code> in your preamble.</dd>
     </dl>
