@@ -202,5 +202,20 @@
   clean("wild.footnoteUrl", "\\footnote{See \\url{a_b.com} for x\\_y}.");
   clean("wild.currencyEscaped", "It costs \\$5 to \\$10 per unit.");
 
+  // ============ real forum errors (from tex.stackexchange / overleaf / latex.org) ============
+  // Each of these is a genuine error people ask about; the finder must catch it.
+  ok("rw.underscoreFilename", warnMsg("see the file math_example.tex here", /Missing \$ inserted|text mode/));
+  ok("rw.blankLineInEquation", warnMsg("\\begin{equation}\ny=x^3,\n\nz=x^3\n\\end{equation}", /blank line.*math/));
+  ok("rw.dollarInAlign", warnMsg("\\begin{align*}\n$2x - 5y &= 8$\n\\end{align*}", /\$ inside a math environment/));
+  ok("rw.parInDisplay", warnMsg("$$ y=f(x) \\par $$", /par.*inside math/));
+  ok("rw.docEndedByEnv", errMsg("\\begin{document}\\begin{tabular}{cc} a & b \\end{document}", /tabular.*never closed/));
+  ok("rw.missingBraceTextbf", errMsg("\\textbf{Bold text with no close", /never closed/));
+  ok("rw.bareAmpText", warnMsg("Research and a bare & sign here", /alignment character &/));
+  // and the fail-proof guards for the new math-context checks
+  clean("guard.textDollarInMath", "\\begin{align} y &= \\text{if $x>0$ then 1} \\end{align}");
+  clean("guard.blankLineOutsideMath", "Math $x^2$ here.\n\nA new paragraph is fine.");
+  clean("guard.matrixDollarOutside", "$\\begin{matrix} a & b \\\\ c & d \\end{matrix}$");
+  clean("guard.equationMultilineNoGap", "\\begin{equation}\n a = b\n + c\n\\end{equation}");
+
   return JSON.stringify({ pass: pass, fail: fail, total: pass + fail, failures: R });
 })();

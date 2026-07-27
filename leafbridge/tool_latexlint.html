@@ -121,7 +121,7 @@ Hello \textbf{world.
       <dt>Does it compile my document?</dt>
       <dd>No. It checks the structure of your source directly in your browser, so it is instant, needs no LaTeX install, and nothing is uploaded. It catches the structural errors that stop a compile, not every possible warning.</dd>
       <dt>What exactly does it check?</dt>
-      <dd>Brace balance, <code>\begin</code>/<code>\end</code> nesting, math delimiters (<code>$</code>, <code>$$</code>, <code>\[ \]</code>, <code>\( \)</code>), <code>\left</code>/<code>\right</code> pairing, unclosed <code>\verb</code>, and stray text-mode <code>_ ^ &amp;</code>. It ignores comments, escaped characters like <code>\{</code>, <code>\verb</code> content, and verbatim blocks so it does not raise false alarms.</dd>
+      <dd>Brace balance, <code>\begin</code>/<code>\end</code> nesting, math delimiters (<code>$</code>, <code>$$</code>, <code>\[ \]</code>, <code>\( \)</code>), <code>\left</code>/<code>\right</code> pairing, unclosed <code>\verb</code>, stray text-mode <code>_ ^ &amp;</code>, and common math-mode slips like a <code>$</code> placed inside an <code>align</code> or a blank line inside an equation. It ignores comments, escaped characters like <code>\{</code>, <code>\verb</code> content, and verbatim blocks so it does not raise false alarms. It does not catch every possible error (for example an undefined command like <code>\alpha</code> used in text); those are the AI connector's job.</dd>
     </dl>
   </div>
 
@@ -157,7 +157,14 @@ function lint(src){
   while(i < n){
     var c = text[i];
 
-    if(c === "\n"){ line++; i++; continue; }
+    if(c === "\n"){
+      if(inMath()){
+        var bk = i+1;
+        while(bk < n && (text[bk] === " " || text[bk] === "\t" || text[bk] === "\r")) bk++;
+        if(text[bk] === "\n") add(line, colAt(i), "warning", "blank line (paragraph break) inside math mode causes 'Missing $ inserted'");
+      }
+      line++; i++; continue;
+    }
 
     // comment: unescaped % runs to end of line
     if(c === "%"){ while(i < n && text[i] !== "\n") i++; continue; }
@@ -248,6 +255,7 @@ function lint(src){
 
         if(name === "left"){ lefts.push({line: line, col: colAt(cmdStart)}); continue; }
         if(name === "right"){ if(lefts.length) lefts.pop(); else add(line, colAt(cmdStart), "error", "\\right has no matching \\left"); continue; }
+        if(name === "par" && inMath()){ add(line, colAt(cmdStart), "warning", "\\par (paragraph break) inside math mode causes 'Missing $ inserted'"); continue; }
         continue;
       } else {
         // escaped single non-letter char, plus \[ \] \( \)
@@ -278,6 +286,9 @@ function lint(src){
 
     if(c === "$"){
       var topk = math.length ? math[math.length-1].kind : null;
+      if(hasEnv(MATH_ENVS) && braces.length === 0 && topk !== "$" && topk !== "$$"){
+        add(line, colAt(i), "warning", "$ inside a math environment, which is already math mode (delete the $)");
+      }
       if(topk === "$"){ math.pop(); i++; continue; }             // close inline
       if(topk === "$$"){                                          // display needs $$ to close
         if(text[i+1] === "$"){ math.pop(); i += 2; continue; }
