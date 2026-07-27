@@ -141,6 +141,12 @@ var VERB_ENVS = {"verbatim":1,"verbatim*":1,"Verbatim":1,"Verbatim*":1,"BVerbati
 var MATH_ENVS = {"math":1,"displaymath":1,"equation":1,"equation*":1,"align":1,"align*":1,"alignat":1,"alignat*":1,"flalign":1,"flalign*":1,"gather":1,"gather*":1,"multline":1,"multline*":1,"eqnarray":1,"eqnarray*":1,"array":1,"matrix":1,"matrix*":1,"pmatrix":1,"pmatrix*":1,"bmatrix":1,"bmatrix*":1,"Bmatrix":1,"vmatrix":1,"vmatrix*":1,"Vmatrix":1,"smallmatrix":1,"cases":1,"cases*":1,"dcases":1,"rcases":1,"split":1,"aligned":1,"alignedat":1,"gathered":1,"IEEEeqnarray":1,"IEEEeqnarray*":1,"subequations":1,"empheq":1,"multlined":1};
 var TAB_ENVS = {"tabular":1,"tabular*":1,"tabularx":1,"tabulary":1,"longtable":1,"longtabu":1,"tabu":1,"supertabular":1,"xtabular":1,"array":1,"matrix":1,"matrix*":1,"pmatrix":1,"pmatrix*":1,"bmatrix":1,"bmatrix*":1,"Bmatrix":1,"vmatrix":1,"vmatrix*":1,"Vmatrix":1,"smallmatrix":1,"cases":1,"cases*":1,"dcases":1,"split":1,"aligned":1,"alignedat":1,"align":1,"align*":1,"alignat":1,"alignat*":1,"flalign":1,"flalign*":1,"eqnarray":1,"eqnarray*":1,"IEEEeqnarray":1,"IEEEeqnarray*":1,"matrix-like":1};
 
+// Commands that DEFINE a macro/environment. A \begin or \end inside their body is
+// part of the definition, not a live environment, so it must not be tracked. The
+// value is how many following brace groups belong to the definition. (Star variants
+// are handled naturally: the command name stops at the letters, e.g. \newcommand*.)
+var DEF_CMDS = {"def":1,"edef":1,"gdef":1,"xdef":1,"long":1,"newcommand":2,"renewcommand":2,"providecommand":2,"DeclareRobustCommand":2,"newenvironment":3,"renewenvironment":3,"NewDocumentCommand":3,"RenewDocumentCommand":3,"ProvideDocumentCommand":3,"DeclareDocumentCommand":3,"NewDocumentEnvironment":4,"RenewDocumentEnvironment":4,"ProvideDocumentEnvironment":4,"DeclareDocumentEnvironment":4};
+
 function isLetter(c){ return c >= "A" && c <= "Z" || c >= "a" && c <= "z"; }
 
 function lint(src){
@@ -148,11 +154,13 @@ function lint(src){
   var n = text.length, i = 0, line = 1;
   var braces = [], envs = [], math = [], lefts = [];
   var issues = [];
+  var defArm = 0, defBase = 0; // marking the brace groups of a macro definition
 
   function colAt(idx){ var p = text.lastIndexOf("\n", idx - 1); return idx - p; }
   function add(ln, cl, sev, msg){ issues.push({line: ln, col: cl, severity: sev, msg: msg}); }
   function hasEnv(set){ for(var s = 0; s < envs.length; s++){ if(set[envs[s].name]) return true; } return false; }
   function inMath(){ return math.length > 0 || hasEnv(MATH_ENVS); }
+  function insideDef(){ for(var s = 0; s < braces.length; s++){ if(braces[s].def) return true; } return false; }
 
   while(i < n){
     var c = text[i];
@@ -179,6 +187,8 @@ function lint(src){
         var cmdStart = i;
         i = j;
 
+        if(DEF_CMDS[name]){ defArm = DEF_CMDS[name]; defBase = braces.length; continue; }
+
         if(name === "verb" || name === "lstinline"){
           var k = i;
           if(text[k] === "*") k++;
@@ -199,6 +209,7 @@ function lint(src){
         }
 
         if(name === "begin" || name === "end"){
+          if(insideDef()){ continue; } // \begin/\end inside a macro definition is literal text
           var k2 = i;
           while(k2 < n && (text[k2] === " " || text[k2] === "\t")) k2++;
           if(text[k2] !== "{"){ i = k2; continue; }
@@ -277,9 +288,13 @@ function lint(src){
       }
     }
 
-    if(c === "{"){ braces.push({line: line, col: colAt(i)}); i++; continue; }
+    if(c === "{"){
+      var be = {line: line, col: colAt(i)};
+      if(defArm > 0 && braces.length === defBase) be.def = true;
+      braces.push(be); i++; continue;
+    }
     if(c === "}"){
-      if(braces.length) braces.pop();
+      if(braces.length){ var bp = braces.pop(); if(bp.def && defArm > 0) defArm--; }
       else add(line, colAt(i), "error", "extra closing brace } with no matching {");
       i++; continue;
     }

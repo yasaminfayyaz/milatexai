@@ -217,5 +217,21 @@
   clean("guard.matrixDollarOutside", "$\\begin{matrix} a & b \\\\ c & d \\end{matrix}$");
   clean("guard.equationMultilineNoGap", "\\begin{equation}\n a = b\n + c\n\\end{equation}");
 
+  // ============ \begin/\end inside macro definitions are literal (no false positives) ============
+  clean("def.lonelyEnd", "\\newcommand{\\eal}{\\end{align*}}");
+  clean("def.lonelyBegin", "\\newcommand{\\bal}{\\begin{align*}}");
+  clean("def.defLonelyBegin", "\\def\\bal{\\begin{align}}");
+  clean("def.newenvironmentPair", "\\newenvironment{myq}{\\begin{quote}\\itshape}{\\end{quote}}");
+  clean("def.newcommandPair", "\\newcommand{\\imp}[1]{\\begin{center}#1\\end{center}}");
+  clean("def.xparse", "\\NewDocumentCommand{\\x}{m}{\\begin{itemize}\\item #1\\end{itemize}}");
+  clean("def.usedAfterwards", "\\newcommand{\\bal}{\\begin{align}}\\newcommand{\\eal}{\\end{align}}\nText follows.");
+  // but real errors are still caught, even right after a definition
+  ok("def.realUnclosedAfterDef", errMsg("\\newcommand{\\x}{y}\n\\begin{itemize}\\item a", /itemize.*never closed/));
+  ok("def.realEndNoBeginAfterDef", errMsg("\\newcommand{\\x}{y}\n\\end{foo}", /no matching \\begin/));
+  ok("def.unclosedBraceInBody", errMsg("\\newcommand{\\x}{\\textbf{a}", /never closed/));
+
+  // runaway argument (missing brace swallows following text), from dickimaw-books
+  ok("rw.runawayArg", errMsg("\\newcommand{\\ex}[1]{#1}\n\\begin{document}\ncommand \\ex{with an error.\nnext para\n\\end{document}", /never closed/));
+
   return JSON.stringify({ pass: pass, fail: fail, total: pass + fail, failures: R });
 })();
