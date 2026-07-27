@@ -315,7 +315,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <nav class='links'>
     <a href='#features' data-i18n='nav.features'>{_t(en,'nav.features')}</a>
     <a href='#how' data-i18n='nav.how'>{_t(en,'nav.how')}</a>
-    <a href='#tools'>Free tools</a>
+    <a href='#tools'>Free web tools</a>
     <a href='#pricing' data-i18n='nav.pricing'>{_t(en,'nav.pricing')}</a>
     <a href='#faq' data-i18n='nav.faq'>{_t(en,'nav.faq')}</a>
     <a href='/account' data-i18n='nav.manage_subscription'>{_t(en,'nav.manage_subscription')}</a>
@@ -349,7 +349,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
 </section>"""
 
     tools = """<section class='section' id='tools'>
-  <h2 class='h2'>Free tools for researchers</h2>
+  <h2 class='h2'>Free web tools for researchers</h2>
   <p class='sub'>Small utilities that run right in your browser. No login, nothing uploaded.</p>
   <div class='grid'>
     <div class='card'>
