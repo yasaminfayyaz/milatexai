@@ -76,6 +76,21 @@ def test_account_route():
     assert r.status_code == 200
 
 
+def test_tools_hub_page_and_route():
+    page = site.render_tools_page()
+    assert page.lstrip().lower().startswith("<!doctype html>")
+    # links to both tools, and back to the product
+    assert "/tools/bibtex" in page and "/tools/latex-error-finder" in page
+    assert "milatexai.com/tools" in page  # canonical
+    with TestClient(_server().http_app()) as client:
+        r = client.get("/tools")
+    assert r.status_code == 200
+    assert "Free web tools" in r.text
+    # edge-cached so it never wakes the container
+    from leafbridge import asgi
+    assert "/tools" in asgi._SecurityHeaders._EDGE_CACHED
+
+
 def test_health_capacity_route():
     with TestClient(_server().http_app()) as client:
         r = client.get("/health/capacity")

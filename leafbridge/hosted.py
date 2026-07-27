@@ -1386,6 +1386,13 @@ def create_hosted_server(
             _pages["home"] = site.render_site()
         return HTMLResponse(_pages["home"])
 
+    @mcp.custom_route("/tools", methods=["GET"])
+    async def tools_hub(request: Request) -> Response:
+        # Static hub page listing the free tools. Edge-cached, never wakes the container.
+        if "tools_hub" not in _pages:
+            _pages["tools_hub"] = site.render_tools_page()
+        return HTMLResponse(_pages["tools_hub"])
+
     @mcp.custom_route("/tools/bibtex", methods=["GET"])
     async def bibtex_tool(request: Request) -> Response:
         # Static, client-side BibTeX cleaner. Edge-cached (see asgi._EDGE_CACHED),

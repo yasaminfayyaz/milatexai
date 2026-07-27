@@ -315,7 +315,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <nav class='links'>
     <a href='#features' data-i18n='nav.features'>{_t(en,'nav.features')}</a>
     <a href='#how' data-i18n='nav.how'>{_t(en,'nav.how')}</a>
-    <a href='#tools'>Free web tools</a>
+    <a href='/tools'>Free web tools</a>
     <a href='#pricing' data-i18n='nav.pricing'>{_t(en,'nav.pricing')}</a>
     <a href='#faq' data-i18n='nav.faq'>{_t(en,'nav.faq')}</a>
     <a href='/account' data-i18n='nav.manage_subscription'>{_t(en,'nav.manage_subscription')}</a>
@@ -362,19 +362,8 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
 
     tools = """<section class='section' id='tools'>
   <h2 class='h2'>Free web tools for researchers</h2>
-  <p class='sub'>Small utilities that run right in your browser. No login, nothing uploaded.</p>
-  <div class='grid'>
-    <div class='card'>
-      <h3>BibTeX Cleaner, DOI Finder &amp; Duplicate Remover</h3>
-      <p class='muted'>Clean a .bib file, find missing DOIs, remove duplicate entries, protect title capitals, and fix url and howpublished fields.</p>
-      <a class='btn' href='/tools/bibtex'>Open the free tool</a>
-    </div>
-    <div class='card'>
-      <h3>LaTeX Error Finder</h3>
-      <p class='muted'>Paste your .tex and find the exact line of an unmatched brace, an unclosed \\begin/\\end, or a broken math delimiter, without compiling.</p>
-      <a class='btn' href='/tools/latex-error-finder'>Open the free tool</a>
-    </div>
-  </div>
+  <p class='sub'>Small utilities that run right in your browser: a BibTeX cleaner with DOI finder, and a LaTeX error finder. No login, nothing uploaded.</p>
+  <div style='text-align:center'><a class='btn' href='/tools'>Browse the free tools &#8594;</a></div>
 </section>"""
 
     see = f"""<section class='section see' id='see'>
@@ -509,7 +498,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <nav class='foot-links'>
     <a href='#privacy' data-i18n='nav.privacy'>{_t(en,'nav.privacy')}</a>
     <a href='#terms' data-i18n='nav.terms'>{_t(en,'nav.terms')}</a>
-    <a href='/tools/bibtex'>Free BibTeX cleaner</a>
+    <a href='/tools'>Free web tools</a>
     <a href='https://github.com/yasaminfayyaz/milatexai' target='_blank' rel='noopener'>GitHub</a>
     <a href='mailto:support@milatexai.com'><span data-i18n='footer.contact_label'>{_t(en,'footer.contact_label')}</span></a>
   </nav>
@@ -731,6 +720,54 @@ def render_account(
 </main></body></html>"""
 
 
+_TOOL_CARDS = """<div class='grid'>
+    <div class='card'>
+      <h3>BibTeX Cleaner, DOI Finder &amp; Duplicate Remover</h3>
+      <p class='muted'>Clean a .bib file, find missing DOIs, remove duplicate entries, protect title capitals, and fix url and howpublished fields.</p>
+      <a class='btn' href='/tools/bibtex'>Open the free tool</a>
+    </div>
+    <div class='card'>
+      <h3>LaTeX Error Finder</h3>
+      <p class='muted'>Paste your .tex and find the exact line of an unmatched brace, an unclosed \\begin/\\end, a broken math delimiter, or a stray text-mode character, without compiling.</p>
+      <a class='btn' href='/tools/latex-error-finder'>Open the free tool</a>
+    </div>
+  </div>"""
+
+
+def render_tools_page() -> str:
+    """The /tools hub: a dedicated, SEO-friendly page listing the free web tools,
+    so the homepage stays short and new tools have a home to grow into."""
+    return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>Free Web Tools for LaTeX Researchers | MiLatexAI</title>
+<meta name='description' content='Free browser-based tools for LaTeX researchers: a BibTeX cleaner with DOI finder and duplicate remover, and a LaTeX error finder. No login, nothing uploaded.'>
+<link rel='canonical' href='https://milatexai.com/tools'>
+<meta name='robots' content='index,follow'>
+<meta property='og:type' content='website'>
+<meta property='og:site_name' content='MiLatexAI'>
+<meta property='og:title' content='Free web tools for LaTeX researchers'>
+<meta property='og:description' content='A BibTeX cleaner and DOI finder, and a LaTeX error finder. Free, in your browser, no login.'>
+<meta property='og:url' content='https://milatexai.com/tools'>
+<style>{_CSS}</style></head>
+<body>
+<header class='nav'><a class='brand' href='/'>Mi<span>LaTeX</span>AI</a>
+  <nav class='links'><a href='/#features'>Features</a><a href='/#how'>How it works</a><a href='/#pricing'>Pricing</a><a href='/#faq'>FAQ</a></nav>
+  <div class='navactions'><a class='btn btn-sm' href='/#get-started'>Get started</a></div>
+</header>
+<main class='section' style='max-width:860px'>
+  <h1 class='hero-title' style='font-size:clamp(28px,4vw,40px)'>Free web tools for researchers</h1>
+  <p class='muted' style='max-width:660px;margin:0 0 26px'>Small, reliable utilities that run entirely in your browser. No login, nothing uploaded, no cost. They pair with MiLatexAI, our AI connector that edits and commits changes to your real Overleaf or Git project.</p>
+  {_TOOL_CARDS}
+  <div class='card' style='margin-top:30px'>
+    <b>Want the AI to fix your paper, not just flag it?</b>
+    <p class='muted'>MiLatexAI connects Claude or ChatGPT to your real Overleaf project or a GitHub, GitLab, or Bitbucket repo, and commits the changes for you.</p>
+    <a class='btn' href='/#get-started'>See how it works &#8594;</a>
+  </div>
+  <p style='margin-top:18px'><a class='muted' href='/'>Back to home</a></p>
+</main>
+</body></html>"""
+
+
 def render_og_image() -> str:
     """A 1200x630 social preview image (SVG) referenced by og:image."""
     return """<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'>
@@ -820,6 +857,7 @@ def sitemap_xml() -> str:
         "<?xml version='1.0' encoding='UTF-8'?>\n"
         "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>\n"
         "  <url><loc>https://milatexai.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n"
+        "  <url><loc>https://milatexai.com/tools</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>\n"
         "  <url><loc>https://milatexai.com/tools/bibtex</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
         "  <url><loc>https://milatexai.com/tools/latex-error-finder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
         "</urlset>\n"
