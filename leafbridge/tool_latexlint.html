@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free LaTeX Error Finder: Unmatched Braces &amp; Unclosed Environments | MiLatexAI</title>
+<meta name="description" content="Paste your LaTeX and find the exact line of an unmatched brace, an unclosed \begin/\end environment, or a broken math delimiter, without compiling. Free, in your browser, no login.">
+<link rel="canonical" href="https://milatexai.com/tools/latex-error-finder">
+<meta name="keywords" content="latex error finder, missing } inserted, latex unmatched brace, runaway argument, begin ended by end, latex unclosed environment, latex math mode error, why won't my latex compile, latex linter online, overleaf error">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MiLatexAI">
+<meta property="og:title" content="Free LaTeX Error Finder">
+<meta property="og:description" content="Find the exact line of an unmatched brace, unclosed environment, or broken math delimiter in your LaTeX, without compiling. Free, in your browser, no login.">
+<meta property="og:url" content="https://milatexai.com/tools/latex-error-finder">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "LaTeX Error Finder",
+      "url": "https://milatexai.com/tools/latex-error-finder",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any (web browser)",
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+      "description": "Free online tool that finds the exact line of unmatched braces, unclosed or mismatched \\begin/\\end environments, and broken math delimiters in LaTeX, without compiling. Runs entirely in the browser.",
+      "publisher": {"@type": "Organization", "name": "MiLatexAI", "url": "https://milatexai.com"}
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type":"Question","name":"Why does LaTeX say 'Missing } inserted'?","acceptedAnswer":{"@type":"Answer","text":"You have an opening brace with no matching close, or an extra closing brace. Paste your file here and the finder points to the exact line of the unmatched brace, so you do not have to hunt for it."}},
+        {"@type":"Question","name":"How do I find an unclosed LaTeX environment?","acceptedAnswer":{"@type":"Answer","text":"The finder tracks every \\begin and \\end and reports any environment that is opened but never closed, or closed by the wrong \\end, with the line number of the \\begin."}},
+        {"@type":"Question","name":"Does it compile my document?","acceptedAnswer":{"@type":"Answer","text":"No. It checks the structure of your source directly in your browser, so it is instant, needs no LaTeX install, and nothing is uploaded. It catches the structural errors that stop a compile, not every possible warning."}}
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{color-scheme:light dark;--bg:#ffffff;--fg:#0f1420;--muted:#5b6472;--line:#e7eaf0;--card:#f7f8fb;--accent:#00a693;--accent2:#007f6e;--warn:#b5680a;--err:#c0392b;--ok:#0b7a63;--radius:12px}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0d12;--fg:#e9ecf2;--muted:#9aa3b2;--line:#20242e;--card:#12151c;--warn:#e0a24a;--err:#ef6b60;--ok:#3fcaab}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 64px}
+.brand{font-weight:800;font-size:18px;letter-spacing:-.02em}
+.brand span{color:var(--accent)}
+h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:18px 0 10px}
+.sub{color:var(--muted);max-width:720px;margin:0 0 22px}
+.io-grid{display:grid;grid-template-columns:1fr;gap:16px}
+label.io{display:block;font-weight:600;font-size:13px;color:var(--muted);margin:0 0 6px}
+textarea{width:100%;min-height:280px;resize:vertical;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:var(--radius);padding:14px;font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+.btn{appearance:none;border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;font-size:14px;padding:10px 16px;border-radius:10px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.secondary{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.summary{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:6px 0 0}
+.chip{font-size:12.5px;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.err{background:color-mix(in srgb,var(--err) 16%,transparent);color:var(--err)}
+.chip.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.issues{margin-top:16px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.issues .row{display:flex;gap:12px;padding:11px 14px;border-top:1px solid var(--line);font-size:14px}
+.issues .row:first-child{border-top:none}
+.issues .ln{flex:0 0 auto;font:12.5px ui-monospace,Consolas,monospace;color:var(--accent);font-weight:700;min-width:64px}
+.issues .msg{flex:1}
+.hidden{display:none}
+.cta{margin-top:34px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+.cta a.btn{margin-top:10px}
+.faq{margin-top:34px}
+.faq h2{font-size:20px}
+.faq dt{font-weight:700;margin-top:16px}
+.faq dd{margin:6px 0 0;color:var(--muted)}
+.note{margin-top:26px;color:var(--muted);font-size:12.5px}
+code{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 5px;font:12.5px ui-monospace,Consolas,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Mi<span>LaTeX</span>AI</div>
+  <h1>LaTeX Error Finder</h1>
+  <p class="sub">Paste your <code>.tex</code> and hit Check. It finds the structural mistakes that make LaTeX fail with cryptic messages: an unmatched <code>{</code> or <code>}</code>, a <code>\begin</code> with no matching <code>\end</code>, or a math delimiter left open. It tells you the exact line, without compiling. It runs entirely in your browser, so nothing is uploaded and there is no sign-up. <b>Free to use.</b></p>
+
+  <div class="io-grid">
+    <div>
+      <label class="io" for="in">Your LaTeX source</label>
+      <textarea id="in" spellcheck="false" placeholder="\documentclass{article}
+\begin{document}
+Hello \textbf{world.
+\end{document}"></textarea>
+    </div>
+  </div>
+
+  <div class="btnrow">
+    <button class="btn" id="check">Check for errors</button>
+    <button class="btn secondary" id="sample">Load a broken sample</button>
+  </div>
+
+  <ul class="summary" id="summary"></ul>
+  <div class="issues hidden" id="issues"></div>
+
+  <div class="cta">
+    <b>Want the AI to just fix it for you?</b>
+    <p>MiLatexAI connects Claude or ChatGPT to your real Overleaf project or a GitHub/GitLab repo. Ask it to fix the compile errors, and every change is committed straight to your repo.</p>
+    <a class="btn" href="https://milatexai.com/#get-started">Add the connector &#8594;</a>
+  </div>
+
+  <div class="faq">
+    <h2>About this tool</h2>
+    <dl>
+      <dt>Why does LaTeX say &ldquo;Missing } inserted&rdquo;?</dt>
+      <dd>You have an opening brace with no matching close, or an extra closing brace. Paste your file here and the finder points to the exact line of the unmatched brace, so you do not have to hunt for it.</dd>
+      <dt>How do I find an unclosed environment?</dt>
+      <dd>The finder tracks every <code>\begin</code> and <code>\end</code> and reports any environment opened but never closed, or closed by the wrong <code>\end</code>, with the line of the <code>\begin</code>.</dd>
+      <dt>Does it compile my document?</dt>
+      <dd>No. It checks the structure of your source directly in your browser, so it is instant, needs no LaTeX install, and nothing is uploaded. It catches the structural errors that stop a compile, not every possible warning.</dd>
+      <dt>What does it check?</dt>
+      <dd>Brace balance, <code>\begin</code>/<code>\end</code> nesting, math delimiters (<code>$</code>, <code>$$</code>, <code>\[ \]</code>, <code>\( \)</code>), and <code>\left</code>/<code>\right</code> pairing. It ignores comments, escaped characters like <code>\{</code>, and verbatim blocks so it does not raise false alarms.</dd>
+    </dl>
+  </div>
+
+  <p class="note">Free LaTeX tools by <a href="https://milatexai.com">MiLatexAI</a>. Runs entirely client-side.</p>
+</div>
+
+<script>
+/* ===================== LaTeX structural linter (dependency-free) ===================== */
+// Walks the source once, tracking braces, environments, and math delimiters, so it
+// can report the exact line of a structural error WITHOUT compiling. It deliberately
+// ignores comments, escaped chars (\{ \} \$ \%), \verb, and verbatim-like environments
+// so it does not raise false alarms on legitimate source.
+var VERB_ENVS = {"verbatim":1,"verbatim*":1,"lstlisting":1,"minted":1,"Verbatim":1,"comment":1,"alltt":1};
+
+function isLetter(c){ return c >= "A" && c <= "Z" || c >= "a" && c <= "z"; }
+
+function lint(src){
+  var text = String(src == null ? "" : src);
+  var n = text.length, i = 0, line = 1;
+  var braces = [];      // {line}
+  var envs = [];        // {name,line}
+  var math = [];        // {kind,line}
+  var lefts = [];       // {line}
+  var issues = [];
+  function add(ln, msg){ issues.push({line: ln, msg: msg}); }
+
+  while(i < n){
+    var c = text[i];
+
+    if(c === "\n"){ line++; i++; continue; }
+
+    // comment: unescaped % runs to end of line
+    if(c === "%"){ while(i < n && text[i] !== "\n") i++; continue; }
+
+    if(c === "\\"){
+      var next = text[i+1];
+      if(next === undefined){ i++; continue; }
+      if(isLetter(next)){
+        var j = i+1;
+        while(j < n && isLetter(text[j])) j++;
+        var name = text.slice(i+1, j);
+        i = j;
+
+        if(name === "verb"){
+          var k = i;
+          if(text[k] === "*") k++;
+          var delim = text[k];
+          if(delim === undefined){ i = k; continue; }
+          k++;
+          while(k < n && text[k] !== delim){ if(text[k] === "\n") line++; k++; }
+          if(k < n) k++;
+          i = k;
+          continue;
+        }
+
+        if(name === "begin" || name === "end"){
+          var k2 = i;
+          while(k2 < n && (text[k2] === " " || text[k2] === "\t")) k2++;
+          if(text[k2] !== "{"){ i = k2; continue; }
+          var m = k2+1;
+          while(m < n && text[m] !== "}" && text[m] !== "\n") m++;
+          var envName = text.slice(k2+1, m);
+          var envLine = line;
+          i = (text[m] === "}") ? m+1 : m;
+
+          if(name === "begin"){
+            if(VERB_ENVS[envName]){
+              var endTok = "\\end{" + envName + "}";
+              var idx = text.indexOf(endTok, i);
+              if(idx === -1){
+                add(envLine, "\\begin{" + envName + "} is never closed (no matching \\end{" + envName + "})");
+                i = n;
+              } else {
+                for(var p = i; p < idx; p++){ if(text[p] === "\n") line++; }
+                i = idx + endTok.length;
+              }
+            } else {
+              envs.push({name: envName, line: envLine});
+            }
+          } else { // end
+            if(envName === "document"){
+              // pop a matching document if open, then stop: anything after does not compile
+              if(envs.length && envs[envs.length-1].name === "document") envs.pop();
+              else if(!envs.some(function(e){ return e.name === "document"; }))
+                add(envLine, "\\end{document} has no matching \\begin{document}");
+              else { // document is open but not on top: report the unclosed inner ones now
+                while(envs.length && envs[envs.length-1].name !== "document")
+                  { var u = envs.pop(); add(u.line, "\\begin{" + u.name + "} is never closed with \\end{" + u.name + "}"); }
+                if(envs.length) envs.pop();
+              }
+              i = n; // stop scanning at end of document
+              continue;
+            }
+            if(envs.length === 0){
+              add(envLine, "\\end{" + envName + "} has no matching \\begin{" + envName + "}");
+            } else {
+              var top = envs[envs.length-1];
+              if(top.name === envName){ envs.pop(); }
+              else {
+                var found = -1;
+                for(var s = envs.length-1; s >= 0; s--){ if(envs[s].name === envName){ found = s; break; } }
+                if(found >= 0){
+                  // inner environments were left unclosed
+                  for(var q = envs.length-1; q > found; q--)
+                    add(envs[q].line, "\\begin{" + envs[q].name + "} is never closed with \\end{" + envs[q].name + "}");
+                  envs.length = found;
+                } else {
+                  add(envLine, "\\end{" + envName + "} has no matching \\begin{" + envName + "}");
+                }
+              }
+            }
+          }
+          continue;
+        }
+
+        if(name === "left"){ lefts.push({line: line}); continue; }
+        if(name === "right"){ if(lefts.length) lefts.pop(); else add(line, "\\right has no matching \\left"); continue; }
+        continue;
+      } else {
+        // escaped single non-letter char
+        if(next === "["){ math.push({kind: "\\[", line: line}); i += 2; continue; }
+        if(next === "]"){
+          if(math.length && math[math.length-1].kind === "\\[") math.pop();
+          else add(line, "\\] has no matching \\[");
+          i += 2; continue;
+        }
+        if(next === "("){ math.push({kind: "\\(", line: line}); i += 2; continue; }
+        if(next === ")"){
+          if(math.length && math[math.length-1].kind === "\\(") math.pop();
+          else add(line, "\\) has no matching \\(");
+          i += 2; continue;
+        }
+        if(next === "\n") line++;
+        i += 2; // \{ \} \$ \% \& \_ \# \\ etc: literal
+        continue;
+      }
+    }
+
+    if(c === "{"){ braces.push({line: line}); i++; continue; }
+    if(c === "}"){
+      if(braces.length) braces.pop();
+      else add(line, "extra closing brace } with no matching {");
+      i++; continue;
+    }
+
+    if(c === "$"){
+      if(text[i+1] === "$"){
+        if(math.length && math[math.length-1].kind === "$$") math.pop();
+        else math.push({kind: "$$", line: line});
+        i += 2; continue;
+      }
+      if(math.length && math[math.length-1].kind === "$") math.pop();
+      else math.push({kind: "$", line: line});
+      i++; continue;
+    }
+
+    i++;
+  }
+
+  for(var a = 0; a < braces.length; a++) add(braces[a].line, "opening brace { on line " + braces[a].line + " is never closed");
+  for(var b = 0; b < envs.length; b++) add(envs[b].line, "\\begin{" + envs[b].name + "} is never closed with \\end{" + envs[b].name + "}");
+  for(var d = 0; d < math.length; d++){
+    var kind = math[d].kind;
+    var label = kind === "$" ? "inline math $" : kind === "$$" ? "display math $$" : kind === "\\[" ? "display math \\[" : "inline math \\(";
+    add(math[d].line, "math opened with " + label + " is never closed");
+  }
+  for(var e = 0; e < lefts.length; e++) add(lefts[e].line, "\\left on line " + lefts[e].line + " has no matching \\right");
+
+  issues.sort(function(x, y){ return x.line - y.line; });
+  return {ok: issues.length === 0, issues: issues};
+}
+
+window.LATEXLINT = {lint: lint, isLetter: isLetter};
+
+/* ===================== UI ===================== */
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+
+function runCheck(){
+  var res = lint($("in").value);
+  var u = $("summary"); u.innerHTML = "";
+  var box = $("issues");
+  function chip(t, cls){ var li = document.createElement("li"); li.className = "chip" + (cls ? " " + cls : ""); li.textContent = t; u.appendChild(li); }
+  if(!$("in").value.trim()){ chip("paste some LaTeX first"); box.classList.add("hidden"); return; }
+  if(res.ok){
+    chip("no structural errors found ✓", "ok");
+    box.classList.add("hidden");
+    return;
+  }
+  chip(res.issues.length + " issue" + (res.issues.length === 1 ? "" : "s") + " found", "err");
+  box.classList.remove("hidden");
+  box.innerHTML = res.issues.map(function(x){
+    return '<div class="row"><span class="ln">line ' + x.line + '</span><span class="msg">' + esc(x.msg) + '</span></div>';
+  }).join("");
+}
+$("check").onclick = runCheck;
+$("sample").onclick = function(){
+  $("in").value = "\\documentclass{article}\n\\begin{document}\n\\section{Intro}\nHere is some \\textbf{bold text with a missing brace.\nAnd an equation $x^2 + y^2 = z^2 that never closes.\n\\begin{itemize}\n\\item one\n\\item two\n\\end{document}";
+  runCheck();
+};
+// file drop
+var inEl = $("in");
+["dragover","drop"].forEach(function(ev){ inEl.addEventListener(ev, function(e){ e.preventDefault(); }); });
+inEl.addEventListener("drop", function(e){ var f = e.dataTransfer.files[0]; if(f){ var rd = new FileReader(); rd.onload = function(){ inEl.value = rd.result; runCheck(); }; rd.readAsText(f); } });
+</script>
+</body>
+</html>

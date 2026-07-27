@@ -1395,6 +1395,14 @@ def create_hosted_server(
             _pages["bibtex_tool"] = tool_bibtex.render_bibtex_tool()
         return HTMLResponse(_pages["bibtex_tool"])
 
+    @mcp.custom_route("/tools/latex-error-finder", methods=["GET"])
+    async def latexlint_tool(request: Request) -> Response:
+        # Static, client-side LaTeX error finder. Edge-cached, never wakes the container.
+        if "latexlint_tool" not in _pages:
+            from . import tool_latexlint
+            _pages["latexlint_tool"] = tool_latexlint.render_latexlint_tool()
+        return HTMLResponse(_pages["latexlint_tool"])
+
     @mcp.custom_route("/account", methods=["GET"])
     async def account(request: Request) -> Response:
         status = request.query_params.get("status")

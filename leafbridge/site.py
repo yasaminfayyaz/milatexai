@@ -369,6 +369,11 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
       <p class='muted'>Clean a .bib file, find missing DOIs, remove duplicate entries, protect title capitals, and fix url and howpublished fields.</p>
       <a class='btn' href='/tools/bibtex'>Open the free tool</a>
     </div>
+    <div class='card'>
+      <h3>LaTeX Error Finder</h3>
+      <p class='muted'>Paste your .tex and find the exact line of an unmatched brace, an unclosed \\begin/\\end, or a broken math delimiter, without compiling.</p>
+      <a class='btn' href='/tools/latex-error-finder'>Open the free tool</a>
+    </div>
   </div>
 </section>"""
 
@@ -816,6 +821,7 @@ def sitemap_xml() -> str:
         "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>\n"
         "  <url><loc>https://milatexai.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n"
         "  <url><loc>https://milatexai.com/tools/bibtex</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
+        "  <url><loc>https://milatexai.com/tools/latex-error-finder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
         "</urlset>\n"
     )
 
