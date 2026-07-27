@@ -24,13 +24,36 @@ def _engine_js() -> str:
     return "var window = {};\n" + js[:ui]
 
 
-def test_engine_passes_full_battery():
+def _ctx():
     quickjs = pytest.importorskip("quickjs")
     ctx = quickjs.Context()
     ctx.eval(_engine_js())
+    return ctx
+
+
+def _lint(ctx, src: str) -> dict:
+    return json.loads(ctx.eval("JSON.stringify(window.LATEXLINT.lint(" + json.dumps(src) + "))"))
+
+
+def test_engine_passes_full_battery():
+    ctx = _ctx()
     res = json.loads(ctx.eval(_BATTERY))
     assert res["fail"] == 0, res["failures"]
-    assert res["pass"] >= 40, f"expected many assertions, ran {res['pass']}"
+    assert res["pass"] >= 90, f"expected many assertions, ran {res['pass']}"
+
+
+def test_advisory_warnings_and_safe_negatives():
+    """Text-mode _ ^ & are flagged as warnings, but never inside math, labels,
+    citations, URLs, or file names (the fail-proof guarantee)."""
+    ctx = _ctx()
+    assert _lint(ctx, "the value x_2 is")["warnings"] == 1
+    assert _lint(ctx, "E = mc^2 in text")["warnings"] == 1
+    assert _lint(ctx, "Tom & Jerry")["warnings"] == 1
+    for safe in ("$x_2$", "\\[ y^3 \\]", "\\label{fig:a_b}", "\\cite{smith_2020}",
+                 "\\url{http://a.com/x_y?p=1&q=2}", "\\includegraphics{plot_1}",
+                 "\\begin{align} a &= b_i^j \\end{align}",
+                 "\\begin{tabular}{cc} a & b \\end{tabular}"):
+        assert _lint(ctx, safe)["ok"], safe
 
 
 def test_realistic_document_is_clean():
