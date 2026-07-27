@@ -27,7 +27,7 @@ import aiohttp
 
 _AZURE_MGMT = "https://management.azure.com"
 _COST_API_VERSION = "2023-11-01"
-DEFAULT_STARTER = float(os.environ.get("FREE_CAPACITY_STARTER", "3"))
+DEFAULT_STARTER = float(os.environ.get("FREE_CAPACITY_STARTER", "50"))
 DEFAULT_FRACTION = float(os.environ.get("PAID_REVENUE_FRACTION", "0.8"))
 DEFAULT_TTL = 900.0  # seconds
 
