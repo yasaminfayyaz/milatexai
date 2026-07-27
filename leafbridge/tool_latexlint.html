@@ -104,9 +104,9 @@ Hello \textbf{world.
   <div class="issues hidden" id="issues"></div>
 
   <div class="cta">
-    <b>Want the AI to just fix it for you?</b>
-    <p>MiLatexAI connects Claude or ChatGPT to your real Overleaf project or a GitHub/GitLab repo. Ask it to fix the compile errors, and every change is committed straight to your repo.</p>
-    <a class="btn" href="https://milatexai.com/#get-started">Add the connector &#8594;</a>
+    <b id="ctahead">Have MiLatexAI fix your LaTeX for you</b>
+    <p>MiLatexAI is our AI connector. It links Claude or ChatGPT to your real Overleaf project, or your GitHub, GitLab, or Bitbucket repo. Instead of fixing each error by hand, ask it to fix them all: it edits the source and commits the change straight to your repository. Free to try, with a Pro plan for heavier use.</p>
+    <a class="btn" href="https://milatexai.com/#get-started">Fix my LaTeX with MiLatexAI &#8594;</a>
   </div>
 
   <div class="faq">
@@ -328,13 +328,20 @@ window.LATEXLINT = {lint: lint, isLetter: isLetter};
 var $ = function(id){ return document.getElementById(id); };
 function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
 
+function setHead(total){
+  var h = $("ctahead"); if(!h) return;
+  h.textContent = total > 0
+    ? "Fix " + (total === 1 ? "this problem" : "these " + total + " problems") + " with MiLatexAI"
+    : "Have MiLatexAI fix your LaTeX for you";
+}
 function runCheck(){
   var val = $("in").value;
   var u = $("summary"); u.innerHTML = "";
   var box = $("issues");
   function chip(t, cls){ var li = document.createElement("li"); li.className = "chip" + (cls ? " " + cls : ""); li.textContent = t; u.appendChild(li); }
-  if(!val.trim()){ chip("paste some LaTeX first"); box.classList.add("hidden"); return; }
+  if(!val.trim()){ chip("paste some LaTeX first"); box.classList.add("hidden"); setHead(0); return; }
   var res = lint(val);
+  setHead(res.errors + res.warnings);
   if(res.ok){ chip("no problems found ✓", "ok"); box.classList.add("hidden"); return; }
   if(res.errors) chip(res.errors + " error" + (res.errors === 1 ? "" : "s"), "err");
   if(res.warnings) chip(res.warnings + " warning" + (res.warnings === 1 ? "" : "s"), "warn");

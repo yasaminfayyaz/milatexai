@@ -81,7 +81,7 @@ def test_page_is_self_contained_and_static():
     html = tool_latexlint.render_latexlint_tool()
     assert html.lstrip().lower().startswith("<!doctype html>")
     assert "LaTeX Error Finder" in html
-    assert "milatexai.com" in html and "Add the connector" in html
+    assert "milatexai.com/#get-started" in html and "Fix my LaTeX with MiLatexAI" in html
     assert re.search(r"<script[^>]+\bsrc=", html) is None, "external <script src> found"
     assert re.search(r"<link[^>]+stylesheet", html) is None, "external stylesheet found"
     assert "<title>" in html and '<meta name="description"' in html
