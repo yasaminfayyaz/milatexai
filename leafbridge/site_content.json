@@ -12,9 +12,9 @@
    "manage_subscription": "Manage subscription"
   },
   "hero": {
-   "badge": "Works with Claude, ChatGPT, and more",
-   "title": "From thought to paper, no copy-paste.",
-   "subtitle": "Ask Claude or ChatGPT to edit your real Overleaf project, or any GitHub, GitLab, Bitbucket, or allowlisted self-hosted Git repository. No pasting sections, no downloading files, your AI works on the live document, always the ground truth, and every change lands on your default branch as a real Git commit.",
+   "badge": "MCP connector for Overleaf and Git",
+   "title": "Connect Overleaf or any Git repo to Claude and ChatGPT",
+   "subtitle": "MiLatexAI is an MCP connector. Add it to Claude or ChatGPT, on the web or in the app, and ask it to read, edit, and fix your LaTeX. It works on your live Overleaf project or any GitHub, GitLab, Bitbucket, or self-hosted Git repo, and every change lands as a real Git commit.",
    "cta_primary": "Get started",
    "cta_secondary": "See how it works",
    "note": "What you need: a repository you can push to, plus Claude or ChatGPT (their free tiers work fine). For Overleaf that means an account with Git integration (a paid Overleaf feature); for GitHub, GitLab, or Bitbucket, any repo and a free access token will do. MiLatexAI's own Free tier is best-effort as capacity allows; Pro is $8.99 a month for guaranteed access."

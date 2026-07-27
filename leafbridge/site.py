@@ -348,6 +348,18 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <div class='grid'>{feature_cards}</div>
 </section>"""
 
+    prompts = """<section class='section alt' id='prompts'>
+  <h2 class='h2'>Once it is connected, just ask</h2>
+  <p class='sub'>Add MiLatexAI to Claude or ChatGPT, then type prompts like these. Your AI does the work on your real project and commits it.</p>
+  <ul class='prompts'>
+    <li>Fix the compile errors in my Overleaf paper and tell me what was wrong.</li>
+    <li>Add this figure to Section 3 and commit it.</li>
+    <li>Clean up my .bib file and remove duplicate references.</li>
+    <li>Find every undefined citation and broken cross-reference in my thesis.</li>
+    <li>Rewrite the abstract to under 150 words, then show me the diff.</li>
+  </ul>
+</section>"""
+
     tools = """<section class='section' id='tools'>
   <h2 class='h2'>Free web tools for researchers</h2>
   <p class='sub'>Small utilities that run right in your browser. No login, nothing uploaded.</p>
@@ -600,6 +612,7 @@ function applyLang(lang) {{
 {header}
 <main>
 {hero}
+{prompts}
 {features}
 {tools}
 {see}
@@ -851,6 +864,10 @@ a{color:inherit;text-decoration:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
 .section.alt .card{background:var(--bg)}
 .card h3{margin:0 0 8px;font-size:17px}
+.prompts{list-style:none;padding:0;margin:18px auto 0;max-width:760px;display:grid;gap:12px}
+.prompts li{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px 46px;font-size:15.5px}
+.section.alt .prompts li{background:var(--bg)}
+.prompts li::before{content:'\201C';position:absolute;left:16px;top:10px;font-size:28px;line-height:1;color:var(--accent);font-weight:800}
 .feat-art{margin:0 0 14px}
 .feat-art svg{width:100%;max-width:170px;height:66px;display:block}
 .muted{color:var(--muted);margin:0}
