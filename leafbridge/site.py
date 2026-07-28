@@ -315,10 +315,10 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <nav class='links'>
     <a href='#features' data-i18n='nav.features'>{_t(en,'nav.features')}</a>
     <a href='#how' data-i18n='nav.how'>{_t(en,'nav.how')}</a>
-    <a href='/tools'>Free web tools</a>
     <a href='#pricing' data-i18n='nav.pricing'>{_t(en,'nav.pricing')}</a>
     <a href='#faq' data-i18n='nav.faq'>{_t(en,'nav.faq')}</a>
     <a href='/account' data-i18n='nav.manage_subscription'>{_t(en,'nav.manage_subscription')}</a>
+    <a href='/tools'>Free web tools</a>
   </nav>
   <div class='navactions'>{lang_select}
     <a class='btn btn-sm' href='#get-started' data-i18n='nav.get_started'>{_t(en,'nav.get_started')}</a>
@@ -754,16 +754,16 @@ def render_tools_page() -> str:
   <nav class='links'><a href='/#features'>Features</a><a href='/#how'>How it works</a><a href='/#pricing'>Pricing</a><a href='/#faq'>FAQ</a></nav>
   <div class='navactions'><a class='btn btn-sm' href='/#get-started'>Get started</a></div>
 </header>
-<main class='section' style='max-width:860px'>
-  <h1 class='hero-title' style='font-size:clamp(28px,4vw,40px)'>Free web tools for researchers</h1>
-  <p class='muted' style='max-width:660px;margin:0 0 26px'>Small, reliable utilities that run entirely in your browser. No login, nothing uploaded, no cost. They pair with MiLatexAI, our AI connector that edits and commits changes to your real Overleaf or Git project.</p>
+<main class='section' style='max-width:860px;padding-top:64px;padding-bottom:96px'>
+  <h1 class='hero-title' style='font-size:clamp(28px,4vw,40px);margin:0 0 22px'>Free web tools for researchers</h1>
+  <p class='muted' style='max-width:660px;margin:0 0 44px;font-size:17px;line-height:1.6'>Small, reliable utilities that run entirely in your browser. No login, nothing uploaded, no cost. They pair with MiLatexAI, our AI connector that edits and commits changes to your real Overleaf or Git project.</p>
   {_TOOL_CARDS}
-  <div class='card' style='margin-top:30px'>
+  <div class='card' style='margin-top:52px'>
     <b>Want the AI to fix your paper, not just flag it?</b>
     <p class='muted'>MiLatexAI connects Claude or ChatGPT to your real Overleaf project or a GitHub, GitLab, or Bitbucket repo, and commits the changes for you.</p>
     <a class='btn' href='/#get-started'>See how it works &#8594;</a>
   </div>
-  <p style='margin-top:18px'><a class='muted' href='/'>Back to home</a></p>
+  <p style='margin-top:40px'><a class='muted' href='/'>Back to home</a></p>
 </main>
 </body></html>"""
 

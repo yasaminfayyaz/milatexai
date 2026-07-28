@@ -18,6 +18,14 @@
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type":"ListItem","position":1,"name":"Home","item":"https://milatexai.com/"},
+        {"@type":"ListItem","position":2,"name":"Free web tools","item":"https://milatexai.com/tools"},
+        {"@type":"ListItem","position":3,"name":"BibTeX Cleaner","item":"https://milatexai.com/tools/bibtex"}
+      ]
+    },
+    {
       "@type": "WebApplication",
       "name": "BibTeX Cleaner and DOI Finder",
       "url": "https://milatexai.com/tools/bibtex",
@@ -45,8 +53,11 @@
 @media (prefers-color-scheme:dark){:root{--bg:#0b0d12;--fg:#e9ecf2;--muted:#9aa3b2;--line:#20242e;--card:#12151c;--warn:#e0a24a;--err:#ef6b60;--ok:#3fcaab}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
-.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 64px}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 20px 72px}
 .brand{font-weight:800;font-size:18px;letter-spacing:-.02em}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.topbar a{text-decoration:none;color:inherit}
+.toplink{color:var(--accent);font-weight:600;font-size:14px}
 .brand span{color:var(--accent)}
 h1{font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;margin:18px 0 8px}
 .sub{color:var(--muted);margin:0 0 18px;max-width:70ch}
@@ -85,7 +96,7 @@ a{color:var(--accent)}
 </head>
 <body>
 <div class="wrap">
-  <div class="brand">Mi<span>LaTeX</span>AI</div>
+  <div class="topbar"><a class="brand" href="/">Mi<span>LaTeX</span>AI</a><a class="toplink" href="/tools">&#8592; All free web tools</a></div>
   <h1>Free BibTeX Cleaner, DOI Finder, and Duplicate Remover</h1>
   <p class="sub">Paste your <code>.bib</code> file and hit Clean. It fixes the formatting, removes duplicate entries, and flags likely mistakes. Missing a DOI? It looks one up from the title and authors, and only fills it in when it is confident it found the right paper. It also completes missing fields like author, year, and journal from the DOI. It runs entirely in your browser, so nothing is uploaded and there is no sign-up. <b>Free to use.</b></p>
 
