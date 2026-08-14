@@ -360,12 +360,6 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   </ul>
 </section>"""
 
-    tools = """<section class='section' id='tools'>
-  <h2 class='h2'>Free web tools for researchers</h2>
-  <p class='sub'>Small utilities that run right in your browser: a BibTeX cleaner with DOI finder, and a LaTeX error finder. No login, nothing uploaded.</p>
-  <div style='text-align:center'><a class='btn' href='/tools'>Browse the free tools &#8594;</a></div>
-</section>"""
-
     see = f"""<section class='section see' id='see'>
   <div class='spotlight'>
     <div class='spotlight-text'>
@@ -477,27 +471,12 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <a class='btn btn-lg' href='#get-started' data-i18n='cta.button'>{_t(en,'cta.button')}</a>
 </section>"""
 
-    def _legal(kind: str, count: int) -> str:
-        secs = "".join(
-            f"<div class='legal-sec'>{_node(en,'h3',f'{kind}.sections.{i}.heading')}{_node(en,'p',f'{kind}.sections.{i}.body','muted pre')}</div>"
-            for i in range(count)
-        )
-        return f"""<section class='section legal' id='{kind}'>
-  {_node(en,'h2',f'{kind}.title','h2')}
-  {_node(en,'p',f'{kind}.updated_label','sub small')}
-  {_node(en,'p',f'{kind}.intro','muted')}
-  {secs}
-</section>"""
-
-    privacy = _legal("privacy", n_priv)
-    terms = _legal("terms", n_terms)
-
     footer = f"""<footer class='site-footer'>
   <div class='foot-brand'>Mi<span>LaTeX</span>AI</div>
   {_node(en,'p','footer.blurb','muted')}
   <nav class='foot-links'>
-    <a href='#privacy' data-i18n='nav.privacy'>{_t(en,'nav.privacy')}</a>
-    <a href='#terms' data-i18n='nav.terms'>{_t(en,'nav.terms')}</a>
+    <a href='/privacy' data-i18n='nav.privacy'>{_t(en,'nav.privacy')}</a>
+    <a href='/terms' data-i18n='nav.terms'>{_t(en,'nav.terms')}</a>
     <a href='/tools'>Free web tools</a>
     <a href='https://github.com/yasaminfayyaz/milatexai' target='_blank' rel='noopener'>GitHub</a>
     <a href='mailto:support@milatexai.com'><span data-i18n='footer.contact_label'>{_t(en,'footer.contact_label')}</span></a>
@@ -606,18 +585,15 @@ function applyLang(lang) {{
 {header}
 <main>
 {hero}
-{prompts}
-{features}
-{tools}
-{see}
-{how}
 {get_started}
+{features}
+{how}
+{see}
+{prompts}
 {security}
-{pricing}
 {faq}
 {cta}
-{privacy}
-{terms}
+{pricing}
 </main>
 {footer}
 {script}
@@ -768,6 +744,41 @@ def render_tools_page() -> str:
 </body></html>"""
 
 
+def render_legal_page(kind: str, content: dict | None = None) -> str:
+    """A standalone /privacy or /terms page (English), reusing the site shell,
+    so the homepage stays short."""
+    content = content or load_content()
+    en = content.get("en", _FALLBACK_EN)
+    title = _t(en, f"{kind}.title")
+    updated = _t(en, f"{kind}.updated_label")
+    intro = _t(en, f"{kind}.intro")
+    count = len(en.get(kind, {}).get("sections", []))
+    secs = "".join(
+        f"<div class='legal-sec'><h3>{html.escape(_t(en, f'{kind}.sections.{i}.heading'))}</h3>"
+        f"<p class='muted pre'>{html.escape(_t(en, f'{kind}.sections.{i}.body'))}</p></div>"
+        for i in range(count)
+    )
+    return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>{html.escape(title)} · MiLatexAI</title>
+<link rel='canonical' href='https://milatexai.com/{kind}'>
+<meta name='robots' content='index,follow'>
+<style>{_CSS}</style></head>
+<body>
+<header class='nav'><a class='brand' href='/'>Mi<span>LaTeX</span>AI</a>
+  <nav class='links'><a href='/#features'>Features</a><a href='/#pricing'>Pricing</a><a href='/#faq'>FAQ</a><a href='/tools'>Free web tools</a></nav>
+  <div class='navactions'><a class='btn btn-sm' href='/#get-started'>Get started</a></div>
+</header>
+<main class='section legal' style='max-width:820px'>
+  <h1 class='h2'>{html.escape(title)}</h1>
+  <p class='muted small' style='margin:0 0 18px'>{html.escape(updated)}</p>
+  <p class='muted'>{html.escape(intro)}</p>
+  {secs}
+  <p style='margin-top:28px'><a class='muted' href='/'>Back to home</a></p>
+</main>
+</body></html>"""
+
+
 def render_og_image() -> str:
     """A 1200x630 social preview image (SVG) referenced by og:image."""
     return """<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'>
@@ -860,6 +871,8 @@ def sitemap_xml() -> str:
         "  <url><loc>https://milatexai.com/tools</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>\n"
         "  <url><loc>https://milatexai.com/tools/bibtex</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
         "  <url><loc>https://milatexai.com/tools/latex-error-finder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
+        "  <url><loc>https://milatexai.com/privacy</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>\n"
+        "  <url><loc>https://milatexai.com/terms</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>\n"
         "</urlset>\n"
     )
 
@@ -909,9 +922,8 @@ a{color:inherit;text-decoration:none}
 .section.alt .card{background:var(--bg)}
 .card h3{margin:0 0 8px;font-size:17px}
 .prompts{list-style:none;padding:0;margin:18px auto 0;max-width:760px;display:grid;gap:12px}
-.prompts li{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px 46px;font-size:15.5px}
+.prompts li{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:13px 16px;font-size:15px;line-height:1.5}
 .section.alt .prompts li{background:var(--bg)}
-.prompts li::before{content:'\201C';position:absolute;left:16px;top:10px;font-size:28px;line-height:1;color:var(--accent);font-weight:800}
 .feat-art{margin:0 0 14px}
 .feat-art svg{width:100%;max-width:170px;height:66px;display:block}
 .muted{color:var(--muted);margin:0}

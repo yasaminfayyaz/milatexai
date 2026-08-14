@@ -1393,6 +1393,18 @@ def create_hosted_server(
             _pages["tools_hub"] = site.render_tools_page()
         return HTMLResponse(_pages["tools_hub"])
 
+    @mcp.custom_route("/privacy", methods=["GET"])
+    async def privacy_page(request: Request) -> Response:
+        if "privacy" not in _pages:
+            _pages["privacy"] = site.render_legal_page("privacy")
+        return HTMLResponse(_pages["privacy"])
+
+    @mcp.custom_route("/terms", methods=["GET"])
+    async def terms_page(request: Request) -> Response:
+        if "terms" not in _pages:
+            _pages["terms"] = site.render_legal_page("terms")
+        return HTMLResponse(_pages["terms"])
+
     @mcp.custom_route("/tools/bibtex", methods=["GET"])
     async def bibtex_tool(request: Request) -> Response:
         # Static, client-side BibTeX cleaner. Edge-cached (see asgi._EDGE_CACHED),

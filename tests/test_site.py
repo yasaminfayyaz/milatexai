@@ -91,6 +91,21 @@ def test_tools_hub_page_and_route():
     assert "/tools" in asgi._SecurityHeaders._EDGE_CACHED
 
 
+def test_legal_pages_are_separate_and_off_homepage():
+    from leafbridge import asgi
+    # legal content lives on its own pages, not crowding the homepage
+    home = site.render_site()
+    assert "id='privacy'" not in home and "id='terms'" not in home
+    for kind in ("privacy", "terms"):
+        page = site.render_legal_page(kind)
+        assert page.lstrip().lower().startswith("<!doctype html>")
+        assert f"milatexai.com/{kind}" in page  # canonical
+        assert f"/{kind}" in asgi._SecurityHeaders._EDGE_CACHED
+    with TestClient(_server().http_app()) as client:
+        assert client.get("/privacy").status_code == 200
+        assert client.get("/terms").status_code == 200
+
+
 def test_health_capacity_route():
     with TestClient(_server().http_app()) as client:
         r = client.get("/health/capacity")
