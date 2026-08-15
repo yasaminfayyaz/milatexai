@@ -329,10 +329,11 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <span class='badge' data-i18n='hero.badge'>{_t(en,'hero.badge')}</span>
   {_node(en,'h1','hero.title','hero-title')}
   {_node(en,'p','hero.subtitle','hero-sub')}
-  <div class='hero-cta'>
-    <a class='btn' href='#get-started' data-i18n='hero.cta_primary'>{_t(en,'hero.cta_primary')}</a>
-    <a class='btn btn-ghost' href='#how' data-i18n='hero.cta_secondary'>{_t(en,'hero.cta_secondary')}</a>
-  </div>
+</section>"""
+
+    # Requirements, illustration, and the security reassurance sit below the
+    # getting-started box so the MCP address and setup steps come first.
+    hero_extras = f"""<section class='section' style='text-align:center;padding-top:8px'>
   {_node(en,'p','hero.note','hero-note')}
   {_HERO_ART}
   {_node(en,'p','trust','trust')}
@@ -586,14 +587,15 @@ function applyLang(lang) {{
 <main>
 {hero}
 {get_started}
+{hero_extras}
 {features}
 {how}
 {see}
 {prompts}
 {security}
+{pricing}
 {faq}
 {cta}
-{pricing}
 </main>
 {footer}
 {script}
@@ -730,7 +732,7 @@ def render_tools_page() -> str:
   <nav class='links'><a href='/#features'>Features</a><a href='/#how'>How it works</a><a href='/#pricing'>Pricing</a><a href='/#faq'>FAQ</a></nav>
   <div class='navactions'><a class='btn btn-sm' href='/#get-started'>Get started</a></div>
 </header>
-<main class='section' style='max-width:860px;padding-top:64px;padding-bottom:96px'>
+<main class='section' style='max-width:860px;padding-top:64px;padding-bottom:150px'>
   <h1 class='hero-title' style='font-size:clamp(28px,4vw,40px);margin:0 0 22px'>Free web tools for researchers</h1>
   <p class='muted' style='max-width:660px;margin:0 0 44px;font-size:17px;line-height:1.6'>Small, reliable utilities that run entirely in your browser. No login, nothing uploaded, no cost. They pair with MiLatexAI, our AI connector that edits and commits changes to your real Overleaf or Git project.</p>
   {_TOOL_CARDS}
@@ -739,7 +741,7 @@ def render_tools_page() -> str:
     <p class='muted'>MiLatexAI connects Claude or ChatGPT to your real Overleaf project or a GitHub, GitLab, or Bitbucket repo, and commits the changes for you.</p>
     <a class='btn' href='/#get-started'>See how it works &#8594;</a>
   </div>
-  <p style='margin-top:40px'><a class='muted' href='/'>Back to home</a></p>
+  <p style='margin-top:64px'><a class='muted' href='/'>Back to home</a></p>
 </main>
 </body></html>"""
 
