@@ -756,13 +756,13 @@ def render_legal_page(kind: str, content: dict | None = None) -> str:
     intro = _t(en, f"{kind}.intro")
     count = len(en.get(kind, {}).get("sections", []))
     secs = "".join(
-        f"<div class='legal-sec'><h3>{html.escape(_t(en, f'{kind}.sections.{i}.heading'))}</h3>"
-        f"<p class='muted pre'>{html.escape(_t(en, f'{kind}.sections.{i}.body'))}</p></div>"
+        f"<div class='legal-sec'><h3>{_t(en, f'{kind}.sections.{i}.heading')}</h3>"
+        f"<p class='muted pre'>{_t(en, f'{kind}.sections.{i}.body')}</p></div>"
         for i in range(count)
     )
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<title>{html.escape(title)} · MiLatexAI</title>
+<title>{title} · MiLatexAI</title>
 <link rel='canonical' href='https://milatexai.com/{kind}'>
 <meta name='robots' content='index,follow'>
 <style>{_CSS}</style></head>
@@ -772,9 +772,9 @@ def render_legal_page(kind: str, content: dict | None = None) -> str:
   <div class='navactions'><a class='btn btn-sm' href='/#get-started'>Get started</a></div>
 </header>
 <main class='section legal' style='max-width:820px'>
-  <h1 class='h2'>{html.escape(title)}</h1>
-  <p class='muted small' style='margin:0 0 18px'>{html.escape(updated)}</p>
-  <p class='muted'>{html.escape(intro)}</p>
+  <h1 class='h2'>{title}</h1>
+  <p class='muted small' style='margin:0 0 18px'>{updated}</p>
+  <p class='muted'>{intro}</p>
   {secs}
   <p style='margin-top:28px'><a class='muted' href='/'>Back to home</a></p>
 </main>
