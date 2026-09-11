@@ -534,6 +534,22 @@ def create_hosted_server(
         return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it."
 
     @mcp.tool
+    async def rename_project(project: str, new_name: str) -> str:
+        """Relabel an already-connected project. Same project, same token, just a
+        new display name, no need to disconnect and re-add it.
+
+        Args:
+            project: The project's current name or id (list_projects shows both).
+            new_name: The new label to give it.
+        """
+        try:
+            user = await app.user()
+            proj = await app.service.rename_project(user.user_id, project, new_name)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return f"Renamed to {proj.name!r} ({proj.project_id})."
+
+    @mcp.tool
     async def manage_projects() -> str:
         """Get a secure link to view, add, or remove the Overleaf projects the AI
         can access. No token needed. The AI only ever touches projects you list."""
@@ -849,20 +865,25 @@ def create_hosted_server(
         return [note, *[Image(data=p, format="png") for p in pngs]]
 
     @mcp.tool(annotations={"readOnlyHint": True})
-    async def arxiv_export(project: str | None = None) -> str:
+    async def arxiv_export(project: str | None = None, tex: str | None = None) -> str:
         """Prepare an arXiv-ready submission zip: flattens all \\input/\\include
         into one main.tex, strips comment lines, includes the precompiled
         bibliography (.bbl, which arXiv requires since it will not run bibtex),
         referenced graphics, and any custom .cls/.bst/.sty. Returns a download
-        link (valid ~15 minutes)."""
+        link (valid ~15 minutes).
+
+        Args:
+            tex: project-relative path of the root .tex to export (e.g.
+                "paper2/main.tex"). Pass this if the project has more than one
+                .tex file, otherwise auto-detection may flatten the wrong
+                document; list_files shows the available .tex files.
+        """
         try:
             user = await app.user()
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                main = texcompile.find_main_tex(repo)
-                if not main:
-                    raise ToolError("Could not find a root .tex to export.")
+                main = _resolve_main_tex(repo, tex)
                 bbl = await arxivprep.compile_bbl(repo, main)
                 blob, manifest = arxivprep.build_zip(repo, main, bbl)
             app.dl_dir.mkdir(parents=True, exist_ok=True)

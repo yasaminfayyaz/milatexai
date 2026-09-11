@@ -178,3 +178,86 @@ def test_arxiv_export_and_download_roundtrip(tmp_path, monkeypatch):
         assert "main.tex" in z.namelist() and z.read("main.bbl") == b"THE BBL"
         # Bad code -> clean expiry page.
         assert client.get("/dl?code=garbage").status_code == 400
+
+
+def _harness_two_tex(tmp_path: Path):
+    """A project with TWO valid root documents: a conventionally-named
+    'main.tex' (which auto-detect always prefers) and a custom-named
+    'realpaper.tex' (the one the user actually cares about). Reproduces the
+    bug where arxiv_export silently flattened the wrong document with no way
+    to point it at the right one."""
+    remote = tmp_path / "remote.git"; seed = tmp_path / "seed"
+    remote.mkdir(parents=True); _git(["init", "--bare", "-b", "main", "."], remote)
+    seed.mkdir(parents=True); _git(["init", "-b", "main", "."], seed)
+    (seed / "main.tex").write_text(
+        "\\documentclass{article}\\begin{document}Wrong document.\\end{document}\n")
+    (seed / "realpaper.tex").write_text(
+        "\\documentclass{article}\\begin{document}The real paper.\\end{document}\n")
+    _git(["add", "-A"], seed)
+    _git(["-c", "user.name=S", "-c", "user.email=s@t", "commit", "-m", "init"], seed)
+    _git(["remote", "add", "origin", remote.as_uri()], seed)
+    _git(["push", "-u", "origin", "main"], seed)
+    store = InMemoryStore()
+    cipher = TokenCipher(TokenCipher.generate_key())
+    asyncio.run(store.upsert_user(User(user_id="u", email="t@x.com", plan="pro")))
+    mcp = create_hosted_server(
+        store=store, cipher=cipher, auth=False,
+        identity_provider=lambda: ("u", "t@x.com"),
+        base_url="https://milatexai.com", data_dir=tmp_path / "cache",
+    )
+    from leafbridge.service import AccountService
+
+    asyncio.run(AccountService(store, cipher).connect_project(
+        "u", OVERLEAF_URL, "olp_x", "paper", git_url=remote.as_uri()))
+    return mcp
+
+
+def test_arxiv_export_auto_detect_prefers_conventional_name(tmp_path, monkeypatch):
+    """Reproduces the reported bug: with two valid documents, auto-detection
+    picks the conventionally-named one (main.tex) over the user's actual
+    paper, silently."""
+    mcp = _harness_two_tex(tmp_path)
+
+    async def fake_bbl(repo, main, timeout=240):
+        return "BBL FOR " + main
+    monkeypatch.setattr(arxivprep, "compile_bbl", fake_bbl)
+    out = _text(_call(mcp, "arxiv_export", {}))
+    assert "main.tex (flattened)" in out
+    url = next(l for l in out.splitlines() if "/dl?code=" in l).split(": ", 1)[1].strip()
+    path_q = url.split("milatexai.com", 1)[1]
+    with TestClient(mcp.http_app(), base_url="https://testserver") as client:
+        z = zipfile.ZipFile(io.BytesIO(client.get(path_q).content))
+        flattened = z.read("main.tex").decode()
+    assert "Wrong document." in flattened
+    assert "The real paper." not in flattened
+
+
+def test_arxiv_export_tex_override_targets_the_right_file(tmp_path, monkeypatch):
+    """The fix: passing tex= exports the SPECIFIED document, regardless of
+    what auto-detection would have picked."""
+    mcp = _harness_two_tex(tmp_path)
+
+    async def fake_bbl(repo, main, timeout=240):
+        return "BBL FOR " + main
+    monkeypatch.setattr(arxivprep, "compile_bbl", fake_bbl)
+    out = _text(_call(mcp, "arxiv_export", {"tex": "realpaper.tex"}))
+    # The zip's internal entry is always named main.tex (arXiv's expected
+    # layout); what changes with the override is which SOURCE got flattened.
+    assert "main.tex (flattened)" in out
+    url = next(l for l in out.splitlines() if "/dl?code=" in l).split(": ", 1)[1].strip()
+    path_q = url.split("milatexai.com", 1)[1]
+    with TestClient(mcp.http_app(), base_url="https://testserver") as client:
+        z = zipfile.ZipFile(io.BytesIO(client.get(path_q).content))
+        flattened = z.read("main.tex").decode()
+    assert "The real paper." in flattened
+    assert "Wrong document." not in flattened
+
+
+def test_arxiv_export_bad_tex_override_lists_available_files(tmp_path):
+    mcp = _harness_two_tex(tmp_path)
+    from fastmcp.exceptions import ToolError
+
+    with pytest.raises(ToolError) as exc_info:
+        _call(mcp, "arxiv_export", {"tex": "nonexistent.tex"})
+    msg = str(exc_info.value)
+    assert "main.tex" in msg and "realpaper.tex" in msg

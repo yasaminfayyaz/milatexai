@@ -224,6 +224,20 @@ class AccountService:
         await self.store.put_project(proj)
         return proj
 
+    async def rename_project(self, user_id: str, project_ref: str, new_name: str) -> Project:
+        """Relabel an already-connected project in place: same project_id, same
+        token, same provider, just a new display name. No need to disconnect and
+        re-add it. ``_select`` scopes this to the caller's own projects."""
+        name = (new_name or "").strip()
+        if not name:
+            raise ServiceError("A non-empty name is required.")
+        name = name[:80]
+        projects = await self.store.list_projects(user_id)
+        proj = self._select(projects, project_ref)
+        proj.name = name
+        await self.store.put_project(proj)
+        return proj
+
     async def revoke_token(self, user_id: str) -> None:
         """Revoke the stored token, the AI can no longer reach any project until a
         new token is set. Projects stay in the list; re-add a token to restore."""

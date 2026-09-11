@@ -173,6 +173,66 @@ def test_update_project_token_foreign_ref_is_out_of_scope():
         asyncio.run(svc.update_project_token("u", "nope", "ghp_new"))
 
 
+# --- service: rename project (relabel in place, no disconnect/reconnect) ---
+
+def test_rename_project_updates_name_only():
+    svc = _svc()
+    _admin_user(svc)
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "old name"))
+    gh_proj = asyncio.run(svc.connect_project("u", GH_URL, "ghp_old", "gh"))
+    before = asyncio.run(svc.store.get_project("u", HEX1))
+    proj = asyncio.run(svc.rename_project("u", "old name", "new name"))
+    assert proj.name == "new name"
+    assert proj.project_id == HEX1  # same project, not re-added
+    # Everything else about the project is untouched: token, provider, git url.
+    assert proj.token_encrypted == before.token_encrypted
+    assert proj.provider == before.provider
+    assert proj.git_url == before.git_url
+    # It resolves by its NEW name now, and its token/id are unaffected.
+    cfg = asyncio.run(svc.resolve_project("u", "new name"))
+    assert cfg.project_id == HEX1
+    assert cfg.token == "olp_tok"
+    # The other project is untouched.
+    assert asyncio.run(svc.resolve_project("u", "gh")).project_id == gh_proj.project_id
+
+
+def test_rename_project_by_id_also_works():
+    svc = _svc()
+    _admin_user(svc)
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "thesis"))
+    proj = asyncio.run(svc.rename_project("u", HEX1, "renamed via id"))
+    assert proj.name == "renamed via id"
+
+
+def test_rename_project_trims_and_truncates():
+    svc = _svc()
+    _admin_user(svc)
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "thesis"))
+    proj = asyncio.run(svc.rename_project("u", "thesis", "  padded  "))
+    assert proj.name == "padded"
+    long_name = "x" * 200
+    proj2 = asyncio.run(svc.rename_project("u", "padded", long_name))
+    assert len(proj2.name) == 80
+
+
+def test_rename_project_rejects_empty_name():
+    svc = _svc()
+    _admin_user(svc)
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "thesis"))
+    with pytest.raises(ServiceError):
+        asyncio.run(svc.rename_project("u", "thesis", ""))
+    with pytest.raises(ServiceError):
+        asyncio.run(svc.rename_project("u", "thesis", "   "))
+
+
+def test_rename_project_foreign_ref_is_out_of_scope():
+    svc = _svc()
+    _admin_user(svc)
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "first"))
+    with pytest.raises(ProjectNotConnected):
+        asyncio.run(svc.rename_project("u", "nope", "new name"))
+
+
 # --- web routes ------------------------------------------------------------
 
 def _server():
@@ -257,3 +317,42 @@ def test_token_form_never_echoes_token():
         r = client.post("/token", data={
             "code": code, "action": "set", "token": "PASTE_secret_xyz"})
     assert "PASTE_secret_xyz" not in r.text
+
+
+# --- MCP tool level: rename_project ----------------------------------------
+
+def _call_tool(mcp, tool, args):
+    from fastmcp import Client
+
+    async def go():
+        async with Client(mcp) as c:
+            return await c.call_tool(tool, args)
+    return asyncio.run(go())
+
+
+def _tool_text(r):
+    return "".join(getattr(b, "text", "") for b in (r.content or []))
+
+
+def test_rename_project_tool_end_to_end():
+    store, cipher, mcp = _server()
+    svc = AccountService(store, cipher)
+    asyncio.run(svc.get_or_create_user("u", "e@x.com"))
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "old name"))
+    out = _tool_text(_call_tool(mcp, "rename_project", {
+        "project": "old name", "new_name": "new name",
+    }))
+    assert "Renamed" in out and "new name" in out
+    proj = asyncio.run(store.get_project("u", HEX1))
+    assert proj.name == "new name"
+
+
+def test_rename_project_tool_rejects_empty_name():
+    from fastmcp.exceptions import ToolError
+
+    store, cipher, mcp = _server()
+    svc = AccountService(store, cipher)
+    asyncio.run(svc.get_or_create_user("u", "e@x.com"))
+    asyncio.run(svc.connect_project("u", URL1, "olp_tok", "thesis"))
+    with pytest.raises(ToolError):
+        _call_tool(mcp, "rename_project", {"project": "thesis", "new_name": ""})
