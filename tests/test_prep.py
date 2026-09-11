@@ -261,3 +261,90 @@ def test_arxiv_export_bad_tex_override_lists_available_files(tmp_path):
         _call(mcp, "arxiv_export", {"tex": "nonexistent.tex"})
     msg = str(exc_info.value)
     assert "main.tex" in msg and "realpaper.tex" in msg
+
+
+# --- download_file: copy a file from one project into another -------------
+
+HEX2_DL = "2223456789abcdef01234567"
+OVERLEAF_URL2_DL = f"https://www.overleaf.com/project/{HEX2_DL}"
+
+
+def _harness_two_projects(tmp_path: Path):
+    """Two SEPARATE projects (separate git remotes) connected to the SAME
+    user, so a file can be downloaded from one and uploaded into the other."""
+    def _make_remote(name: str, tex_content: str):
+        remote = tmp_path / f"remote_{name}.git"
+        seed = tmp_path / f"seed_{name}"
+        remote.mkdir(parents=True); _git(["init", "--bare", "-b", "main", "."], remote)
+        seed.mkdir(parents=True); _git(["init", "-b", "main", "."], seed)
+        (seed / "main.tex").write_text(tex_content)
+        (seed / "figures").mkdir()
+        (seed / "figures" / "plot.png").write_bytes(b"\x89PNG fake bytes for project " + name.encode())
+        _git(["add", "-A"], seed)
+        _git(["-c", "user.name=S", "-c", "user.email=s@t", "commit", "-m", "init"], seed)
+        _git(["remote", "add", "origin", remote.as_uri()], seed)
+        _git(["push", "-u", "origin", "main"], seed)
+        return remote
+
+    remote_a = _make_remote("a", "\\documentclass{article}\\begin{document}Project A.\\end{document}\n")
+    remote_b = _make_remote("b", "\\documentclass{article}\\begin{document}Project B.\\end{document}\n")
+
+    store = InMemoryStore()
+    cipher = TokenCipher(TokenCipher.generate_key())
+    asyncio.run(store.upsert_user(User(user_id="u", email="t@x.com", plan="pro")))
+    mcp = create_hosted_server(
+        store=store, cipher=cipher, auth=False,
+        identity_provider=lambda: ("u", "t@x.com"),
+        base_url="https://milatexai.com", data_dir=tmp_path / "cache",
+    )
+    from leafbridge.service import AccountService
+
+    svc = AccountService(store, cipher)
+    asyncio.run(svc.connect_project("u", OVERLEAF_URL, "olp_x", "project-a", git_url=remote_a.as_uri()))
+    asyncio.run(svc.add_project("u", OVERLEAF_URL2_DL, "project-b", git_url=remote_b.as_uri()))
+    return mcp
+
+
+def test_download_file_then_upload_into_another_project_byte_identical(tmp_path):
+    mcp = _harness_two_projects(tmp_path)
+
+    # Download the figure from project A.
+    b64 = _text(_call(mcp, "download_file", {"path": "figures/plot.png", "project": "project-a"}))
+
+    # Upload that same content into project B, under a new name.
+    out = _text(_call(mcp, "upload_file", {
+        "path": "imported/plot_from_a.png", "content_base64": b64, "project": "project-b",
+    }))
+    assert "Committed" in out
+
+    # Independently verify: push the remote's contents and compare raw bytes.
+    verify = tmp_path / "verify_b"
+    _git(["clone", (tmp_path / "remote_b.git").as_uri(), str(verify)], tmp_path)
+    landed = (verify / "imported" / "plot_from_a.png").read_bytes()
+    original = (tmp_path / "seed_a" / "figures" / "plot.png").read_bytes()
+    assert landed == original
+
+
+def test_download_file_text_also_works(tmp_path):
+    mcp = _harness_two_projects(tmp_path)
+    b64 = _text(_call(mcp, "download_file", {"path": "main.tex", "project": "project-a"}))
+    import base64 as _b64mod
+    decoded = _b64mod.b64decode(b64).decode("utf-8")
+    assert "Project A." in decoded
+
+
+def test_download_file_missing_path_errors_clearly(tmp_path):
+    from fastmcp.exceptions import ToolError
+
+    mcp = _harness_two_projects(tmp_path)
+    with pytest.raises(ToolError) as exc_info:
+        _call(mcp, "download_file", {"path": "no/such/file.png", "project": "project-a"})
+    assert "No such file" in str(exc_info.value)
+
+
+def test_download_file_rejects_path_traversal(tmp_path):
+    from fastmcp.exceptions import ToolError
+
+    mcp = _harness_two_projects(tmp_path)
+    with pytest.raises(ToolError):
+        _call(mcp, "download_file", {"path": "../../etc/passwd", "project": "project-a"})

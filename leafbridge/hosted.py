@@ -1393,6 +1393,32 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
+    @mcp.tool(annotations={"readOnlyHint": True})
+    async def download_file(path: str, project: str | None = None) -> str:
+        """Read a BINARY file (image, PDF, etc.) as base64, so you can copy it into
+        a DIFFERENT project with upload_file: download_file here, then
+        upload_file(that base64, project=the other project). For text files
+        (.tex/.bib/.sty/...), use read_file instead, plain text, no base64 needed;
+        write_file writes it into the other project the same way.
+        """
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            proj = await app.resolve_or_onboard(user, project)
+            async with app.worker.open_repo(proj) as repo:
+                target = safe_join(repo, path)
+                if not target.is_file():
+                    raise PathError(f"No such file: {path!r}.")
+                size = target.stat().st_size
+                if size > MAX_UPLOAD_BYTES:
+                    raise ToolError(
+                        f"File too large to download ({size} bytes; limit {MAX_UPLOAD_BYTES})."
+                    )
+                data = target.read_bytes()
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return base64.b64encode(data).decode("ascii")
+
     # -- web surface: token-out-of-chat onboarding -------------------------
     # These routes live OUTSIDE the MCP bearer auth. They self-authenticate via
     # the one-time connect code minted by start_connect, so the Overleaf token is
