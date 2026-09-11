@@ -163,3 +163,15 @@ def test_cors_does_not_echo_unknown_origin():
             },
         )
     assert r.headers.get("access-control-allow-origin") != "https://evil.example.com"
+
+
+def test_feature_badge_renders_on_the_new_card_only():
+    """Only the "new capability" card should carry a badge; the old spotlight
+    section's own badge must have moved off "New" once a newer feature exists."""
+    html = site.render_site()
+    assert html.count(">New<") == 1
+    assert 'data-i18n="features.10.badge"' in html
+    assert "Move files between projects" in html
+    # The spotlight ("see") section is no longer the one marked New.
+    see_block = html[html.index("id='see'"):html.index("id='how'")]
+    assert "New" not in see_block

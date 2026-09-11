@@ -282,6 +282,8 @@ _FEAT_ART = [
     f"""<svg viewBox='0 0 160 64' aria-hidden='true'><rect x='20' y='6' width='54' height='52' rx='8' fill='var(--card)' stroke='var(--line)'/><rect x='28' y='16' width='38' height='4' rx='2' fill='{_M}' opacity='.4'/><rect x='28' y='26' width='38' height='5' rx='2.5' fill='#22c55e' opacity='.85'/><rect x='28' y='36' width='30' height='5' rx='2.5' fill='#e5484d' opacity='.75'/><line x1='28' y1='38.5' x2='58' y2='38.5' stroke='var(--bg)' stroke-width='1.6'/><rect x='28' y='46' width='38' height='4' rx='2' fill='{_M}' opacity='.4'/><path d='M92 34 Q104 28 112 32' fill='none' stroke='{_A}' stroke-width='3' stroke-linecap='round' stroke-dasharray='1 7'/><path d='M118 40 L152 18 L140 52 L131 42 Z' fill='{_A}'/><path d='M131 42 L152 18' stroke='var(--bg)' stroke-width='2'/></svg>""",
     # 10 figures from chat: bar chart + tikz node graph
     f"""<svg viewBox='0 0 160 64' aria-hidden='true'><rect x='14' y='34' width='9' height='18' rx='2' fill='{_A}' opacity='.5'/><rect x='28' y='24' width='9' height='28' rx='2' fill='{_A}' opacity='.75'/><rect x='42' y='14' width='9' height='38' rx='2' fill='{_A}'/><path d='M10 56 H60' stroke='{_M}' stroke-width='2.4' opacity='.5'/><circle cx='100' cy='18' r='8' fill='none' stroke='{_A}' stroke-width='3'/><circle cx='140' cy='28' r='8' fill='none' stroke='{_A}' stroke-width='3'/><circle cx='112' cy='48' r='8' fill='none' stroke='{_A}' stroke-width='3'/><path d='M107 21 L133 26 M104 26 L109 40 M119 45 L133 33' stroke='{_M}' stroke-width='2.6' opacity='.7'/></svg>""",
+    # 11 move files between projects: a figure leaving one project card for another
+    f"""<svg viewBox='0 0 160 64' aria-hidden='true'><rect x='6' y='10' width='46' height='44' rx='8' fill='var(--card)' stroke='{_A}' stroke-width='2'/><rect x='16' y='20' width='26' height='18' rx='3' fill='{_A}' opacity='.18'/><circle cx='22' cy='27' r='3' fill='{_A}'/><path d='M18 36 L26 28 L31 33 L38 24 L42 38 Z' fill='{_A}' opacity='.6'/><rect x='16' y='42' width='26' height='4' rx='2' fill='{_M}' opacity='.4'/><path d='M58 32 H98' stroke='{_A}' stroke-width='3' stroke-linecap='round' stroke-dasharray='2 7'/><path d='M92 23 L104 32 L92 41 Z' fill='{_A}'/><rect x='108' y='10' width='46' height='44' rx='8' fill='var(--card)' stroke='{_M}' stroke-width='2' stroke-dasharray='4 4' opacity='.7'/><rect x='118' y='20' width='26' height='18' rx='3' fill='{_A}' opacity='.18'/><circle cx='124' cy='27' r='3' fill='{_A}'/><path d='M120 36 L128 28 L133 33 L140 24 L144 38 Z' fill='{_A}' opacity='.6'/><rect x='118' y='42' width='26' height='4' rx='2' fill='{_M}' opacity='.4'/></svg>""",
 ]
 
 
@@ -339,8 +341,16 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   {_node(en,'p','trust','trust')}
 </section>"""
 
+    def _feat_badge(i: int) -> str:
+        text = _t(en, f"features.{i}.badge")
+        if not text:
+            return ""
+        return (f"<span class='badge feat-badge' data-i18n=\"features.{i}.badge\">"
+                f"{text}</span>")
+
     feature_cards = "".join(
         f"<div class='card'>"
+        f"{_feat_badge(i)}"
         f"<div class='feat-art'>{_FEAT_ART[i] if i < len(_FEAT_ART) else ''}</div>"
         f"{_node(en,'h3',f'features.{i}.title')}{_node(en,'p',f'features.{i}.desc','muted')}</div>"
         for i in range(n_features)
@@ -907,6 +917,7 @@ a{color:inherit;text-decoration:none}
 .acct-nudge a{color:var(--accent);font-weight:600}
 .hero{max-width:820px;margin:0 auto;padding:72px 24px 40px;text-align:center}
 .badge{display:inline-block;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;margin-bottom:20px}
+.feat-badge{font-size:11px;padding:3px 9px;margin:0 0 10px}
 .hero-title{font-size:clamp(32px,5vw,52px);line-height:1.16;letter-spacing:-.03em;margin:0 0 26px;padding-bottom:6px;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-sub{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:640px;margin:0 auto 26px}
 .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}

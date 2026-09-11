@@ -60,10 +60,15 @@
    {
     "title": "Figures and diagrams from chat",
     "desc": "Create matplotlib charts and TikZ diagrams by describing them. The source code is kept in your project, so a future edit is one sentence away. A Pro feature."
+   },
+   {
+    "badge": "New",
+    "title": "Move files between projects",
+    "desc": "Ask your AI to pull a figure or file from one project and add it straight to another. It reads the file where it is and writes it where you want it, no downloading to your computer and uploading it back."
    }
   ],
   "see": {
-   "badge": "New",
+   "badge": "See it work",
    "title": "Your AI sees the compiled page, not just the code",
    "desc": "When a table or figure looks off, MiLatexAI compiles your paper, captures the exact page it lands on, and reads the image. It catches layout problems the LaTeX source never shows: cramped columns, overfull cells, collisions. Multi-page tables are handled automatically.",
    "example": "\"This table looks cramped.\" It renders the page, sees the collision, and widens the columns."
