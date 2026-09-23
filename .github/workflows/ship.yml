@@ -6,6 +6,7 @@ name: ship
 on:
   push:
     branches: [main, "ci-test/**"]
+    paths-ignore: ["ops/maint/run-now"]   # that file only starts maintenance
   workflow_dispatch:
 
 permissions:
