@@ -29,13 +29,13 @@ jobs:
       group: production-deploy
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       # Keyless login (OIDC). These are identifiers, not secrets: the Azure side
       # only trusts tokens minted for this repo's main branch, and the identity
       # can touch nothing but the container app and its environment.
-      - uses: azure/login@v2
+      - uses: azure/login@v3
         with:
           client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
           tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927

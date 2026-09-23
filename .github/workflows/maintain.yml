@@ -39,10 +39,10 @@ jobs:
     outputs:
       changed: ${{ steps.patch.outputs.changed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install -q uv pip-audit
@@ -125,7 +125,7 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
             git diff --cached --stat
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: maintenance
@@ -143,13 +143,13 @@ jobs:
     outputs:
       sha: ${{ steps.push.outputs.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: maintenance
           path: ${{ runner.temp }}/maint
@@ -194,7 +194,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Fast-forward main to the verified commit
