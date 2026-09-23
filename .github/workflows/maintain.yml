@@ -116,7 +116,7 @@ jobs:
       - name: Package the change as a patch
         id: patch
         run: |
-          git add -A -- . ':(exclude).maint'
+          git add -A   # .maint/ (logs, reports) is gitignored, so it never enters the patch
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Nothing to update this run."
