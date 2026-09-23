@@ -559,9 +559,9 @@ cryptography==50.0.1 \
     #   msal
     #   pyjwt
     #   secretstorage
-cyclopts==4.25.3 \
-    --hash=sha256:40e76b3153ea90e885abd8d3a4d8184db5a5eec2fde8540025aae8d72fc973fc \
-    --hash=sha256:7d3a067bc7699a1a65fe2ea0b092a925855bb711a05adc1e65c5b9ba307acea4
+cyclopts==5.0.0 \
+    --hash=sha256:69c5d98bd48827a0f7c663b76f966f730652cbc48daa7625f1e69ae429b82376 \
+    --hash=sha256:8bee8822319f5cd90711f568aec54a0a02bd3571ddff45c94aa62405beed38b6
     # via fastmcp-slim
 dnspython==2.8.0 \
     --hash=sha256:01d9bbc4a2d76bf0db7c1f729812ded6d912bd318d3b1cf81d30c0f845dbf3af \
