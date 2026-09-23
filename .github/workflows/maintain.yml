@@ -78,6 +78,10 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ github.token }}
+          # Runs relayed by run-now.yml or audit.yml are dispatched by GitHub's own
+          # bot. Safe to allow: this workflow only starts on schedule or dispatch,
+          # and dispatching requires write access to the repo.
+          allowed_bots: "*"
           claude_args: >-
             --max-turns 80
             --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python -m pytest:*),Bash(python -m pip install:*),Bash(uv pip compile:*)"
