@@ -1,0 +1,43 @@
+name: deploy
+
+# Staged production rollout with automatic rollback (see ops/deploy.sh).
+# Called by ship.yml and maintain.yml after verify passes. Run it by hand with
+# a commit SHA to redeploy or roll back to any already-built image.
+
+on:
+  workflow_call:
+    inputs:
+      sha:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Commit SHA of an already-built image (redeploy or roll back)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      # Keyless login (OIDC). These are identifiers, not secrets: the Azure side
+      # only trusts tokens minted for this repo's main branch, and the identity
+      # can touch nothing but the container app and its environment.
+      - uses: azure/login@v2
+        with:
+          client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
+          tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
+          subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
+      - run: bash ops/deploy.sh "${{ inputs.sha }}"

@@ -1,0 +1,210 @@
+name: maintain
+
+# Weekly autonomous maintenance: upgrade dependencies and LaTeX tools, let an
+# AI agent fix anything the upgrade breaks (and any security finding), then
+# verify end to end and ship. No human step. Failures email the repo owner and
+# leave production untouched.
+#
+# Trust boundary: the agent job holds READ-ONLY credentials and can only hand
+# over a patch. A separate job with no AI in it checks the patch against
+# guardrails (ops/maint/guard.py), re-runs every test, and commits.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"   # Mondays 07:00 UTC (3:00 Toronto)
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: Why this run was started
+        required: false
+        default: manual
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+concurrency:
+  group: maintain
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      HAS_CLAUDE: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' || secrets.ANTHROPIC_API_KEY != '' }}
+    outputs:
+      changed: ${{ steps.patch.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q uv pip-audit
+
+      - name: Upgrade dependencies and LaTeX tools (mechanical)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash ops/maint/refresh.sh
+
+      - name: Test and audit the upgraded set
+        id: check
+        run: |
+          set +e
+          python -m pip install -q --require-hashes -r requirements-dev.txt
+          python -m pytest tests -q -p no:cacheprovider -W default > .maint/tests.log 2>&1
+          echo "tests=$?" >> "$GITHUB_OUTPUT"
+          pip-audit -r requirements.txt --require-hashes --disable-pip > .maint/audit.txt 2>&1
+          echo "audit=$?" >> "$GITHUB_OUTPUT"
+          grep -E "Warning" .maint/tests.log | grep -E "leafbridge/|tests/" | sort -u > .maint/warnings.txt
+          echo "warnings=$(wc -l < .maint/warnings.txt)" >> "$GITHUB_OUTPUT"
+          tail -5 .maint/tests.log
+
+      - name: Agent fixes what the upgrade broke
+        # An agent outage must not block plain upgrades: the guardrails and the
+        # full test suite in the next job still decide whether anything ships.
+        continue-on-error: true
+        if: >-
+          env.HAS_CLAUDE == 'true' && (steps.check.outputs.tests != '0'
+          || steps.check.outputs.audit != '0' || steps.check.outputs.warnings != '0')
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          claude_args: >-
+            --max-turns 80
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python -m pytest:*),Bash(python -m pip install:*),Bash(uv pip compile:*)"
+          prompt: |
+            You are the maintenance engineer for MiLatexAI, a Python MCP server
+            (code in leafbridge/, tests in tests/). Dependencies and LaTeX tools
+            were just upgraded mechanically. Make the whole test suite pass and
+            resolve the findings below with the SMALLEST correct change.
+
+            Inputs (read them first):
+            - .maint/changes.txt: what was upgraded.
+            - .maint/tests.log: pytest output after the upgrade.
+            - .maint/audit.txt: pip-audit results (known vulnerabilities).
+            - .maint/warnings.txt: deprecation warnings raised in OUR code.
+
+            Rules:
+            1. Adapt our code to the upgraded dependencies. Never delete, skip,
+               xfail, or weaken a test, and never loosen an assertion. If a
+               test truly cannot pass, stop and explain why in the report.
+            2. For a vulnerability that has a fixed version, raise that
+               package's lower bound in requirements.in (add the package if it
+               is transitive), then regenerate BOTH lockfiles with exactly:
+               uv pip compile requirements.in --python-version 3.12 --python-platform x86_64-manylinux_2_28 --generate-hashes --quiet -o requirements.txt
+               uv pip compile requirements-dev.in --python-version 3.12 --python-platform x86_64-manylinux_2_28 --generate-hashes --quiet -o requirements-dev.txt
+               If a vulnerability has no fix yet, only note it in the report.
+            3. Fix deprecation warnings only where they originate in leafbridge/
+               or tests/. Ignore warnings raised inside third-party packages.
+            4. Do not change features, behavior, website copy, or pricing. Do
+               not touch .github/ or ops/. No refactors, no style changes.
+            5. Never write the em dash character (U+2014) anywhere.
+            6. When done, reinstall and run the suite; it must pass:
+               python -m pip install -q --require-hashes -r requirements-dev.txt
+               python -m pytest tests -q -p no:cacheprovider
+            7. Write a short plain-English summary of what you changed and why
+               to .maint/agent_report.md.
+
+      - name: Package the change as a patch
+        id: patch
+        run: |
+          git add -A -- . ':(exclude).maint'
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing to update this run."
+          else
+            git diff --cached --binary > .maint/maint.patch
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --cached --stat
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: maintenance
+          path: .maint/
+          include-hidden-files: true
+          retention-days: 30
+
+  commit:
+    needs: refresh
+    if: needs.refresh.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.push.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: maintenance
+          path: ${{ runner.temp }}/maint
+      - name: Apply the patch and check it against the guardrails
+        run: |
+          cp ops/maint/guard.py "$RUNNER_TEMP/guard.py"   # judge the change with the PRE-change guard
+          git apply --index "$RUNNER_TEMP/maint/maint.patch"
+          python "$RUNNER_TEMP/guard.py" HEAD
+      - name: Full test suite on the final change
+        run: |
+          pip install -q --require-hashes -r requirements-dev.txt
+          python -m pytest tests -q -p no:cacheprovider
+      - name: Commit to a maintenance branch
+        id: push
+        run: |
+          git config user.name "MiLatexAI Maintenance"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          {
+            echo "maint: automated dependency and security refresh ($(date -u +%F))"
+            echo
+            echo "Started by: ${{ github.event.inputs.reason || 'weekly schedule' }}"
+            echo
+            cat "$RUNNER_TEMP/maint/changes.txt" 2>/dev/null || true
+            if [ -f "$RUNNER_TEMP/maint/agent_report.md" ]; then
+              echo; echo "Agent report:"; cat "$RUNNER_TEMP/maint/agent_report.md"
+              echo; echo "Co-Authored-By: Claude <noreply@anthropic.com>"
+            fi
+          } > "$RUNNER_TEMP/msg.txt"
+          git commit -q -F "$RUNNER_TEMP/msg.txt"
+          git push -q origin "HEAD:refs/heads/maint/${{ github.run_id }}"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  verify:
+    needs: commit
+    uses: ./.github/workflows/verify.yml
+    with:
+      sha: ${{ needs.commit.outputs.sha }}
+
+  promote:
+    needs: [commit, verify]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fast-forward main to the verified commit
+        run: |
+          git fetch -q origin "maint/${{ github.run_id }}"
+          git push origin "${{ needs.commit.outputs.sha }}:refs/heads/main"
+          git push -q origin --delete "maint/${{ github.run_id }}"
+
+  deploy:
+    needs: [commit, promote]
+    uses: ./.github/workflows/deploy.yml
+    with:
+      sha: ${{ needs.commit.outputs.sha }}

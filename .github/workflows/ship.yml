@@ -1,0 +1,27 @@
+name: ship
+
+# Every push to main is verified end to end and then deployed automatically.
+# Pushes to ci-test/** branches run the same verification without deploying.
+
+on:
+  push:
+    branches: [main, "ci-test/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  verify:
+    uses: ./.github/workflows/verify.yml
+    with:
+      sha: ${{ github.sha }}
+
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      sha: ${{ github.sha }}

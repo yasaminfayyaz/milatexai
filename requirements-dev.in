@@ -1,0 +1,5 @@
+# Test-time dependencies on top of the runtime set. Lockfile: requirements-dev.txt,
+# generated the same way as requirements.txt (see requirements.in).
+-r requirements.in
+pytest>=8
+pytest-asyncio>=0.23

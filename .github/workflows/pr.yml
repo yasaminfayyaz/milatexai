@@ -1,0 +1,23 @@
+name: pr-tests
+
+# Outside contributions (the repo is public): unit tests only, no secrets, no
+# image publishing, no deploy.
+
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --require-hashes -r requirements-dev.txt
+      - run: python -m pytest tests -q -p no:cacheprovider

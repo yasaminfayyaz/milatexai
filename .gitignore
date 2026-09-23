@@ -28,3 +28,6 @@ dist/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Scratch output of the automated maintenance run
+.maint/
