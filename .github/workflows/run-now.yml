@@ -1,0 +1,22 @@
+name: run-now
+
+# Start maintenance immediately without logging in anywhere: change
+# ops/maint/run-now on main (for example, edit it in the GitHub web UI).
+# This relays the push as a workflow_dispatch, because the AI agent step in
+# maintain.yml supports scheduled and manual runs but not push events.
+
+on:
+  push:
+    branches: [main]
+    paths: ["ops/maint/run-now"]
+
+permissions:
+  actions: write
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run maintain.yml --repo "${{ github.repository }}" -f reason=run-now

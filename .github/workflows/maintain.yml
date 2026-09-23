@@ -12,11 +12,7 @@ name: maintain
 on:
   schedule:
     - cron: "0 7 * * 1"   # Mondays 07:00 UTC (3:00 Toronto)
-  # Run now without logging in anywhere: change ops/maint/run-now on main
-  # (e.g. edit it in the GitHub web UI).
-  push:
-    branches: [main]
-    paths: ["ops/maint/run-now"]
+  # Also started on demand by run-now.yml (edit ops/maint/run-now on main).
   workflow_dispatch:
     inputs:
       reason:
@@ -175,7 +171,7 @@ jobs:
           {
             echo "maint: automated dependency and security refresh ($(date -u +%F))"
             echo
-            echo "Started by: ${{ github.event.inputs.reason || (github.event_name == 'push' && 'run-now trigger') || 'weekly schedule' }}"
+            echo "Started by: ${{ github.event.inputs.reason || 'weekly schedule' }}"
             echo
             cat "$RUNNER_TEMP/maint/changes.txt" 2>/dev/null || true
             if [ -f "$RUNNER_TEMP/maint/agent_report.md" ]; then
