@@ -196,6 +196,7 @@ def world(tmp_path_factory):
     server.should_exit = True
     thread.join(timeout=15)
     fake.shutdown()
+    fake.server_close()  # release the fake issuer's socket
 
 
 INIT = {"protocolVersion": "2025-06-18", "capabilities": {},
