@@ -12,7 +12,7 @@ license = { text = "AGPL-3.0-or-later" }
 authors = [{ name = "LeafBridge" }]
 keywords = ["overleaf", "latex", "mcp", "claude", "chatgpt", "git"]
 dependencies = [
-    "fastmcp>=3.4,<4",
+    "fastmcp>=4.0.9,<5",
     "python-dotenv>=1.0",
     "cryptography>=42",
     "azure-data-tables>=12.5",

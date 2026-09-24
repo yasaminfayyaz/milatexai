@@ -3,7 +3,7 @@
 #   uv pip compile requirements.in --python-version 3.12
 #     --python-platform x86_64-manylinux_2_28 --generate-hashes -o requirements.txt
 # Pin the FastMCP major line; uvicorn/starlette come in as FastMCP deps.
-fastmcp>=3.4,<4
+fastmcp>=4.0.9,<5
 python-dotenv>=1.0
 cryptography>=42          # Phase 2: encrypt stored Overleaf tokens at rest
 azure-data-tables>=12.5   # Phase 2: persistent multi-tenant store
