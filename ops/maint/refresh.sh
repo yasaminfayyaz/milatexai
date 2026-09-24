@@ -31,4 +31,6 @@ print(f"Python packages changed: {len(changed)}")
 for n, b, a in changed:
     print(f"  {n}: {b or '(new)'} -> {a or '(removed)'}")
 PY
+python ops/maint/find_majors.py > .maint/majors.txt
+{ echo "Held back by a version cap (the agent will attempt these):"; cat .maint/majors.txt; } >> .maint/changes.txt
 cat .maint/changes.txt

@@ -36,7 +36,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     permissions:
       contents: read
     env:
@@ -68,6 +68,8 @@ jobs:
           echo "audit=$?" >> "$GITHUB_OUTPUT"
           grep -E "Warning" .maint/tests.log | grep -E "leafbridge/|tests/" | sort -u > .maint/warnings.txt
           echo "warnings=$(wc -l < .maint/warnings.txt)" >> "$GITHUB_OUTPUT"
+          echo "majors=$(grep -c . .maint/majors.txt || true)" >> "$GITHUB_OUTPUT"
+          echo "site=$(python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")" >> "$GITHUB_OUTPUT"
           tail -5 .maint/tests.log
 
       - name: Agent fixes what the upgrade broke
@@ -76,7 +78,8 @@ jobs:
         continue-on-error: true
         if: >-
           env.HAS_CLAUDE == 'true' && (steps.check.outputs.tests != '0'
-          || steps.check.outputs.audit != '0' || steps.check.outputs.warnings != '0')
+          || steps.check.outputs.audit != '0' || steps.check.outputs.warnings != '0'
+          || steps.check.outputs.majors != '0')
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -88,7 +91,8 @@ jobs:
           allowed_bots: "*"
           show_full_output: ${{ inputs.debug == true }}
           claude_args: >-
-            --max-turns 80
+            --max-turns 150
+            --add-dir ${{ steps.check.outputs.site }}
             --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python -m pytest:*),Bash(python -m pip install:*),Bash(uv pip compile:*)"
           prompt: |
             You are the maintenance engineer for MiLatexAI, a Python MCP server
@@ -101,6 +105,8 @@ jobs:
             - .maint/tests.log: pytest output after the upgrade.
             - .maint/audit.txt: pip-audit results (known vulnerabilities).
             - .maint/warnings.txt: deprecation warnings raised in OUR code.
+            - .maint/majors.txt: dependencies held back by a version cap while a
+              newer MAJOR version exists (may be empty).
 
             Rules:
             1. Adapt our code to the upgraded dependencies. Never delete, skip,
@@ -115,13 +121,26 @@ jobs:
             3. Fix deprecation warnings only where they originate in leafbridge/
                or tests/. Ignore warnings raised inside third-party packages.
             4. Do not change features, behavior, website copy, or pricing. Do
-               not touch .github/ or ops/. No refactors, no style changes.
+               not touch .github/, ops/, tests/e2e/test_auth.py, or
+               tests/conftest.py. No refactors, no style changes. Adapting our
+               code to a library's new API is expected; what users see and
+               how login works must stay the same.
             5. Never write the em dash character (U+2014) anywhere.
             6. When done, reinstall and run the suite; it must pass:
                python -m pip install -q --require-hashes -r requirements-dev.txt
                python -m pytest tests -q -p no:cacheprovider
             7. Write a short plain-English summary of what you changed and why
                to .maint/agent_report.md.
+            8. For each package in .maint/majors.txt, attempt the major upgrade:
+               raise its cap in the .in file to allow the new major, with the
+               latest version as the new floor (e.g. fastmcp>=4.0.9,<5), then
+               regenerate both lockfiles, reinstall, and adapt our code until
+               the FULL suite passes. You can read the new library's source in
+               ${{ steps.check.outputs.site }} to learn what changed. If it cannot
+               pass without breaking rules 1 or 4, restore that package's
+               original line in the .in file, regenerate both lockfiles,
+               reinstall, confirm the suite passes, and explain why in the
+               report. The other updates must still ship either way.
 
       - name: Package the change as a patch
         id: patch

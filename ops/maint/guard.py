@@ -3,7 +3,7 @@ diff (``git diff --cached``) relative to a base ref. Run from a PRISTINE copy
 of this file (the change under review must not be able to edit its own judge).
 
 Refuses the change if it:
-  - touches the pipeline or deploy tooling (.github/, ops/)
+  - touches the pipeline, deploy tooling, or protected login tests
   - deletes any test file
   - reduces the number of test functions
   - adds any skip / xfail
@@ -18,7 +18,8 @@ import re
 import subprocess
 import sys
 
-PROTECTED = (".github/", "ops/")
+# Security-critical tests the agent must never edit (they gate login).
+PROTECTED = (".github/", "ops/", "tests/e2e/test_auth.py", "tests/conftest.py")
 EM_DASH = chr(0x2014)  # written as a code point so this file never contains one
 
 
