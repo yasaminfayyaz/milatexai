@@ -4,3 +4,4 @@
 pytest>=8
 pytest-asyncio>=0.23
 quickjs>=1.19            # runs the free web tools' JS in tests (BibTeX cleaner, error finder)
+httpx2>=2.13             # starlette.testclient.TestClient prefers this over the deprecated httpx shim
