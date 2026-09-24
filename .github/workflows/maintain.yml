@@ -19,6 +19,10 @@ on:
         description: Why this run was started
         required: false
         default: manual
+      debug:
+        description: Show the agent's full transcript in the log (for diagnosing failures)
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -82,6 +86,7 @@ jobs:
           # bot. Safe to allow: this workflow only starts on schedule or dispatch,
           # and dispatching requires write access to the repo.
           allowed_bots: "*"
+          show_full_output: ${{ inputs.debug == true }}
           claude_args: >-
             --max-turns 80
             --allowedTools "Read,Edit,Write,Glob,Grep,Bash(python -m pytest:*),Bash(python -m pip install:*),Bash(uv pip compile:*)"
