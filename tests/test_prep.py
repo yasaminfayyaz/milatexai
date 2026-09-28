@@ -152,7 +152,8 @@ def test_tracked_changes_tool_returns_images(tmp_path, monkeypatch):
     pdf = _fake_pdf()
 
     async def fake_diff(repo, main, old, timeout=240):
-        assert "Words." in open(Path(repo) / main, encoding="utf-8").read()
+        with open(Path(repo) / main, encoding="utf-8") as f:
+            assert "Words." in f.read()
         return pdf
     monkeypatch.setattr(texdiff, "diff_pdf", fake_diff)
     r = _call(mcp, "tracked_changes_pdf", {"ref": "HEAD"})
