@@ -5,11 +5,16 @@
 #   3. Only then does it take 100% of traffic, and it is smoke-tested again live.
 #   4. Any failure puts traffic back on the previous revision and deactivates
 #      the new one, so users never stay on a broken build.
-# The previous revision is kept active (scaled to zero, no cost) for instant
-# manual rollback; anything older is deactivated.
+# Always-on: every revision is created with min-replicas 1, so one copy is
+# running at all times and a request never waits for a ~30 second cold start.
+# While that copy is quiet, Azure bills it at the cheap idle rate. Because a
+# min-replicas-1 revision keeps its copy running even at 0% traffic, a
+# successful deploy deactivates EVERY other revision; keeping the previous one
+# warm as a standby would double the bill.
 #
 #   Usage: ops/deploy.sh <git-sha>     (the image ghcr.io/...:<sha> must exist)
-# Manual redeploy or rollback: run the "deploy" workflow with a SHA, or this
+# Manual redeploy or rollback: run the "deploy" workflow with an older commit
+# SHA (the images stay in the registry; this takes about 2 minutes), or this
 # script locally after `az login`. Do NOT use a bare `az containerapp update`
 # any more: the app runs in multiple-revision mode, so a bare update creates a
 # revision that receives no traffic.
@@ -38,7 +43,8 @@ azq containerapp ingress traffic set -n "$APP" -g "$RG" --revision-weight "$PREV
 
 SUFFIX="g${SHA:0:8}-r${GITHUB_RUN_NUMBER:-0}-${GITHUB_RUN_ATTEMPT:-$(date +%s)}"
 NEW="$APP--$SUFFIX"
-azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" >/dev/null
+azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" \
+  --min-replicas 1 >/dev/null
 echo "new revision: $NEW (0% traffic)"
 
 rollback() {
@@ -68,9 +74,15 @@ APP_FQDN=$(azq containerapp show -n "$APP" -g "$RG" --query properties.configura
 echo "--- smoke test on the live URL ---"
 bash "$HERE/smoke.sh" "https://$APP_FQDN" || rollback
 
+echo "letting in-flight requests on the old revision finish (60s)..."
+sleep 60
 for r in $(azq containerapp revision list -n "$APP" -g "$RG" --query "[?properties.active].name" -o tsv); do
-  if [ "$r" != "$NEW" ] && [ "$r" != "$PREV" ]; then
-    azq containerapp revision deactivate -n "$APP" -g "$RG" --revision "$r" >/dev/null && echo "deactivated old revision $r"
+  if [ "$r" != "$NEW" ]; then
+    if azq containerapp revision deactivate -n "$APP" -g "$RG" --revision "$r" >/dev/null; then
+      echo "deactivated old revision $r"
+    else
+      echo "::warning::could not deactivate $r; it may keep a warm copy running and add cost"
+    fi
   fi
 done
-echo "DEPLOYED $SHA as $NEW (rollback target kept: $PREV)"
+echo "DEPLOYED $SHA as $NEW (to roll back, redeploy an older commit SHA; previous was $PREV)"
