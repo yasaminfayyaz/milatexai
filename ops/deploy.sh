@@ -43,8 +43,11 @@ azq containerapp ingress traffic set -n "$APP" -g "$RG" --revision-weight "$PREV
 
 SUFFIX="g${SHA:0:8}-r${GITHUB_RUN_NUMBER:-0}-${GITHUB_RUN_ATTEMPT:-$(date +%s)}"
 NEW="$APP--$SUFFIX"
+# FREE_CAPACITY_STARTER: month-to-date Azure spend (CAD) at which the capacity
+# gate pauses the FREE tier (plus 80% of Pro revenue, see leafbridge/capacity.py).
+# Pro is never paused. Kept here so the limit is reviewable in git.
 azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" \
-  --min-replicas 1 >/dev/null
+  --min-replicas 1 --set-env-vars FREE_CAPACITY_STARTER=100 >/dev/null
 echo "new revision: $NEW (0% traffic)"
 
 rollback() {
