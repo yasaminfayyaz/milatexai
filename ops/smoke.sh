@@ -26,6 +26,17 @@ assert h["figure_studio"] is True, "Figure Studio unavailable"
 ' || fail "health degraded: $health"
 echo "ok  GET /health/capacity (LaTeX and Figure Studio available)"
 
+# Deep health: database and LaTeX engine of OURS must be fine. Older images
+# (a rollback target) do not have this endpoint, so a 404 is a skip, not a fail.
+deep_code=$(curl -s -o /tmp/smoke_deep.json -w "%{http_code}" --max-time 40 "$BASE/health/deep" || true)
+case "$deep_code" in
+  200) "$PY" -c 'import json,sys; assert json.load(open(sys.argv[1]))["ok"] is True' /tmp/smoke_deep.json \
+         || fail "/health/deep says ok is not true"
+       echo "ok  GET /health/deep (database and LaTeX engine healthy)";;
+  404) echo "skip GET /health/deep (older image without it)";;
+  *)   fail "GET /health/deep -> $deep_code (something of ours is broken)";;
+esac
+
 check() {  # path expected_status [text_that_must_appear]
   local path=$1 want=$2 needle=${3:-} out status body
   out=$(curl -s --max-time 30 -w $'\n%{http_code}' "$BASE$path" || true)

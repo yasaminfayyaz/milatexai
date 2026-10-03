@@ -54,6 +54,7 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ inputs.sha }}
+          build-args: GIT_SHA=${{ inputs.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: End-to-end journeys inside the production image

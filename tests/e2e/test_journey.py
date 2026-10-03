@@ -201,6 +201,24 @@ def test_web_surface_serves(world):
     assert status == 200 and json.loads(body)["free_open"] is True
 
 
+def test_deep_health_reports_the_real_state(world):
+    import urllib.error
+
+    assert json.loads(_get(world, "/health/live")[1]) == {"ok": True}
+    try:
+        status, body = _get(world, "/health/deep")
+    except urllib.error.HTTPError as exc:  # a broken "ours" check answers 503 with the same JSON
+        status, body = exc.code, exc.read()
+    report = json.loads(body)
+    assert set(report["checks"]) == {"storage", "latex", "signin_keys", "payments", "overleaf_git"}
+    assert report["checks"]["storage"]["ok"] is True
+    if REQUIRE_LATEX:  # inside the production image
+        assert status == 200 and report["ok"] is True and report["checks"]["latex"]["ok"] is True
+        # The image must know which commit it was built from (the watchdog and
+        # status page report it, and rollback logic relies on it).
+        assert re.fullmatch(r"[0-9a-f]{40}", report["version"]), report["version"]
+
+
 def test_research_journey(world):
     from fastmcp.exceptions import ToolError
 

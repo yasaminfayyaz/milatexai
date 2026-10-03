@@ -53,6 +53,7 @@ from .files import (
     write_text_exact,
 )
 from .git_worker import GitError, GitWorker, PushConflict
+from .health import DeepHealth
 from .service import (
     AccountService,
     AlreadyConnected,
@@ -1625,6 +1626,26 @@ def create_hosted_server(
             "figure_studio": app.sessions.enabled,
         }
         return Response(json.dumps(payload), media_type="application/json")
+
+    deep_health = DeepHealth(
+        app.service.store, app.billing, os.environ.get("WORKOS_AUTHKIT_DOMAIN"),
+        texcompile.tectonic_path,
+    )
+
+    @mcp.custom_route("/health/live", methods=["GET"])
+    async def health_live(request: Request) -> Response:
+        # No dependencies on purpose: answers as long as the process is up.
+        return Response(json.dumps({"ok": True}), media_type="application/json",
+                        headers={"cache-control": "no-store"})
+
+    @mcp.custom_route("/health/deep", methods=["GET"])
+    async def health_deep(request: Request) -> Response:
+        report = await deep_health.run()
+        # 503 only when something of OURS is broken; a third-party outage
+        # (login provider, payments, Overleaf) is reported but is still a 200.
+        return Response(json.dumps(report), media_type="application/json",
+                        status_code=200 if report["ok"] else 503,
+                        headers={"cache-control": "no-store"})
 
     @mcp.custom_route("/stripe/webhook", methods=["POST"])
     async def stripe_webhook(request: Request) -> Response:

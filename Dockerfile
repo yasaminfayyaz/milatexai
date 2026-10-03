@@ -44,5 +44,10 @@ COPY pyproject.toml README.md ./
 ENV LEAFBRIDGE_DATA_DIR=/tmp/mila-cache \
     PYTHONUNBUFFERED=1
 
+# Which commit this image was built from; reported by /health/deep. Declared late
+# so a new commit does not invalidate the cached LaTeX and pip layers above.
+ARG GIT_SHA=dev
+ENV MILATEXAI_SHA=$GIT_SHA
+
 EXPOSE 8000
 CMD ["uvicorn", "leafbridge.asgi:app", "--host", "0.0.0.0", "--port", "8000"]
