@@ -31,7 +31,10 @@ STARTED_AT = time.time()
 # rarely so a one-minute watchdog does not become a one-minute load on them.
 TTL = {"storage": 20, "latex": 600, "signin_keys": 60, "payments": 300, "overleaf_git": 120}
 CHECK_TIMEOUT = 8.0
-OVERLEAF_GIT_URL = "https://git.overleaf.com/"
+# The path a real git client hits, with a project id that cannot exist: a healthy
+# host answers 401 (asks for credentials). The bare homepage always answers 500,
+# so it must not be used as the probe.
+OVERLEAF_GIT_URL = "https://git.overleaf.com/000000000000000000000000/info/refs?service=git-upload-pack"
 
 
 def version() -> str:
@@ -122,8 +125,8 @@ class DeepHealth:
         return {"ok": True}
 
     async def _overleaf_git(self) -> dict:
-        # Any HTTP answer (even 401/404) proves the host is reachable; only a
-        # server error or no answer at all counts as down.
+        # An auth challenge (401) or "no such project" (404) proves the git host is
+        # answering; only a server error or no answer at all counts as down.
         status, _ = await self._http_get(OVERLEAF_GIT_URL)
         return {"ok": status < 500} if status < 500 else {"ok": False, "error": f"HTTP{status}"}
 
