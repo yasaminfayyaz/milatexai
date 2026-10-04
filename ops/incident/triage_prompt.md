@@ -31,9 +31,12 @@ The menu. You choose exactly one action. Anything else is impossible.
   failing health check with no sign of a bad deploy. Never when first aid already restarted
   it and the problem is still there.
 - `rollback`: put the previous known-good version back (`azure.deploy_tags.previous`).
-  Only when the trouble began shortly after a deploy (compare the incident time with the
-  age of the running revision and with `github.recent_ship_runs`) AND the logs point at the
-  new code. If there is no previous version recorded, choose `escalate`.
+  Choose it, with at least medium confidence, when all of these hold in `hints`:
+  `minutes_from_latest_deploy_to_detection` is under 120, `previous_version_recorded` is true,
+  `first_aid_restart_failed` is true, and the app's own health is failing. A rollback is tested,
+  reversible (the newer version can be redeployed), and the deploy workflow smoke-tests it before
+  it takes traffic, so you do not need to know the exact bug. Do not choose it when the failure
+  clearly comes from a third party, from data, or from Cloudflare.
 - `purge_cache`: clear the Cloudflare cache. Only for `edge` incidents where the app is
   healthy but customers are served stale or broken pages.
 - `disable_waf_rule`: switch off one firewall rule, and only one whose description starts

@@ -116,8 +116,8 @@ def main() -> None:
     report = plan.compose_report(ctx)
     if broken:
         report["details"].append("The repair workflow itself had a problem in: " + ", ".join(broken))
-        if report["resolved"] is False and report["headline"].startswith("Needs you: this is not something"):
-            report["headline"] = "Needs you: the automatic repair could not finish"
+        if report["resolved"] is False and "not something that can be fixed automatically" in report["headline"]:
+            report["headline"] = report["headline"].split("This is not")[0] + "The automatic repair could not finish"
 
     issue_url, issue_number = record_issue(incident_id, report, run_url)
     links = [u for u in (issue_url, run_url) if u]

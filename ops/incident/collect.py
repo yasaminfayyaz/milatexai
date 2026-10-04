@@ -154,6 +154,7 @@ def main() -> None:
         "cloudflare": safe("cloudflare", cloudflare_section),
         "automatic_changes_last_24h": safe("ledger", lambda: c.ledger_read(app), []),
     }
+    evidence["hints"] = plan.build_hints(evidence, time.time())
     text = json.dumps(evidence, indent=1)
     for drop in ("console_tail", "system", "console_errors"):       # shrink, least useful first
         if len(text) <= MAX_BYTES:

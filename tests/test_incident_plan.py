@@ -214,6 +214,7 @@ def test_report_not_fixed_asks_for_the_owner():
     ):
         r = report(**kw)
         assert r["resolved"] is False and r["stage"] == "Needs you" and text in r["headline"], text
+        assert not r["headline"].startswith("Needs you")      # the stage already says it; the email subject must not repeat it
         # the public status page must never carry the owner-facing wording
         assert "Needs you" not in r["public"] and r["summary"] == "" and "switched off" not in r["public"]
 
@@ -336,3 +337,17 @@ def test_only_the_drill_copy_can_be_named_as_a_drill_target(monkeypatch):
     monkeypatch.setenv("DRILL_APP", "some-other-app")
     with pytest.raises(SystemExit):
         common.target_app()
+
+
+# --- facts handed to the triage step -----------------------------------------------------------------------
+
+def test_hints_summarise_the_timeline():
+    ev = {"incident": {"detected_at": "2026-10-04T07:00:00Z"},
+          "azure": {"deploy_tags": {"deployed_at": 1791097200 - 25 * 60, "previous": GOOD}},   # 07:00:00Z is 1791097200
+          "first_aid": {"restarted": True, "recovered": False}}
+    h = plan.build_hints(ev, NOW)
+    assert h == {"minutes_from_latest_deploy_to_detection": 25, "previous_version_recorded": True, "first_aid_restart_failed": True}
+    empty = plan.build_hints({}, NOW)
+    assert empty == {"minutes_from_latest_deploy_to_detection": None, "previous_version_recorded": False, "first_aid_restart_failed": False}
+    fixed = plan.build_hints({"first_aid": {"restarted": True, "recovered": True}}, NOW)
+    assert fixed["first_aid_restart_failed"] is False

@@ -93,6 +93,32 @@ def parse_deploy_tags(tags: dict | None) -> dict:
     return {"current": sha(tags.get("current_sha")), "previous": sha(tags.get("previous_sha")), "deployed_at": deployed_at}
 
 
+def _iso_epoch(value) -> float | None:
+    import calendar
+    import time as _time
+    try:
+        return float(calendar.timegm(_time.strptime(str(value)[:19], "%Y-%m-%dT%H:%M:%S")))
+    except (ValueError, TypeError):
+        return None
+
+
+def build_hints(evidence: dict, now: float) -> dict:
+    """Three plain facts the triage step would otherwise have to work out from raw logs:
+    how soon after the latest deploy the trouble began, whether there is a previous version
+    to go back to, and whether the restart already tried did not help."""
+    inc = evidence.get("incident") or {}
+    azure = evidence.get("azure") if isinstance(evidence.get("azure"), dict) else {}
+    tags = azure.get("deploy_tags") or {}
+    first_aid = evidence.get("first_aid") or {}
+    detected = _iso_epoch(inc.get("detected_at")) or now
+    deployed = tags.get("deployed_at")
+    return {
+        "minutes_from_latest_deploy_to_detection": round((detected - float(deployed)) / 60) if deployed else None,
+        "previous_version_recorded": bool(tags.get("previous")),
+        "first_aid_restart_failed": bool(first_aid.get("restarted")) and not first_aid.get("recovered"),
+    }
+
+
 def deploy_in_flight(revisions: list[dict], now: float) -> bool:
     """ops/deploy.sh keeps exactly one revision active; two active at once means a
     deploy is mid-way (new one under test, old one still serving). If a stuck extra
@@ -214,15 +240,15 @@ def compose_report(ctx: dict) -> dict:
         return {"stage": "Recovered", "headline": prefix + "Recovered on its own, no repair was needed", "details": details,
                 "public_details": public_details, "resolved": True, "summary": prefix + "Recovered on its own", "public": ""}
     if not ctx.get("armed") and not ctx.get("drill"):
-        head = "Needs you: automatic repair is switched off"
+        head = "Automatic repair is switched off, so nothing was changed"
     elif plan.get("mode") in ("refused", "hold"):
-        head = "Needs you: " + plan.get("why", "the automatic repair stopped")
+        head = plan.get("why", "The automatic repair stopped")
     elif result.get("ran") and not result.get("ok"):
-        head = "Needs you: the automatic repair did not work"
+        head = "The automatic repair did not work"
     elif result.get("ran"):
-        head = "Needs you: the automatic repair did not fix it"
+        head = "The automatic repair did not fix it"
     else:
-        head = "Needs you: this is not something that can be fixed automatically"
+        head = "This is not something that can be fixed automatically"
     return {"stage": "Needs you", "headline": prefix + head, "details": details, "public_details": public_details, "resolved": False,
             "summary": "", "public": prefix + "We are looking into a problem and working on a fix"}
 
