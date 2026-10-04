@@ -299,3 +299,40 @@ def test_backstop_only_raises_the_alarm_when_the_watchdog_is_really_silent():
     assert judge(503, "", 0)[0] == "stale" and judge(0, "", 0)[0] == "stale"
     for blocked in (401, 403, 429):
         assert judge(blocked, "", 0)[0] == "unknown"               # Cloudflare turned the runner away: never alarm
+
+
+# --- a "drill" label can never relax the rules on production ---------------------------------------------
+
+def test_kill_switch_and_drill_labels(monkeypatch):
+    spec = importlib.util.spec_from_file_location("incident_common", Path(__file__).resolve().parents[1] / "ops" / "incident" / "common.py")
+    common = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(common)
+
+    for key in ("DRILL_APP", "INCIDENT_KIND", "AUTOFIX_ENABLED"):
+        monkeypatch.delenv(key, raising=False)
+    # production, kill switch off by default
+    assert common.target_app() == "milatexai-app" and not common.is_drill() and not common.armed()
+    monkeypatch.setenv("AUTOFIX_ENABLED", "TRUE")
+    assert common.armed()
+    monkeypatch.setenv("AUTOFIX_ENABLED", "yes")
+    assert not common.armed()                                   # only the word "true" arms it
+    # a request that says "drill" but names no drill app is handled as a real problem
+    monkeypatch.setenv("INCIDENT_KIND", "drill")
+    assert common.effective_kind() == "ours"
+    monkeypatch.setenv("INCIDENT_KIND", "anything else")
+    assert common.effective_kind() == "ours"
+    monkeypatch.setenv("INCIDENT_KIND", "edge")
+    assert common.effective_kind() == "edge"
+    # a real rehearsal is armed without the switch and acts on the copy
+    monkeypatch.setenv("DRILL_APP", "milatexai-drill")
+    monkeypatch.setenv("AUTOFIX_ENABLED", "false")
+    assert common.is_drill() and common.armed() and common.effective_kind() == "drill"
+
+
+def test_only_the_drill_copy_can_be_named_as_a_drill_target(monkeypatch):
+    spec = importlib.util.spec_from_file_location("incident_common2", Path(__file__).resolve().parents[1] / "ops" / "incident" / "common.py")
+    common = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(common)
+    monkeypatch.setenv("DRILL_APP", "some-other-app")
+    with pytest.raises(SystemExit):
+        common.target_app()

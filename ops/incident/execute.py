@@ -94,7 +94,7 @@ def main() -> None:
             raw = fh.read()
     decision = plan.parse_decision(raw) if raw.strip() else None
 
-    kind = os.environ.get("INCIDENT_KIND", "ours")
+    kind = c.effective_kind()
     app = c.target_app()
     base = c.app_base(app)
     now = time.time()
@@ -106,7 +106,7 @@ def main() -> None:
     show = c.az("containerapp", "show", "-n", app, "-g", c.RG)
     tags = plan.parse_deploy_tags(show.get("tags"))
     facts = {
-        "armed": c.armed(), "kind": "drill" if c.is_drill() else kind, "now": now,
+        "armed": c.armed(), "kind": kind, "now": now,
         "ledger": c.ledger_read(app),
         "deploy_running": plan.deploy_in_flight(c.revisions(app), now) and not c.is_drill(),
         "firstaid_restarted": bool(firstaid.get("restarted")),

@@ -27,7 +27,7 @@ def done(recovered: bool, restarted: bool, summary: str) -> None:
 
 
 def main() -> None:
-    kind = os.environ.get("INCIDENT_KIND", "ours")
+    kind = c.effective_kind()
     app = c.target_app()
     base = c.app_base(app)
     now = time.time()
@@ -48,7 +48,7 @@ def main() -> None:
         return
 
     revs = c.revisions(app)
-    facts = {"armed": c.armed(), "kind": "drill" if c.is_drill() else "ours", "now": now,
+    facts = {"armed": c.armed(), "kind": kind, "now": now,
              "ledger": c.ledger_read(app), "deploy_running": plan.deploy_in_flight(revs, now) and not c.is_drill(),
              "firstaid_restarted": False}
     gate = plan.plan_action({"action": "restart", "category": "process_hang", "confidence": "high", "diagnosis": "",

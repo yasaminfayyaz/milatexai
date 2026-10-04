@@ -18,6 +18,7 @@ import urllib.request
 
 RG = "milatexai-rg"
 PROD_APP = "milatexai-app"
+DRILL_APP_NAME = "milatexai-drill"
 SITE = "https://milatexai.com"
 STATUS = "https://status.milatexai.com"
 REPO = os.environ.get("GITHUB_REPOSITORY", "yasaminfayyaz/milatexai")
@@ -28,11 +29,24 @@ UA = "milatexai-incident/1.0"
 
 def target_app() -> str:
     """The app every action applies to. A drill points this at a throwaway copy."""
-    return os.environ.get("DRILL_APP", "").strip() or PROD_APP
+    app = os.environ.get("DRILL_APP", "").strip()
+    if app not in ("", DRILL_APP_NAME):
+        raise SystemExit(f"refusing to act on unknown app {app!r}")
+    return app or PROD_APP
 
 
 def is_drill() -> bool:
     return target_app() != PROD_APP
+
+
+def effective_kind() -> str:
+    """What the repair treats this incident as. "drill" only ever means a rehearsal on the
+    throwaway copy; a request that says drill but names no drill app is handled as a
+    real problem of ours, so a label can never relax the rules on production."""
+    if is_drill():
+        return "drill"
+    kind = os.environ.get("INCIDENT_KIND", "ours").strip().lower()
+    return kind if kind in ("ours", "edge") else "ours"
 
 
 def armed() -> bool:
