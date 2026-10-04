@@ -83,14 +83,16 @@ def disable_rule(rule_id: str) -> dict:
 
 
 def wait_healthy(kind: str, base: str, patience: int) -> bool:
+    """Is the service answering? Checks at least once, then keeps checking for `patience` seconds."""
     if kind == "edge":
         end = time.time() + patience
-        while time.time() < end:
+        while True:
             view = c.site_view()
             if view.get("known") and view.get("level") == "ok" and (view.get("age_seconds") or 9999) < 120:
                 return True
+            if time.time() >= end:
+                return False
             time.sleep(15)
-        return False
     return c.probe_origin(base, patience=patience)["healthy"]
 
 
