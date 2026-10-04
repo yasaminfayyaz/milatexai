@@ -255,7 +255,7 @@ def test_every_email_template_is_clean_and_links_to_status(js):
     for template, ctx in ctxs.items():
         m = js(f"__test.composeEmail({jsv(template)}, {jsv(ctx)}, {{}})")
         assert m["subject"].startswith("[MiLatexAI]") and "https://status.milatexai.com" in m["text"], template
-        assert "—" not in m["subject"] + m["text"], template
+        assert chr(0x2014) not in m["subject"] + m["text"], template  # no em dashes, ever
     opened = js(f"__test.composeEmail('opened', {jsv(ctxs['opened'])}, {{}})")
     assert "the app server" in opened["subject"] and "the database" in opened["subject"]
     assert "needs you" in js(f"__test.composeEmail('still_down', {jsv(ctxs['still_down'])}, {{}})")["text"]
