@@ -10,6 +10,7 @@ and letting text that originated in logs inject HTML into the public page.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -292,3 +293,9 @@ def test_constant_time_equal(js):
     assert js("__test.constantTimeEqual('abc', 'abd')") is False
     assert js("__test.constantTimeEqual('abc', 'ab')") is False
     assert js("__test.constantTimeEqual('', undefined)") is False
+
+
+def test_alerts_go_to_the_owner_and_nobody_else():
+    # A one-letter typo here once sent two test emails to a stranger's mailbox, so pin it.
+    assert re.search(r'ALERT_TO: "yasaminfayyaz@gmail\.com"', SRC.read_text(encoding="utf-8"))
+    assert "yasminfayyaz" not in SRC.read_text(encoding="utf-8")

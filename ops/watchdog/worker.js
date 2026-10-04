@@ -15,7 +15,7 @@
 const DEFAULTS = {
   SITE: "https://milatexai.com",
   ORIGIN: "https://milatexai-app.graydune-9dce6624.canadaeast.azurecontainerapps.io",
-  ALERT_TO: "yasminfayyaz@gmail.com",
+  ALERT_TO: "yasaminfayyaz@gmail.com",
   ALERT_FROM_EMAIL: "alerts@milatexai.com",
   ALERT_FROM_NAME: "MiLatexAI Alerts",
   GH_REPO: "yasaminfayyaz/milatexai",
