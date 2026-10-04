@@ -226,13 +226,18 @@ def cf(method: str, path: str, body: dict | None = None) -> dict:
     return data
 
 
-def waf_rules() -> tuple[str, list[dict]]:
-    """(ruleset id, custom firewall rules) for the zone."""
+def waf_rules_raw() -> tuple[str, list[dict]]:
+    """(ruleset id, the custom firewall rules exactly as Cloudflare stores them)."""
     data = cf("GET", f"/zones/{CF_ZONE}/rulesets/phases/http_request_firewall_custom/entrypoint")
     result = data.get("result") or {}
-    rules = [{"id": r.get("id"), "description": r.get("description", ""), "enabled": r.get("enabled", True),
-              "action": r.get("action")} for r in result.get("rules") or []]
-    return result.get("id", ""), rules
+    return result.get("id", ""), list(result.get("rules") or [])
+
+
+def waf_rules() -> tuple[str, list[dict]]:
+    """(ruleset id, a short description of each custom firewall rule)."""
+    ruleset_id, raw = waf_rules_raw()
+    return ruleset_id, [{"id": r.get("id"), "description": r.get("description", ""), "enabled": r.get("enabled", True),
+                         "action": r.get("action")} for r in raw]
 
 
 def utc_now() -> float:

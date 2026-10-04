@@ -216,12 +216,12 @@ jobs:
           tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
           subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
       - uses: actions/download-artifact@v8
-        continue-on-error: true
+        if: ${{ needs.triage.outputs.has_decision == 'true' }}
         with:
           name: decision
           path: .incident
       - name: Decrypt the proposal
-        continue-on-error: true
+        if: ${{ needs.triage.outputs.has_decision == 'true' }}
         env:
           KEY: ${{ secrets.INCIDENT_EVIDENCE_KEY }}
         run: openssl enc -d -aes-256-cbc -pbkdf2 -pass env:KEY -in .incident/decision.enc -out .incident/decision.json
@@ -246,12 +246,12 @@ jobs:
         with:
           persist-credentials: false
       - uses: actions/download-artifact@v8
-        continue-on-error: true
+        if: ${{ needs.triage.outputs.has_decision == 'true' }}
         with:
           name: decision
           path: .incident
       - name: Decrypt the proposal
-        continue-on-error: true
+        if: ${{ needs.triage.outputs.has_decision == 'true' }}
         env:
           KEY: ${{ secrets.INCIDENT_EVIDENCE_KEY }}
         run: openssl enc -d -aes-256-cbc -pbkdf2 -pass env:KEY -in .incident/decision.enc -out .incident/decision.json

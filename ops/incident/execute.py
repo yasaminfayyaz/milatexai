@@ -68,9 +68,17 @@ def purge_cache() -> dict:
 
 
 def disable_rule(rule_id: str) -> dict:
-    ruleset_id, rules = c.waf_rules()
-    c.cf("PATCH", f"/zones/{c.CF_ZONE}/rulesets/{ruleset_id}/rules/{rule_id}", {"enabled": False})
-    name = next((r["description"] for r in rules if r["id"] == rule_id), rule_id)
+    # Cloudflare wants the whole rule back on an update (a bare {"enabled": false} is
+    # rejected), so take the stored rule and change only that one field.
+    ruleset_id, raw = c.waf_rules_raw()
+    rule = next((r for r in raw if r.get("id") == rule_id), None)
+    if rule is None:
+        return {"ran": True, "ok": False, "detail": "The firewall rule was not found when it came to switching it off."}
+    keep = ("action", "action_parameters", "expression", "description", "logging", "ratelimit")
+    body = {k: rule[k] for k in keep if k in rule}
+    body["enabled"] = False
+    c.cf("PATCH", f"/zones/{c.CF_ZONE}/rulesets/{ruleset_id}/rules/{rule_id}", body)
+    name = rule.get("description") or rule_id
     return {"ran": True, "ok": True, "detail": f"Switched off the firewall rule '{name}'. It stays off until you switch it back on in Cloudflare."}
 
 
