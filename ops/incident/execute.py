@@ -13,8 +13,10 @@ Outputs: plan (JSON), result (JSON), healthy_now (true/false)
 
 from __future__ import annotations
 
+import calendar
 import json
 import os
+import re
 import sys
 import time
 
@@ -39,14 +41,15 @@ def rollback(app: str, sha: str) -> dict:
     cmd = ["gh", "workflow", "run", "deploy.yml", "--repo", c.REPO, "--ref", "main", "-f", f"sha={sha}"]
     if c.is_drill():
         cmd += ["-f", f"app={app}"]
-    c.sh(cmd)
-    run_id = None
+    out = c.sh(cmd)
+    found = re.search(r"/actions/runs/(\d+)", out)          # gh prints the URL of the run it started
+    run_id = int(found.group(1)) if found else None
     deadline = time.time() + 120
-    while time.time() < deadline and run_id is None:
+    while run_id is None and time.time() < deadline:         # older gh versions print nothing: look for it
         time.sleep(6)
         runs = c.gh_api("GET", f"repos/{c.REPO}/actions/workflows/deploy.yml/runs?event=workflow_dispatch&per_page=5") or {}
         for r in runs.get("workflow_runs", []):
-            made = time.mktime(time.strptime(r["created_at"], "%Y-%m-%dT%H:%M:%SZ")) - time.timezone
+            made = calendar.timegm(time.strptime(r["created_at"], "%Y-%m-%dT%H:%M:%SZ"))
             if made >= started - 5:
                 run_id = r["id"]
                 break
