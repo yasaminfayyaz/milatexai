@@ -10,12 +10,21 @@ on:
       sha:
         required: true
         type: string
+      app:
+        required: false
+        type: string
+        default: ""
   workflow_dispatch:
     inputs:
       sha:
         description: Commit SHA of an already-built image (redeploy or roll back)
         required: true
         type: string
+      app:
+        description: Leave empty for production. milatexai-drill is the rehearsal copy used by the incident drills.
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -26,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
-      group: production-deploy
+      group: ${{ inputs.app == 'milatexai-drill' && 'drill-deploy' || 'production-deploy' }}
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v7
@@ -40,4 +49,7 @@ jobs:
           client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
           tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
           subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
-      - run: bash ops/deploy.sh "${{ inputs.sha }}"
+      - run: bash ops/deploy.sh "$DEPLOY_SHA"
+        env:
+          DEPLOY_SHA: ${{ inputs.sha }}
+          DEPLOY_APP: ${{ inputs.app }}

@@ -1,0 +1,267 @@
+name: incident
+
+# Automatic repair, started by the Cloudflare watchdog (ops/watchdog/worker.js) when
+# something of ours has been down for two minutes. Also used for rehearsals: a drill
+# passes drill_app=milatexai-drill and every action then lands on that throwaway copy.
+#
+#   first-aid  restart the live app and see if that was enough (no AI involved)
+#   collect    gather redacted facts: health, Azure state, logs, recent deploys, Cloudflare
+#   triage     an AI reads the facts and proposes ONE action from a short menu. It holds
+#              no cloud credentials and can only read files.
+#   execute    a plain script validates the proposal against the menu, preconditions,
+#              hourly limits and the kill switch (vars.AUTOFIX_ENABLED), then acts
+#   report     email (through the watchdog) and a GitHub issue, whatever happened
+#
+# Every action goes through ops/incident/plan.py, which is covered by tests. Setting the
+# repository variable AUTOFIX_ENABLED to anything but "true" turns every action into a
+# recorded dry run.
+
+on:
+  workflow_dispatch:
+    inputs:
+      incident_id:
+        description: Incident id from the watchdog
+        required: true
+      kind:
+        description: ours | edge | drill
+        required: true
+      failing:
+        description: Comma separated list of failing checks
+        required: false
+        default: ""
+      detected_at:
+        required: false
+        default: ""
+      version:
+        required: false
+        default: ""
+      attempt:
+        required: false
+        default: first
+      drill_app:
+        description: Leave empty for production. milatexai-drill for a rehearsal.
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: incident-${{ inputs.drill_app || 'production' }}
+  cancel-in-progress: false
+
+env:
+  INCIDENT_ID: ${{ inputs.incident_id }}
+  INCIDENT_KIND: ${{ inputs.kind }}
+  INCIDENT_FAILING: ${{ inputs.failing }}
+  INCIDENT_DETECTED_AT: ${{ inputs.detected_at }}
+  INCIDENT_VERSION: ${{ inputs.version }}
+  INCIDENT_ATTEMPT: ${{ inputs.attempt }}
+  DRILL_APP: ${{ inputs.drill_app }}
+  AUTOFIX_ENABLED: ${{ vars.AUTOFIX_ENABLED }}
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  first-aid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: incident-fix
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+    outputs:
+      firstaid: ${{ steps.aid.outputs.firstaid }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: azure/login@v3
+        with:
+          client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
+          tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
+          subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
+      - id: aid
+        run: python3 ops/incident/firstaid.py
+
+  collect:
+    needs: first-aid
+    if: ${{ always() && !contains(needs.first-aid.outputs.firstaid, '"recovered":true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: incident-fix
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: azure/login@v3
+        with:
+          client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
+          tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
+          subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
+      - name: Gather the facts
+        env:
+          FIRSTAID: ${{ needs.first-aid.outputs.firstaid }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          mkdir -p .incident
+          python3 ops/incident/collect.py .incident/evidence.json
+      # This repository is public and artifacts are downloadable by any GitHub user, so the
+      # facts leave this job encrypted. Only the triage job and the scripts hold the key.
+      - name: Encrypt the facts
+        env:
+          KEY: ${{ secrets.INCIDENT_EVIDENCE_KEY }}
+        run: |
+          openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:KEY -in .incident/evidence.json -out .incident/evidence.enc
+          rm .incident/evidence.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: evidence
+          path: .incident/evidence.enc
+          retention-days: 3
+
+  triage:
+    needs: collect
+    if: ${{ always() && needs.collect.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # No environment, no cloud credentials, read-only permissions: this job can think
+    # and talk, nothing else. Its only output is a proposal that execute re-checks.
+    permissions:
+      contents: read
+    outputs:
+      has_decision: ${{ steps.save.outputs.has_decision }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: evidence
+          path: .incident
+      - name: Decrypt the facts
+        env:
+          KEY: ${{ secrets.INCIDENT_EVIDENCE_KEY }}
+        run: |
+          openssl enc -d -aes-256-cbc -pbkdf2 -pass env:KEY -in .incident/evidence.enc -out .incident/evidence.json
+          rm .incident/evidence.enc
+      - name: Read the facts and propose one action
+        id: triage
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          # This repository is public: keep the AI's words out of the run log and summary.
+          display_report: "false"
+          show_full_output: "false"
+          claude_args: >-
+            --max-turns 20
+            --allowedTools "Read,Grep,Glob"
+            --json-schema '{"type":"object","additionalProperties":false,"required":["action","category","confidence","diagnosis","customer_impact"],"properties":{"action":{"enum":["none","restart","rollback","purge_cache","disable_waf_rule","escalate"]},"category":{"enum":["bad_deploy","process_hang","resource_exhaustion","dependency_ours","dependency_external","edge_config","traffic_attack","unknown"]},"confidence":{"enum":["low","medium","high"]},"diagnosis":{"type":"string","maxLength":600},"customer_impact":{"type":"string","maxLength":300},"waf_rule_id":{"type":"string","maxLength":64},"suggested_followup":{"type":"string","maxLength":600}}}'
+          prompt: |
+            Follow the instructions in ops/incident/triage_prompt.md exactly. The facts are in
+            .incident/evidence.json. Your final answer is the structured result only.
+      # The answer is read from the action's output file, never from a step output or
+      # environment variable, because GitHub prints those in the (public) run log.
+      - name: Keep the proposal, encrypted, for the next job
+        id: save
+        if: ${{ always() }}
+        env:
+          EXEC_FILE: ${{ steps.triage.outputs.execution_file }}
+          KEY: ${{ secrets.INCIDENT_EVIDENCE_KEY }}
+        run: |
+          python3 ops/incident/save_decision.py "$EXEC_FILE" .incident/decision.json || : > .incident/decision.json
+          if [ -s .incident/decision.json ]; then
+            openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:KEY -in .incident/decision.json -out .incident/decision.enc
+            echo "has_decision=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_decision=false" >> "$GITHUB_OUTPUT"
+          fi
+          rm -f .incident/decision.json .incident/evidence.json
+      - uses: actions/upload-artifact@v7
+        if: ${{ always() && steps.save.outputs.has_decision == 'true' }}
+        with:
+          name: decision
+          path: .incident/decision.enc
+          retention-days: 3
+
+  execute:
+    needs: [first-aid, collect, triage]
+    if: ${{ always() && needs.collect.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment: incident-fix
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+      actions: write
+    outputs:
+      plan: ${{ steps.run.outputs.plan }}
+      result: ${{ steps.run.outputs.result }}
+      healthy_now: ${{ steps.run.outputs.healthy_now }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: azure/login@v3
+        with:
+          client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
+          tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
+          subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: decision
+          path: .incident
+      - name: Decrypt the proposal
+        continue-on-error: true
+        env:
+          KEY: ${{ secrets.INCIDENT_EVIDENCE_KEY }}
+        run: openssl enc -d -aes-256-cbc -pbkdf2 -pass env:KEY -in .incident/decision.enc -out .incident/decision.json
+      - name: Validate the proposal and act on it if allowed
+        id: run
+        env:
+          FIRSTAID: ${{ needs.first-aid.outputs.firstaid }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: python3 ops/incident/execute.py .incident/decision.json
+
+  report:
+    needs: [first-aid, collect, triage, execute]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: incident-fix
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: decision
+          path: .incident
+      - name: Decrypt the proposal
+        continue-on-error: true
+        env:
+          KEY: ${{ secrets.INCIDENT_EVIDENCE_KEY }}
+        run: openssl enc -d -aes-256-cbc -pbkdf2 -pass env:KEY -in .incident/decision.enc -out .incident/decision.json
+      - name: Email and record what happened
+        env:
+          FIRSTAID: ${{ needs.first-aid.outputs.firstaid }}
+          PLAN: ${{ needs.execute.outputs.plan }}
+          RESULT: ${{ needs.execute.outputs.result }}
+          HEALTHY_NOW: ${{ needs.execute.outputs.healthy_now }}
+          NEEDS: ${{ toJSON(needs) }}
+          REPORT_SECRET: ${{ secrets.WATCHDOG_REPORT_SECRET }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python3 ops/incident/report.py .incident/decision.json

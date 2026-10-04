@@ -6,7 +6,17 @@ name: ship
 on:
   push:
     branches: [main, "ci-test/**"]
-    paths-ignore: ["ops/maint/run-now"]   # that file only starts maintenance
+    # None of these touch the app: run-now only starts maintenance; the rest are the
+    # watchdog and repair tooling, tested by ops-tests.yml instead of redeploying the app.
+    paths-ignore:
+      - "ops/maint/run-now"
+      - "ops/watchdog/**"
+      - "ops/incident/**"
+      - ".github/workflows/incident.yml"
+      - ".github/workflows/watchdog-*.yml"
+      - ".github/workflows/ops-tests.yml"
+      - "tests/test_incident_*.py"
+      - "tests/test_watchdog_*.py"
   workflow_dispatch:
 
 permissions:

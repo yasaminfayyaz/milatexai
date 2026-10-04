@@ -124,7 +124,7 @@ function step(prev, cls, now) {
       s.oks += 1;
       if (s.oks >= CLOSE_AFTER_OKS) {
         const inc = s.incident;
-        s.history.unshift({ id: inc.id, openedAt: inc.openedAt, closedAt: now, kind: inc.kind, failing: inc.failing });
+        s.history.unshift({ id: inc.id, openedAt: inc.openedAt, closedAt: now, kind: inc.kind, failing: inc.failing, summary: inc.summary || "" });
         s.history = s.history.slice(0, MAX_HISTORY);
         actions.push({ type: "email", template: "recovered", incident: inc, closedAt: now });
         s.incident = null;
@@ -296,7 +296,8 @@ function composeEmail(template, ctx, cfg) {
     case "recovered":
       return { subject: "[MiLatexAI] Recovered after " + fmtDuration(ctx.closedAt - inc.openedAt),
         text: "Everything is healthy again.\n\nIt lasted " + fmtDuration(ctx.closedAt - inc.openedAt) +
-          ".\nWhat had failed: " + listify(inc.failing) + "\nIncident: " + inc.id + "\n\nLive status: " + status + "\n" };
+          ".\nWhat had failed: " + listify(inc.failing) + (inc.summary ? "\nWhat was done: " + inc.summary : "") +
+          "\nIncident: " + inc.id + "\n\nLive status: " + status + "\n" };
     case "external":
       return { subject: "[MiLatexAI] A third-party service is having trouble: " + listify(ctx.ext.failing),
         text: "Nothing on our side is broken, but a service we depend on has been failing for over 10 minutes:\n  " +
@@ -319,6 +320,8 @@ function cleanReport(body) {
     incident_id: clean(body.incident_id, 60),
     stage: clean(body.stage || "Update", 40),
     headline: clean(body.headline || "Update", 200),
+    summary: clean(body.summary, 160),      // plain words for the public status page and the recovery email
+    public: clean(body.public, 160),
     details: (Array.isArray(body.details) ? body.details : []).slice(0, 40).map((d) => clean(d, 300)),
     links: (Array.isArray(body.links) ? body.links : []).slice(0, 5).map((d) => clean(d, 300)).filter((u) => /^https:\/\//.test(u)),
     resolved: body.resolved === true,
@@ -379,7 +382,7 @@ async function probeAll(cfg) {
 
 async function sendEmail(env, cfg, template, ctx) {
   const m = composeEmail(template, ctx, cfg);
-  await env.EMAIL.send({ to: cfg.ALERT_TO, from: { email: cfg.ALERT_FROM_EMAIL, name: cfg.ALERT_FROM_NAME }, subject: m.subject, text: m.text });
+  return await env.EMAIL.send({ to: cfg.ALERT_TO, from: { email: cfg.ALERT_FROM_EMAIL, name: cfg.ALERT_FROM_NAME }, subject: m.subject, text: m.text });
 }
 
 async function dispatchRepair(env, cfg, inc, latest, retry, drill) {
@@ -446,17 +449,24 @@ async function handleFetch(request, env) {
     if (!authed()) return J({ error: "unauthorized" }, 401);
     const rep = cleanReport(await request.json().catch(() => ({})));
     const core = (await env.STATE.get("core", "json")) || initialState();
-    if (core.incident && core.incident.id === rep.incident_id) core.incident.headline = rep.headline;
+    let mail = true;
+    if (core.incident && core.incident.id === rep.incident_id) {
+      // Only the public wording reaches the status page; the owner-facing headline goes by email.
+      if (rep.public) core.incident.headline = rep.public;
+      // A "fixed" report rides along in the single "recovered" email once the
+      // probes confirm it, so we do not send two emails for one recovery.
+      if (rep.resolved) { core.incident.summary = rep.summary || rep.headline; mail = false; }
+    }
     const idx = core.history.findIndex((h) => h.id === rep.incident_id);
-    if (idx >= 0 && rep.resolved) core.history[idx].summary = rep.headline;
+    if (idx >= 0 && rep.resolved) core.history[idx].summary = rep.summary || rep.headline;
     await env.STATE.put("core", JSON.stringify(core));
-    await sendEmail(env, cfg, "report", rep);
-    return J({ ok: true });
+    if (mail) await sendEmail(env, cfg, "report", rep);
+    return J({ ok: true, emailed: mail });
   }
   if (request.method === "POST" && url.pathname === "/api/test-email") {
     if (!authed()) return J({ error: "unauthorized" }, 401);
-    await sendEmail(env, cfg, "report", { stage: "Test", headline: "Alert email path works", details: ["Sent from the watchdog on Cloudflare."], links: [] });
-    return J({ ok: true });
+    const sent = await sendEmail(env, cfg, "report", { stage: "Test", headline: "Alert email path works", details: ["Sent from the watchdog on Cloudflare at " + new Date(now).toISOString() + "."], links: [] });
+    return J({ ok: true, sent: sent || null });
   }
   if (request.method === "POST" && url.pathname === "/api/test-dispatch") {
     if (!authed()) return J({ error: "unauthorized" }, 401);
@@ -470,10 +480,16 @@ async function handleFetch(request, env) {
 
 export default {
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(runCheck(env).catch((e) => env.STATE.put("lasterror", String((e && e.name) || "error") + " at " + new Date().toISOString())));
+    ctx.waitUntil(runCheck(env).catch((e) => {
+      console.error("scheduled run failed:", String((e && e.name) || "error"), String((e && e.message) || "").slice(0, 200));
+      return env.STATE.put("lasterror", String((e && e.name) || "error") + " at " + new Date().toISOString());
+    }));
   },
   async fetch(request, env) {
-    try { return await handleFetch(request, env); } catch (e) { return new Response("Error", { status: 500 }); }
+    try { return await handleFetch(request, env); } catch (e) {
+      console.error("request failed:", String((e && e.name) || "error"), String((e && e.message) || "").slice(0, 200));
+      return new Response("Error", { status: 500 });
+    }
   },
 };
 

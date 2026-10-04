@@ -1,0 +1,34 @@
+name: ops-tests
+
+# Changes to the watchdog and the repair scripts do not touch the app, so they must not
+# redeploy it (ship.yml ignores these paths). This runs the unit tests for them instead.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops/watchdog/**"
+      - "ops/incident/**"
+      - ".github/workflows/incident.yml"
+      - ".github/workflows/watchdog-*.yml"
+      - ".github/workflows/ops-tests.yml"
+      - "tests/test_incident_*.py"
+      - "tests/test_watchdog_*.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install --require-hashes -r requirements-dev.txt
+      - run: python -m pytest tests -q -p no:cacheprovider

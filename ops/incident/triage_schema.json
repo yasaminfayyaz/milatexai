@@ -1,0 +1,58 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "action",
+    "category",
+    "confidence",
+    "diagnosis",
+    "customer_impact"
+  ],
+  "properties": {
+    "action": {
+      "enum": [
+        "none",
+        "restart",
+        "rollback",
+        "purge_cache",
+        "disable_waf_rule",
+        "escalate"
+      ]
+    },
+    "category": {
+      "enum": [
+        "bad_deploy",
+        "process_hang",
+        "resource_exhaustion",
+        "dependency_ours",
+        "dependency_external",
+        "edge_config",
+        "traffic_attack",
+        "unknown"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "diagnosis": {
+      "type": "string",
+      "maxLength": 600
+    },
+    "customer_impact": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "waf_rule_id": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "suggested_followup": {
+      "type": "string",
+      "maxLength": 600
+    }
+  }
+}

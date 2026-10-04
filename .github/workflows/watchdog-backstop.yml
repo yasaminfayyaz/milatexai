@@ -1,0 +1,26 @@
+name: watchdog-backstop
+
+# The watchdog runs on Cloudflare. This is the check on the checker: GitHub's own
+# scheduler (a separate system, though it can run hours late) asks whether the watchdog
+# is still alive and opens an issue that @mentions the owner if it has gone quiet.
+
+on:
+  schedule:
+    - cron: "23 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 ops/incident/backstop.py

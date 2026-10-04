@@ -148,6 +148,21 @@ def test_recovery_needs_three_good_minutes_and_says_so(js):
     assert len(s["history"]) == 1 and s["history"][0]["kind"] == "ours"
 
 
+def test_what_was_done_rides_in_the_single_recovery_email(js):
+    s, _ = step(js, None, "ours", 0)
+    s, _ = step(js, s, "ours", 1)
+    s["incident"]["summary"] = "Restarted the app server"      # set by /api/report with resolved=true
+    for m in (2, 3):
+        s, _ = step(js, s, "none", m)
+    s, a = step(js, s, "none", 4)
+    assert kinds(a) == [("email", "recovered")]
+    assert s["history"][0]["summary"] == "Restarted the app server"
+    mail = js(f"__test.composeEmail('recovered', {jsv(a[0])}, {{}})")
+    assert "What was done: Restarted the app server" in mail["text"]
+    plain = js(f"__test.composeEmail('recovered', {jsv({'incident': {'id': 'i', 'openedAt': T0, 'failing': []}, 'closedAt': T0 + MIN})}, {{}})")
+    assert "What was done" not in plain["text"]
+
+
 def test_edge_problems_also_trigger_repair(js):
     s, _ = step(js, None, "edge", 0, ["site"])
     s, a = step(js, s, "edge", 1, ["site"])
@@ -268,6 +283,8 @@ def test_report_payloads_are_bounded_and_cleaned(js):
     assert len(r["incident_id"]) == 60 and len(r["headline"]) == 200 and "\u0000" not in r["headline"]
     assert len(r["details"]) == 40 and all(len(d) == 300 for d in r["details"])
     assert r["links"] == ["https://ok.example/a"] and r["resolved"] is True
+    r = js(f"__test.cleanReport({jsv({'summary': 's' * 999, 'public': 'p' * 999})})")
+    assert len(r["summary"]) == 160 and len(r["public"]) == 160
 
 
 def test_constant_time_equal(js):

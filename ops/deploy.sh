@@ -20,7 +20,11 @@
 # revision that receives no traffic.
 set -euo pipefail
 SHA="${1:?usage: deploy.sh <git-sha>}"
-APP=milatexai-app
+# DEPLOY_APP lets the incident drills rehearse a rollback on a throwaway copy
+# (milatexai-drill). Anything else is refused, so this can only touch those two.
+APP="${DEPLOY_APP:-milatexai-app}"
+case "$APP" in milatexai-app|milatexai-drill) ;; *) echo "refusing to deploy to unknown app: $APP" >&2; exit 1;; esac
+MIN_REPLICAS=1; [ "$APP" = "milatexai-app" ] || MIN_REPLICAS=0   # the drill copy stays scale-to-zero (no idle bill)
 RG=milatexai-rg
 IMAGE="ghcr.io/yasaminfayyaz/milatexai:$SHA"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -47,7 +51,7 @@ NEW="$APP--$SUFFIX"
 # gate pauses the FREE tier (plus 80% of Pro revenue, see leafbridge/capacity.py).
 # Pro is never paused. Kept here so the limit is reviewable in git.
 azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" \
-  --min-replicas 1 --set-env-vars FREE_CAPACITY_STARTER=100 >/dev/null
+  --min-replicas "$MIN_REPLICAS" --set-env-vars FREE_CAPACITY_STARTER=100 >/dev/null
 echo "new revision: $NEW (0% traffic)"
 
 rollback() {
@@ -76,6 +80,21 @@ echo "traffic -> $NEW"
 APP_FQDN=$(azq containerapp show -n "$APP" -g "$RG" --query properties.configuration.ingress.fqdn -o tsv)
 echo "--- smoke test on the live URL ---"
 bash "$HERE/smoke.sh" "https://$APP_FQDN" || rollback
+
+# Remember which version is live and which one it replaced, only now that both smoke
+# tests passed. The incident repair reads these tags to find a known-good version to
+# roll back to. Redeploying the previous version clears "previous" so a second rollback
+# can never land on the version that was just rolled away from.
+APP_ID=$(azq containerapp show -n "$APP" -g "$RG" --query id -o tsv)
+OLD_CUR=$(azq containerapp show -n "$APP" -g "$RG" --query "tags.current_sha" -o tsv 2>/dev/null || true)
+OLD_PREV=$(azq containerapp show -n "$APP" -g "$RG" --query "tags.previous_sha" -o tsv 2>/dev/null || true)
+[ "$OLD_CUR" = "None" ] && OLD_CUR=""; [ "$OLD_PREV" = "None" ] && OLD_PREV=""
+if [ "$OLD_CUR" = "$SHA" ]; then NEW_PREV="$OLD_PREV"
+elif [ "$OLD_PREV" = "$SHA" ]; then NEW_PREV=""
+else NEW_PREV="$OLD_CUR"; fi
+azq tag update --resource-id "$APP_ID" --operation Merge \
+  --tags current_sha="$SHA" previous_sha="$NEW_PREV" deployed_at="$(date +%s)" >/dev/null \
+  || echo "::warning::could not record the deployed version (automatic rollback will have no target)"
 
 echo "letting in-flight requests on the old revision finish (60s)..."
 sleep 60
