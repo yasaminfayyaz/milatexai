@@ -46,6 +46,7 @@ USER_ID = "user_e2e_auth"
 EMAIL = "auth-e2e@example.com"
 KID = "e2e-key-1"
 HEX = "cccccccccccccccccccccccc"
+ENV_CLIENT_ID = "client_e2e_environment"
 
 
 def _b64url(data: bytes) -> str:
@@ -167,7 +168,9 @@ def world(tmp_path_factory):
         mp.setenv("WORKOS_AUTHKIT_DOMAIN", issuer)
         # Never reach the real WorkOS from a test, even if a local .env is loaded.
         mp.delenv("WORKOS_API_KEY", raising=False)
-        mp.delenv("WORKOS_CLIENT_ID", raising=False)
+        # Without an API key no WorkOS call is possible. The client id is the audience WorkOS
+        # falls back to for a connection authorized without naming this server.
+        mp.setenv("WORKOS_CLIENT_ID", ENV_CLIENT_ID)
         mcp = create_hosted_server(
             store=store, cipher=cipher, auth=True, base_url=base,
             data_dir=root / "cache",
@@ -244,3 +247,28 @@ def test_bad_tokens_are_refused(world, case):
         claims["iss"] = "https://evil-issuer.example"
     status, _, _ = _post(world, "initialize", INIT, _mint(key, claims))
     assert status == 401, f"{case} token was accepted"
+
+
+def test_token_addressed_to_our_workos_environment_is_accepted(world):
+    """A connection authorized without naming this server gets a token whose audience is the
+    WorkOS environment client id, and WorkOS keeps that audience on refresh. Claude never
+    signs in again after a 401, so refusing it strands the user until they reconnect."""
+    claims = dict(world.good_claims, aud=ENV_CLIENT_ID)
+    status, _, init = _post(world, "initialize", INIT, _mint(world.key, claims))
+    assert status == 200, status
+    assert init["result"]["serverInfo"]["name"] == "MiLatexAI"
+
+
+@pytest.mark.parametrize("aud", ["client_somebody_elses_app", "https://milatexai.com/other", "", ["client_x", "https://other.example/mcp"]])
+def test_every_other_audience_is_still_refused(world, aud):
+    claims = dict(world.good_claims, aud=aud)
+    status, _, _ = _post(world, "initialize", INIT, _mint(world.key, claims))
+    assert status == 401, f"audience {aud!r} was accepted"
+
+
+def test_widened_audience_does_not_weaken_the_other_checks(world):
+    base = dict(world.good_claims, aud=ENV_CLIENT_ID)
+    forged = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    assert _post(world, "initialize", INIT, _mint(forged, base))[0] == 401
+    assert _post(world, "initialize", INIT, _mint(world.key, dict(base, exp=base["iat"] - 10)))[0] == 401
+    assert _post(world, "initialize", INIT, _mint(world.key, dict(base, iss="https://evil-issuer.example")))[0] == 401

@@ -2,7 +2,7 @@
 
 Differences from the local Phase-1 ``server.py``:
 
-* Auth via WorkOS AuthKit (``AuthKitProvider``). Every tool call carries a
+* Auth via WorkOS AuthKit (``MiLatexAIAuthKit``, an ``AuthKitProvider``). Every tool call carries a
   verified user identity.
 * Each user's Overleaf token is fetched from the encrypted store (decrypted
   transiently) via :class:`~leafbridge.service.AccountService`, no
@@ -30,7 +30,6 @@ from urllib.parse import parse_qs, quote
 
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
-from fastmcp.server.auth.providers.workos import AuthKitProvider
 from fastmcp.server.dependencies import get_access_token
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
@@ -53,6 +52,7 @@ from .files import (
     write_text_exact,
 )
 from .git_worker import GitError, GitWorker, PushConflict
+from .authkit import MiLatexAIAuthKit
 from .health import DeepHealth
 from .service import (
     AccountService,
@@ -431,9 +431,12 @@ def create_hosted_server(
 
     auth_provider = None
     if auth:
-        auth_provider = AuthKitProvider(
+        auth_provider = MiLatexAIAuthKit(
             authkit_domain=os.environ["WORKOS_AUTHKIT_DOMAIN"],
             base_url=resolved_base,
+            # Connections authorized without naming this server get tokens addressed
+            # to the WorkOS environment client id; accept those too (see authkit.py).
+            extra_audiences=[os.environ.get("WORKOS_CLIENT_ID", "")],
         )
     mcp = FastMCP(
         name="MiLatexAI", instructions=INSTRUCTIONS, version=__version__, auth=auth_provider
