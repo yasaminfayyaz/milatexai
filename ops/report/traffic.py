@@ -65,8 +65,22 @@ Q = """query($zone: String!, $since: Time!, $until: Time!) {
     } } } }"""
 
 
-def fetch(dimensions: str, since: str, until: str) -> list[dict]:
-    return gql(Q % dimensions, {"zone": ZONE, "since": since, "until": until})
+DIMENSIONS = ["clientRequestPath", "userAgent", "cacheStatus", "clientCountryName", "clientRefererHost", "clientIP"]
+UNAVAILABLE: list[str] = []      # fields this Cloudflare plan will not give us; reported at the end
+
+
+def fetch(since: str, until: str) -> list[dict]:
+    """Ask for every dimension; when the plan refuses one, drop it and ask again."""
+    while True:
+        dims = [d for d in DIMENSIONS if d not in UNAVAILABLE]
+        try:
+            return gql(Q % " ".join(dims), {"zone": ZONE, "since": since, "until": until})
+        except RuntimeError as exc:
+            m = re.search(r"access to the field '([A-Za-z]+)'", str(exc))
+            name = next((d for d in dims if m and d.lower() == m.group(1).lower() and d != "clientRequestPath"), None)
+            if not name:
+                raise
+            UNAVAILABLE.append(name)
 
 
 def main() -> None:
@@ -82,7 +96,7 @@ def main() -> None:
     for since, until in day_windows(days):
         day = since[:10]
         try:
-            rows = fetch("clientRequestPath userAgent cacheStatus clientCountryName clientRefererHost clientIP", since, until)
+            rows = fetch(since, until)
         except RuntimeError as exc:
             last_error = str(exc)
             continue
@@ -125,12 +139,16 @@ def main() -> None:
     for p, label in PAGES.items():
         total = sum(per_day[d].get(p, 0) for d in per_day)
         print(f"  {label:<20} {total:>6} page loads, about {len({ip for _, ip in visitors[p]}):>5} distinct visitors")
-    print("\nWhere visitors came from:")
-    for ref, n in sorted(referrers.items(), key=lambda kv: -kv[1])[:12]:
-        print(f"  {n:>6}  {ref}")
-    print("\nCountries:")
-    for c, n in sorted(countries.items(), key=lambda kv: -kv[1])[:10]:
-        print(f"  {n:>6}  {c}")
+    if "clientRefererHost" not in UNAVAILABLE:
+        print("\nWhere visitors came from:")
+        for ref, n in sorted(referrers.items(), key=lambda kv: -kv[1])[:12]:
+            print(f"  {n:>6}  {ref}")
+    if "clientCountryName" not in UNAVAILABLE:
+        print("\nCountries:")
+        for c, n in sorted(countries.items(), key=lambda kv: -kv[1])[:10]:
+            print(f"  {n:>6}  {c}")
+    if UNAVAILABLE:
+        print("\nNot available on this Cloudflare plan: " + ", ".join(UNAVAILABLE))
     if cached + uncached:
         print(f"\nServed from Cloudflare's cache: {cached} of {cached + uncached} loads")
     if reached < days:
