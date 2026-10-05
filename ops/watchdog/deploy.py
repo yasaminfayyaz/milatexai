@@ -9,7 +9,7 @@ It makes sure that, in this order:
   5. it answers on status.milatexai.com and nowhere else (the workers.dev address is switched off).
 
 Reads these from the environment (the GitHub environment "watchdog-deploy" provides them):
-  CLOUDFLARE_API_TOKEN, WATCHDOG_GITHUB_TOKEN, WATCHDOG_REPORT_SECRET
+  CLOUDFLARE_API_TOKEN, WATCHDOG_GITHUB_TOKEN, WATCHDOG_REPORT_SECRET, WATCHDOG_DIGEST_SECRET
 Nothing secret is ever printed.
 """
 
@@ -29,7 +29,8 @@ SCRIPT = "milatexai-watchdog"
 KV_TITLE = "milatexai-watchdog"
 SUBDOMAIN = "milatexai"
 HOST = "status.milatexai.com"
-CRON = "* * * * *"
+CRON = "* * * * *"          # the health check
+DAILY_CRON = "0 12 * * *"   # starts the daily user table (must match DAILY_CRON in worker.js)
 COMPAT_DATE = "2025-09-01"
 CODE = Path(__file__).with_name("worker.js")
 
@@ -98,6 +99,7 @@ def upload(kv_id: str) -> None:
             {"type": "send_email", "name": "EMAIL"},
             {"type": "secret_text", "name": "GITHUB_TOKEN", "text": need("WATCHDOG_GITHUB_TOKEN")},
             {"type": "secret_text", "name": "REPORT_SECRET", "text": need("WATCHDOG_REPORT_SECRET")},
+            {"type": "secret_text", "name": "DIGEST_SECRET", "text": need("WATCHDOG_DIGEST_SECRET")},
         ],
     }
     boundary = uuid.uuid4().hex
@@ -116,8 +118,8 @@ def upload(kv_id: str) -> None:
 
 
 def set_schedule() -> None:
-    call("PUT", f"/accounts/{ACCOUNT}/workers/scripts/{SCRIPT}/schedules", [{"cron": CRON}])
-    print(f"ok  runs on schedule: {CRON}")
+    call("PUT", f"/accounts/{ACCOUNT}/workers/scripts/{SCRIPT}/schedules", [{"cron": CRON}, {"cron": DAILY_CRON}])
+    print(f"ok  runs on schedules: {CRON} and {DAILY_CRON}")
 
 
 def attach_domain() -> None:

@@ -299,3 +299,22 @@ def test_alerts_go_to_the_owner_and_nobody_else():
     # A one-letter typo here once sent two test emails to a stranger's mailbox, so pin it.
     assert re.search(r'ALERT_TO: "yasaminfayyaz@gmail\.com"', SRC.read_text(encoding="utf-8"))
     assert "yasminfayyaz" not in SRC.read_text(encoding="utf-8")
+
+
+def test_an_empty_secret_never_matches(js):
+    # a Worker whose secret is unset must not accept a request with an empty token
+    assert js("__test.constantTimeEqual('', '')") is False
+    assert js("__test.constantTimeEqual('x', '')") is False
+
+
+def test_daily_digest_is_bounded_and_composed(js):
+    big = {"subject": "Daily\r\nBcc: attacker@example.com " + "s" * 999, "text": "t" * 99999, "html": "h" * 99999,
+           "snapshot": {"a@example.com": {"commits": 1}}}
+    d = js(f"__test.cleanDigest({jsv(big)})")
+    assert "\r" not in d["subject"] and "\n" not in d["subject"] and len(d["subject"]) <= 150 and d["subject"].startswith("Daily Bcc: ")
+    assert len(d["text"]) == 30000 and len(d["html"]) == 60000
+    assert d["snapshot"] == {"a@example.com": {"commits": 1}}
+    huge = js(f"__test.cleanDigest({jsv({'snapshot': {'k': 'v' * 70000}})})")
+    assert huge["snapshot"] == {}                      # an oversized snapshot is dropped, not stored
+    mail = js(f"__test.composeEmail('digest', {jsv({'subject': 'Daily users: 21', 'text': 'body', 'html': '<p>body</p>'})}, {{}})")
+    assert mail["subject"] == "[MiLatexAI] Daily users: 21" and mail["text"] == "body" and mail["html"] == "<p>body</p>"

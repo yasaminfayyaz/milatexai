@@ -23,6 +23,7 @@ const DEFAULTS = {
   STATUS_URL: "https://status.milatexai.com",
 };
 
+const DAILY_CRON = "0 12 * * *";   // 12:00 UTC, 8am Toronto: build and email the daily user table
 const MINUTE = 60 * 1000;
 const BAR_MINUTES = 1440;          // one character per minute, kept for 24 hours
 const OPEN_AFTER_FAILS = 2;        // consecutive bad minutes before an incident opens
@@ -307,6 +308,8 @@ function composeEmail(template, ctx, cfg) {
     case "report":
       return { subject: "[MiLatexAI] " + ctx.stage + ": " + ctx.headline,
         text: ctx.headline + "\n\n" + (ctx.details || []).join("\n") + (ctx.links && ctx.links.length ? "\n\nMore:\n" + ctx.links.join("\n") : "") + "\n\nLive status: " + status + "\n" };
+    case "digest":
+      return { subject: "[MiLatexAI] " + ctx.subject, text: ctx.text, html: ctx.html || "" };
     default:
       return { subject: "[MiLatexAI] " + template, text: JSON.stringify(ctx) };
   }
@@ -328,8 +331,22 @@ function cleanReport(body) {
   };
 }
 
+// The daily digest comes from our own workflow, but it is still bounded before it is emailed or stored.
+function cleanDigest(body) {
+  const clean = (v, n) => String(v == null ? "" : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").slice(0, n);
+  const snapshot = body && typeof body.snapshot === "object" && body.snapshot ? body.snapshot : {};
+  const json = JSON.stringify(snapshot);
+  return {
+    subject: clean(body.subject || "Daily report", 150).replace(/[\r\n]+/g, " "),
+    text: clean(body.text, 30000),
+    html: clean(body.html, 60000),
+    snapshot: json.length <= 60000 ? snapshot : {},
+  };
+}
+
 function constantTimeEqual(a, b) {
-  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  // An empty secret must never match: a Worker with the secret unset would otherwise accept an empty token.
+  if (typeof a !== "string" || typeof b !== "string" || !a || !b || a.length !== b.length) return false;
   let d = 0;
   for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return d === 0;
@@ -382,7 +399,9 @@ async function probeAll(cfg) {
 
 async function sendEmail(env, cfg, template, ctx) {
   const m = composeEmail(template, ctx, cfg);
-  return await env.EMAIL.send({ to: cfg.ALERT_TO, from: { email: cfg.ALERT_FROM_EMAIL, name: cfg.ALERT_FROM_NAME }, subject: m.subject, text: m.text });
+  const message = { to: cfg.ALERT_TO, from: { email: cfg.ALERT_FROM_EMAIL, name: cfg.ALERT_FROM_NAME }, subject: m.subject, text: m.text };
+  if (m.html) message.html = m.html;
+  return await env.EMAIL.send(message);
 }
 
 async function dispatchRepair(env, cfg, inc, latest, retry, drill) {
@@ -396,6 +415,17 @@ async function dispatchRepair(env, cfg, inc, latest, retry, drill) {
       attempt: retry ? "retry" : "first", drill_app: "" } }),
   });
   return r.status === 204;
+}
+
+// Started by the daily cron below: asks GitHub to build and email the daily user table.
+async function dispatchDaily(env, cfg) {
+  const r = await fetch("https://api.github.com/repos/" + cfg.GH_REPO + "/actions/workflows/daily-report.yml/dispatches", {
+    method: "POST",
+    headers: { authorization: "Bearer " + env.GITHUB_TOKEN, accept: "application/vnd.github+json", "x-github-api-version": "2022-11-28",
+               "user-agent": "milatexai-watchdog", "content-type": "application/json" },
+    body: JSON.stringify({ ref: "main" }),
+  });
+  if (r.status !== 204) throw new Error("daily dispatch " + r.status);
 }
 
 async function runCheck(env) {
@@ -468,6 +498,19 @@ async function handleFetch(request, env) {
     const sent = await sendEmail(env, cfg, "report", { stage: "Test", headline: "Alert email path works", details: ["Sent from the watchdog on Cloudflare at " + new Date(now).toISOString() + "."], links: [] });
     return J({ ok: true, sent: sent || null });
   }
+  // The daily user table: its own secret, so the job that builds it can send nothing else.
+  const digestAuthed = () => constantTimeEqual((request.headers.get("authorization") || "").replace(/^Bearer /, ""), env.DIGEST_SECRET || "");
+  if (request.method === "GET" && url.pathname === "/api/digest-state") {
+    if (!digestAuthed()) return J({ error: "unauthorized" }, 401);
+    return J((await env.STATE.get("digest:last", "json")) || {});
+  }
+  if (request.method === "POST" && url.pathname === "/api/digest") {
+    if (!digestAuthed()) return J({ error: "unauthorized" }, 401);
+    const d = cleanDigest(await request.json().catch(() => ({})));
+    await sendEmail(env, cfg, "digest", d);
+    await env.STATE.put("digest:last", JSON.stringify(d.snapshot));   // only after the email was accepted
+    return J({ ok: true });
+  }
   if (request.method === "POST" && url.pathname === "/api/test-dispatch") {
     if (!authed()) return J({ error: "unauthorized" }, 401);
     const body = await request.json().catch(() => ({}));
@@ -480,6 +523,10 @@ async function handleFetch(request, env) {
 
 export default {
   async scheduled(event, env, ctx) {
+    if (event.cron === DAILY_CRON) {
+      ctx.waitUntil(dispatchDaily(env, cfgOf(env)).catch((e) => env.STATE.put("daily-error", String((e && e.message) || "error").slice(0, 100) + " at " + new Date().toISOString())));
+      return;   // the every-minute cron fires at the same moment and does the health check
+    }
     ctx.waitUntil(runCheck(env).catch((e) => {
       console.error("scheduled run failed:", String((e && e.name) || "error"), String((e && e.message) || "").slice(0, 200));
       return env.STATE.put("lasterror", String((e && e.name) || "error") + " at " + new Date().toISOString());
@@ -493,4 +540,4 @@ export default {
   },
 };
 
-export const __test = { classify, step, parseDeep, updateBar, updateDays, uptimePercent, renderStatus, composeEmail, cleanReport, constantTimeEqual, initialState, fmtDuration, components, overall };
+export const __test = { classify, step, parseDeep, updateBar, updateDays, uptimePercent, renderStatus, composeEmail, cleanReport, cleanDigest, constantTimeEqual, initialState, fmtDuration, components, overall };

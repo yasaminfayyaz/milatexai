@@ -35,4 +35,5 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           WATCHDOG_GITHUB_TOKEN: ${{ secrets.WATCHDOG_GITHUB_TOKEN }}
           WATCHDOG_REPORT_SECRET: ${{ secrets.WATCHDOG_REPORT_SECRET }}
+          WATCHDOG_DIGEST_SECRET: ${{ secrets.WATCHDOG_DIGEST_SECRET }}
         run: python ops/watchdog/deploy.py

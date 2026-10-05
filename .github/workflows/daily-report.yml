@@ -1,0 +1,36 @@
+name: daily-report
+
+# Emails the owner the user table every day. Started at 12:00 UTC (8am Toronto) by the
+# Cloudflare watchdog's daily cron, which is on time (GitHub's own scheduler can drift by
+# hours). It signs in with a separate identity that can only READ the storage tables, and the
+# table leaves only through the email: this repository is public, so the log shows counts.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: daily-report
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: daily-report
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: azure/login@v3
+        with:
+          client-id: 02494938-8fc0-4750-adb3-c429bf2c2ff3
+          tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
+          subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
+      - run: python3 ops/report/daily_users.py
+        env:
+          AZURE_STORAGE_ACCOUNT: milatexaistore
+          DIGEST_SECRET: ${{ secrets.WATCHDOG_DIGEST_SECRET }}

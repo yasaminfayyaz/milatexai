@@ -17,6 +17,9 @@ on:
       - ".github/workflows/ops-tests.yml"
       - "tests/test_incident_*.py"
       - "tests/test_watchdog_*.py"
+      - "ops/report/**"
+      - ".github/workflows/daily-report.yml"
+      - "tests/test_daily_report.py"
   workflow_dispatch:
 
 permissions:
