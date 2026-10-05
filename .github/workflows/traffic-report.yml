@@ -1,0 +1,29 @@
+name: traffic-report
+
+# One-off or on-demand: how many people loaded the free client-side tools, from Cloudflare's
+# own analytics. Aggregate counts only; addresses are counted, never printed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: How many days back (the free Cloudflare plan keeps a few)
+        required: false
+        default: "7"
+
+permissions:
+  contents: read
+
+jobs:
+  traffic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: watchdog-deploy
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: python3 ops/report/traffic.py "$DAYS"
+        env:
+          DAYS: ${{ inputs.days }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

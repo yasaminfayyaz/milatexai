@@ -87,3 +87,27 @@ def test_snapshot_round_trips_into_the_next_comparison():
     snap = du.snapshot_of(r)
     again = du.compare(rows(), snap)
     assert again["commit_delta"] == 0 and again["new_users"] == []
+
+
+# --- traffic report helpers ------------------------------------------------------------------------
+
+def _traffic():
+    spec = importlib.util.spec_from_file_location("traffic", Path(__file__).resolve().parents[1] / "ops" / "report" / "traffic.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_bots_are_told_apart_from_people():
+    t = _traffic()
+    assert t.is_bot("") and t.is_bot("Mozilla/5.0 (compatible; Googlebot/2.1)") and t.is_bot("python-requests/2.31")
+    assert t.is_bot("Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.1)")
+    assert not t.is_bot("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36")
+
+
+def test_day_windows_are_utc_days_newest_first_and_never_in_the_future():
+    t = _traffic()
+    now = 1_760_000_000.0           # 2025-10-09 08:53:20 UTC
+    w = t.day_windows(3, now)
+    assert [a[:10] for a, _ in w] == ["2025-10-09", "2025-10-08", "2025-10-07"]
+    assert w[0][1] == "2025-10-09T08:53:20Z" and w[1][1] == "2025-10-09T00:00:00Z"
