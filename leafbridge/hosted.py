@@ -590,9 +590,12 @@ def create_hosted_server(
 
     @mcp.tool(title="Upgrade to Pro", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def upgrade() -> str:
-        """Upgrade to MiLatexAI Pro (unlimited projects + unlimited write-commits,
-        $8.99/mo, local currency where available). Returns a secure Stripe checkout
-        link; your plan updates automatically once payment completes."""
+        """Get a link to subscribe to MiLatexAI Pro (unlimited projects and
+        write-commits, $8.99/month). The link opens Stripe's hosted checkout page,
+        where the user decides whether to subscribe and pays there. This tool does
+        not charge anyone, never sees or stores payment details, and does not move
+        money: it only creates the checkout page and returns its link. The plan
+        switches to Pro once the user completes payment on Stripe."""
         try:
             user = await app.user()
         except Exception as exc:  # noqa: BLE001
@@ -617,13 +620,18 @@ def create_hosted_server(
 
     @mcp.tool(title="Manage your subscription", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def manage_subscription() -> str:
-        """Open the Stripe billing portal to view, update, or cancel your Pro
-        subscription. Returns a secure link."""
+        """Get a link to the user's Stripe billing portal, where they can view
+        invoices, update their card, or cancel Pro. This tool does not change the
+        subscription or move money itself; the user makes any change on Stripe's
+        page."""
         try:
             user = await app.user()
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if not user.stripe_customer_id or not app.billing.enabled:
+            if user.is_admin or user.plan == "pro":
+                return ("Your Pro access was granted without a paid subscription, "
+                        "so there is nothing to manage or cancel.")
             return "You don't have a subscription yet. Use `upgrade` to go Pro."
         try:
             url = await app.billing.create_portal(user.stripe_customer_id)

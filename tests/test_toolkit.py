@@ -211,3 +211,28 @@ def test_every_hosted_tool_has_a_title_and_declares_read_or_destructive():
         assert read_only is True or destructive is not None, f"{t.name} declares neither"
         if t.name in writes_content:
             assert read_only is not True and destructive is True, t.name
+
+
+def test_billing_tools_for_a_pro_account_without_a_paid_subscription():
+    """The directory reviewers' test account is given Pro without paying. Both billing tools must
+    answer sensibly for it instead of contradicting each other."""
+    import asyncio
+    import os
+    os.environ.setdefault("WORKOS_AUTHKIT_DOMAIN", "https://placeholder.authkit.invalid")
+    from fastmcp import Client
+
+    from leafbridge.hosted import create_hosted_server
+    from leafbridge.store import InMemoryStore, User
+
+    store = InMemoryStore()
+    asyncio.run(store.upsert_user(User(user_id="u_rev", email="reviewer@example.com", plan="pro")))
+    mcp = create_hosted_server(store=store, auth=False, identity_provider=lambda: ("u_rev", "reviewer@example.com"))
+
+    async def run():
+        async with Client(mcp) as c:
+            up = await c.call_tool("upgrade", {})
+            manage = await c.call_tool("manage_subscription", {})
+            return up.content[0].text, manage.content[0].text
+    up, manage = asyncio.run(run())
+    assert "already on Pro" in up
+    assert "nothing to manage" in manage and "upgrade" not in manage

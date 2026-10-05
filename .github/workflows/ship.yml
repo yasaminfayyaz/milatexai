@@ -10,6 +10,7 @@ on:
     # watchdog and repair tooling, tested by ops-tests.yml instead of redeploying the app.
     paths-ignore:
       - "ops/maint/run-now"
+      - "docs/**"
       - "ops/watchdog/**"
       - "ops/incident/**"
       - ".github/workflows/incident.yml"
