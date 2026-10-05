@@ -22,6 +22,18 @@ _TOKEN_HINT = (
 # Placeholder that leads with an Overleaf URL, then the other providers.
 _REPO_PLACEHOLDER = "https://www.overleaf.com/project/… · GitHub · GitLab · Bitbucket URL"
 
+# "How did you find us?" on the first connect form. Only a count per answer is kept (see
+# AccountService.record_signup_source), never tied to the person, so what we say we store stays true.
+SIGNUP_SOURCES = (
+    ("claude_directory", "Claude's connector directory"),
+    ("search", "Google or Bing"),
+    ("reddit", "Reddit"),
+    ("chatgpt", "ChatGPT"),
+    ("social", "X, LinkedIn, Bluesky or YouTube"),
+    ("friend", "A colleague or friend"),
+    ("other", "Somewhere else"),
+)
+
 _STYLE = """
 :root { color-scheme: light dark; }
 * { box-sizing: border-box; }
@@ -34,7 +46,7 @@ body {
 @media (prefers-color-scheme: dark) {
   body { background: #0f1115; color: #e8eaed; }
   .card { background: #191c22 !important; box-shadow: none !important; border: 1px solid #2a2e37; }
-  input { background: #0f1115 !important; color: #e8eaed !important; border-color: #333844 !important; }
+  input, select { background: #0f1115 !important; color: #e8eaed !important; border-color: #333844 !important; }
   .muted { color: #9aa0aa !important; }
   .note { background: #14181f !important; border-color: #2a2e37 !important; }
 }
@@ -47,11 +59,11 @@ body {
 h1 { font-size: 21px; margin: 18px 0 6px; letter-spacing: -.01em; }
 .muted { color: #6b7280; font-size: 14px; margin: 0 0 20px; }
 label { display: block; font-size: 13px; font-weight: 600; margin: 16px 0 6px; }
-input {
+input, select {
   width: 100%; padding: 11px 12px; font-size: 15px; border: 1px solid #d7dbe0;
   border-radius: 9px; background: #fff; color: #1a1d21; font-family: inherit;
 }
-input:focus { outline: 2px solid #00a693; outline-offset: 1px; border-color: #00a693; }
+input:focus, select:focus { outline: 2px solid #00a693; outline-offset: 1px; border-color: #00a693; }
 button {
   width: 100%; margin-top: 22px; padding: 12px; font-size: 15px; font-weight: 600;
   color: #0b3b33; background: #00a693; border: 0; border-radius: 9px; cursor: pointer;
@@ -103,8 +115,20 @@ def render_connect_form(
     email: str = "",
     error: str | None = None,
     has_token: bool = False,
+    ask_source: bool = False,
+    source: str = "",
 ) -> str:
     err_html = f"<div class='error'>{html.escape(error)}</div>" if error else ""
+    source_field = ""
+    if ask_source:
+        options = "".join(
+            f"<option value='{k}'{' selected' if k == source else ''}>{html.escape(v)}</option>"
+            for k, v in SIGNUP_SOURCES
+        )
+        source_field = (
+            "<label for='source'>How did you find MiLatexAI? <span class='muted'>(optional)</span></label>"
+            f"<select id='source' name='source'><option value=''>Prefer not to say</option>{options}</select>"
+        )
     # The token field is ALWAYS shown: non-Overleaf repos carry a per-repo token,
     # so a saved Overleaf token can't stand in for them. For a returning user the
     # field is optional, leaving it blank reuses the saved Overleaf token, but
@@ -159,6 +183,7 @@ def render_connect_form(
   <label for='name'>Label <span class='muted'>(optional)</span></label>
   <input id='name' name='name' placeholder='e.g. thesis'
          value='{html.escape(name, quote=True)}'>
+  {source_field}
   <button type='submit'>Connect securely</button>
 </form>
 {note}""",

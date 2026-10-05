@@ -53,6 +53,29 @@ def build_rows(users: list[dict], projects: list[dict], usage: list[dict], month
     return rows
 
 
+SOURCE_LABELS = {
+    "claude_directory": "Claude's connector directory", "search": "Google or Bing", "reddit": "Reddit", "chatgpt": "ChatGPT",
+    "social": "X, LinkedIn, Bluesky or YouTube", "friend": "A colleague or friend", "other": "Somewhere else",
+}
+
+
+def source_counts(usage: list[dict], month: str) -> list[dict]:
+    """Answers to "How did you find MiLatexAI?" on the first connect form. They are stored as a
+    count per answer and month under a pseudo-user "signup-source:<answer>", never tied to a person."""
+    out: dict[str, dict] = {}
+    for u in usage:
+        pk = u.get("PartitionKey", "")
+        if not pk.startswith("signup-source:"):
+            continue
+        key = pk.split(":", 1)[1]
+        row = out.setdefault(key, {"source": SOURCE_LABELS.get(key, key), "month": 0, "total": 0})
+        n = int(u.get("count", 0) or 0)
+        row["total"] += n
+        if u.get("RowKey") == month:
+            row["month"] += n
+    return sorted(out.values(), key=lambda r: (-r["month"], -r["total"], r["source"]))
+
+
 def snapshot_of(rows: list[dict]) -> dict:
     return {r["email"]: {"commits": r["commits"], "projects": r["projects"], "plan": r["plan"]} for r in rows}
 
@@ -105,7 +128,7 @@ def _delta(r: dict) -> str:
     return f"{r['delta']:+d}" if r["delta"] else "0"
 
 
-def render_text(rows: list[dict], summary: dict) -> str:
+def render_text(rows: list[dict], summary: dict, sources: list[dict] | None = None) -> str:
     lines = [subject_of(summary), ""]
     lines.append(f"{summary['users']} users | {summary['pro']} pro | {summary['with_project']} with a project | "
                  f"{summary['commits']} commits all-time")
@@ -123,10 +146,13 @@ def render_text(rows: list[dict], summary: dict) -> str:
         mark = " (admin)" if r["admin"] else ""
         lines.append(f"{(r['email'] + mark).ljust(width + 8)} {r['plan']:<5} {r['projects']:<5} {r['commits']:<8} "
                      f"{(_delta(r) + ' ' + r['note']).strip()}")
+    if sources:
+        lines += ["", "How people said they found us (asked once, on the first connect form):"]
+        lines += [f"  {r['source']}: {r['month']} this month, {r['total']} in total" for r in sources]
     return "\n".join(lines) + "\n"
 
 
-def render_html(rows: list[dict], summary: dict) -> str:
+def render_html(rows: list[dict], summary: dict, sources: list[dict] | None = None) -> str:
     e = html.escape
     cell = "padding:6px 10px;border-bottom:1px solid #e5e7eb;"
     head = "".join(f'<th style="{cell}text-align:{a};background:#f3f4f6">{t}</th>'
@@ -154,7 +180,21 @@ def render_html(rows: list[dict], summary: dict) -> str:
         f'<strong>{summary["with_project"]}</strong> with a project, <strong>{summary["commits"]}</strong> commits all-time'
         + ("" if summary["first"] else f' (<strong>{summary["commit_delta"]:+d}</strong> since yesterday)') + '</p>'
         + "".join(f'<p style="margin:0 0 4px">{n}</p>' for n in notes)
-        + f'<table style="border-collapse:collapse;margin-top:12px"><thead><tr>{head}</tr></thead><tbody>{"".join(body)}</tbody></table></div>')
+        + f'<table style="border-collapse:collapse;margin-top:12px"><thead><tr>{head}</tr></thead><tbody>{"".join(body)}</tbody></table>'
+        + _sources_html(sources) + '</div>')
+
+
+def _sources_html(sources: list[dict] | None) -> str:
+    if not sources:
+        return ""
+    cell = "padding:4px 10px;border-bottom:1px solid #e5e7eb;"
+    rows = "".join(f'<tr><td style="{cell}">{html.escape(r["source"])}</td><td style="{cell}text-align:right">{r["month"]}</td>'
+                   f'<td style="{cell}text-align:right">{r["total"]}</td></tr>' for r in sources)
+    return ('<p style="margin:18px 0 4px"><strong>How people said they found us</strong> '
+            '<span style="color:#6b7280">(asked once, on the first connect form)</span></p>'
+            '<table style="border-collapse:collapse"><thead><tr>'
+            f'<th style="{cell}text-align:left;background:#f3f4f6">Answer</th><th style="{cell}text-align:right;background:#f3f4f6">This month</th>'
+            f'<th style="{cell}text-align:right;background:#f3f4f6">All time</th></tr></thead><tbody>{rows}</tbody></table>')
 
 
 # --- I/O ------------------------------------------------------------------------------------------
@@ -206,7 +246,9 @@ def worker(method: str, path: str, body: dict | None = None) -> dict:
 def main() -> None:
     account = os.environ["AZURE_STORAGE_ACCOUNT"]
     month = time.strftime("%Y-%m", time.gmtime())
-    rows = build_rows(entities(account, "users"), entities(account, "projects"), entities(account, "usage"), month)
+    usage = entities(account, "usage")
+    rows = build_rows(entities(account, "users"), entities(account, "projects"), usage, month)
+    sources = source_counts(usage, month)
     dry = os.environ.get("DRY_RUN") == "1"
     previous = {} if dry else worker("GET", "/api/digest-state")
     summary = compare(rows, previous)
@@ -214,8 +256,8 @@ def main() -> None:
           + ("" if summary["first"] else f", {len(summary['new_users'])} new, {summary['commit_delta']:+d} commits since the last report"))
     if dry:
         return
-    worker("POST", "/api/digest", {"subject": subject_of(summary), "text": render_text(rows, summary),
-                                   "html": render_html(rows, summary), "snapshot": snapshot_of(rows)})
+    worker("POST", "/api/digest", {"subject": subject_of(summary), "text": render_text(rows, summary, sources),
+                                   "html": render_html(rows, summary, sources), "snapshot": snapshot_of(rows)})
     print("emailed")
 
 

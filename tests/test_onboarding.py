@@ -264,3 +264,58 @@ def test_connect_post_does_not_echo_token_on_error(harness):
             },
         )
     assert "olp_secretshouldnotecho" not in r.text
+
+
+# --- "How did you find MiLatexAI?" (an anonymous count, asked once) ---------------------------------
+
+def _source_counts(store):
+    month = __import__("time").strftime("%Y-%m", __import__("time").gmtime())
+    from leafbridge.web import SIGNUP_SOURCES
+    return {k: asyncio.run(store.get_usage(f"signup-source:{k}", month)) for k, _ in SIGNUP_SOURCES}
+
+
+def test_first_connect_form_asks_where_you_found_us_and_the_second_does_not(harness):
+    _store, cipher, mcp = harness
+    code = mint_connect_code(cipher, "user_web", "web@example.com")
+    with TestClient(mcp.http_app()) as client:
+        first = client.get("/connect", params={"code": code})
+        client.post("/connect", data={"code": code, "overleaf_url": OVERLEAF_URL, "token": "olp_tok", "name": "a"})
+        again = client.get("/connect", params={"code": code})
+    assert "name='source'" in first.text and "Prefer not to say" in first.text and "(optional)" in first.text
+    assert "name='source'" not in again.text
+
+
+def test_the_answer_is_counted_once_and_not_tied_to_the_person(harness):
+    store, cipher, mcp = harness
+    code = mint_connect_code(cipher, "user_web", "web@example.com")
+    second = "https://www.overleaf.com/project/0123456789abcdef01234568"
+    with TestClient(mcp.http_app()) as client:
+        r = client.post("/connect", data={"code": code, "overleaf_url": OVERLEAF_URL, "token": "olp_tok",
+                                          "name": "a", "source": "reddit"})
+        assert r.status_code == 200
+        # a later project from the same account must not count again, even if the field is sent
+        client.post("/connect", data={"code": code, "overleaf_url": second, "name": "b", "source": "reddit"})
+    counts = _source_counts(store)
+    assert counts["reddit"] == 1 and sum(counts.values()) == 1
+    user = asyncio.run(store.get_user("user_web"))
+    assert not hasattr(user, "source")          # nothing about the answer is stored on the user
+
+
+def test_blank_unknown_and_hostile_answers_are_ignored_and_never_block_connecting(harness):
+    store, cipher, mcp = harness
+    for i, answer in enumerate(("", "not-a-choice", "<script>alert(1)</script>", "reddit; drop table")):
+        code = mint_connect_code(cipher, f"user_{i}", f"u{i}@example.com")
+        url = f"https://www.overleaf.com/project/0123456789abcdef0123456{i}"
+        with TestClient(mcp.http_app()) as client:
+            r = client.post("/connect", data={"code": code, "overleaf_url": url, "token": "olp_tok", "name": "x", "source": answer})
+        assert r.status_code == 200 and "Connected" in r.text, answer
+    assert sum(_source_counts(store).values()) == 0
+
+
+def test_a_failed_submission_keeps_the_choice_and_counts_nothing(harness):
+    store, cipher, mcp = harness
+    code = mint_connect_code(cipher, "user_web", "web@example.com")
+    with TestClient(mcp.http_app()) as client:
+        r = client.post("/connect", data={"code": code, "overleaf_url": "", "token": "olp_tok", "source": "search"})
+    assert r.status_code == 400 and "<option value='search' selected>" in r.text
+    assert sum(_source_counts(store).values()) == 0

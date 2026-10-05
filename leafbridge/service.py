@@ -375,6 +375,19 @@ class AccountService:
         """Count one successful metered write. Call AFTER a push succeeds."""
         return await self.store.increment_usage(user_id, month)
 
+    async def record_signup_source(self, source: str, month: str) -> None:
+        """Count one answer to "How did you find MiLatexAI?". Only a count per answer and month is
+        kept, under a pseudo-user, so it is never tied to a person. Unknown answers are ignored and
+        a failure here must never get in the way of connecting a project."""
+        from .web import SIGNUP_SOURCES
+
+        if source not in {k for k, _ in SIGNUP_SOURCES}:
+            return
+        try:
+            await self.store.increment_usage(f"signup-source:{source}", month)
+        except Exception:  # noqa: BLE001
+            pass
+
     # -- helpers ------------------------------------------------------------
 
     @staticmethod

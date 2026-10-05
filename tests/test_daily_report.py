@@ -111,3 +111,31 @@ def test_day_windows_are_utc_days_newest_first_and_never_in_the_future():
     w = t.day_windows(3, now)
     assert [a[:10] for a, _ in w] == ["2025-10-09", "2025-10-08", "2025-10-07"]
     assert w[0][1] == "2025-10-09T08:53:20Z" and w[1][1] == "2025-10-09T00:00:00Z"
+
+
+# --- where signups said they came from --------------------------------------------------------------
+
+def test_source_counts_are_summed_per_answer_and_ignore_real_users():
+    usage = [
+        {"PartitionKey": "signup-source:reddit", "RowKey": "2026-10", "count": 3},
+        {"PartitionKey": "signup-source:reddit", "RowKey": "2026-09", "count": 1},
+        {"PartitionKey": "signup-source:claude_directory", "RowKey": "2026-10", "count": 5},
+        {"PartitionKey": "signup-source:made_up", "RowKey": "2026-10", "count": "2"},
+        {"PartitionKey": "u1", "RowKey": "2026-10", "count": 99},
+    ]
+    got = du.source_counts(usage, "2026-10")
+    assert [r["source"] for r in got] == ["Claude's connector directory", "Reddit", "made_up"] or got[0]["month"] == 5
+    by = {r["source"]: r for r in got}
+    assert by["Reddit"] == {"source": "Reddit", "month": 3, "total": 4}
+    assert by["Claude's connector directory"]["month"] == 5 and "u1" not in str(got)
+    assert du.source_counts([], "2026-10") == []
+
+
+def test_sources_appear_in_both_versions_of_the_email_and_are_escaped():
+    r = rows()
+    s = du.compare(r, {})
+    sources = [{"source": "<b>x</b>", "month": 1, "total": 2}, {"source": "Reddit", "month": 3, "total": 4}]
+    text, page = du.render_text(r, s, sources), du.render_html(r, s, sources)
+    assert "Reddit: 3 this month, 4 in total" in text and "How people said they found us" in page
+    assert "<b>x</b>" not in page and "&lt;b&gt;x&lt;/b&gt;" in page
+    assert "found us" not in du.render_text(r, s) and "found us" not in du.render_html(r, s)

@@ -24,6 +24,7 @@ import json
 import os
 import secrets
 import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, quote
@@ -444,7 +445,7 @@ def create_hosted_server(
 
     # -- account management ------------------------------------------------
 
-    @mcp.tool
+    @mcp.tool(title="Get a secure connect link", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def start_connect() -> str:
         """Get a secure link to connect an Overleaf project WITHOUT pasting your
         Git token into this chat. Recommended over connect_project. Returns a
@@ -464,7 +465,7 @@ def create_hosted_server(
             "back here and ask me to list your files or edit your paper."
         )
 
-    @mcp.tool
+    @mcp.tool(title="Connect a project", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def connect_project(
         overleaf_url: str, token: str, name: str | None = None
     ) -> str:
@@ -488,7 +489,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return f"Connected project {proj.name!r} ({proj.project_id}). You can now edit it."
 
-    @mcp.tool
+    @mcp.tool(title="Disconnect a project", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def disconnect_project(project: str) -> str:
         """Disconnect a project and delete its stored token."""
         try:
@@ -498,7 +499,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return "Disconnected." if ok else "No such project."
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="List projects", annotations={"readOnlyHint": True})
     async def list_projects() -> str:
         """List your connected Overleaf projects."""
         try:
@@ -511,7 +512,7 @@ def create_hosted_server(
                     "Overleaf, GitHub, or GitLab repo link + its access token.")
         return "\n".join(f"- {p.name}  (id {p.project_id})" for p in projects)
 
-    @mcp.tool
+    @mcp.tool(title="Add another project", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def add_project(
         overleaf_url: str, name: str | None = None, token: str | None = None
     ) -> str:
@@ -537,7 +538,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it."
 
-    @mcp.tool
+    @mcp.tool(title="Rename a project", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def rename_project(project: str, new_name: str) -> str:
         """Relabel an already-connected project. Same project, same token, just a
         new display name, no need to disconnect and re-add it.
@@ -553,7 +554,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return f"Renamed to {proj.name!r} ({proj.project_id})."
 
-    @mcp.tool
+    @mcp.tool(title="Manage projects", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def manage_projects() -> str:
         """Get a secure link to view, add, or remove the Overleaf projects the AI
         can access. No token needed. The AI only ever touches projects you list."""
@@ -568,7 +569,7 @@ def create_hosted_server(
             f"any time, no token needed:\n\n{url}\n\nThe link is valid for 15 minutes."
         )
 
-    @mcp.tool
+    @mcp.tool(title="Manage your access token", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def change_token() -> str:
         """Manage your stored Overleaf Git token. Use this whenever the user wants
         to check, view, see, change, update, rotate, or revoke their token: it
@@ -587,7 +588,7 @@ def create_hosted_server(
 
     # -- billing -----------------------------------------------------------
 
-    @mcp.tool
+    @mcp.tool(title="Upgrade to Pro", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def upgrade() -> str:
         """Upgrade to MiLatexAI Pro (unlimited projects + unlimited write-commits,
         $8.99/mo, local currency where available). Returns a secure Stripe checkout
@@ -614,7 +615,7 @@ def create_hosted_server(
             "Your plan switches to Pro automatically once payment goes through."
         )
 
-    @mcp.tool
+    @mcp.tool(title="Manage your subscription", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def manage_subscription() -> str:
         """Open the Stripe billing portal to view, update, or cancel your Pro
         subscription. Returns a secure link."""
@@ -632,7 +633,7 @@ def create_hosted_server(
 
     # -- reads (unmetered) -------------------------------------------------
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="List files", annotations={"readOnlyHint": True})
     async def list_files(project: str | None = None, all_files: bool = False) -> str:
         """List files in one of your projects."""
         try:
@@ -648,7 +649,7 @@ def create_hosted_server(
         return "\n".join([f"{len(entries)} file(s) in {proj.name!r}:"]
                          + [f"- {e.path}  ({e.size} bytes)" for e in entries])
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Read a file", annotations={"readOnlyHint": True})
     async def read_file(path: str, project: str | None = None, with_line_numbers: bool = True) -> str:
         """Read a file's content from one of your projects."""
         try:
@@ -661,7 +662,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return number_lines(content) if with_line_numbers else content
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="List sections", annotations={"readOnlyHint": True})
     async def get_sections(path: str, project: str | None = None) -> str:
         """Return the LaTeX section outline of a .tex file."""
         try:
@@ -674,7 +675,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return f"Sections in {path}:\n{latex.outline(latex.find_sections(content))}"
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Read a section", annotations={"readOnlyHint": True})
     async def read_section(path: str, title: str, project: str | None = None) -> str:
         """Return one section of a .tex file by title."""
         try:
@@ -694,7 +695,7 @@ def create_hosted_server(
         return (f"# {section.command}: {section.title}  (lines {section.line}-{section.end_line})\n"
                 f"{number_lines(body, start=section.line)}")
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="View commit history", annotations={"readOnlyHint": True})
     async def get_history(project: str | None = None, limit: int = 10) -> str:
         """Recent commits for one of your projects."""
         try:
@@ -706,7 +707,7 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Check that the paper compiles", annotations={"readOnlyHint": True})
     async def check_compile(project: str | None = None, tex: str | None = None) -> str:
         """Compile a project with a local LaTeX engine and report whether it builds,
         with the exact LaTeX errors and warnings. Use this whenever the user asks
@@ -774,7 +775,7 @@ def create_hosted_server(
         note = f"{kind.title()} {number}: page {pages[0]}{span}."
         return [note, *[Image(data=b, format="png") for b in imgs]]
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Show a table as an image", annotations={"readOnlyHint": True})
     async def show_table(table: str, project: str | None = None):
         """Show a rendered IMAGE of a table so you can SEE how it actually looks
         (layout, column widths, overfull or misaligned cells) and fix it, things the
@@ -785,7 +786,7 @@ def create_hosted_server(
         unknown reference returns the list of tables so you can pick."""
         return await _show_float("table", table, project)
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Show a figure", annotations={"readOnlyHint": True})
     async def show_figure(figure: str, project: str | None = None):
         """Show a rendered IMAGE of a figure so you can SEE how it renders. Pass the
         figure NUMBER (e.g. "3") or its \\label. If the user describes it in words,
@@ -793,7 +794,7 @@ def create_hosted_server(
         figures return all pages; an unknown reference returns the list of figures."""
         return await _show_float("figure", figure, project)
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Show a page of the PDF", annotations={"readOnlyHint": True})
     async def show_page(page: int = 1, project: str | None = None, tex: str | None = None):
         """Show a rendered IMAGE of a compiled PDF page so you can SEE the actual
         layout, margins, spacing, line breaks, overfull/underfull boxes, float
@@ -841,7 +842,7 @@ def create_hosted_server(
 
     # -- tracked changes + arXiv export ---------------------------------------
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Build a tracked-changes PDF", annotations={"readOnlyHint": True})
     async def tracked_changes_pdf(ref: str, project: str | None = None):
         """A tracked-changes PDF (latexdiff): additions and deletions between a
         commit/checkpoint id (list_checkpoints / get_history) and the CURRENT
@@ -868,7 +869,7 @@ def create_hosted_server(
                 "additions/deletions marked).")
         return [note, *[Image(data=p, format="png") for p in pngs]]
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Prepare an arXiv bundle", annotations={"readOnlyHint": True})
     async def arxiv_export(project: str | None = None, tex: str | None = None) -> str:
         """Prepare an arXiv-ready submission zip: flattens all \\input/\\include
         into one main.tex, strips comment lines, includes the precompiled
@@ -905,7 +906,7 @@ def create_hosted_server(
 
     # -- version safety: checkpoints, diffs, restores -------------------------
 
-    @mcp.tool
+    @mcp.tool(title="Save a checkpoint", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def checkpoint(name: str, project: str | None = None) -> str:
         """Save a named restore point of the project RIGHT NOW (before a big
         rewrite, before a deadline push). Cheap and instant; restore any file
@@ -922,7 +923,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return f"{result}\nCheckpoint {label!r} saved. See them with list_checkpoints."
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="List checkpoints", annotations={"readOnlyHint": True})
     async def list_checkpoints(project: str | None = None) -> str:
         """List saved checkpoints (newest first) with their commit ids, for
         project_diff / restore_file."""
@@ -936,7 +937,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return out or "No checkpoints yet. Create one with checkpoint('before rewrite')."
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Show changes between versions", annotations={"readOnlyHint": True})
     async def project_diff(ref: str, project: str | None = None) -> str:
         """What changed since a commit/checkpoint id (from list_checkpoints or
         get_history): per-file change summary."""
@@ -950,7 +951,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return out or f"No changes since {ref}."
 
-    @mcp.tool
+    @mcp.tool(title="Restore a file", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def restore_file(path: str, ref: str, project: str | None = None) -> str:
         """Restore one file to its content at a commit/checkpoint id and commit
         the restoration (undo for AI edits gone wrong). Counts as one commit."""
@@ -973,7 +974,7 @@ def create_hosted_server(
 
     # -- citation toolkit -----------------------------------------------------
 
-    @mcp.tool
+    @mcp.tool(title="Add a verified citation", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def add_citation(
         reference: str, bib_file: str | None = None, project: str | None = None
     ) -> str:
@@ -1016,7 +1017,7 @@ def create_hosted_server(
             raise _wrap(exc)
         return f"{result}\nAdded {key!r} to {target}. Cite it with \\cite{{{key}}}."
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Check citations", annotations={"readOnlyHint": True})
     async def check_citations(project: str | None = None) -> str:
         """Bibliography integrity check: \\cite keys with no .bib entry
         (broken/hallucinated) and .bib entries never cited."""
@@ -1047,7 +1048,7 @@ def create_hosted_server(
             lines.append("All citations resolve and every entry is used.")
         return "\n".join(lines)
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Project statistics", annotations={"readOnlyHint": True})
     async def project_stats(project: str | None = None) -> str:
         """Word counts per .tex file (approximate, comments/commands stripped),
         TODO/FIXME markers, and undefined or unused \\ref labels, for trimming
@@ -1080,7 +1081,7 @@ def create_hosted_server(
         "_os.chdir('/mnt/data')\n"
     )
 
-    @mcp.tool
+    @mcp.tool(title="Save an approved figure", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def commit_figure(
         code: str, name: str, format: str = "png", project: str | None = None
     ):
@@ -1169,7 +1170,7 @@ def create_hosted_server(
             return note
         return [note, Image(data=png, format="png")]
 
-    @mcp.tool
+    @mcp.tool(title="Save an approved TikZ diagram", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def commit_tikz(
         code: str, name: str, format: str = "png", project: str | None = None
     ):
@@ -1229,7 +1230,7 @@ def create_hosted_server(
             return note
         return [note, Image(data=png, format="png")]
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="List figures", annotations={"readOnlyHint": True})
     async def list_figures(project: str | None = None) -> str:
         """List the project's Figure Studio figures (Pro): each managed figure's
         slug, source file, and whether its rendered output exists, plus recently
@@ -1280,7 +1281,7 @@ def create_hosted_server(
 
     # -- writes (metered) --------------------------------------------------
 
-    @mcp.tool
+    @mcp.tool(title="Edit a file", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def edit_file(
         path: str, old_string: str, new_string: str,
         project: str | None = None, allow_shrink: bool = False,
@@ -1318,7 +1319,7 @@ def create_hosted_server(
                 result = f"{result}\n\n{d}"
         return result
 
-    @mcp.tool
+    @mcp.tool(title="Write a file", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def write_file(
         path: str, content: str, project: str | None = None, allow_shrink: bool = False
     ) -> str:
@@ -1346,7 +1347,7 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
-    @mcp.tool
+    @mcp.tool(title="Delete a file", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def delete_file(path: str, project: str | None = None) -> str:
         """Delete a file, then commit+push."""
         try:
@@ -1369,7 +1370,7 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
-    @mcp.tool
+    @mcp.tool(title="Upload a binary file", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def upload_file(path: str, content_base64: str, project: str | None = None) -> str:
         """Add or replace a BINARY file (image/PDF) from base64, then commit+push."""
         try:
@@ -1397,7 +1398,7 @@ def create_hosted_server(
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
 
-    @mcp.tool(annotations={"readOnlyHint": True})
+    @mcp.tool(title="Download a file", annotations={"readOnlyHint": True})
     async def download_file(path: str, project: str | None = None) -> str:
         """Read a BINARY file (image, PDF, etc.) as base64, so you can copy it into
         a DIFFERENT project with upload_file: download_file here, then
@@ -1727,7 +1728,8 @@ def create_hosted_server(
         await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
         has = await app.service.has_token(user_id)
         return HTMLResponse(
-            web.render_connect_form(request.query_params["code"], email=email, has_token=has)
+            web.render_connect_form(request.query_params["code"], email=email, has_token=has,
+                                    ask_source=not has)
         )
 
     @mcp.custom_route("/connect", methods=["POST"])
@@ -1735,6 +1737,7 @@ def create_hosted_server(
         field = _form_fields(await request.body())
         code, overleaf_url, token = field("code"), field("overleaf_url"), field("token")
         name = field("name") or None
+        source = field("source")
         ident = _verified(code)
         if ident is None:
             return _expired()
@@ -1745,7 +1748,8 @@ def create_hosted_server(
         def form_error(msg: str, status: int = 400) -> Response:
             return HTMLResponse(
                 web.render_connect_form(code, overleaf_url=overleaf_url,
-                                        name=name or "", email=email, error=msg, has_token=has),
+                                        name=name or "", email=email, error=msg, has_token=has,
+                                        ask_source=not has, source=source),
                 status_code=status,
             )
 
@@ -1766,6 +1770,8 @@ def create_hosted_server(
             return form_error(str(exc))
         except Exception:  # noqa: BLE001
             return form_error("Something went wrong connecting the project. Please try again.", status=500)
+        if not has:   # the first connection is the only time the question is asked
+            await app.service.record_signup_source(source, time.strftime("%Y-%m", time.gmtime()))
         return HTMLResponse(web.render_success(proj.name, proj.project_id))
 
     # -- manage the list of projects (add / remove, no token) --------------

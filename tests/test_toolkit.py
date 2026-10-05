@@ -186,3 +186,28 @@ def test_project_stats_tool(tmp_path):
     mcp = _harness(tmp_path)
     out = _text(_call(mcp, "project_stats", {}))
     assert "main.tex" in out and "words" in out
+
+
+# --- directory requirements: every tool has a title and declares what it does to data ---------------
+
+def test_every_hosted_tool_has_a_title_and_declares_read_or_destructive():
+    """Anthropic's Connectors Directory flags any tool without a title or a readOnlyHint or
+    destructiveHint. Tools that overwrite or remove data must say so, and nothing may be marked
+    read-only if it is on the list of tools that change a project."""
+    import asyncio
+    import os
+    os.environ.setdefault("WORKOS_AUTHKIT_DOMAIN", "https://placeholder.authkit.invalid")
+    from leafbridge.hosted import create_hosted_server
+
+    tools = asyncio.run(create_hosted_server(auth=False).list_tools())
+    tools = tools if isinstance(tools, list) else list(tools.values())
+    assert len(tools) >= 30
+    writes_content = {"edit_file", "write_file", "delete_file", "upload_file", "restore_file", "disconnect_project"}
+    for t in tools:
+        a = t.annotations
+        assert t.title and len(t.title) <= 60 and chr(0x2014) not in t.title, t.name
+        read_only = getattr(a, "read_only_hint", None)
+        destructive = getattr(a, "destructive_hint", None)
+        assert read_only is True or destructive is not None, f"{t.name} declares neither"
+        if t.name in writes_content:
+            assert read_only is not True and destructive is True, t.name
