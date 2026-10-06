@@ -50,4 +50,6 @@ ARG GIT_SHA=dev
 ENV MILATEXAI_SHA=$GIT_SHA
 
 EXPOSE 8000
-CMD ["uvicorn", "leafbridge.asgi:app", "--host", "0.0.0.0", "--port", "8000"]
+# When a copy is removed (scale in, or a deploy), uvicorn stops taking new requests and
+# finishes the ones in flight. Kept under the platform's grace period (120 s, ops/deploy.sh).
+CMD ["uvicorn", "leafbridge.asgi:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-graceful-shutdown", "100"]

@@ -8,6 +8,8 @@ on failure so a later commit can never pick them up.
 
 from __future__ import annotations
 
+from . import load
+
 import asyncio
 import os
 import shutil
@@ -73,7 +75,7 @@ async def diff_pdf(repo: Path, main_rel: str, old_text: str, timeout: int = 240)
                 except OSError:
                     pass
 
-    return await asyncio.to_thread(_run)
+    return await load.run_heavy(_run)
 
 
 def pdf_pages_to_pngs(pdf_bytes: bytes, max_pages: int = 8, dpi: int = 130) -> list[bytes]:

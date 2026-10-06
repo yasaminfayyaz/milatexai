@@ -55,6 +55,7 @@ from .files import (
 from .git_worker import GitError, GitWorker, PushConflict
 from .authkit import MiLatexAIAuthKit
 from .health import DeepHealth
+from . import load
 from .service import (
     AccountService,
     AlreadyConnected,
@@ -130,6 +131,8 @@ def _mini_diff(old: str, new: str, path: str, max_lines: int = 40) -> str:
 def _wrap(exc: Exception) -> ToolError:
     if isinstance(exc, ToolError):
         return exc
+    if isinstance(exc, load.Busy):
+        return ToolError(str(exc))
     if isinstance(exc, (LimitExceeded, ProjectNotConnected, ServiceError, PathError)):
         return ToolError(str(exc))
     if isinstance(exc, PushConflict):
@@ -145,7 +148,7 @@ async def _float_map(repo: Path, main: str) -> str:
     if not exe:
         return ""
     try:
-        res = await asyncio.to_thread(texlocate.compile_and_locate, str(repo), main, exe)
+        res = await load.run_heavy(texlocate.compile_and_locate, str(repo), main, exe)
     except Exception:  # noqa: BLE001
         return ""
     if not res.floats:
@@ -224,7 +227,7 @@ class HostedApp:
     ):
         self.service = AccountService(store, cipher)
         self.cipher = cipher
-        self.worker = GitWorker(data_dir)
+        self.worker = GitWorker(data_dir, heads=store)
         self.admin_emails = admin_emails
         self._identity = identity_provider
         self._email_resolver = email_resolver
@@ -246,8 +249,6 @@ class HostedApp:
         )
         # Figure Studio sandbox; disabled (no pool endpoint) is a valid state.
         self.sessions = sessions if sessions is not None else SessionsClient("")
-        # Short-lived download bundles (arXiv zips); ephemeral by design.
-        self.dl_dir = Path(tempfile.gettempdir()) / "mila_dl"
 
     def ensure_pro(self, user: User, feature: str) -> None:
         """Gate a paid-only feature. Admin and Pro pass; free users get a clear
@@ -261,8 +262,13 @@ class HostedApp:
 
     async def ensure_capacity(self, user: User) -> None:
         """Admission control for the git-backed tools. Paid users and admins are
-        never gated; free users are refused when we're over free capacity."""
-        if user.is_admin or user.plan == "pro":
+        never gated; free users are refused when we're over free capacity.
+
+        Also records who is calling, so heavy work (compiles, page images) can let
+        paying users go first when the server is busy (see load.py)."""
+        paid = user.is_admin or user.plan == "pro"
+        load.set_caller(priority=paid, user_id=user.user_id, store=self.service.store)
+        if paid:
             return
         if not await self.capacity.free_allowed():
             raise ToolError(
@@ -759,7 +765,7 @@ def create_hosted_server(
                 main = texcompile.find_main_tex(repo)
                 if not main:
                     raise ToolError("Could not find a root .tex to compile.")
-                res = await asyncio.to_thread(texlocate.compile_and_locate, str(repo), main, exe)
+                res = await load.run_heavy(texlocate.compile_and_locate, str(repo), main, exe)
                 number = texlocate.resolve_number(ref, res)
                 f = res.floats.get((kind, number)) if number is not None else None
                 if f is None or not f.pages:
@@ -772,7 +778,7 @@ def create_hosted_server(
                         + f"\n\nTell me the {kind} number or its \\label and I'll show it."
                     )
                 pages = f.pages
-                imgs = await asyncio.to_thread(texlocate.render_pages, res.pdf_path, pages)
+                imgs = await load.run_heavy(texlocate.render_pages, res.pdf_path, pages)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if not imgs:
@@ -828,18 +834,18 @@ def create_hosted_server(
                 raise ToolError("The LaTeX engine is unavailable on the server right now.")
             async with app.worker.open_repo(proj) as repo:
                 main = _resolve_main_tex(repo, tex)
-                res = await asyncio.to_thread(texlocate.compile_and_locate, str(repo), main, exe)
+                res = await load.run_heavy(texlocate.compile_and_locate, str(repo), main, exe)
                 if not res.pdf_path:
                     raise ToolError(
                         "The project did not produce a PDF, so it likely has compile "
                         "errors. Run check_compile to see them."
                     )
-                total = await asyncio.to_thread(texlocate.page_count, res.pdf_path)
+                total = await load.run_heavy(texlocate.page_count, res.pdf_path)
                 if page < 1 or page > total:
                     raise ToolError(
                         f"Page {page} is out of range; the document has {total} page(s)."
                     )
-                imgs = await asyncio.to_thread(texlocate.render_pages, res.pdf_path, [page])
+                imgs = await load.run_heavy(texlocate.render_pages, res.pdf_path, [page])
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if not imgs:
@@ -899,9 +905,9 @@ def create_hosted_server(
                 main = _resolve_main_tex(repo, tex)
                 bbl = await arxivprep.compile_bbl(repo, main)
                 blob, manifest = arxivprep.build_zip(repo, main, bbl)
-            app.dl_dir.mkdir(parents=True, exist_ok=True)
+            # Shared storage, not this copy's disk: the link may be opened on another copy.
             fname = secrets.token_urlsafe(10) + ".zip"
-            (app.dl_dir / fname).write_bytes(blob)
+            await app.service.store.put_download(fname, blob)
             code = app.cipher.encrypt(json.dumps({"k": "dl", "f": fname}))
             url = f"{app.base_url}/dl?code={quote(code, safe='')}"
         except Exception as exc:  # noqa: BLE001
@@ -1686,8 +1692,6 @@ def create_hosted_server(
 
     @mcp.custom_route("/dl", methods=["GET"])
     async def download(request: Request) -> Response:
-        from starlette.responses import FileResponse
-
         code = request.query_params.get("code", "")
         try:
             data = json.loads(app.cipher.decrypt(code, ttl=900))
@@ -1697,13 +1701,17 @@ def create_hosted_server(
             return HTMLResponse(web.render_notice(
                 "Link expired", "This download link is invalid or has expired. "
                 "Run arxiv_export again for a fresh one.", icon="⏰"), status_code=400)
-        target = app.dl_dir / fname
-        if not target.is_file():
+        try:
+            data = await app.service.store.get_download(fname)
+        except Exception:  # noqa: BLE001
+            data = None
+        if data is None:
             return HTMLResponse(web.render_notice(
-                "Bundle gone", "This bundle is no longer on the server (it restarted). "
+                "Bundle gone", "This bundle is no longer available. "
                 "Run arxiv_export again.", icon="⏰"), status_code=410)
-        return FileResponse(target, filename="arxiv-submission.zip",
-                            media_type="application/zip")
+        return Response(data, media_type="application/zip", headers={
+            "content-disposition": 'attachment; filename="arxiv-submission.zip"',
+            "cache-control": "no-store"})
 
     def _verified(request_code: str):
         """Return (user_id, email) for a valid capability code, else None. Codes
