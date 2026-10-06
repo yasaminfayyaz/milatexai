@@ -55,6 +55,7 @@ from .files import (
 from .git_worker import GitError, GitWorker, PushConflict
 from .authkit import MiLatexAIAuthKit
 from .health import DeepHealth
+from . import buildcache
 from . import load
 from .service import (
     AccountService,
@@ -142,16 +143,10 @@ def _wrap(exc: Exception) -> ToolError:
     return ToolError(f"Unexpected error: {exc}")
 
 
-async def _float_map(repo: Path, main: str) -> str:
-    """Best-effort: where each table/figure landed, one line each. Never raises."""
-    exe = texcompile.tectonic_path()
-    if not exe:
-        return ""
-    try:
-        res = await load.run_heavy(texlocate.compile_and_locate, str(repo), main, exe)
-    except Exception:  # noqa: BLE001
-        return ""
-    if not res.floats:
+def _float_map(res) -> str:
+    """Where each table/figure landed, one line each, from a page-locating compile result
+    (texlocate.LocateResult). Empty when nothing was located."""
+    if res is None or not res.floats:
         return ""
     lines = ["Where each table/figure landed (use show_table / show_figure to see one):"]
     for kind, num in sorted(res.floats):
@@ -228,6 +223,9 @@ class HostedApp:
         self.service = AccountService(store, cipher)
         self.cipher = cipher
         self.worker = GitWorker(data_dir, heads=store)
+        # Compile results per exact version (commit id), so an unchanged paper is never
+        # compiled twice; see buildcache.py.
+        self.builds = buildcache.BuildCache(Path(data_dir) / "_builds")
         self.admin_emails = admin_emails
         self._identity = identity_provider
         self._email_resolver = email_resolver
@@ -249,6 +247,33 @@ class HostedApp:
         )
         # Figure Studio sandbox; disabled (no pool endpoint) is a valid state.
         self.sessions = sessions if sessions is not None else SessionsClient("")
+
+    async def located(self, proj, repo: Path, main: str, exe: str):
+        """The page-locating compile of the version the working copy is at, reused when that
+        exact version was compiled before. Call inside open_repo(fresh=True)."""
+        commit = await self.worker.head(proj)
+
+        async def build():
+            try:
+                res = await load.run_heavy(texlocate.compile_and_locate, str(repo), main, exe)
+            except load.Busy:
+                raise
+            except Exception as exc:  # noqa: BLE001
+                return buildcache.Located(clean=False, message=f"compile failed to run: {type(exc).__name__}")
+            return buildcache.from_locate(res)
+
+        loc, _cached = await self.builds.located(proj.project_id, commit, main, build)
+        return buildcache.to_locate(loc)
+
+    async def plain(self, proj, repo: Path, main: str):
+        """The ordinary compile (the authoritative verdict and real errors), reused per version."""
+        commit = await self.worker.head(proj)
+
+        async def build():
+            return buildcache.from_compile(await texcompile.compile_project(repo, main))
+
+        res, _cached = await self.builds.plain(proj.project_id, commit, main, build)
+        return res
 
     def ensure_pro(self, user: User, feature: str) -> None:
         """Gate a paid-only feature. Admin and Pro pass; free users get a clear
@@ -737,11 +762,22 @@ def create_hosted_server(
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             float_map = ""
-            async with app.worker.open_repo(proj) as repo:
+            # fresh: always include edits made directly in Overleaf, GitHub or GitLab.
+            async with app.worker.open_repo(proj, fresh=True) as repo:
                 main = _resolve_main_tex(repo, tex)
-                res = await texcompile.compile_project(repo, main)
+                exe = texcompile.tectonic_path()
+                loc = await app.located(proj, repo, main, exe) if exe else None
+                if loc is not None and loc.clean:
+                    # One compile answers everything when the paper builds cleanly.
+                    pages = loc.pages
+                    res = buildcache.Plain(available=True, ok=True, pages=pages, message=(
+                        f"Compiles cleanly ({pages} pages)." if pages else "Compiles cleanly."))
+                else:
+                    # Errors always come from the ordinary compile of the real document,
+                    # never from the page-locating copy.
+                    res = await app.plain(proj, repo, main)
                 if res.ok:
-                    float_map = await _float_map(repo, main)
+                    float_map = _float_map(loc)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if not res.available:
@@ -761,11 +797,11 @@ def create_hosted_server(
             exe = texcompile.tectonic_path()
             if not exe:
                 raise ToolError("The LaTeX engine is unavailable on the server right now.")
-            async with app.worker.open_repo(proj) as repo:
+            async with app.worker.open_repo(proj, fresh=True) as repo:
                 main = texcompile.find_main_tex(repo)
                 if not main:
                     raise ToolError("Could not find a root .tex to compile.")
-                res = await load.run_heavy(texlocate.compile_and_locate, str(repo), main, exe)
+                res = await app.located(proj, repo, main, exe)
                 number = texlocate.resolve_number(ref, res)
                 f = res.floats.get((kind, number)) if number is not None else None
                 if f is None or not f.pages:
@@ -778,7 +814,7 @@ def create_hosted_server(
                         + f"\n\nTell me the {kind} number or its \\label and I'll show it."
                     )
                 pages = f.pages
-                imgs = await load.run_heavy(texlocate.render_pages, res.pdf_path, pages)
+                imgs = await asyncio.to_thread(texlocate.render_pages, res.pdf_path, pages)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if not imgs:
@@ -832,20 +868,20 @@ def create_hosted_server(
             exe = texcompile.tectonic_path()
             if not exe:
                 raise ToolError("The LaTeX engine is unavailable on the server right now.")
-            async with app.worker.open_repo(proj) as repo:
+            async with app.worker.open_repo(proj, fresh=True) as repo:
                 main = _resolve_main_tex(repo, tex)
-                res = await load.run_heavy(texlocate.compile_and_locate, str(repo), main, exe)
+                res = await app.located(proj, repo, main, exe)
                 if not res.pdf_path:
                     raise ToolError(
                         "The project did not produce a PDF, so it likely has compile "
                         "errors. Run check_compile to see them."
                     )
-                total = await load.run_heavy(texlocate.page_count, res.pdf_path)
+                total = await asyncio.to_thread(texlocate.page_count, res.pdf_path)
                 if page < 1 or page > total:
                     raise ToolError(
                         f"Page {page} is out of range; the document has {total} page(s)."
                     )
-                imgs = await load.run_heavy(texlocate.render_pages, res.pdf_path, [page])
+                imgs = await asyncio.to_thread(texlocate.render_pages, res.pdf_path, [page])
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         if not imgs:

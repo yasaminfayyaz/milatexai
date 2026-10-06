@@ -90,27 +90,35 @@ class GitWorker:
     def repo_path(self, project: ProjectConfig) -> Path:
         return self.data_dir / project.project_id
 
-    async def ensure_repo(self, project: ProjectConfig, *, sync: bool = True) -> Path:
+    async def ensure_repo(self, project: ProjectConfig, *, sync: bool = True, fresh: bool = False) -> Path:
         """Return the local clone path, cloning if needed and optionally syncing.
 
         For reads, ``sync`` respects a short TTL to avoid hammering Overleaf; for
         writes the caller uses :meth:`sync` with ``force=True`` inside the lock.
+        ``fresh`` always checks the remote first (compiles and previews use it, so an
+        edit made directly in Overleaf, GitHub or GitLab is always included).
         """
         path = self.repo_path(project)
         if not (path / ".git").exists():
             await self._clone(project)
+        elif fresh:
+            await self.sync(project, force=True)
         elif sync:
             await self.sync(project, force=False)
         return path
 
+    async def head(self, project: ProjectConfig) -> str:
+        """The full commit id the working copy is at."""
+        return (await self._git(project, ["rev-parse", "HEAD"])).strip()
+
     @asynccontextmanager
-    async def open_repo(self, project: ProjectConfig, *, sync: bool = True):
+    async def open_repo(self, project: ProjectConfig, *, sync: bool = True, fresh: bool = False):
         """Acquire the per-project lock for the WHOLE duration of a read, then
         yield the clone path. This serializes reads with writes so a concurrent
         write's ``reset --hard`` / ``clean -fd`` can never wipe the working tree
         while a read is in progress (and two reads never collide on index.lock)."""
         async with self.lock_for(project):
-            yield await self.ensure_repo(project, sync=sync)
+            yield await self.ensure_repo(project, sync=sync, fresh=fresh)
 
     async def sync(self, project: ProjectConfig, *, force: bool) -> None:
         """Fast-forward the local clone to match the Overleaf remote.
