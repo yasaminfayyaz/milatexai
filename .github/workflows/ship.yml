@@ -40,3 +40,27 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       sha: ${{ github.sha }}
+
+  # The public pages are cached at Cloudflare for hours (see asgi._EDGE_CACHED), so a deploy
+  # that changes their wording is invisible until the cache expires. Clear just those pages.
+  clear-page-cache:
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: watchdog-deploy
+    permissions:
+      contents: read
+    steps:
+      - name: Clear the cached public pages at Cloudflare
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          pages='"https://milatexai.com/","https://milatexai.com/privacy","https://milatexai.com/terms","https://milatexai.com/help","https://milatexai.com/tools","https://milatexai.com/tools/bibtex","https://milatexai.com/tools/latex-error-finder","https://milatexai.com/llms.txt","https://milatexai.com/sitemap.xml"'
+          code=$(curl -s -o /tmp/purge.json -w "%{http_code}" -X POST \
+            "https://api.cloudflare.com/client/v4/zones/1378686c9478bd4880bca1288ead3079/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
+            --data "{\"files\":[$pages]}")
+          echo "Cloudflare answered $code: $(head -c 300 /tmp/purge.json)"
+          [ "$code" = "200" ] || echo "::warning::could not clear the page cache; pages update when the cache expires"
