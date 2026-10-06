@@ -40,6 +40,16 @@ export MSYS_NO_PATHCONV=1   # Git Bash on Windows: don't mangle /subscriptions/.
 az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors >/dev/null 2>&1 || true
 # Every Azure call gets a hard 10 minute limit, so one hung call cannot stall a deploy.
 azq() { timeout 600 az "$@" --only-show-errors; }
+# Azure refuses a change while the previous one is still being applied, so wait for it.
+settle() {
+  local st=""
+  for _ in $(seq 1 60); do
+    st=$(azq containerapp show -n "$APP" -g "$RG" --query properties.provisioningState -o tsv || true)
+    case "$st" in Succeeded|Failed|Canceled) return 0;; esac
+    sleep 5
+  done
+  echo "::warning::$APP still provisioning after 5 minutes (state: $st)"
+}
 
 # Revision currently serving traffic. Single-revision mode reports only a
 # "latestRevision" entry, so fall back to the latest ready revision.
@@ -70,10 +80,12 @@ if [ "$CUR_COOLDOWN" != "$COOLDOWN" ]; then
     [ "$PATCHED" != "$PREV" ] && break
     sleep 5
   done
+  settle
   if [ "$PATCHED" != "$PREV" ]; then
     azq containerapp ingress traffic set -n "$APP" -g "$RG" --revision-weight "$PREV=100" >/dev/null
     azq containerapp revision deactivate -n "$APP" -g "$RG" --revision "$PATCHED" >/dev/null || true
   fi
+  settle
   echo "scale-in delay set to ${COOLDOWN}s"
 fi
 
