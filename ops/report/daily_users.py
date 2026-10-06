@@ -128,10 +128,26 @@ def _delta(r: dict) -> str:
     return f"{r['delta']:+d}" if r["delta"] else "0"
 
 
-def render_text(rows: list[dict], summary: dict, sources: list[dict] | None = None) -> str:
+def service_line(service: dict | None) -> str:
+    """One line about the service itself: is the free tier open, and how many copies ran."""
+    if not service:
+        return ""
+    parts = []
+    if service.get("free_open") is True:
+        parts.append("free tier open")
+    elif service.get("free_open") is False:
+        parts.append("free tier PAUSED (spending limit reached; Pro unaffected)")
+    if service.get("peak_copies") is not None:
+        parts.append(f"most copies running in the last 24 h: {service['peak_copies']} of {service.get('max_copies', 5)}")
+    return ("Service: " + ", ".join(parts)) if parts else ""
+
+
+def render_text(rows: list[dict], summary: dict, sources: list[dict] | None = None, service: dict | None = None) -> str:
     lines = [subject_of(summary), ""]
     lines.append(f"{summary['users']} users | {summary['pro']} pro | {summary['with_project']} with a project | "
                  f"{summary['commits']} commits all-time")
+    if service_line(service):
+        lines.append(service_line(service))
     if summary["first"]:
         lines.append("First report, so there is nothing to compare with yet.")
     else:
@@ -152,7 +168,7 @@ def render_text(rows: list[dict], summary: dict, sources: list[dict] | None = No
     return "\n".join(lines) + "\n"
 
 
-def render_html(rows: list[dict], summary: dict, sources: list[dict] | None = None) -> str:
+def render_html(rows: list[dict], summary: dict, sources: list[dict] | None = None, service: dict | None = None) -> str:
     e = html.escape
     cell = "padding:6px 10px;border-bottom:1px solid #e5e7eb;"
     head = "".join(f'<th style="{cell}text-align:{a};background:#f3f4f6">{t}</th>'
@@ -174,6 +190,8 @@ def render_html(rows: list[dict], summary: dict, sources: list[dict] | None = No
         notes.append("New since yesterday: " + e(", ".join(summary["new_users"])))
     if summary["upgraded"]:
         notes.append("Upgraded to pro: " + e(", ".join(summary["upgraded"])))
+    if service_line(service):
+        notes.insert(0, e(service_line(service)))
     return (
         '<div style="font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111827">'
         f'<p style="margin:0 0 4px"><strong>{summary["users"]}</strong> users, <strong>{summary["pro"]}</strong> pro, '
@@ -243,6 +261,38 @@ def worker(method: str, path: str, body: dict | None = None) -> dict:
     raise RuntimeError(f"the watchdog did not answer ({last})")
 
 
+APP_ID = ("/subscriptions/f1b1a285-7029-47fc-88a7-b83cf5b8c938/resourceGroups/milatexai-rg"
+          "/providers/Microsoft.App/containerApps/milatexai-app")
+MAX_COPIES = 5   # keep in step with MAX_REPLICAS in ops/deploy.sh
+
+
+def service_status() -> dict:
+    """Free tier open or paused (public health endpoint) and the most copies that ran in the
+    last 24 hours (Azure metric). Each part is optional: a failure just leaves it out."""
+    out: dict = {"max_copies": MAX_COPIES}
+    try:
+        req = urllib.request.Request("https://milatexai.com/health/capacity",
+                                     headers={"User-Agent": "milatexai-daily-report/1.0"})
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            out["free_open"] = bool(json.loads(resp.read()).get("free_open"))
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        az = shutil.which("az") or "az"
+        start = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - 86400))
+        res = subprocess.run([az, "monitor", "metrics", "list", "--resource", APP_ID, "--metric", "Replicas",
+                              "--aggregation", "Maximum", "--interval", "PT1H", "--start-time", start,
+                              "-o", "json", "--only-show-errors"], capture_output=True, text=True, timeout=120)
+        if res.returncode == 0:
+            series = json.loads(res.stdout)["value"][0]["timeseries"]
+            peaks = [p.get("maximum") for t in series for p in t.get("data", []) if p.get("maximum") is not None]
+            if peaks:
+                out["peak_copies"] = int(max(peaks))
+    except Exception:  # noqa: BLE001
+        pass
+    return out
+
+
 def main() -> None:
     account = os.environ["AZURE_STORAGE_ACCOUNT"]
     month = time.strftime("%Y-%m", time.gmtime())
@@ -256,8 +306,10 @@ def main() -> None:
           + ("" if summary["first"] else f", {len(summary['new_users'])} new, {summary['commit_delta']:+d} commits since the last report"))
     if dry:
         return
-    worker("POST", "/api/digest", {"subject": subject_of(summary), "text": render_text(rows, summary, sources),
-                                   "html": render_html(rows, summary, sources), "snapshot": snapshot_of(rows)})
+    service = service_status()
+    print("service:", service_line(service) or "unavailable")
+    worker("POST", "/api/digest", {"subject": subject_of(summary), "text": render_text(rows, summary, sources, service),
+                                   "html": render_html(rows, summary, sources, service), "snapshot": snapshot_of(rows)})
     print("emailed")
 
 

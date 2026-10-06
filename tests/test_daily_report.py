@@ -139,3 +139,25 @@ def test_sources_appear_in_both_versions_of_the_email_and_are_escaped():
     assert "Reddit: 3 this month, 4 in total" in text and "How people said they found us" in page
     assert "<b>x</b>" not in page and "&lt;b&gt;x&lt;/b&gt;" in page
     assert "found us" not in du.render_text(r, s) and "found us" not in du.render_html(r, s)
+
+
+
+# --- the service line: free tier status and how many copies ran -----------------------------------
+
+def test_service_line_reports_free_tier_and_peak_copies():
+    assert du.service_line(None) == "" and du.service_line({"max_copies": 5}) == ""
+    assert du.service_line({"free_open": True, "peak_copies": 2, "max_copies": 5}) == \
+        "Service: free tier open, most copies running in the last 24 h: 2 of 5"
+    assert "PAUSED" in du.service_line({"free_open": False}) and "Pro unaffected" in du.service_line({"free_open": False})
+    r = rows()
+    s = du.compare(r, {})
+    svc = {"free_open": True, "peak_copies": 3, "max_copies": 5}
+    assert "most copies running in the last 24 h: 3 of 5" in du.render_text(r, s, None, svc)
+    assert "most copies running in the last 24 h: 3 of 5" in du.render_html(r, s, None, svc)
+    assert "Service:" not in du.render_text(r, s)
+
+
+def test_report_cap_matches_the_deploy_script():
+    import re
+    deploy = (Path(__file__).resolve().parents[1] / "ops" / "deploy.sh").read_text(encoding="utf-8")
+    assert re.search(r'MAX_REPLICAS="\$\{DEPLOY_MAX_REPLICAS:-(\d+)\}"', deploy).group(1) == str(du.MAX_COPIES)

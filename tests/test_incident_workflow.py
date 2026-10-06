@@ -112,9 +112,11 @@ def test_deploys_keep_the_scaling_policy():
     one copy (or remove the always-on copy). The grace period must outlast uvicorn's drain."""
     import re
     deploy = (ROOT / "ops" / "deploy.sh").read_text(encoding="utf-8")
-    for flag in ("--min-replicas", "--max-replicas", "--scale-rule-type http", "--scale-rule-http-concurrency",
-                 "--termination-grace-period", "cooldownPeriod"):
+    for flag in ("--min-replicas", "--max-replicas", "--termination-grace-period", "cooldownPeriod",
+                 '"type":"cpu"', '"type":"memory"', "concurrentRequests", "scale_policy"):
         assert flag in deploy, flag
+    assert "--scale-rule-type" not in deploy        # the CLI flag would replace the three rules with one
+    assert re.search(r"^CPU_PCT=70$", deploy, re.M) and re.search(r"^MEM_PCT=80$", deploy, re.M)
     assert re.search(r'MAX_REPLICAS="\$\{DEPLOY_MAX_REPLICAS:-5\}"', deploy)
     grace = int(re.search(r"^GRACE=(\d+)", deploy, re.M).group(1))
     drain = int(re.search(r'"--timeout-graceful-shutdown", "(\d+)"', (ROOT / "Dockerfile").read_text(encoding="utf-8")).group(1))

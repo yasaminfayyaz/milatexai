@@ -25,12 +25,18 @@ SHA="${1:?usage: deploy.sh <git-sha>}"
 APP="${DEPLOY_APP:-milatexai-app}"
 case "$APP" in milatexai-app|milatexai-drill) ;; *) echo "refusing to deploy to unknown app: $APP" >&2; exit 1;; esac
 MIN_REPLICAS=1; [ "$APP" = "milatexai-app" ] || MIN_REPLICAS=0   # the drill copy stays scale-to-zero (no idle bill)
-# Scaling: one copy always runs; more are added while copies are busy, up to MAX_REPLICAS,
-# and removed after COOLDOWN quiet seconds. A copy being removed gets GRACE seconds to
-# finish the requests it is serving (uvicorn waits for them; see the Dockerfile).
+# Scaling: one copy always runs; more are added up to MAX_REPLICAS when ANY rule fires:
+#   CPU_PCT    average CPU across copies above this percentage (the main signal: compiles)
+#   MEM_PCT    average memory above this percentage (large papers compile with a lot of memory)
+#   FLOOD_RPS  more than this many requests per second per copy (Azure averages over 15 s);
+#              only a backstop for floods of light requests, which wait on Git and use no CPU
+# Extra copies are removed after 300 quiet seconds (Azure's fixed scale-down window). A copy
+# being removed gets GRACE seconds to finish its requests (uvicorn drains; see the Dockerfile).
 # Every copy must be interchangeable: shared state lives in storage (see store.py).
 MAX_REPLICAS="${DEPLOY_MAX_REPLICAS:-5}"; [ "$APP" = "milatexai-app" ] || MAX_REPLICAS="${DEPLOY_MAX_REPLICAS:-3}"
-BUSY_REQUESTS=5     # in-flight requests per copy before another copy is added
+CPU_PCT=70
+MEM_PCT=80
+FLOOD_RPS=20
 COOLDOWN=300
 GRACE=120
 RG=milatexai-rg
@@ -66,15 +72,18 @@ azq containerapp ingress traffic set -n "$APP" -g "$RG" --revision-weight "$PREV
 
 SUFFIX="g${SHA:0:8}-r${GITHUB_RUN_NUMBER:-0}-${GITHUB_RUN_ATTEMPT:-$(date +%s)}"
 NEW="$APP--$SUFFIX"
-# The scale-in delay is not settable from `containerapp update`, so set it once on the app
-# template (a merge patch that leaves everything else alone; it needs a fresh revision name,
-# or Azure rejects it as a duplicate). That creates a throwaway revision with no traffic; it is switched off straight away, and the update below copies
-# the setting into every new revision from then on.
-CUR_COOLDOWN=$(azq containerapp show -n "$APP" -g "$RG" --query properties.template.scale.cooldownPeriod -o tsv || true)
-if [ "$CUR_COOLDOWN" != "$COOLDOWN" ]; then
+# The CLI can set only one scale rule, so the three rules (and the scale-in delay) are set on
+# the app template through the API, and every later `containerapp update` copies them into
+# its new revision. The applied set is remembered in the app's `scale_policy` tag, so this
+# runs only when the policy above changes. The patch needs a fresh revision name (Azure
+# rejects a duplicate) and creates a throwaway revision with no traffic, switched off at once.
+POLICY="cpu${CPU_PCT}-mem${MEM_PCT}-req${FLOOD_RPS}-cd${COOLDOWN}-min${MIN_REPLICAS}-max${MAX_REPLICAS}"
+CUR_POLICY=$(azq containerapp show -n "$APP" -g "$RG" --query "tags.scale_policy" -o tsv || true)
+if [ "$CUR_POLICY" != "$POLICY" ]; then
   APP_ID_FOR_PATCH=$(azq containerapp show -n "$APP" -g "$RG" --query id -o tsv)
-  azq rest --method patch --url "https://management.azure.com${APP_ID_FOR_PATCH}?api-version=2025-01-01" \
-    --body "{\"properties\":{\"template\":{\"revisionSuffix\":\"cool$(date +%s)\",\"scale\":{\"cooldownPeriod\":$COOLDOWN}}}}" >/dev/null
+  SCALE_BODY=$(printf '{"properties":{"template":{"revisionSuffix":"scale%s","scale":{"minReplicas":%s,"maxReplicas":%s,"cooldownPeriod":%s,"pollingInterval":30,"rules":[{"name":"cpu-busy","custom":{"type":"cpu","metadata":{"type":"Utilization","value":"%s"}}},{"name":"memory-busy","custom":{"type":"memory","metadata":{"type":"Utilization","value":"%s"}}},{"name":"request-flood","http":{"metadata":{"concurrentRequests":"%s"}}}]}}}}' \
+    "$(date +%s)" "$MIN_REPLICAS" "$MAX_REPLICAS" "$COOLDOWN" "$CPU_PCT" "$MEM_PCT" "$FLOOD_RPS")
+  azq rest --method patch --url "https://management.azure.com${APP_ID_FOR_PATCH}?api-version=2025-01-01" --body "$SCALE_BODY" >/dev/null
   for _ in $(seq 1 36); do
     PATCHED=$(azq containerapp show -n "$APP" -g "$RG" --query properties.latestRevisionName -o tsv)
     [ "$PATCHED" != "$PREV" ] && break
@@ -86,7 +95,8 @@ if [ "$CUR_COOLDOWN" != "$COOLDOWN" ]; then
     azq containerapp revision deactivate -n "$APP" -g "$RG" --revision "$PATCHED" >/dev/null || true
   fi
   settle
-  echo "scale-in delay set to ${COOLDOWN}s"
+  azq tag update --resource-id "$APP_ID_FOR_PATCH" --operation Merge --tags scale_policy="$POLICY" >/dev/null
+  echo "scale policy set: $POLICY"
 fi
 
 # FREE_CAPACITY_STARTER: month-to-date Azure spend (CAD) at which the capacity
@@ -94,7 +104,6 @@ fi
 # Pro is never paused. Kept here so the limit is reviewable in git.
 azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" \
   --min-replicas "$MIN_REPLICAS" --max-replicas "$MAX_REPLICAS" \
-  --scale-rule-name http-busy --scale-rule-type http --scale-rule-http-concurrency "$BUSY_REQUESTS" \
   --termination-grace-period "$GRACE" \
   --set-env-vars FREE_CAPACITY_STARTER=100 >/dev/null
 echo "new revision: $NEW (0% traffic)"
