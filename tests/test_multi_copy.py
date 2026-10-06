@@ -237,3 +237,17 @@ def test_concurrent_counting_loses_nothing_in_memory():
         await asyncio.gather(*(store.increment_usage("u", "2026-10") for _ in range(50)))
         return await store.get_usage("u", "2026-10")
     assert asyncio.run(go()) == 50
+
+
+def test_a_copy_can_be_given_its_own_tables(monkeypatch):
+    from leafbridge.azure_store import AzureTableStore
+    cs = "DefaultEndpointsProtocol=https;AccountName=x;AccountKey=eA==;EndpointSuffix=core.windows.net"
+    monkeypatch.setenv("AZURE_STORAGE_CONNECTION_STRING", cs)
+    monkeypatch.delenv("LEAFBRIDGE_TABLE_PREFIX", raising=False)
+    assert AzureTableStore.from_env()._name("users") == "users"          # production: unchanged
+    monkeypatch.setenv("LEAFBRIDGE_TABLE_PREFIX", "loadtest")
+    assert AzureTableStore.from_env()._name("users") == "loadtestusers"
+    for bad in ("Load", "9x", "a-b", "x" * 21):
+        monkeypatch.setenv("LEAFBRIDGE_TABLE_PREFIX", bad)
+        with pytest.raises(ValueError):
+            AzureTableStore.from_env()

@@ -1,0 +1,54 @@
+name: compile-load-test
+
+# Simulated people using the real tools (compiles, page and table images, reads) against the
+# THROWAWAY copy only (milatexai-drill), which alone trusts the load-test sign-in key. The number
+# of people grows in steps; the summary gives response times for Pro and free, "busy" counts,
+# real errors and how many copies ran. Production is never targeted.
+
+on:
+  workflow_dispatch:
+    inputs:
+      steps:
+        description: People at each step, comma separated
+        required: true
+        default: "2,4,8,12,16,20"
+      step_seconds:
+        description: How long each step lasts
+        required: true
+        default: "180"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: load-test
+  cancel-in-progress: false
+
+jobs:
+  load:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: loadtest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: azure/login@v3
+        with:
+          client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
+          tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
+          subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
+      - run: pip install -q aiohttp cryptography
+      - name: Run the simulated users
+        env:
+          APP: milatexai-drill
+          ISSUER: https://raw.githubusercontent.com/yasaminfayyaz/milatexai-loadtest-issuer/main
+          ISSUER_KEY: ${{ secrets.LOADTEST_ISSUER_KEY }}
+          REPO_URL: https://github.com/yasaminfayyaz/milatexai-loadtest-paper.git
+          REPO_TOKEN: ${{ secrets.LOADTEST_REPO_TOKEN }}
+          STEPS: ${{ inputs.steps }}
+          STEP_SECONDS: ${{ inputs.step_seconds }}
+        run: |
+          FQDN=$(az containerapp show -n milatexai-drill -g milatexai-rg --query properties.configuration.ingress.fqdn -o tsv --only-show-errors)
+          BASE_URL="https://$FQDN" python ops/mcp_loadtest.py

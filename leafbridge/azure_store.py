@@ -34,8 +34,14 @@ class AzureTableStore(Store):
         self._container = None
 
     @classmethod
-    def from_env(cls, *, prefix: str = "") -> "AzureTableStore":
+    def from_env(cls, *, prefix: str | None = None) -> "AzureTableStore":
+        """``LEAFBRIDGE_TABLE_PREFIX`` gives a copy its own tables and download container in the
+        same storage account (used by the throwaway load-test copy). Production sets none."""
         cs = os.environ["AZURE_STORAGE_CONNECTION_STRING"]
+        if prefix is None:
+            prefix = os.environ.get("LEAFBRIDGE_TABLE_PREFIX", "")
+        if prefix and not (prefix.isalnum() and prefix[0].isalpha() and prefix.islower() and len(prefix) <= 20):
+            raise ValueError("LEAFBRIDGE_TABLE_PREFIX must be 1 to 20 lowercase letters and digits, starting with a letter")
         return cls(cs, prefix=prefix)
 
     def _name(self, base: str) -> str:

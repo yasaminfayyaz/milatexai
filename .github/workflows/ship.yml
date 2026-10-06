@@ -22,6 +22,8 @@ on:
       - ".github/workflows/*-report.yml"
       - "tests/test_daily_report.py"
       - "ops/loadtest.py"
+      - "ops/mcp_loadtest.py"
+      - ".github/workflows/compile-load-test.yml"
       - ".github/workflows/load-test.yml"
   workflow_dispatch:
 
