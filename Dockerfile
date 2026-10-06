@@ -30,6 +30,7 @@ RUN curl -fsSL "https://github.com/ftilmann/latexdiff/releases/download/${LATEXD
 # they're just not persisted past a scale-to-zero.)
 ENV TECTONIC_CACHE_DIR=/opt/tectonic-cache
 COPY docker/prime.tex /tmp/prime/main.tex
+COPY docker/prime.bib /tmp/prime/prime.bib
 RUN cd /tmp/prime && tectonic -X compile main.tex && rm -rf /tmp/prime
 
 WORKDIR /app

@@ -1,16 +1,30 @@
 % Compiled once at Docker build time to warm Tectonic's package-bundle cache into
-% an image layer, so the first real compile after a cold start needs no network.
-% Pulls the packages most academic papers use.
+% an image layer, so no compile ever waits on a package download: not after a cold
+% start, and not on a copy that was just added because the service is busy (every
+% new copy starts from the image). Pulls the packages most academic papers use,
+% including charts (pgfplots) and natbib bibliographies, which a load test showed
+% were being downloaded in the middle of users' compiles.
 \documentclass{article}
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage{graphicx,hyperref,geometry,xcolor,booktabs,url}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{graphicx,hyperref,geometry,xcolor,booktabs,url,multirow,array,tabularx}
+\usepackage{caption,subcaption,float,enumitem,microtype}
 \usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes,calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{siunitx}
+\usepackage{algorithm,algpseudocode}
+\usepackage{listings}
+\usepackage[numbers]{natbib}
+\usepackage{cleveref}
 \title{Warm-up}
 \author{MiLatexAI}
 \begin{document}
 \maketitle
-\section{Introduction}
-Euler's identity: \(e^{i\pi} + 1 = 0\).
+\section{Introduction}\label{sec:intro}
+Euler's identity: \(e^{i\pi} + 1 = 0\), see \cref{sec:intro} and \citet{warm}, \SI{3}{\metre}.
 \begin{align}
   a &= b + c, \\
   \int_0^1 x^2 \, dx &= \tfrac{1}{3}.
@@ -18,7 +32,20 @@ Euler's identity: \(e^{i\pi} + 1 = 0\).
 \begin{tikzpicture}
   \draw (0,0) -- (1,1) -- (2,0) -- cycle;
 \end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=5cm]
+    \addplot coordinates {(0,1) (1,3) (2,2)};
+  \end{axis}
+\end{tikzpicture}
 \begin{table}[h]\centering
 \begin{tabular}{lr}\toprule A & B \\ \midrule 1 & 2 \\ \bottomrule\end{tabular}
 \end{table}
+\begin{algorithmic}
+\State $x \gets 1$
+\end{algorithmic}
+\begin{lstlisting}
+print("warm")
+\end{lstlisting}
+\bibliographystyle{plainnat}
+\bibliography{prime}
 \end{document}
