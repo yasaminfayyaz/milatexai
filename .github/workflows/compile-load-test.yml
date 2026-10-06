@@ -36,7 +36,7 @@ jobs:
           persist-credentials: false
       - uses: azure/login@v3
         with:
-          client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
+          client-id: 0d9a09c4-67a8-4383-8bae-3dc97256ba84   # milatexai-loadtest: Reader on milatexai-drill only
           tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
           subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
       - run: pip install -q aiohttp cryptography
