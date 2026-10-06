@@ -38,7 +38,8 @@ IMAGE="ghcr.io/yasaminfayyaz/milatexai:$SHA"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 export MSYS_NO_PATHCONV=1   # Git Bash on Windows: don't mangle /subscriptions/... ids
 az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors >/dev/null 2>&1 || true
-azq() { az "$@" --only-show-errors; }
+# Every Azure call gets a hard 10 minute limit, so one hung call cannot stall a deploy.
+azq() { timeout 600 az "$@" --only-show-errors; }
 
 # Revision currently serving traffic. Single-revision mode reports only a
 # "latestRevision" entry, so fall back to the latest ready revision.
@@ -56,14 +57,14 @@ azq containerapp ingress traffic set -n "$APP" -g "$RG" --revision-weight "$PREV
 SUFFIX="g${SHA:0:8}-r${GITHUB_RUN_NUMBER:-0}-${GITHUB_RUN_ATTEMPT:-$(date +%s)}"
 NEW="$APP--$SUFFIX"
 # The scale-in delay is not settable from `containerapp update`, so set it once on the app
-# template (a merge patch that leaves everything else alone). That creates a throwaway
-# revision with no traffic; it is switched off straight away, and the update below copies
+# template (a merge patch that leaves everything else alone; it needs a fresh revision name,
+# or Azure rejects it as a duplicate). That creates a throwaway revision with no traffic; it is switched off straight away, and the update below copies
 # the setting into every new revision from then on.
 CUR_COOLDOWN=$(azq containerapp show -n "$APP" -g "$RG" --query properties.template.scale.cooldownPeriod -o tsv || true)
 if [ "$CUR_COOLDOWN" != "$COOLDOWN" ]; then
   APP_ID_FOR_PATCH=$(azq containerapp show -n "$APP" -g "$RG" --query id -o tsv)
-  azq rest --method patch --url "https://management.azure.com${APP_ID_FOR_PATCH}?api-version=2024-03-01" \
-    --body "{\"properties\":{\"template\":{\"scale\":{\"cooldownPeriod\":$COOLDOWN}}}}" >/dev/null
+  azq rest --method patch --url "https://management.azure.com${APP_ID_FOR_PATCH}?api-version=2025-01-01" \
+    --body "{\"properties\":{\"template\":{\"revisionSuffix\":\"cool$(date +%s)\",\"scale\":{\"cooldownPeriod\":$COOLDOWN}}}}" >/dev/null
   for _ in $(seq 1 36); do
     PATCHED=$(azq containerapp show -n "$APP" -g "$RG" --query properties.latestRevisionName -o tsv)
     [ "$PATCHED" != "$PREV" ] && break
