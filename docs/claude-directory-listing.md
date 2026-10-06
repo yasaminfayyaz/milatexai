@@ -35,7 +35,7 @@ Synced automatically. Every tool now has a title and a read-only or destructive 
 
 ## Step: Listing
 
-- **Name**: MiLatexAI for Overleaf and Git
+- **Name**: MiLatexAI (keep Overleaf out of the name: it is another company's trademark; the one-liner and description say what it works with)
 - **One-liner**: Edit your Overleaf or Git LaTeX project from Claude. Every change is a real Git commit you can review and undo. No downloads, no copy-paste.
 - **Description**:
 
@@ -67,7 +67,7 @@ Synced automatically. Every tool now has a title and a read-only or destructive 
   GitLab and Bitbucket repositories only need a free access token.
 
 - **Categories**: whichever of these the portal offers: Productivity, Writing, Developer tools, Education, Research
-- **Documentation URL**: https://milatexai.com/ (the "Add MiLatexAI in two minutes" section)
+- **Documentation URL**: https://milatexai.com/help (setup, example prompts, troubleshooting)
 - **Privacy policy URL**: https://milatexai.com/privacy
 - **Support contact**: support@milatexai.com
 - **Icon**: `docs/directory/icon-512.png` (a 64 px version is next to it)
@@ -95,7 +95,10 @@ OAuth with dynamic client registration (WorkOS AuthKit).
 
 ## Step: Data handling
 
-- The API is our own (first party).
+- Choose the option that says the API is your own. MiLatexAI's tools run on our own service at milatexai.com.
+  If the portal asks for detail, say: the service reads and writes the user's own repositories on Overleaf,
+  GitHub, GitLab or Bitbucket over the standard Git protocol, using an access token the user creates for that
+  purpose and enters on our secure web form.
 - No personal health data. No sponsored content.
 
 ## Step: Test and launch (reviewers read this text, so the payment explanation goes here)
@@ -104,7 +107,7 @@ Paste, filling in the two blanks:
 
 > Add the connector in Claude (Settings, Connectors, Add custom connector, URL https://milatexai.com/mcp) and sign
 > in with email ____ and password ____. This account is on Pro and already has a small sample paper connected
-> (a private GitHub repository named "milatexai-review-paper"), so every tool works without any setup.
+> (a private GitHub repository, labelled "Review" in MiLatexAI), so every tool works without any setup.
 >
 > Things to try: "list my projects", "show the outline of main.tex", "fix the typo in the abstract" (edit_file),
 > "undo that change" (restore_file), "does the paper compile?" (check_compile), "show me table 1" (show_table),

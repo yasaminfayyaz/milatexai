@@ -1459,6 +1459,12 @@ def create_hosted_server(
             _pages["privacy"] = site.render_legal_page("privacy")
         return HTMLResponse(_pages["privacy"])
 
+    @mcp.custom_route("/help", methods=["GET"])
+    async def help_page(request: Request) -> Response:
+        if "help" not in _pages:
+            _pages["help"] = site.render_legal_page("help")
+        return HTMLResponse(_pages["help"])
+
     @mcp.custom_route("/terms", methods=["GET"])
     async def terms_page(request: Request) -> Response:
         if "terms" not in _pages:

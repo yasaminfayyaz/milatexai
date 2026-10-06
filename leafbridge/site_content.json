@@ -150,7 +150,7 @@
     },
     {
      "q": "Can you see my documents?",
-     "a": "We don't store your document contents. MiLatexAI reads and edits your files in the moment to carry out a request, but the only things we keep are your account email, your encrypted access token, and a monthly commit counter."
+     "a": "We don't store your document contents. MiLatexAI reads and edits your files while it carries out a request. We keep your account email, your encrypted access token, the list of projects you connect, and a monthly commit counter. The privacy policy lists everything."
     },
     {
      "q": "Which AI assistants does it work with?",
@@ -219,28 +219,36 @@
   },
   "privacy": {
    "title": "Privacy Policy",
-   "updated_label": "Last updated: July 2026",
-   "intro": "This policy explains, in plain language, what MiLatexAI collects, what it deliberately does not collect, and how your Git access token is protected. MiLatexAI is a small, independent product, and we try to touch as little of your data as possible.",
+   "updated_label": "Last updated: October 2026",
+   "intro": "This policy explains, in plain language, what MiLatexAI keeps, what it deliberately does not keep, and who else is involved in running the service. MiLatexAI is a small, independent product, and we try to touch as little of your data as possible.",
    "sections": [
     {
-     "heading": "What we collect",
-     "body": "We collect only three things: your account email address (provided through single sign-on), your Git access token in encrypted form, and a counter of how many write-commits you've made in the current month. That is the complete list."
+     "heading": "What we keep",
+     "body": "Your account: the email address and account ID you sign in with, your plan, and, if you subscribe to Pro, the customer ID that Stripe gives us. Your Git access token, encrypted. The projects you connect: each repository link and the label you gave it. A count of your write-commits for each month. That is everything we keep about you.\n\nWhen you connect your first project, you can optionally tell us how you found MiLatexAI. We only add one to a running count for that answer. The answer is not linked to you."
     },
     {
-     "heading": "What we do NOT collect",
-     "body": "We do not store the contents of your LaTeX documents, your figures, your compiled PDFs, or your project history. Files are read and edited in the moment to carry out your requests and are not retained by us afterward."
+     "heading": "What we do not keep",
+     "body": "We do not keep a copy of your documents, figures, compiled PDFs or project history. To read and edit your files, the server works on a temporary copy of each connected repository. It is a working cache, not a backup: it is never shared, and it is deleted whenever the server restarts or is updated. Figures you ask MiLatexAI to render run in an isolated sandbox that discards your files when the session ends."
     },
     {
      "heading": "How your token is secured",
-     "body": "Your Git access token is entered into a web form at milatexai.com/connect, never into the chat, and is encrypted at rest using authenticated encryption. It is used only to access the specific projects you connect, and is never shown in the conversation transcript."
+     "body": "Your Git access token is entered into a web form at milatexai.com/connect, never into the chat, and is encrypted at rest using authenticated encryption. It is used only to access the specific projects you connect, and it is never shown in the conversation."
+    },
+    {
+     "heading": "Payments",
+     "body": "Pro subscriptions are handled by Stripe. You enter your card details on Stripe's own page, and we never see or store them. Stripe tells us whether your subscription is active so we can set your plan."
+    },
+    {
+     "heading": "Technical logs",
+     "body": "Like most web services, our servers keep technical logs of requests (the time, the page or tool used, the result, and any error message) so we can keep the service secure and working. Logs are deleted after 30 days."
     },
     {
      "heading": "Third parties we rely on",
-     "body": "Sign-in is handled by WorkOS AuthKit, which authenticates you and provides your email. Hosting is on Microsoft Azure in the Canada region. Your projects live on Overleaf, GitHub, GitLab, Bitbucket, or your own Git host, and MiLatexAI communicates with them over Git. We do not sell your data or share it beyond what these providers require to run the service."
+     "body": "WorkOS handles sign-in. Microsoft Azure, in the Canada region, hosts the service, its storage and the figure sandbox. Cloudflare delivers and protects the website, which means it processes visitors' IP addresses. Stripe handles payments for Pro. Your projects live on Overleaf, GitHub, GitLab, Bitbucket or your own Git host, and MiLatexAI talks to them over Git using your token. We do not sell your data or share it beyond what these providers need to run the service."
     },
     {
      "heading": "Data retention and deletion",
-     "body": "We keep your email, encrypted token, and commit counter only while your account is active. You can disconnect a project or ask us to delete your stored data at any time. Because we don't store your documents, disconnecting immediately ends our access to your projects."
+     "body": "We keep your account data while your account exists. Disconnecting a project removes it and its stored token. You can ask us to delete your account and everything listed above at any time, and logs expire on their own after 30 days. Because we don't keep your documents, disconnecting immediately ends our access to your projects."
     },
     {
      "heading": "Your rights",
@@ -321,6 +329,33 @@
    "chatgpt_note": "Works on ChatGPT, including its free plan. See the guide.",
    "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+  },
+  "help": {
+   "title": "Help",
+   "updated_label": "Setting up and using MiLatexAI",
+   "intro": "MiLatexAI connects Claude (or ChatGPT) to your Overleaf project or Git repository, so you can work on your paper by asking for changes in the chat. Every change is a Git commit you can review and undo.",
+   "sections": [
+    {
+     "heading": "Set it up in Claude",
+     "body": "1. In Claude, open Settings, then Connectors, then Add custom connector.\n2. Paste https://milatexai.com/mcp and sign in.\n3. Ask Claude to connect your project. It gives you a secure link: paste your repository link and access token there, never in the chat.\n4. Ask Claude about your paper."
+    },
+    {
+     "heading": "What you need",
+     "body": "A repository you can push to and an access token for it.\n\nOverleaf: Git integration is a paid Overleaf feature (many universities include it). Create a Git token in Overleaf under Account settings, then Git integration.\n\nGitHub: a fine-grained personal access token limited to that repository, with Contents set to read and write. GitLab and Bitbucket work the same way with their own access tokens."
+    },
+    {
+     "heading": "Things to ask",
+     "body": "\"Show me the outline of main.tex.\"\n\"Tighten the abstract and keep it under 200 words.\"\n\"Why won't my paper compile? Fix it.\"\n\"Add the citation 10.48550/arXiv.1706.03762.\"\n\"Show me how table 2 looks and fix the column that runs off the page.\"\n\"Save a checkpoint, then rewrite the introduction.\"\n\"Undo your last change to intro.tex.\"\n\"Make a tracked-changes PDF against my last checkpoint.\""
+    },
+    {
+     "heading": "Troubleshooting",
+     "body": "Claude says the connector isn't responding, or keeps asking you to sign in: remove MiLatexAI under Settings, then Connectors, and add it again. This refreshes the sign-in.\n\nClaude says no project is connected: ask it to connect your project and open the link it gives you within 15 minutes.\n\nOverleaf rejects the token: Git integration needs a paid Overleaf plan. Create a new Git token in Overleaf, then ask Claude to change your token.\n\nYou've used your 10 free commits: reading stays free and unlimited. Commits start again on the 1st of the month (UTC), or you can move to Pro.\n\nYour edit doesn't appear in Overleaf: reload the project. Overleaf picks up Git changes within a few seconds.\n\nThe paper compiles on Overleaf but not here, or the other way round: MiLatexAI's compile check uses its own LaTeX engine, so a package that depends on a specific compiler setting can behave differently. Overleaf's own compile is the final word."
+    },
+    {
+     "heading": "Contact",
+     "body": "Email support@milatexai.com. To report a security problem, put \"Security\" in the subject line; see the security policy on GitHub."
+    }
+   ]
   }
  },
  "zh": {
@@ -463,7 +498,7 @@
     },
     {
      "q": "你们能看到我的文档吗？",
-     "a": "我们不存储你的文档内容。MiLatexAI 只在执行请求的当下读取和编辑你的文件，我们唯一保留的只有你的账户邮箱、加密后的访问令牌，以及一个每月提交计数器。"
+     "a": "我们不存储你的文档内容。MiLatexAI 只在执行请求时读取和编辑你的文件。我们保留的是你的账户邮箱、加密后的访问令牌、你连接的项目列表，以及一个每月提交计数器。完整清单见隐私政策。"
     },
     {
      "q": "它支持哪些 AI 助手？",
@@ -782,7 +817,7 @@
     },
     {
      "q": "Pouvez-vous voir mes documents ?",
-     "a": "Nous ne stockons pas le contenu de vos documents. MiLatexAI lit et modifie vos fichiers sur le moment pour exécuter une demande, mais les seules choses que nous conservons sont l'e-mail de votre compte, votre jeton d'accès chiffré et un compteur mensuel de commits."
+     "a": "Nous ne stockons pas le contenu de vos documents. MiLatexAI lit et modifie vos fichiers le temps d'exécuter une demande. Nous conservons l'e-mail de votre compte, votre jeton d'accès chiffré, la liste des projets que vous connectez et un compteur mensuel de commits. La politique de confidentialité donne la liste complète."
     },
     {
      "q": "Avec quels assistants d'IA fonctionne-t-il ?",
@@ -1101,7 +1136,7 @@
     },
     {
      "q": "¿Podéis ver mis documentos?",
-     "a": "No almacenamos el contenido de tus documentos. MiLatexAI lee y edita tus archivos en el momento para llevar a cabo una petición, pero lo único que conservamos es el correo de tu cuenta, tu token de acceso cifrado y un contador mensual de commits."
+     "a": "No almacenamos el contenido de tus documentos. MiLatexAI lee y edita tus archivos mientras lleva a cabo una petición. Conservamos el correo de tu cuenta, tu token de acceso cifrado, la lista de proyectos que conectas y un contador mensual de commits. La política de privacidad tiene la lista completa."
     },
     {
      "q": "¿Con qué asistentes de IA funciona?",
@@ -1420,7 +1455,7 @@
     },
     {
      "q": "Könnt ihr meine Dokumente sehen?",
-     "a": "Wir speichern die Inhalte deiner Dokumente nicht. MiLatexAI liest und bearbeitet deine Dateien im Moment der Anfrage, aber das Einzige, was wir behalten, sind deine Konto-E-Mail, dein verschlüsseltes Zugriffstoken und ein monatlicher Commit-Zähler."
+     "a": "Wir speichern die Inhalte deiner Dokumente nicht. MiLatexAI liest und bearbeitet deine Dateien nur, während es eine Anfrage ausführt. Wir behalten deine Konto-E-Mail, dein verschlüsseltes Zugriffstoken, die Liste der Projekte, die du verbindest, und einen monatlichen Commit-Zähler. Die vollständige Liste steht in der Datenschutzerklärung."
     },
     {
      "q": "Mit welchen KI-Assistenten funktioniert es?",
@@ -1739,7 +1774,7 @@
     },
     {
      "q": "私のドキュメントは見えるのですか？",
-     "a": "ドキュメントの内容は保存しません。MiLatexAI はリクエストを実行するその場でファイルを読み書きしますが、保持するのはアカウントのメールアドレス、暗号化されたアクセストークン、月間コミット数のカウンターのみです。"
+     "a": "ドキュメントの内容は保存しません。MiLatexAI はリクエストを実行している間だけファイルを読み書きします。保持するのは、アカウントのメールアドレス、暗号化されたアクセストークン、接続したプロジェクトの一覧、月間コミット数のカウンターです。全項目はプライバシーポリシーに記載しています。"
     },
     {
      "q": "どのAIアシスタントに対応していますか？",
@@ -2058,7 +2093,7 @@
     },
     {
      "q": "Vocês conseguem ver meus documentos?",
-     "a": "Não armazenamos o conteúdo dos seus documentos. O MiLatexAI lê e edita seus arquivos no momento para atender a uma solicitação, mas as únicas coisas que guardamos são o e-mail da sua conta, seu token de acesso criptografado e um contador mensal de commits."
+     "a": "Não armazenamos o conteúdo dos seus documentos. O MiLatexAI lê e edita seus arquivos enquanto atende a uma solicitação. Guardamos o e-mail da sua conta, seu token de acesso criptografado, a lista de projetos que você conecta e um contador mensal de commits. A política de privacidade traz a lista completa."
     },
     {
      "q": "Com quais assistentes de IA ele funciona?",
@@ -2377,7 +2412,7 @@
     },
     {
      "q": "هل يمكنكم الاطلاع على مستنداتي؟",
-     "a": "نحن لا نخزّن محتويات مستنداتك. يقرأ MiLatexAI ويحرّر ملفاتك في اللحظة لتنفيذ الطلب، لكن الأشياء الوحيدة التي نحتفظ بها هي بريد حسابك الإلكتروني، ورمز الوصول المشفّر الخاص بك، وعدّاد الالتزامات الشهري."
+     "a": "نحن لا نخزّن محتويات مستنداتك. يقرأ MiLatexAI ملفاتك ويحرّرها أثناء تنفيذ الطلب فقط. نحتفظ ببريد حسابك الإلكتروني، ورمز الوصول المشفّر، وقائمة المشاريع التي تربطها، وعدّاد شهري للالتزامات. تجد القائمة الكاملة في سياسة الخصوصية."
     },
     {
      "q": "مع أي مساعدات الذكاء الاصطناعي يعمل؟",
@@ -2696,7 +2731,7 @@
     },
     {
      "q": "क्या आप मेरे दस्तावेज़ देख सकते हैं?",
-     "a": "हम आपके दस्तावेज़ों की सामग्री संग्रहीत नहीं करते। MiLatexAI किसी अनुरोध को पूरा करने के लिए उसी क्षण आपकी फ़ाइलें पढ़ता और एडिट करता है, लेकिन हम केवल आपका खाता ईमेल, आपका एन्क्रिप्टेड एक्सेस टोकन, और एक मासिक commit काउंटर ही रखते हैं।"
+     "a": "हम आपके दस्तावेज़ों की सामग्री संग्रहीत नहीं करते। MiLatexAI किसी अनुरोध को पूरा करते समय ही आपकी फ़ाइलें पढ़ता और एडिट करता है। हम आपका खाता ईमेल, आपका एन्क्रिप्टेड एक्सेस टोकन, आपके जोड़े गए प्रोजेक्ट्स की सूची, और एक मासिक commit काउंटर रखते हैं। पूरी सूची गोपनीयता नीति में है।"
     },
     {
      "q": "यह किन AI असिस्टेंट्स के साथ काम करता है?",
@@ -3015,7 +3050,7 @@
     },
     {
      "q": "제 문서를 볼 수 있나요?",
-     "a": "저희는 문서 내용을 저장하지 않습니다. MiLatexAI는 요청을 처리하기 위해 그 순간에 파일을 읽고 편집할 뿐이며, 저희가 보관하는 것은 계정 이메일, 암호화된 액세스 토큰, 그리고 월별 커밋 카운터뿐입니다."
+     "a": "저희는 문서 내용을 저장하지 않습니다. MiLatexAI는 요청을 처리하는 동안에만 파일을 읽고 편집합니다. 저희가 보관하는 것은 계정 이메일, 암호화된 액세스 토큰, 연결한 프로젝트 목록, 월별 커밋 카운터입니다. 전체 목록은 개인정보 처리방침에 있습니다."
     },
     {
      "q": "어떤 AI 어시스턴트와 함께 작동하나요?",
@@ -3334,7 +3369,7 @@
     },
     {
      "q": "Видите ли вы мои документы?",
-     "a": "Мы не храним содержимое ваших документов. MiLatexAI читает и редактирует ваши файлы в момент выполнения запроса, но единственное, что мы сохраняем, это email вашей учётной записи, ваш зашифрованный токен доступа и месячный счётчик коммитов."
+     "a": "Мы не храним содержимое ваших документов. MiLatexAI читает и редактирует ваши файлы только во время выполнения запроса. Мы храним email вашей учётной записи, ваш зашифрованный токен доступа, список подключённых проектов и месячный счётчик коммитов. Полный список приведён в политике конфиденциальности."
     },
     {
      "q": "С какими ИИ-ассистентами это работает?",
@@ -3653,7 +3688,7 @@
     },
     {
      "q": "Potete vedere i miei documenti?",
-     "a": "Non memorizziamo i contenuti dei tuoi documenti. MiLatexAI legge e modifica i tuoi file al momento per eseguire una richiesta, ma le uniche cose che conserviamo sono l'email del tuo account, il tuo token di accesso cifrato e un contatore mensile dei commit."
+     "a": "Non memorizziamo i contenuti dei tuoi documenti. MiLatexAI legge e modifica i tuoi file solo mentre esegue una richiesta. Conserviamo l'email del tuo account, il tuo token di accesso cifrato, l'elenco dei progetti che colleghi e un contatore mensile dei commit. L'informativa sulla privacy riporta l'elenco completo."
     },
     {
      "q": "Con quali assistenti AI funziona?",

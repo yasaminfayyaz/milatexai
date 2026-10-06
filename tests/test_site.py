@@ -175,3 +175,37 @@ def test_feature_badge_renders_on_the_new_card_only():
     # The spotlight ("see") section is no longer the one marked New.
     see_block = html[html.index("id='see'"):html.index("id='how'")]
     assert "New" not in see_block
+
+
+# --- what the Claude directory reviewers read: help, privacy, security ---------------------------------
+
+def test_help_page_has_setup_examples_and_troubleshooting():
+    from leafbridge import site
+    page = site.render_legal_page("help")
+    assert "https://milatexai.com/mcp" in page and "Things to ask" in page and "Troubleshooting" in page
+    assert page.count("&quot;") >= 6 or page.count('"') >= 6           # at least three example prompts
+    assert "support@milatexai.com" in page and chr(0x2014) not in page
+    assert "https://milatexai.com/help" in site.sitemap_xml()
+
+
+def test_privacy_policy_names_everything_we_keep_and_every_provider():
+    from leafbridge import site
+    page = site.render_legal_page("privacy")
+    for must in ("email", "account ID", "encrypted", "repository link", "write-commits", "customer ID",
+                 "30 days", "WorkOS", "Azure", "Cloudflare", "Stripe", "Overleaf"):
+        assert must in page, must
+    assert "only three things" not in page and "complete list" not in page
+
+
+def test_faq_no_longer_claims_we_keep_only_three_things():
+    import json
+    from pathlib import Path
+    d = json.loads((Path(__file__).resolve().parents[1] / "leafbridge" / "site_content.json").read_text(encoding="utf-8"))
+    assert "the list of projects you connect" in d["en"]["faq"]["items"][3]["a"]
+    assert "only things we keep" not in d["en"]["faq"]["items"][3]["a"]
+
+
+def test_security_policy_exists_with_a_reporting_channel():
+    from pathlib import Path
+    text = (Path(__file__).resolve().parents[1] / "SECURITY.md").read_text(encoding="utf-8")
+    assert "support@milatexai.com" in text and "Security" in text

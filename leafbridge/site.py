@@ -92,7 +92,7 @@ _FALLBACK_EN = {
                 "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away."},
     "faq": {"title": "Frequently asked questions", "items": [
         {"q": "Is my access token safe?", "a": "You enter it on a secure web page, not in the chat. It's encrypted at rest and only used to sync your connected projects over Git."},
-        {"q": "Do you see my documents?", "a": "We don't store your document contents. Edits flow through your Git provider; we keep only your account email, your encrypted token, and a commit counter."},
+        {"q": "Do you see my documents?", "a": "We don't store your document contents. Edits flow through your Git provider; we keep your account email, your encrypted token, the projects you connect, and a commit counter."},
         {"q": "Which assistants work?", "a": "Anthropic Claude and OpenAI ChatGPT, via the Model Context Protocol."},
         {"q": "What happens at the free limit?", "a": "Reads stay free and unlimited. New write-commits resume next month, or you can upgrade to Pro."},
         {"q": "Is it open source?", "a": "Yes, the code is public under the AGPL license, so you can audit exactly what it does."},
@@ -114,7 +114,7 @@ _FALLBACK_EN = {
     "privacy": {"title": "Privacy Policy", "updated_label": "Last updated: July 2026",
                 "intro": "This policy explains what MiLatexAI collects and how it is handled.",
                 "sections": [
-                    {"heading": "What we collect", "body": "Your account email (from single sign-on), an encrypted copy of the Git access token you provide, and a monthly commit counter."},
+                    {"heading": "What we collect", "body": "Your account email and ID (from single sign-on), an encrypted copy of the Git access token you provide, the projects you connect, a monthly commit counter, and for Pro the Stripe customer ID."},
                     {"heading": "What we do not collect", "body": "We do not store the contents of your Overleaf or Git-hosted documents."},
                     {"heading": "How tokens are secured", "body": "Tokens are encrypted at rest and decrypted only transiently to sync the projects you connect."},
                     {"heading": "Third parties", "body": "Sign-in is handled by WorkOS; hosting is on Microsoft Azure; edits sync through your Git provider (Overleaf, GitHub, GitLab, or Bitbucket)."},
@@ -488,6 +488,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
   <nav class='foot-links'>
     <a href='/privacy' data-i18n='nav.privacy'>{_t(en,'nav.privacy')}</a>
     <a href='/terms' data-i18n='nav.terms'>{_t(en,'nav.terms')}</a>
+    <a href='/help'>Help</a>
     <a href='/tools'>Free web tools</a>
     <a href='https://github.com/yasaminfayyaz/milatexai' target='_blank' rel='noopener'>GitHub</a>
     <a href='mailto:support@milatexai.com'><span data-i18n='footer.contact_label'>{_t(en,'footer.contact_label')}</span></a>
@@ -757,7 +758,7 @@ def render_tools_page() -> str:
 
 
 def render_legal_page(kind: str, content: dict | None = None) -> str:
-    """A standalone /privacy or /terms page (English), reusing the site shell,
+    """A standalone /privacy, /terms or /help page (English), reusing the site shell,
     so the homepage stays short."""
     content = content or load_content()
     en = content.get("en", _FALLBACK_EN)
@@ -883,6 +884,7 @@ def sitemap_xml() -> str:
         "  <url><loc>https://milatexai.com/tools</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>\n"
         "  <url><loc>https://milatexai.com/tools/bibtex</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
         "  <url><loc>https://milatexai.com/tools/latex-error-finder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n"
+        "  <url><loc>https://milatexai.com/help</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>\n"
         "  <url><loc>https://milatexai.com/privacy</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>\n"
         "  <url><loc>https://milatexai.com/terms</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>\n"
         "</urlset>\n"
