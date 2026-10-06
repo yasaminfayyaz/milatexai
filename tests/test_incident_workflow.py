@@ -105,3 +105,18 @@ def test_every_incident_script_compiles():
     import py_compile
     for path in (ROOT / "ops" / "incident").glob("*.py"):
         py_compile.compile(str(path), doraise=True)
+
+
+def test_deploys_keep_the_scaling_policy():
+    """Every deploy must carry the scaling rules, or a deploy would silently pin the app to
+    one copy (or remove the always-on copy). The grace period must outlast uvicorn's drain."""
+    import re
+    deploy = (ROOT / "ops" / "deploy.sh").read_text(encoding="utf-8")
+    for flag in ("--min-replicas", "--max-replicas", "--scale-rule-type http", "--scale-rule-http-concurrency",
+                 "--termination-grace-period", "cooldownPeriod"):
+        assert flag in deploy, flag
+    assert re.search(r'MAX_REPLICAS="\$\{DEPLOY_MAX_REPLICAS:-5\}"', deploy)
+    grace = int(re.search(r"^GRACE=(\d+)", deploy, re.M).group(1))
+    drain = int(re.search(r'"--timeout-graceful-shutdown", "(\d+)"', (ROOT / "Dockerfile").read_text(encoding="utf-8")).group(1))
+    assert drain < grace
+    assert "FREE_CAPACITY_STARTER=100" in deploy       # the owner's out-of-pocket limit (CAD)

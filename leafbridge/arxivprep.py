@@ -9,6 +9,8 @@ harvest the .bbl, and zip exactly what arXiv needs.
 
 from __future__ import annotations
 
+from . import load
+
 import io
 import re
 import zipfile
@@ -48,7 +50,7 @@ async def compile_bbl(repo: Path, main_rel: str, timeout: int = 240) -> str | No
             bbl = Path(outdir) / (Path(main_rel).stem + ".bbl")
             return bbl.read_text(encoding="utf-8", errors="replace") if bbl.is_file() else None
 
-    return await asyncio.to_thread(_run)
+    return await load.run_heavy(_run)
 
 
 def flatten(repo: Path, main_rel: str, _seen: set[str] | None = None) -> str:

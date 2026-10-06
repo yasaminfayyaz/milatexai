@@ -166,6 +166,7 @@ azure-core==1.41.0 \
     # via
     #   azure-data-tables
     #   azure-identity
+    #   azure-storage-blob
 azure-data-tables==12.7.0 \
     --hash=sha256:24ed9b5690aa46c213182e32bb1b39a68dd9f526d84f447c287e3a401b437c10 \
     --hash=sha256:b14fc94a3223a2835ff5688e17d8e107b27c7cd7c4114138f2ac81373723705d
@@ -173,6 +174,10 @@ azure-data-tables==12.7.0 \
 azure-identity==1.26.0 \
     --hash=sha256:3c60d9682b3ac01507388d474cb5a5ffbe54152a96b6cdcaa7013da9315cf186 \
     --hash=sha256:61b4538b87df10d2d6d44b77cd5ea28a8929fd4929d58b45bf3f230f7daba02e
+    # via -r requirements.in
+azure-storage-blob==12.31.0 \
+    --hash=sha256:0c0cb601d3462491d09ea96023cd791bb9dd4b173bf950daf3cff34ff47ba5b5 \
+    --hash=sha256:997b393cfcbdc4b186d5911790d91f80387f7edc12c4d73eab963a2d26e5b2a9
     # via -r requirements.in
 beartype==0.22.9 \
     --hash=sha256:8f82b54aa723a2848a56008d18875f91c1db02c32ef6a62319a002e3e25a975f \
@@ -575,6 +580,7 @@ cryptography==50.0.2 \
     #   -r requirements.in
     #   authlib
     #   azure-identity
+    #   azure-storage-blob
     #   joserfc
     #   msal
     #   pyjwt
@@ -778,7 +784,9 @@ iniconfig==2.3.0 \
 isodate==0.7.2 \
     --hash=sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15 \
     --hash=sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6
-    # via azure-data-tables
+    # via
+    #   azure-data-tables
+    #   azure-storage-blob
 jaraco-classes==3.4.0 \
     --hash=sha256:47a024b51d0239c0dd8c8540c6c7f484be3b8fcf0b2d85c13825780d3b3f3acd \
     --hash=sha256:f662826b6bed8cace05e7ff873ce0f9283b5c924470fe664fff1c2f00f581790
@@ -1690,6 +1698,7 @@ typing-extensions==4.16.0 \
     #   azure-core
     #   azure-data-tables
     #   azure-identity
+    #   azure-storage-blob
     #   exceptiongroup
     #   fastmcp-slim
     #   httpx2

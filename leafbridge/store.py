@@ -139,6 +139,25 @@ class Store(ABC):
     @abstractmethod
     async def increment_usage(self, user_id: str, month: str, by: int = 1) -> int: ...
 
+    # -- state shared by every running copy of the server ---------------------
+    # With more than one copy, anything one copy keeps in its own memory or disk is
+    # invisible to the others. These two live in shared storage instead.
+
+    async def get_head(self, project_id: str) -> str | None:
+        """The commit the remote was at after the last push by ANY copy, so a copy
+        whose working copy is older knows to refresh before a read."""
+        return None
+
+    async def put_head(self, project_id: str, sha: str) -> None:
+        return None
+
+    async def put_download(self, name: str, data: bytes) -> None:
+        """A short-lived download (an arXiv bundle) that any copy can serve."""
+        raise NotImplementedError
+
+    async def get_download(self, name: str) -> bytes | None:
+        raise NotImplementedError
+
 
 class InMemoryStore(Store):
     """Non-persistent store for development and tests."""
@@ -147,6 +166,8 @@ class InMemoryStore(Store):
         self._users: dict[str, User] = {}
         self._projects: dict[tuple[str, str], Project] = {}
         self._usage: dict[tuple[str, str], int] = {}
+        self._heads: dict[str, str] = {}
+        self._downloads: dict[str, bytes] = {}
 
     async def get_user(self, user_id: str) -> User | None:
         return self._users.get(user_id)
@@ -173,3 +194,15 @@ class InMemoryStore(Store):
         new = self._usage.get((user_id, month), 0) + by
         self._usage[(user_id, month)] = new
         return new
+
+    async def get_head(self, project_id: str) -> str | None:
+        return self._heads.get(project_id)
+
+    async def put_head(self, project_id: str, sha: str) -> None:
+        self._heads[project_id] = sha
+
+    async def put_download(self, name: str, data: bytes) -> None:
+        self._downloads[name] = data
+
+    async def get_download(self, name: str) -> bytes | None:
+        return self._downloads.get(name)

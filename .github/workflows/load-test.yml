@@ -1,0 +1,59 @@
+name: load-test
+
+# Generates heavy HTTP traffic against the throwaway copy (milatexai-drill) or, gently, against
+# production, and records how many copies run while the load lasts and while they scale back
+# in. Run by hand. The production run is capped at 40 clients and hits only cheap public pages.
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: milatexai-drill (throwaway copy) or milatexai-app (production)
+        required: true
+        default: milatexai-drill
+      workers:
+        description: Simultaneous clients
+        required: true
+        default: "80"
+      load_seconds:
+        required: true
+        default: "240"
+      watch_seconds:
+        description: How long to keep watching after the load stops (scale in)
+        required: true
+        default: "600"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: load-test
+  cancel-in-progress: false
+
+jobs:
+  load:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: azure/login@v3
+        with:
+          client-id: cc4283a3-f4e0-4741-81a1-0024a284add0
+          tenant-id: e9ddd0b5-3a81-4fa5-a613-448e65995927
+          subscription-id: f1b1a285-7029-47fc-88a7-b83cf5b8c938
+      - run: pip install -q aiohttp
+      - name: Run the load
+        env:
+          APP: ${{ inputs.app }}
+          WORKERS: ${{ inputs.workers }}
+          LOAD_SECONDS: ${{ inputs.load_seconds }}
+          WATCH_SECONDS: ${{ inputs.watch_seconds }}
+        run: |
+          case "$APP" in milatexai-drill|milatexai-app) ;; *) echo "unknown app" >&2; exit 1;; esac
+          if [ "$APP" = "milatexai-app" ] && [ "$WORKERS" -gt 40 ]; then WORKERS=40; fi
+          FQDN=$(az containerapp show -n "$APP" -g milatexai-rg --query properties.configuration.ingress.fqdn -o tsv --only-show-errors)
+          python ops/loadtest.py "https://$FQDN" "$APP" "$WORKERS" "$LOAD_SECONDS" "$WATCH_SECONDS" \
+            "/health/deep,/,/tools,/tools/bibtex,/health/capacity"

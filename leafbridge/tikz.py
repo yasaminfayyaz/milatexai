@@ -8,6 +8,8 @@ like Figure Studio does for matplotlib.
 
 from __future__ import annotations
 
+from . import load
+
 import asyncio
 import os
 import subprocess
@@ -64,4 +66,4 @@ async def render_pdf(code: str, timeout: int = 150) -> bytes:
                 )
             return pdf.read_bytes()
 
-    return await asyncio.to_thread(_run)
+    return await load.run_heavy(_run)

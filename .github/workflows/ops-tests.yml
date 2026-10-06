@@ -17,6 +17,8 @@ on:
       - "ops/report/**"
       - ".github/workflows/*-report.yml"
       - "tests/test_daily_report.py"
+      - "ops/loadtest.py"
+      - ".github/workflows/load-test.yml"
   workflow_dispatch:
 
 permissions:

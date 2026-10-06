@@ -1,7 +1,10 @@
 """Azure Table Storage backend for the multi-tenant :class:`~leafbridge.store.Store`.
 
-Three tables (users, projects, usage) holding only account metadata, the
-ENCRYPTED Overleaf token, and a commit counter. Never any document content.
+Four tables (users, projects, usage, heads) holding only account metadata, the
+ENCRYPTED Overleaf token, counters, and the last pushed commit id per project.
+Never any document content. One blob container holds short-lived download
+bundles (arXiv zips), so any running copy of the server can serve a link that
+another copy created.
 
 Auth is via the storage connection string (from Container Apps secret / Key
 Vault in production). Cheap: Table Storage is pennies at this scale.
@@ -9,9 +12,12 @@ Vault in production). Cheap: Table Storage is pennies at this scale.
 
 from __future__ import annotations
 
+import asyncio
 import os
+import random
 
-from azure.core.exceptions import ResourceNotFoundError
+from azure.core import MatchConditions
+from azure.core.exceptions import ResourceExistsError, ResourceModifiedError, ResourceNotFoundError
 from azure.data.tables import UpdateMode
 from azure.data.tables.aio import TableServiceClient
 
@@ -21,8 +27,11 @@ from .store import Project, Store, User
 class AzureTableStore(Store):
     def __init__(self, connection_string: str, *, prefix: str = ""):
         self._svc = TableServiceClient.from_connection_string(connection_string)
+        self._cs = connection_string
         self._prefix = prefix
         self._ready = False
+        self._blob = None
+        self._container = None
 
     @classmethod
     def from_env(cls, *, prefix: str = "") -> "AzureTableStore":
@@ -34,7 +43,7 @@ class AzureTableStore(Store):
 
     async def _ensure(self) -> None:
         if not self._ready:
-            for base in ("users", "projects", "usage"):
+            for base in ("users", "projects", "usage", "heads"):
                 await self._svc.create_table_if_not_exists(self._name(base))
             self._ready = True
 
@@ -43,6 +52,8 @@ class AzureTableStore(Store):
 
     async def close(self) -> None:
         await self._svc.close()
+        if self._blob is not None:
+            await self._blob.close()
 
     # -- users --------------------------------------------------------------
 
@@ -146,15 +157,77 @@ class AzureTableStore(Store):
     async def increment_usage(self, user_id: str, month: str, by: int = 1) -> int:
         await self._ensure()
         table = self._table("usage")
-        # Read-modify-write. Per-user writes are already serialized by the git
-        # worker's per-project lock, so contention here is negligible.
-        try:
-            e = await table.get_entity(user_id, month)
+        # Optimistic concurrency: two copies of the server may count for the same
+        # user at the same moment. Each write only succeeds if the row has not
+        # changed since it was read; the loser waits a random moment, reads again
+        # and retries, so a crowd of simultaneous writers spreads out instead of colliding.
+        for attempt in range(40):
+            if attempt:
+                await asyncio.sleep(random.uniform(0, min(0.5, 0.02 * attempt)))
+            try:
+                e = await table.get_entity(user_id, month)
+            except ResourceNotFoundError:
+                try:
+                    await table.create_entity({"PartitionKey": user_id, "RowKey": month, "count": by})
+                    return by
+                except ResourceExistsError:
+                    continue          # another copy created it first; count on top of theirs
             new = int(e.get("count", 0)) + by
+            try:
+                await table.update_entity(
+                    {"PartitionKey": user_id, "RowKey": month, "count": new},
+                    mode=UpdateMode.REPLACE, etag=e.metadata["etag"],
+                    match_condition=MatchConditions.IfNotModified,
+                )
+                return new
+            except ResourceModifiedError:
+                continue              # someone else counted in between; read again
+        raise RuntimeError("Could not update the usage counter after repeated conflicts.")
+
+    # -- shared state for several running copies --------------------------------
+
+    @staticmethod
+    def _key(project_id: str) -> str:
+        # Table keys may not contain / \ # ? or control characters.
+        bad = {"/", chr(92), "#", "?"}
+        return "".join("_" if (c in bad or ord(c) < 32 or ord(c) == 127) else c for c in project_id)[:500]
+
+    async def get_head(self, project_id: str) -> str | None:
+        await self._ensure()
+        try:
+            e = await self._table("heads").get_entity("head", self._key(project_id))
         except ResourceNotFoundError:
-            new = by
-        await table.upsert_entity(
-            {"PartitionKey": user_id, "RowKey": month, "count": new},
+            return None
+        return e.get("sha") or None
+
+    async def put_head(self, project_id: str, sha: str) -> None:
+        await self._ensure()
+        await self._table("heads").upsert_entity(
+            {"PartitionKey": "head", "RowKey": self._key(project_id), "sha": sha},
             mode=UpdateMode.REPLACE,
         )
-        return new
+
+    async def _downloads(self):
+        if self._container is None:
+            from azure.storage.blob.aio import BlobServiceClient
+
+            self._blob = BlobServiceClient.from_connection_string(self._cs)
+            container = self._blob.get_container_client(f"{self._prefix}downloads".lower())
+            try:
+                await container.create_container()
+            except ResourceExistsError:
+                pass
+            self._container = container
+        return self._container
+
+    async def put_download(self, name: str, data: bytes) -> None:
+        container = await self._downloads()
+        await container.upload_blob(name, data, overwrite=True)
+
+    async def get_download(self, name: str) -> bytes | None:
+        container = await self._downloads()
+        try:
+            stream = await container.download_blob(name)
+        except ResourceNotFoundError:
+            return None
+        return await stream.readall()

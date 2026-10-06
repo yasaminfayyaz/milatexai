@@ -28,9 +28,12 @@ echo "ok  GET /health/capacity (LaTeX and Figure Studio available)"
 
 # Deep health: database and LaTeX engine of OURS must be fine. Older images
 # (a rollback target) do not have this endpoint, so a 404 is a skip, not a fail.
-deep_code=$(curl -s -o /tmp/smoke_deep.json -w "%{http_code}" --max-time 40 "$BASE/health/deep" || true)
+# Body and status come from one response through stdin (no temp file, so this also runs from Windows).
+deep_out=$(curl -s -w $'\n%{http_code}' --max-time 40 "$BASE/health/deep" || true)
+deep_code=${deep_out##*$'\n'}
+deep_body=${deep_out%$'\n'*}
 case "$deep_code" in
-  200) "$PY" -c 'import json,sys; assert json.load(open(sys.argv[1]))["ok"] is True' /tmp/smoke_deep.json \
+  200) "$PY" -c 'import json,sys; assert json.load(sys.stdin)["ok"] is True' <<<"$deep_body" \
          || fail "/health/deep says ok is not true"
        echo "ok  GET /health/deep (database and LaTeX engine healthy)";;
   404) echo "skip GET /health/deep (older image without it)";;

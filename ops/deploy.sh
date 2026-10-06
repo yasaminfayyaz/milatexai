@@ -25,12 +25,21 @@ SHA="${1:?usage: deploy.sh <git-sha>}"
 APP="${DEPLOY_APP:-milatexai-app}"
 case "$APP" in milatexai-app|milatexai-drill) ;; *) echo "refusing to deploy to unknown app: $APP" >&2; exit 1;; esac
 MIN_REPLICAS=1; [ "$APP" = "milatexai-app" ] || MIN_REPLICAS=0   # the drill copy stays scale-to-zero (no idle bill)
+# Scaling: one copy always runs; more are added while copies are busy, up to MAX_REPLICAS,
+# and removed after COOLDOWN quiet seconds. A copy being removed gets GRACE seconds to
+# finish the requests it is serving (uvicorn waits for them; see the Dockerfile).
+# Every copy must be interchangeable: shared state lives in storage (see store.py).
+MAX_REPLICAS="${DEPLOY_MAX_REPLICAS:-5}"; [ "$APP" = "milatexai-app" ] || MAX_REPLICAS="${DEPLOY_MAX_REPLICAS:-3}"
+BUSY_REQUESTS=5     # in-flight requests per copy before another copy is added
+COOLDOWN=300
+GRACE=120
 RG=milatexai-rg
 IMAGE="ghcr.io/yasaminfayyaz/milatexai:$SHA"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 export MSYS_NO_PATHCONV=1   # Git Bash on Windows: don't mangle /subscriptions/... ids
 az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors >/dev/null 2>&1 || true
-azq() { az "$@" --only-show-errors; }
+# Every Azure call gets a hard 10 minute limit, so one hung call cannot stall a deploy.
+azq() { timeout 600 az "$@" --only-show-errors; }
 
 # Revision currently serving traffic. Single-revision mode reports only a
 # "latestRevision" entry, so fall back to the latest ready revision.
@@ -47,11 +56,35 @@ azq containerapp ingress traffic set -n "$APP" -g "$RG" --revision-weight "$PREV
 
 SUFFIX="g${SHA:0:8}-r${GITHUB_RUN_NUMBER:-0}-${GITHUB_RUN_ATTEMPT:-$(date +%s)}"
 NEW="$APP--$SUFFIX"
+# The scale-in delay is not settable from `containerapp update`, so set it once on the app
+# template (a merge patch that leaves everything else alone; it needs a fresh revision name,
+# or Azure rejects it as a duplicate). That creates a throwaway revision with no traffic; it is switched off straight away, and the update below copies
+# the setting into every new revision from then on.
+CUR_COOLDOWN=$(azq containerapp show -n "$APP" -g "$RG" --query properties.template.scale.cooldownPeriod -o tsv || true)
+if [ "$CUR_COOLDOWN" != "$COOLDOWN" ]; then
+  APP_ID_FOR_PATCH=$(azq containerapp show -n "$APP" -g "$RG" --query id -o tsv)
+  azq rest --method patch --url "https://management.azure.com${APP_ID_FOR_PATCH}?api-version=2025-01-01" \
+    --body "{\"properties\":{\"template\":{\"revisionSuffix\":\"cool$(date +%s)\",\"scale\":{\"cooldownPeriod\":$COOLDOWN}}}}" >/dev/null
+  for _ in $(seq 1 36); do
+    PATCHED=$(azq containerapp show -n "$APP" -g "$RG" --query properties.latestRevisionName -o tsv)
+    [ "$PATCHED" != "$PREV" ] && break
+    sleep 5
+  done
+  if [ "$PATCHED" != "$PREV" ]; then
+    azq containerapp ingress traffic set -n "$APP" -g "$RG" --revision-weight "$PREV=100" >/dev/null
+    azq containerapp revision deactivate -n "$APP" -g "$RG" --revision "$PATCHED" >/dev/null || true
+  fi
+  echo "scale-in delay set to ${COOLDOWN}s"
+fi
+
 # FREE_CAPACITY_STARTER: month-to-date Azure spend (CAD) at which the capacity
 # gate pauses the FREE tier (plus 80% of Pro revenue, see leafbridge/capacity.py).
 # Pro is never paused. Kept here so the limit is reviewable in git.
 azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" \
-  --min-replicas "$MIN_REPLICAS" --set-env-vars FREE_CAPACITY_STARTER=100 >/dev/null
+  --min-replicas "$MIN_REPLICAS" --max-replicas "$MAX_REPLICAS" \
+  --scale-rule-name http-busy --scale-rule-type http --scale-rule-http-concurrency "$BUSY_REQUESTS" \
+  --termination-grace-period "$GRACE" \
+  --set-env-vars FREE_CAPACITY_STARTER=100 >/dev/null
 echo "new revision: $NEW (0% traffic)"
 
 rollback() {

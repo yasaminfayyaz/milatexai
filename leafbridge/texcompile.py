@@ -11,6 +11,8 @@ makes it a good fit for a server that must not carry a full TeX Live install.
 
 from __future__ import annotations
 
+from . import load
+
 import asyncio
 import os
 import re
@@ -76,7 +78,7 @@ async def compile_project(repo: Path, main_tex: str, timeout: int = 240) -> Comp
             ok=False,
             message="Tectonic (a local LaTeX engine) is not installed on the server.",
         )
-    return await asyncio.to_thread(_compile_sync, exe, repo, main_tex, timeout)
+    return await load.run_heavy(_compile_sync, exe, repo, main_tex, timeout)
 
 
 def _compile_sync(exe: str, repo: Path, main_tex: str, timeout: int) -> CompileResult:

@@ -69,8 +69,13 @@ class CommitResult:
 
 
 class GitWorker:
-    def __init__(self, data_dir: Path):
+    def __init__(self, data_dir: Path, heads=None):
+        """``heads`` is optional shared storage (``get_head`` / ``put_head``) used
+        when several copies of the server run at once: each copy has its own
+        working copies on its own disk, so after one copy pushes, the others learn
+        from this record that their copy is behind and refresh before a read."""
         self.data_dir = Path(data_dir)
+        self._heads = heads
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self._locks: dict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._branch: dict[str, str] = {}
@@ -116,7 +121,7 @@ class GitWorker:
         pid = project.project_id
         if not force:
             last = self._last_sync.get(pid, 0.0)
-            if (time.monotonic() - last) < SYNC_TTL_SECONDS:
+            if (time.monotonic() - last) < SYNC_TTL_SECONDS and not await self._behind_another_copy(project):
                 return
         path = self.repo_path(project)
         if not (path / ".git").exists():
@@ -176,7 +181,35 @@ class GitWorker:
             await self._push(project, branch)
 
         self._last_sync[project.project_id] = time.monotonic()
+        await self._record_head(project)
         return CommitResult(True, True, commit_hash, "Committed and pushed.")
+
+    async def _record_head(self, project: ProjectConfig) -> None:
+        """Tell the other copies which commit the remote is at now. Best effort: a
+        failure only means another copy may wait out the short refresh interval."""
+        if self._heads is None:
+            return
+        try:
+            sha = (await self._git(project, ["rev-parse", "HEAD"])).strip()
+            await self._heads.put_head(project.project_id, sha)
+        except Exception:  # noqa: BLE001
+            pass
+
+    async def _behind_another_copy(self, project: ProjectConfig) -> bool:
+        """True when another copy pushed a commit this copy's working copy lacks.
+        On any error, assume behind: one extra refresh is cheaper than a stale read."""
+        if self._heads is None:
+            return False
+        try:
+            remote = await self._heads.get_head(project.project_id)
+            if not remote:
+                return False
+            # Up to date when the recorded commit is already in our history (equal to,
+            # or older than, our tip). A commit we don't have means another copy pushed.
+            base = (await self._git(project, ["merge-base", remote, "HEAD"], check=False)).strip()
+            return base != remote
+        except Exception:  # noqa: BLE001
+            return True
 
     async def log(self, project: ProjectConfig, limit: int = 10) -> str:
         """Return a compact recent-history view with per-commit stat summaries."""
