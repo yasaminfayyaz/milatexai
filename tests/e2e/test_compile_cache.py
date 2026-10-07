@@ -270,3 +270,22 @@ def test_shrinking_a_125_megapixel_image_stays_well_inside_one_server_copy(tmp_p
     from leafbridge import texmemory
     assert texmemory.image_size(img) == (w >> 2, h >> 2)
     assert texmemory.image_dpi(img) == pytest.approx((18, 18), rel=2e-3)     # 72 dpi / 4
+
+
+def test_tracked_changes_marks_an_edit_inside_an_input_chapter(tmp_path):
+    _need_engine()
+    from leafbridge import arxivprep, texdiff
+    if texdiff.latexdiff_cmd() is None:
+        if REQUIRE_LATEX:
+            pytest.fail("latexdiff is required here but missing")
+        pytest.skip("latexdiff not installed")
+    main = (f"{BS}documentclass{{article}}\n{BS}begin{{document}}\nThe abstract stays the same.\n"
+            f"{BS}input{{chapters/ch6}}\n{BS}end{{document}}\n")
+    old, new = tmp_path / "old", tmp_path / "new"
+    for d, word in ((old, "carefully"), (new, "boldly")):
+        (d / "chapters").mkdir(parents=True)
+        (d / "main.tex").write_text(main)
+        (d / "chapters" / "ch6.tex").write_text(f"Future work is planned {word} in this chapter.\n")
+    pdf = asyncio.run(texdiff.diff_pdf(new, "main.tex", arxivprep.flatten(old, "main.tex")))
+    changed, total = texdiff.changed_pages(pdf)
+    assert changed == [1] and total == 1, (changed, total)

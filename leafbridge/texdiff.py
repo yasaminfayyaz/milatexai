@@ -32,7 +32,9 @@ def latexdiff_cmd() -> list[str] | None:
 
 
 async def diff_pdf(repo: Path, main_rel: str, old_text: str, timeout: int = 240) -> bytes:
-    """PDF with old->current changes marked up. Caller holds the repo lock."""
+    """PDF with old->current changes marked up. ``old_text`` is the OLD document with every
+    \\input/\\include already expanded (arxivprep.flatten); the current one is expanded the same
+    way here, so changes inside chapter files are marked too. Caller holds the repo lock."""
     cmd = latexdiff_cmd()
     if cmd is None:
         raise TexDiffError("latexdiff is unavailable on this server.")
@@ -43,13 +45,15 @@ async def diff_pdf(repo: Path, main_rel: str, old_text: str, timeout: int = 240)
             return _diff_in(Path(src))
 
     def _diff_in(repo: Path) -> bytes:
-        main = repo / main_rel
+        from .arxivprep import flatten
         old_f = repo / "__mila_old.tex"
+        new_f = repo / "__mila_new.tex"
         diff_f = repo / "__mila_diff.tex"
         try:
             old_f.write_text(old_text, encoding="utf-8")
+            new_f.write_text(flatten(repo, main_rel), encoding="utf-8")
             proc = subprocess.run(
-                [*cmd, "--append-context2cmd=abstract", old_f.name, str(main.relative_to(repo).as_posix())],
+                [*cmd, "--append-context2cmd=abstract", old_f.name, new_f.name],
                 cwd=str(repo), capture_output=True, text=True, timeout=120,
             )
             if proc.returncode != 0 or not proc.stdout.strip():
@@ -74,7 +78,7 @@ async def diff_pdf(repo: Path, main_rel: str, old_text: str, timeout: int = 240)
                         "clash with complex macros):\n" + ("\n".join(errs) or log[-500:]))
                 return pdf.read_bytes()
         finally:
-            for f in (old_f, diff_f):
+            for f in (old_f, new_f, diff_f):
                 try:
                     f.unlink()
                 except OSError:

@@ -313,6 +313,21 @@ class GitWorker:
         await self.ensure_repo(project)
         return await self._git(project, ["show", f"{ref}:{path}"])
 
+    async def export_tex(self, project: ProjectConfig, ref: str, dest: Path) -> int:
+        """Write every .tex file as it was at ``ref`` under ``dest`` (same relative paths), so a
+        whole multi-file document can be rebuilt for that version. Returns how many."""
+        await self.ensure_repo(project)
+        names = (await self._git(project, ["ls-tree", "-r", "--name-only", ref])).splitlines()
+        count = 0
+        for name in names:
+            if not name.lower().endswith(".tex"):
+                continue
+            target = Path(dest) / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(await self._git(project, ["show", f"{ref}:{name}"]), encoding="utf-8")
+            count += 1
+        return count
+
     async def can_reach(self, project: ProjectConfig) -> str:
         """Whether the remote answers for this project with its token, in one light call that
         only lists branch names: "ok", "denied" (it does not exist, or the token cannot open

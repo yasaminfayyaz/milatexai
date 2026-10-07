@@ -1057,7 +1057,13 @@ def create_hosted_server(
                 main = texcompile.find_main_tex(repo)
                 if not main:
                     raise ToolError("Could not find a root .tex to diff.")
-                old = await app.worker.show_file(proj, ref.strip(), main)
+                # The old version as one document: every .tex file at that commit, with all
+                # \\input/\\include expanded, so edits inside chapter files are marked too.
+                with tempfile.TemporaryDirectory(prefix="mila_old_") as old_dir:
+                    await app.worker.export_tex(proj, ref.strip(), Path(old_dir))
+                    if not (Path(old_dir) / main).is_file():
+                        raise ToolError(f"{main} did not exist at {ref}; pick a later checkpoint or commit.")
+                    old = arxivprep.flatten(Path(old_dir), main)
                 pdf = await texdiff.diff_pdf(repo, main, old)
                 big = texmemory.oversized_images(repo)
             changed, total = await asyncio.to_thread(texdiff.changed_pages, pdf)
