@@ -101,8 +101,16 @@ with Image.open(path) as im:
     im.load()
     if im.mode not in ("1", "L", "LA", "RGB", "RGBA", "I", "F"):
         im = im.convert("RGBA" if im.mode in ("P", "PA") and "transparency" in im.info else "RGB")
-    factor = max(1, round(im.size[0] / tw))
-    small = im.reduce(factor) if factor > 1 else im
+    f = max(1, round(im.size[0] / tw))
+    if f > 1:
+        # In bands: resizing a transparent image all at once makes a second full-size copy.
+        cw, ch = (im.size[0] // f) * f, (im.size[1] // f) * f
+        small = Image.new(im.mode, (cw // f, ch // f))
+        step = 256 * f
+        for y in range(0, ch, step):
+            small.paste(im.crop((0, y, cw, min(y + step, ch))).reduce(f), (0, y // f))
+    else:
+        small = im
     dpi = (px * 0.0254, py * 0.0254)
     if fmt == "JPEG":
         small.save(path, format="JPEG", quality=92, dpi=(round(dpi[0]), round(dpi[1])))
