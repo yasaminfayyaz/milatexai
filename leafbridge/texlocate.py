@@ -21,6 +21,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+from pathlib import Path
 from dataclasses import dataclass, field
 
 # Prepended immediately before \begin{document}. Only common packages that
@@ -139,6 +140,10 @@ def compile_and_locate(
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         return LocateResult(False, message=f"compile failed to run: {exc}")
+    if proc.returncode < 0:
+        # Killed (usually out of memory): whatever it left behind is incomplete.
+        from .texmemory import stopped_message
+        return LocateResult(False, message=stopped_message(Path(repo_dir), proc.returncode))
     aux_path = os.path.join(inst_dir, stem + ".aux")
     pdf_path = os.path.join(inst_dir, stem + ".pdf")
     if not os.path.isfile(aux_path):

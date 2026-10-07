@@ -399,3 +399,73 @@ def test_copies_nobody_used_for_a_day_are_deleted_with_their_results(world, tmp_
     assert len(_account_dirs(root)) == 1 and len(list(builds.iterdir())) == 1
     r, out, _ = call(mine, "read_file", {"path": "main.tex", "project": "paper"})
     assert not r.is_error and "Version one." in out          # and simply fetched again when needed
+
+
+# --- the engine was killed (out of memory): say so, name the image, never remember it ---------
+
+def _big_png(path: Path, w: int = 14280, h: int = 8759) -> None:
+    import struct
+    import zlib
+    ihdr = struct.pack(">IIBBBBB", w, h, 8, 6, 0, 0, 0)
+    chunk = struct.pack(">I", len(ihdr)) + b"IHDR" + ihdr + struct.pack(">I", zlib.crc32(b"IHDR" + ihdr))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk)
+
+
+def test_a_compile_killed_for_memory_says_so_and_names_the_big_image(world, tmp_path):
+    from leafbridge import texmemory
+    eng, server, outside_edit, _ = world
+    calls = {"n": 0}
+
+    def killed_locate(repo_dir, main, exe, cache_dir=None):
+        calls["n"] += 1
+        return texlocate.LocateResult(False, message=texmemory.stopped_message(Path(repo_dir), -9))
+
+    async def killed_plain(repo, main, timeout=240):
+        calls["n"] += 1
+        return texcompile.CompileResult(True, False, main, message=texmemory.stopped_message(Path(repo), -9))
+
+    import leafbridge.texlocate as tl
+    import leafbridge.texcompile as tc
+    tl_orig, tc_orig = tl.compile_and_locate, tc.compile_project
+    tl.compile_and_locate, tc.compile_project = killed_locate, killed_plain
+    try:
+        # The paper has one huge figure (pushed straight to the remote, like a website upload).
+        seed = tmp_path / "seed"
+        _git(["pull", "-q", "origin", "main"], seed)
+        _big_png(seed / "figures" / "map.png")
+        _git(["add", "-A"], seed)
+        _git(["-c", "user.name=Web", "-c", "user.email=w@t", "commit", "-qm", "huge figure"], seed)
+        _git(["push", "-q", "origin", "main"], seed)
+        mcp = server()
+        for _ in range(2):
+            _, out, _ = call(mcp, "check_compile", {"project": "paper"})
+            assert "ran out of memory" in out and "not an error in your paper" in out
+            assert "figures/map.png" in out and "14,280 x 8,759" in out
+        assert calls["n"] == 2                     # tried again the second time, not remembered
+        r, out, _ = call(mcp, "show_page", {"page": 1, "project": "paper"})
+        assert r.is_error and "ran out of memory" in out
+        r, out, _ = call(mcp, "show_table", {"table": "1", "project": "paper"})
+        assert r.is_error and "ran out of memory" in out
+    finally:
+        tl.compile_and_locate, tc.compile_project = tl_orig, tc_orig
+
+
+def test_the_real_compile_reports_a_kill_instead_of_a_bare_failure(tmp_path, monkeypatch):
+    import subprocess as sp
+    from leafbridge import texcompile as tc
+    (tmp_path / "main.tex").write_text(DOC)
+    _big_png(tmp_path / "img" / "scan.png")
+    monkeypatch.setattr(tc.subprocess, "run", lambda *a, **k: sp.CompletedProcess(a, -9, "", "note: Running xdvipdfmx ..."))
+    res = tc._compile_sync("/fake/tectonic", tmp_path, "main.tex", 60)
+    assert not res.ok and res.available and "ran out of memory" in res.message and "img/scan.png" in res.message
+
+
+def test_image_sizes_are_read_from_the_header_only(tmp_path):
+    from leafbridge import texmemory
+    _big_png(tmp_path / "a.png", 4000, 3000)
+    jpg = tmp_path / "b.jpg"
+    jpg.write_bytes(b"\xff\xd8\xff\xe0\x00\x04ab\xff\xc0\x00\x11\x08" + (2000).to_bytes(2, "big") + (5000).to_bytes(2, "big") + b"\x03")
+    assert texmemory.image_size(tmp_path / "a.png") == (4000, 3000)
+    assert texmemory.image_size(jpg) == (5000, 2000)
+    assert texmemory.oversized_images(tmp_path) == []          # 12 and 10 megapixels: fine

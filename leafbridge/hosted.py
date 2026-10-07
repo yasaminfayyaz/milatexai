@@ -56,7 +56,7 @@ from .files import (
 from .git_worker import GitError, GitWorker, PushConflict
 from .authkit import MiLatexAIAuthKit
 from .health import DeepHealth
-from . import buildcache
+from . import buildcache, texmemory
 from . import load
 from .service import (
     AccountService,
@@ -882,7 +882,10 @@ def create_hosted_server(
                 main = _resolve_main_tex(repo, tex)
                 exe = texcompile.tectonic_path()
                 loc = await app.located(proj, repo, main, exe) if exe else None
-                if loc is not None and loc.clean:
+                if loc is not None and texmemory.is_transient(loc.message):
+                    # The engine was stopped (usually memory); the ordinary compile would be too.
+                    res = buildcache.Plain(available=True, ok=False, message=loc.message)
+                elif loc is not None and loc.clean:
                     # One compile answers everything when the paper builds cleanly.
                     pages = loc.pages
                     res = buildcache.Plain(available=True, ok=True, pages=pages, message=(
@@ -917,6 +920,8 @@ def create_hosted_server(
                 if not main:
                     raise ToolError("Could not find a root .tex to compile.")
                 res = await app.located(proj, repo, main, exe)
+                if not res.pdf_path and texmemory.is_transient(res.message):
+                    raise ToolError(res.message)
                 number = texlocate.resolve_number(ref, res)
                 f = res.floats.get((kind, number)) if number is not None else None
                 if f is None or not f.pages:
@@ -987,6 +992,8 @@ def create_hosted_server(
                 main = _resolve_main_tex(repo, tex)
                 res = await app.located(proj, repo, main, exe)
                 if not res.pdf_path:
+                    if texmemory.is_transient(res.message):
+                        raise ToolError(res.message)
                     raise ToolError(
                         "The project did not produce a PDF, so it likely has compile "
                         "errors. Run check_compile to see them."

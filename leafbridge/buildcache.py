@@ -24,6 +24,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Awaitable, Callable
 
+from .texmemory import is_transient
+
 # Bump when the way results are produced changes (for example the float locator), so
 # results built the old way are never reused.
 CACHE_VERSION = "2"
@@ -74,6 +76,8 @@ class BuildCache:
             if not res.pdf_path or Path(res.pdf_path).is_file():
                 return res, True
         res = await build()
+        if is_transient(res.message):     # about the server, not this version: try again next time
+            return res, False
         self._write(d, asdict(res), pdf=res.pdf_path)
         if res.pdf_path:
             res.pdf_path = str(d / "doc.pdf")
@@ -86,7 +90,9 @@ class BuildCache:
         if hit is not None:
             return Plain(**hit), True
         res = await build()
-        if res.available:                 # never remember "engine unavailable"
+        # Never remember "engine unavailable", nor a failure caused by the server (killed for
+        # memory, timed out): only a real verdict on this version, so a retry can succeed.
+        if res.available and not is_transient(res.message):
             self._write(d, asdict(res))
         return res, False
 

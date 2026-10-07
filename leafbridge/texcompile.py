@@ -11,7 +11,7 @@ makes it a good fit for a server that must not carry a full TeX Live install.
 
 from __future__ import annotations
 
-from . import load
+from . import load, texmemory
 
 import asyncio
 import os
@@ -112,6 +112,9 @@ def _compile_sync(exe: str, repo: Path, main_tex: str, timeout: int) -> CompileR
         pm = _PAGES.search(full)
         pages = int(pm.group(1)) if pm else None
 
+        if proc.returncode < 0 and not errors:
+            # Killed (usually out of memory): no LaTeX error exists, so say what happened.
+            return CompileResult(True, False, main_tex, message=texmemory.stopped_message(repo, proc.returncode))
         ok = proc.returncode == 0 and pdf.exists()
         if ok:
             message = f"Compiles cleanly ({pages} pages)." if pages else "Compiles cleanly."
