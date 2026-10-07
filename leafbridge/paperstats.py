@@ -30,14 +30,36 @@ def word_count(tex_text: str) -> int:
     return len([w for w in t.split() if any(c.isalnum() for c in w)])
 
 
-def analyze(repo: Path) -> dict:
-    """Per-file word counts + TODO markers + undefined/unused \\ref labels."""
+_INCLUDE = re.compile(r"\\(?:input|include|subfile)\{([^}]+)\}")
+
+
+def document_files(repo: Path, main: str) -> list[str]:
+    """The .tex files one document is made of: ``main`` and everything it pulls in with
+    \\input / \\include / \\subfile, in reading order (commented-out lines are ignored)."""
+    order: list[str] = []
+
+    def walk(rel: str) -> None:
+        rel = rel if rel.endswith(".tex") else rel + ".tex"
+        if rel in order or not (repo / rel).is_file():
+            return
+        order.append(rel)
+        text = _COMMENT.sub("", (repo / rel).read_text(encoding="utf-8", errors="replace"))
+        for inc in _INCLUDE.findall(text):
+            walk(inc.strip())
+    walk(main)
+    return order
+
+
+def analyze(repo: Path, files: list[str] | None = None) -> dict:
+    """Per-file word counts + TODO markers + undefined/unused \\ref labels, over ``files``
+    (one document, see document_files) or every .tex file in the project."""
     counts: dict[str, int] = {}
     todos: list[str] = []
     labels: set[str] = set()
     refs: set[str] = set()
-    for p in sorted(repo.rglob("*.tex")):
-        if ".git" in p.parts:
+    paths = [repo / f for f in files] if files is not None else sorted(repo.rglob("*.tex"))
+    for p in paths:
+        if ".git" in p.parts or p.name.startswith("__mila"):
             continue
         rel = p.relative_to(repo).as_posix()
         try:

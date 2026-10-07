@@ -39,6 +39,21 @@ def tectonic_path() -> str | None:
     return shutil.which("tectonic")
 
 
+def root_documents(repo: Path) -> list[str]:
+    """Every .tex file that is a document of its own (\\documentclass + \\begin{document})."""
+    found = []
+    for p in sorted(repo.rglob("*.tex")):
+        if ".git" in p.parts or p.name.startswith("__mila"):
+            continue
+        try:
+            text = p.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if "\\documentclass" in text and "\\begin{document}" in text:
+            found.append(p.relative_to(repo).as_posix())
+    return found
+
+
 def find_main_tex(repo: Path) -> str | None:
     """Find the root .tex file (one containing \\documentclass and
     \\begin{document}), preferring conventional root names."""

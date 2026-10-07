@@ -80,5 +80,6 @@ def cite_keys(tex_text: str) -> set[str]:
     """Every key referenced by a \\cite-family command."""
     keys: set[str] = set()
     for group in _CITE.findall(tex_text):
-        keys.update(k.strip() for k in group.split(",") if k.strip())
+        # "#1" is a macro parameter (\\newcommand{\\mycite}[1]{\\cite{#1}}), not a key.
+        keys.update(k.strip() for k in group.split(",") if k.strip() and "#" not in k)
     return keys

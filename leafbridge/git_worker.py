@@ -51,6 +51,13 @@ _COMMIT_EMAIL = "leafbridge@users.noreflect"
 _RATE_LIMIT_MARKERS = (
     "429", "too many requests", "rate limit", "rate-limit", "slow down", "throttl",
 )
+# A dropped or garbled connection (seen with Overleaf under parallel pushes: "bad band"), not a
+# refusal. Retrying is safe: a push that did land just reports "Everything up-to-date".
+_TRANSIENT_MARKERS = (
+    "bad band", "protocol error", "the remote end hung up", "early eof", "unexpected disconnect",
+    "connection reset", "connection was reset", "returned error: 502", "returned error: 503",
+    "returned error: 504", "gnutls", "ssl_read", "operation timed out",
+)
 RETRY_DELAYS = (3.0, 8.0, 20.0)  # waits after successive rate-limited attempts
 MIN_PUSH_INTERVAL_SECONDS = 1.5  # minimum spacing between pushes to one project
 PUSH_ATTEMPTS = 4  # tries when the remote moved or briefly refused, before giving up
@@ -390,8 +397,9 @@ class GitWorker:
             try:
                 return await self._git(project, args, cwd=cwd, authed=True)
             except GitError as exc:
-                rate_limited = any(m in str(exc).lower() for m in _RATE_LIMIT_MARKERS)
-                if rate_limited and attempt < len(RETRY_DELAYS):
+                msg = str(exc).lower()
+                retryable = any(m in msg for m in _RATE_LIMIT_MARKERS + _TRANSIENT_MARKERS)
+                if retryable and attempt < len(RETRY_DELAYS):
                     await asyncio.sleep(RETRY_DELAYS[attempt])
                     attempt += 1
                     continue

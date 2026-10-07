@@ -511,6 +511,18 @@ class HostedApp:
         )
 
 
+def _doc_hint(repo: Path, main: str, tex: str | None) -> str:
+    """When the document was auto-detected and the project holds others, say which one was
+    used and how to pick another."""
+    if tex:
+        return ""
+    others = [d for d in texcompile.root_documents(repo) if d != main]
+    if not others:
+        return ""
+    return (f"Note: this project has {len(others) + 1} documents and this used {main}. "
+            f"For another, pass tex= one of: {', '.join(others)}.")
+
+
 def _resolve_main_tex(repo: Path, tex: str | None) -> str:
     """Which .tex to compile: an explicit project-relative path if given, else the
     auto-detected root document. Lets a caller target a specific document when a
@@ -905,6 +917,7 @@ def create_hosted_server(
             # fresh: always include edits made directly in Overleaf, GitHub or GitLab.
             async with app.worker.open_repo(proj, fresh=True) as repo:
                 main = _resolve_main_tex(repo, tex)
+                hint = _doc_hint(repo, main, tex)
                 exe = texcompile.tectonic_path()
                 loc = await app.located(proj, repo, main, exe) if exe else None
                 if loc is not None and texmemory.is_transient(loc.message):
@@ -932,9 +945,11 @@ def create_hosted_server(
             lines += ["", float_map]
         if res.note:
             lines += ["", res.note]
+        if hint:
+            lines += ["", hint]
         return "\n".join(lines)
 
-    async def _show_float(kind: str, ref: str, project: str | None):
+    async def _show_float(kind: str, ref: str, project: str | None, tex: str | None = None):
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -943,9 +958,8 @@ def create_hosted_server(
             if not exe:
                 raise ToolError("The LaTeX engine is unavailable on the server right now.")
             async with app.worker.open_repo(proj, fresh=True) as repo:
-                main = texcompile.find_main_tex(repo)
-                if not main:
-                    raise ToolError("Could not find a root .tex to compile.")
+                main = _resolve_main_tex(repo, tex)
+                hint = _doc_hint(repo, main, tex)
                 res = await app.located(proj, repo, main, exe)
                 if not res.pdf_path and texmemory.is_transient(res.message):
                     raise ToolError(res.message)
@@ -956,9 +970,10 @@ def create_hosted_server(
                     # hand back the list and let the assistant pick the right number
                     # or label (that resolution is the model's job).
                     return (
-                        f"I couldn't identify {kind} {ref!r}. "
+                        f"I couldn't identify {kind} {ref!r} in {main}. "
                         + texlocate.float_listing(res, kind)
                         + f"\n\nTell me the {kind} number or its \\label and I'll show it."
+                        + (f"\n{hint}" if hint else "")
                     )
                 pages = f.pages
                 imgs = await asyncio.to_thread(texlocate.render_pages, res.pdf_path, pages)
@@ -969,27 +984,30 @@ def create_hosted_server(
         from fastmcp.utilities.types import Image
 
         span = "" if len(pages) == 1 else f" (spans pages {pages[0]}-{pages[-1]})"
-        note = f"{kind.title()} {number}: page {pages[0]}{span}." + (f"\n{res.note}" if res.note else "")
+        note = (f"{kind.title()} {number}: page {pages[0]}{span}." + (f"\n{res.note}" if res.note else "")
+                + (f"\n{hint}" if hint else ""))
         return [note, *[Image(data=b, format="png") for b in imgs]]
 
     @mcp.tool(title="Show a table as an image", annotations={"readOnlyHint": True})
-    async def show_table(table: str, project: str | None = None):
+    async def show_table(table: str, project: str | None = None, tex: str | None = None):
         """Show a rendered IMAGE of a table so you can SEE how it actually looks
         (layout, column widths, overfull or misaligned cells) and fix it, things the
         LaTeX source alone can't tell you. Pass the table NUMBER (e.g. "4") or its
         \\label (e.g. "tab:results"). If the user describes a table in words, first
         read the document (get_sections / read_section) to find its number or label,
         then call this. A table that spans multiple pages returns all of them; an
-        unknown reference returns the list of tables so you can pick."""
-        return await _show_float("table", table, project)
+        unknown reference returns the list of tables so you can pick. tex: the document's
+        .tex path when the project holds more than one (list_files shows them)."""
+        return await _show_float("table", table, project, tex)
 
     @mcp.tool(title="Show a figure", annotations={"readOnlyHint": True})
-    async def show_figure(figure: str, project: str | None = None):
+    async def show_figure(figure: str, project: str | None = None, tex: str | None = None):
         """Show a rendered IMAGE of a figure so you can SEE how it renders. Pass the
         figure NUMBER (e.g. "3") or its \\label. If the user describes it in words,
         read the document first to find its number or label, then call this. Spanning
-        figures return all pages; an unknown reference returns the list of figures."""
-        return await _show_float("figure", figure, project)
+        figures return all pages; an unknown reference returns the list of figures. tex: the
+        document's .tex path when the project holds more than one."""
+        return await _show_float("figure", figure, project, tex)
 
     @mcp.tool(title="Show a page of the PDF", annotations={"readOnlyHint": True})
     async def show_page(page: int = 1, project: str | None = None, tex: str | None = None):
@@ -1043,20 +1061,21 @@ def create_hosted_server(
     # -- tracked changes + arXiv export ---------------------------------------
 
     @mcp.tool(title="Build a tracked-changes PDF", annotations={"readOnlyHint": True})
-    async def tracked_changes_pdf(ref: str, project: str | None = None, pages: list[int] | None = None):
+    async def tracked_changes_pdf(ref: str, project: str | None = None, pages: list[int] | None = None,
+                                  tex: str | None = None):
         """A tracked-changes PDF (latexdiff): additions and deletions between a
         commit/checkpoint id (list_checkpoints / get_history) and the CURRENT
         document, rendered as page images, what journals ask for in a revised
         submission. Nothing is committed. Shows the pages that contain changes (up to 8)
-        and lists them all; pass pages (1-based page numbers) to see specific ones."""
+        and lists them all; pass pages (1-based page numbers) to see specific ones. tex: the
+        document's .tex path when the project holds more than one."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                main = texcompile.find_main_tex(repo)
-                if not main:
-                    raise ToolError("Could not find a root .tex to diff.")
+                main = _resolve_main_tex(repo, tex)
+                hint = _doc_hint(repo, main, tex)
                 # The old version as one document: every .tex file at that commit, with all
                 # \\input/\\include expanded, so edits inside chapter files are marked too.
                 with tempfile.TemporaryDirectory(prefix="mila_old_") as old_dir:
@@ -1085,6 +1104,8 @@ def create_hosted_server(
         if big:
             where += (" Built with a smaller copy of " + ", ".join(rel for rel, _w, _h in big)
                       + " (too large for the compile server); your files are unchanged.")
+        if hint:
+            where += " " + hint
         note = (f"Tracked changes {ref} -> current. {where} Showing page(s) "
                 f"{texdiff.page_ranges(show) or 'none'} (additions in blue, deletions in red).{more}")
         return [note, *[Image(data=p, format="png") for p in pngs]]
@@ -1266,27 +1287,38 @@ def create_hosted_server(
         return "\n".join(lines)
 
     @mcp.tool(title="Project statistics", annotations={"readOnlyHint": True})
-    async def project_stats(project: str | None = None) -> str:
-        """Word counts per .tex file (approximate, comments/commands stripped),
-        TODO/FIXME markers, and undefined or unused \\ref labels, for trimming
-        to journal limits and pre-submission checks."""
+    async def project_stats(project: str | None = None, tex: str | None = None) -> str:
+        """Word counts (approximate, comments/commands stripped), TODO/FIXME markers, and
+        undefined or unused \\ref labels, for trimming to journal limits and pre-submission
+        checks. Counted per DOCUMENT (a root .tex and the files it \\input/\\includes), so a
+        project with several papers gets one block per paper; tex: just that document."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                a = paperstats.analyze(repo)
+                docs = [_resolve_main_tex(repo, tex)] if tex else texcompile.root_documents(repo)
+                if docs:
+                    blocks = [(d, paperstats.analyze(repo, paperstats.document_files(repo, d))) for d in docs]
+                else:
+                    blocks = [(None, paperstats.analyze(repo))]
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
-        lines = [f"~{a['total']} words across {len(a['counts'])} .tex file(s):"]
-        lines += [f"  {f}: ~{n}" for f, n in sorted(a["counts"].items(), key=lambda x: -x[1])]
-        if a["todos"]:
+        lines = []
+        if len(blocks) > 1:
+            lines.append(f"{len(blocks)} documents in this project (counted separately):")
+        for doc, a in blocks:
+            head = f"{doc}: " if doc and len(blocks) > 1 else ""
+            lines.append(f"{head}~{a['total']} words across {len(a['counts'])} .tex file(s):")
+            lines += [f"  {f}: ~{n}" for f, n in sorted(a["counts"].items(), key=lambda x: -x[1])]
+            if a["undefined_refs"]:
+                lines.append("  Undefined \\ref targets: " + ", ".join(a["undefined_refs"]))
+            if a["unused_labels"]:
+                lines.append("  Labels never referenced: " + ", ".join(a["unused_labels"]))
+        todos = sorted({t for _d, a in blocks for t in a["todos"]})
+        if todos:
             lines.append("TODO markers:")
-            lines += [f"  {t}" for t in a["todos"]]
-        if a["undefined_refs"]:
-            lines.append("Undefined \\ref targets: " + ", ".join(a["undefined_refs"]))
-        if a["unused_labels"]:
-            lines.append("Labels never referenced: " + ", ".join(a["unused_labels"]))
+            lines += [f"  {t}" for t in todos[:40]]
         return "\n".join(lines)
 
     # -- Figure Studio (Pro): matplotlib figures with their source kept -------
