@@ -351,6 +351,7 @@ class AccountService:
             token=token,
             git_username=chosen.git_username,
             git_url=chosen.git_url,
+            owner=user_id,
         )
 
     # -- usage metering (writes only) --------------------------------------

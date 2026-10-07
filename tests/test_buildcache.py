@@ -101,6 +101,8 @@ def world(tmp_path, monkeypatch):
         return create_hosted_server(store=store, cipher=cipher, auth=False, identity_provider=lambda: identity,
                                     base_url="https://milatexai.com", data_dir=tmp_path / name)
 
+    server.cipher = cipher
+
     def outside_edit(text: str):
         """An edit made directly in Overleaf / GitHub: a commit pushed straight to the remote."""
         _git(["pull", "-q", "origin", "main"], seed)
@@ -292,3 +294,108 @@ def test_one_compile_at_a_time_per_copy_by_default(monkeypatch):
         assert fresh.HEAVY_SLOTS == 1 and fresh.FREE_MAX_WAIT == 60 and fresh.PRO_MAX_WAIT == 120
     finally:
         importlib.reload(load)
+
+
+# --- each account has its own copy, and nothing is kept for anyone else -------------------------
+
+def _account_dirs(root: Path) -> list[Path]:
+    return sorted(p for p in root.iterdir() if p.is_dir() and p.name.startswith("u"))
+
+
+def test_two_accounts_on_the_same_repository_never_share_a_copy_or_a_result(world, tmp_path):
+    eng, server, _, _ = world
+    mine, theirs = server("copy1"), server("copy1", identity=("f", "f@x.com"))  # same server, same disk
+    _, out_mine, _ = call(mine, "check_compile", {"project": "paper"})
+    _, out_theirs, _ = call(theirs, "check_compile", {"project": "paper"})
+    assert out_mine == out_theirs
+    assert len(eng.located_calls) == 2                       # nothing compiled for one is used for the other
+    assert len(_account_dirs(tmp_path / "copy1")) == 2       # one working copy per account
+
+
+def test_an_account_that_lost_access_cannot_read_through_someone_elses_copy(world, tmp_path):
+    import dataclasses
+    _, server, _, store = world
+    who = {"id": ("u", "t@x.com")}                         # one running server, two people using it
+    mcp = create_hosted_server(store=store, cipher=server.cipher, auth=False, identity_provider=lambda: who["id"],
+                               base_url="https://milatexai.com", data_dir=tmp_path / "copy1")
+    r, out, _ = call(mcp, "read_file", {"path": "main.tex", "project": "paper"})
+    assert not r.is_error and "Version one." in out
+    # Moments later the other account reads the same repository, but its access no longer
+    # works (token revoked, removed from the project...). It must not get the first copy.
+    proj = asyncio.run(store.list_projects("f"))[0]
+    asyncio.run(store.put_project(dataclasses.replace(proj, git_url=(tmp_path / "gone.git").as_uri())))
+    who["id"] = ("f", "f@x.com")
+    r, out, _ = call(mcp, "read_file", {"path": "main.tex", "project": "paper"})
+    assert r.is_error and "Version one." not in out
+
+
+def test_disconnecting_deletes_that_accounts_copy_and_compile_results(world, tmp_path):
+    _, server, _, _ = world
+    mine, theirs = server("copy1"), server("copy1", identity=("f", "f@x.com"))
+    call(mine, "check_compile", {"project": "paper"})
+    call(theirs, "check_compile", {"project": "paper"})
+    builds = tmp_path / "copy1" / "_builds"
+    assert len(_account_dirs(tmp_path / "copy1")) == 2 and len(list(builds.iterdir())) == 2
+    r, out, _ = call(mine, "disconnect_project", {"project": "paper"})
+    assert not r.is_error and "Disconnected" in out
+    assert len(_account_dirs(tmp_path / "copy1")) == 1 and len(list(builds.iterdir())) == 1
+    r, out, _ = call(theirs, "read_file", {"path": "main.tex", "project": "paper"})
+    assert not r.is_error and "Version one." in out           # the other account is untouched
+
+
+# --- download files are stored encrypted, readable only with the link -------------------------
+
+def test_download_files_are_stored_encrypted_and_open_only_with_the_link(world, monkeypatch):
+    import re
+    from urllib.parse import urlparse
+    from starlette.testclient import TestClient
+    from leafbridge import arxivprep
+    _, server, _, store = world
+
+    async def no_bbl(repo, main, timeout=240):
+        return None
+    monkeypatch.setattr(arxivprep, "compile_bbl", no_bbl)
+    mcp = server()
+    r, out, _ = call(mcp, "arxiv_export", {"project": "paper"})
+    assert not r.is_error, out
+    link = re.search(r"https://milatexai\.com/dl\?code=\S+", out).group(0)
+    (stored,) = store._downloads.values()
+    assert not stored.startswith(b"PK") and b"Version one." not in stored      # not a readable zip at rest
+    with TestClient(mcp.http_app()) as client:
+        got = client.get(urlparse(link).path + "?" + urlparse(link).query)
+        assert got.status_code == 200 and got.content.startswith(b"PK")       # the link opens the real zip
+
+
+def test_a_download_link_from_before_the_change_still_opens(world):
+    import json
+    from urllib.parse import quote
+    from starlette.testclient import TestClient
+    _, server, _, store = world
+    mcp = server()
+    asyncio.run(store.put_download("old.zip", b"PK old bundle"))
+    code = server.cipher.encrypt(json.dumps({"k": "dl", "f": "old.zip"}))
+    with TestClient(mcp.http_app()) as client:
+        got = client.get("/dl?code=" + quote(code, safe=""))
+        assert got.status_code == 200 and got.content == b"PK old bundle"
+
+
+def test_copies_nobody_used_for_a_day_are_deleted_with_their_results(world, tmp_path, monkeypatch):
+    import os
+    import time as _time
+    from leafbridge import hosted
+    _, server, _, _ = world
+    monkeypatch.setattr(hosted, "IDLE_SWEEP_EVERY", 0.0)
+    mine, theirs = server("copy1"), server("copy1", identity=("f", "f@x.com"))
+    call(mine, "check_compile", {"project": "paper"})
+    call(theirs, "check_compile", {"project": "paper"})
+    root, builds = tmp_path / "copy1", tmp_path / "copy1" / "_builds"
+    old = _time.time() - 2 * 24 * 3600                       # my copy was last used two days ago
+    from leafbridge.git_worker import GitWorker
+    proj_dir = root / GitWorker.key_for("u", HEX)
+    mine_dir = proj_dir.parent
+    os.utime(proj_dir / ".git" / "milatexai-last-use", (old, old))
+    call(theirs, "list_files", {"project": "paper"})       # any request runs the check
+    assert not mine_dir.exists()                            # deleted, with its compile results
+    assert len(_account_dirs(root)) == 1 and len(list(builds.iterdir())) == 1
+    r, out, _ = call(mine, "read_file", {"path": "main.tex", "project": "paper"})
+    assert not r.is_error and "Version one." in out          # and simply fetched again when needed

@@ -338,6 +338,10 @@ class ProjectConfig:
     # Optional override of the clone URL: for self-hosted Overleaf Server Pro
     # (https://<site>/git/<id>) or for local testing (a file path / file:// URL).
     git_url: str | None = None
+    # The account this project belongs to (hosted service). Each account gets its own
+    # working copy and compile results, never shared with another account, even when
+    # two people connect the same repository. None for the local, single-user server.
+    owner: str | None = None
 
     @property
     def clone_url(self) -> str:

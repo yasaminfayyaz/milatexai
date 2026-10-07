@@ -113,6 +113,10 @@ class BuildCache:
         except OSError:
             shutil.rmtree(d, ignore_errors=True)   # a cache that cannot write just doesn't remember
 
+    def forget(self, project_key: str) -> None:
+        """Delete every stored result for one working copy (used on disconnect)."""
+        shutil.rmtree(self.root / _safe(project_key), ignore_errors=True)
+
     def _evict(self, project_dir: Path) -> None:
         entries = sorted((p for p in project_dir.iterdir() if p.is_dir()),
                          key=lambda p: p.stat().st_mtime, reverse=True)

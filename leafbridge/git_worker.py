@@ -18,6 +18,7 @@ Design rules (from the plan + Overleaf's documented behavior):
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import os
 import random
 import subprocess
@@ -36,6 +37,8 @@ CLONE_DEPTH = 50
 # Don't re-pull more often than this for read operations (seconds). Writes
 # always sync first regardless. Keeps us polite to Overleaf's rate limits.
 SYNC_TTL_SECONDS = 15.0
+IDLE_DELETE_SECONDS = 24 * 3600.0  # an account's working copy unused this long is deleted
+_LAST_USE = "milatexai-last-use"   # touched (inside .git) whenever a working copy is used
 
 # Bump git's HTTP post buffer so larger pushes don't fail (Overleaf tip).
 _POST_BUFFER = str(20 * 1024 * 1024)
@@ -86,11 +89,65 @@ class GitWorker:
 
     # -- public API ---------------------------------------------------------
 
+    @staticmethod
+    def key_for(owner: str | None, project_id: str) -> str:
+        """Name of the working copy for one account's project: one per account, so what
+        is fetched or compiled for one person is never used for anyone else."""
+        if not owner:
+            return project_id
+        return "u" + hashlib.sha256(owner.encode()).hexdigest()[:16] + "/" + project_id
+
+    def clone_key(self, project: ProjectConfig) -> str:
+        return self.key_for(project.owner, project.project_id)
+
     def lock_for(self, project: ProjectConfig) -> asyncio.Lock:
-        return self._locks[project.project_id]
+        key = self.clone_key(project)
+        git_dir = self.data_dir / key / ".git"
+        if git_dir.is_dir():
+            try:
+                (git_dir / _LAST_USE).touch()
+            except OSError:
+                pass
+        return self._locks[key]
+
+    async def sweep_idle(self, max_idle: float | None = None) -> list[str]:
+        """Delete account working copies not used for ``max_idle`` seconds (default a day)
+        and return their keys. Copies in use right now are left alone."""
+        max_idle = IDLE_DELETE_SECONDS if max_idle is None else max_idle
+        now = time.time()
+        gone: list[str] = []
+        for owner_dir in [p for p in self.data_dir.iterdir() if p.is_dir() and p.name.startswith("u")]:
+            for path in [p for p in owner_dir.iterdir() if p.is_dir()]:
+                key = f"{owner_dir.name}/{path.name}"
+                marker, git_dir = path / ".git" / _LAST_USE, path / ".git"
+                try:
+                    used = (marker if marker.exists() else git_dir if git_dir.exists() else path).stat().st_mtime
+                except OSError:
+                    continue
+                if now - used < max_idle or self._locks[key].locked():
+                    continue
+                async with self._locks[key]:
+                    await asyncio.to_thread(_rmtree, path)
+                self._last_sync.pop(key, None)
+                gone.append(key)
+            if not any(owner_dir.iterdir()):
+                owner_dir.rmdir()
+        return gone
 
     def repo_path(self, project: ProjectConfig) -> Path:
-        return self.data_dir / project.project_id
+        return self.data_dir / self.clone_key(project)
+
+    async def forget(self, owner: str | None, project_id: str) -> None:
+        """Delete one account's working copy of a project on this copy of the server
+        (used on disconnect). Best effort."""
+        key = self.key_for(owner, project_id)
+        async with self._locks[key]:
+            path = self.data_dir / key
+            if path.exists():
+                await asyncio.to_thread(_rmtree, path)
+            if owner and path.parent.is_dir() and not any(path.parent.iterdir()):
+                path.parent.rmdir()                      # that account has nothing left here
+            self._last_sync.pop(key, None)
 
     async def ensure_repo(self, project: ProjectConfig, *, sync: bool = True, fresh: bool = False) -> Path:
         """Return the local clone path, cloning if needed and optionally syncing.
@@ -128,7 +185,7 @@ class GitWorker:
         We keep no local uncommitted state between operations, so a hard reset to
         the remote branch is the simplest correct "pull".
         """
-        pid = project.project_id
+        pid = self.clone_key(project)
         if not force:
             last = self._last_sync.get(pid, 0.0)
             if (time.monotonic() - last) < SYNC_TTL_SECONDS and not await self._behind_another_copy(project):
@@ -196,7 +253,7 @@ class GitWorker:
                     await self._git(project, ["rev-parse", "--short", "HEAD"])
                 ).strip()
 
-        self._last_sync[project.project_id] = time.monotonic()
+        self._last_sync[self.clone_key(project)] = time.monotonic()
         await self._record_head(project)
         return CommitResult(True, True, commit_hash, "Committed and pushed.")
 
@@ -294,6 +351,7 @@ class GitWorker:
         if path.exists():
             # Stale/partial dir, remove and re-clone.
             await asyncio.to_thread(_rmtree, path)
+        path.parent.mkdir(parents=True, exist_ok=True)
         # Prefer a shallow clone (polite), but fall back to a full clone if the
         # server doesn't support shallow fetch (Overleaf's Git bridge is custom).
         try:
@@ -313,7 +371,8 @@ class GitWorker:
         # Drop the token: point origin at the clean URL. We always pass the
         # authed URL explicitly on fetch/push instead.
         await self._git(project, ["remote", "set-url", "origin", project.clone_url])
-        self._last_sync[project.project_id] = time.monotonic()
+        (path / ".git" / _LAST_USE).touch()
+        self._last_sync[self.clone_key(project)] = time.monotonic()
 
     async def _fetch(self, project: ProjectConfig, branch: str) -> None:
         """Fetch the branch tip into FETCH_HEAD, falling back from shallow to full."""

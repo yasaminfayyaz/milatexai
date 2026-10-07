@@ -29,6 +29,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, quote
 
+from cryptography.fernet import Fernet
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 from fastmcp.server.dependencies import get_access_token
@@ -201,6 +202,9 @@ def workos_email_resolver(api_key: str):
     return resolve
 
 
+IDLE_SWEEP_EVERY = 600.0  # seconds between checks for working copies nobody has used for a day
+
+
 class HostedApp:
     """Per-deployment state: the account service + one git worker, plus how to
     identify the current caller."""
@@ -226,6 +230,7 @@ class HostedApp:
         # Compile results per exact version (commit id), so an unchanged paper is never
         # compiled twice; see buildcache.py.
         self.builds = buildcache.BuildCache(Path(data_dir) / "_builds")
+        self._next_sweep = time.monotonic() + IDLE_SWEEP_EVERY
         self.admin_emails = admin_emails
         self._identity = identity_provider
         self._email_resolver = email_resolver
@@ -262,8 +267,29 @@ class HostedApp:
                 return buildcache.Located(clean=False, message=f"compile failed to run: {type(exc).__name__}")
             return buildcache.from_locate(res)
 
-        loc, _cached = await self.builds.located(proj.project_id, commit, main, build)
+        loc, _cached = await self.builds.located(self.worker.clone_key(proj), commit, main, build)
         return buildcache.to_locate(loc)
+
+    async def _sweep_idle(self) -> None:
+        """Every few minutes, delete working copies and compile results nobody has used
+        for a day (see GitWorker.sweep_idle). Never fails the caller."""
+        if time.monotonic() < self._next_sweep:
+            return
+        self._next_sweep = time.monotonic() + IDLE_SWEEP_EVERY
+        try:
+            for key in await self.worker.sweep_idle():
+                await asyncio.to_thread(self.builds.forget, key)
+        except Exception:  # noqa: BLE001
+            pass
+
+    async def forget_local(self, user_id: str, project_id: str) -> None:
+        """Delete this copy's working copy and compile results for one account's project.
+        Other copies drop theirs when they restart. Never fails the caller."""
+        try:
+            await self.worker.forget(user_id, project_id)
+            await asyncio.to_thread(self.builds.forget, GitWorker.key_for(user_id, project_id))
+        except Exception:  # noqa: BLE001
+            pass
 
     async def plain(self, proj, repo: Path, main: str):
         """The ordinary compile (the authoritative verdict and real errors), reused per version."""
@@ -272,7 +298,7 @@ class HostedApp:
         async def build():
             return buildcache.from_compile(await texcompile.compile_project(repo, main))
 
-        res, _cached = await self.builds.plain(proj.project_id, commit, main, build)
+        res, _cached = await self.builds.plain(self.worker.clone_key(proj), commit, main, build)
         return res
 
     def ensure_pro(self, user: User, feature: str) -> None:
@@ -341,6 +367,7 @@ class HostedApp:
         """Resolve the caller's project. If they have NONE connected yet, don't
         just error, hand back a secure connect link so onboarding happens on the
         first action, without anyone needing to know the start_connect tool."""
+        await self._sweep_idle()
         try:
             return await self.service.resolve_project(user.user_id, project)
         except ProjectNotConnected:
@@ -525,7 +552,13 @@ def create_hosted_server(
         """Disconnect a project and delete its stored token."""
         try:
             user = await app.user()
+            try:
+                pid = app.service._select(await app.service.store.list_projects(user.user_id), project).project_id
+            except Exception:  # noqa: BLE001
+                pid = None
             ok = await app.service.disconnect_project(user.user_id, project)
+            if ok and pid:
+                await app.forget_local(user.user_id, pid)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         return "Disconnected." if ok else "No such project."
@@ -942,9 +975,12 @@ def create_hosted_server(
                 bbl = await arxivprep.compile_bbl(repo, main)
                 blob, manifest = arxivprep.build_zip(repo, main, bbl)
             # Shared storage, not this copy's disk: the link may be opened on another copy.
+            # Stored encrypted with a fresh key that exists only inside the link (which is
+            # itself encrypted), so the stored file is unreadable without the link.
             fname = secrets.token_urlsafe(10) + ".zip"
-            await app.service.store.put_download(fname, blob)
-            code = app.cipher.encrypt(json.dumps({"k": "dl", "f": fname}))
+            file_key = Fernet.generate_key()
+            await app.service.store.put_download(fname, Fernet(file_key).encrypt(blob))
+            code = app.cipher.encrypt(json.dumps({"k": "dl", "f": fname, "x": file_key.decode()}))
             url = f"{app.base_url}/dl?code={quote(code, safe='')}"
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
@@ -1738,12 +1774,15 @@ def create_hosted_server(
             data = json.loads(app.cipher.decrypt(code, ttl=900))
             assert data.get("k") == "dl"
             fname = os.path.basename(str(data["f"]))
+            file_key = data.get("x")
         except Exception:  # noqa: BLE001
             return HTMLResponse(web.render_notice(
                 "Link expired", "This download link is invalid or has expired. "
                 "Run arxiv_export again for a fresh one.", icon="⏰"), status_code=400)
         try:
             data = await app.service.store.get_download(fname)
+            if data is not None and file_key:
+                data = Fernet(file_key.encode()).decrypt(data)
         except Exception:  # noqa: BLE001
             data = None
         if data is None:
@@ -1876,6 +1915,7 @@ def create_hosted_server(
                 )
             elif action == "remove":
                 await app.service.store.delete_project(user_id, field("project_id"))
+                await app.forget_local(user_id, field("project_id"))
             elif action == "set_token":
                 await app.service.update_project_token(user_id, field("project_id"), field("token"))
             else:

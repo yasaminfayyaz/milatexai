@@ -228,7 +228,7 @@
     },
     {
      "heading": "What we do not keep",
-     "body": "We do not keep a lasting copy of your documents, figures, compiled PDFs or project history. To read, edit and compile your files, the server works on a temporary copy of each connected repository, and keeps the results of its most recent compiles next to it so an unchanged paper is not compiled twice. It is a working cache, not a backup: it is never shared, and it is deleted whenever the server restarts or is updated. When you ask for a download, such as an arXiv bundle, the file is held in our storage only so the link works, and it is deleted within a day. Figures you ask MiLatexAI to render run in an isolated sandbox that discards your files when the session ends."
+     "body": "We do not keep a lasting copy of your documents, figures, compiled PDFs or project history. To read, edit and compile your files, the server works on a temporary copy of each repository you connect, with the results of its most recent compiles next to it so an unchanged paper is not compiled twice. That copy is kept only for you. It is never shared with anyone else or used for anyone else's requests, even if they connect the same repository. It is deleted within a day of your last use, or sooner when you disconnect the project or the server restarts or is updated.\n\nWhen you ask for a download, such as an arXiv bundle, the file is stored encrypted with a key that exists only in your download link, and it is deleted within a day. This, like everything else we store, is also encrypted at rest. Figures you ask MiLatexAI to render run in an isolated sandbox that discards your files when the session ends."
     },
     {
      "heading": "How your token is secured",

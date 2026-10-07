@@ -58,8 +58,8 @@ Synced automatically. Every tool now has a title and a read-only or destructive 
 
   What it does not do
   - It only touches the projects you connect. It does not read the rest of your account.
-  - It does not keep a lasting copy of your documents. It works on a temporary copy that is cleared
-    whenever the service restarts or updates.
+  - It does not keep a lasting copy of your documents. It works on a temporary copy that is kept
+    only for you and deleted within a day of your last use.
 
   Plans
   Reading files is always free. The free plan includes 10 write commits a month and up to 40
