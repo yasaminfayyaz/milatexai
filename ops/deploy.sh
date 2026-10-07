@@ -105,7 +105,7 @@ fi
 # sign-in is linked to the existing account by verified email (hosted.workos_environments).
 # Production's API key is the app secret workos-prod-key; an app without it (the drill copy)
 # gets none of these settings. Rolling back the switch = SIGNIN=staging and push.
-SIGNIN=staging
+SIGNIN=production
 WORKOS_PROD_DOMAIN=https://discerning-tranquility-74.authkit.app
 WORKOS_PROD_CLIENT=client_01KX9FBJGB3T5MG7EPYH59KTEA
 SIGNIN_VARS=()
