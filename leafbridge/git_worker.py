@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import random
 import subprocess
 import time
 from collections import defaultdict
@@ -49,6 +50,7 @@ _RATE_LIMIT_MARKERS = (
 )
 RETRY_DELAYS = (3.0, 8.0, 20.0)  # waits after successive rate-limited attempts
 MIN_PUSH_INTERVAL_SECONDS = 1.5  # minimum spacing between pushes to one project
+PUSH_ATTEMPTS = 4  # tries when the remote moved or briefly refused, before giving up
 
 
 class GitError(Exception):
@@ -165,28 +167,34 @@ class GitWorker:
         commit_hash = (await self._git(project, ["rev-parse", "--short", "HEAD"])).strip()
 
         branch = await self._get_branch(project)
-        try:
-            await self._push(project, branch)
-        except PushConflict:
-            # Remote moved between our sync and our push. Replay our single
-            # commit on top of the new remote tip, then push once more.
-            await self._fetch(project, branch)
+        for attempt in range(PUSH_ATTEMPTS):
             try:
-                await self._git(project, ["rebase", "FETCH_HEAD"])
-            except GitError as exc:
-                await self._git(project, ["rebase", "--abort"], check=False)
-                # Leave the local clone matching the remote so the next op is clean.
-                await self._git(project, ["reset", "--hard", "FETCH_HEAD"], check=False)
-                raise PushConflict(
-                    "Someone edited this project in Overleaf at the same time and "
-                    "the changes overlap, so the edit could not be applied "
-                    "automatically. Nothing was pushed. Please re-read the file "
-                    "and try again."
-                ) from exc
-            commit_hash = (
-                await self._git(project, ["rev-parse", "--short", "HEAD"])
-            ).strip()
-            await self._push(project, branch)
+                await self._push(project, branch)
+                break
+            except PushConflict:
+                if attempt == PUSH_ATTEMPTS - 1:
+                    raise
+                # The remote moved between our sync and our push (another copy of
+                # MiLatexAI, a co-author, or an edit made directly on the website), or a
+                # busy remote briefly refused the update ("cannot lock ref"). Wait a
+                # short random moment, replay our single commit on the new tip, retry.
+                await asyncio.sleep(random.uniform(0.2, 1.0) * (attempt + 1))
+                await self._fetch(project, branch)
+                try:
+                    await self._git(project, ["rebase", "FETCH_HEAD"])
+                except GitError as exc:
+                    await self._git(project, ["rebase", "--abort"], check=False)
+                    # Leave the local clone matching the remote so the next op is clean.
+                    await self._git(project, ["reset", "--hard", "FETCH_HEAD"], check=False)
+                    raise PushConflict(
+                        "Someone edited this project in Overleaf at the same time and "
+                        "the changes overlap, so the edit could not be applied "
+                        "automatically. Nothing was pushed. Please re-read the file "
+                        "and try again."
+                    ) from exc
+                commit_hash = (
+                    await self._git(project, ["rev-parse", "--short", "HEAD"])
+                ).strip()
 
         self._last_sync[project.project_id] = time.monotonic()
         await self._record_head(project)
