@@ -209,3 +209,13 @@ def test_security_policy_exists_with_a_reporting_channel():
     from pathlib import Path
     text = (Path(__file__).resolve().parents[1] / "SECURITY.md").read_text(encoding="utf-8")
     assert "support@milatexai.com" in text and "Security" in text
+
+
+def test_the_site_has_an_icon():
+    with TestClient(_server().http_app()) as client:
+        r = client.get("/favicon.ico")
+        assert r.status_code == 200
+        assert r.headers["content-type"] == "image/png"
+        assert r.content.startswith(b"\x89PNG")
+        for path in ("/", "/help", "/privacy", "/tools"):
+            assert "rel='icon'" in client.get(path).text, path

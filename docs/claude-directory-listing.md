@@ -10,6 +10,9 @@ https://claude.com/docs/connectors/building/review-criteria
 
 ## Before you open the portal (one time, about 20 minutes)
 
+Status, 7 October 2026: all five steps are done. The reviewer account (reviewer@milatexai.com) is Pro, the
+sample paper is connected as "Review", and every tool passed on production.
+
 1. **Reviewer login.** In a private browser window, go to https://milatexai.com, choose Sign in, and create an
    account with a dedicated address (for example `yasaminfayyaz+review@gmail.com`) and a password. Reviewers need
    email and password; a magic link or Google sign-in would not work for them. If the sign-in page offers no
@@ -55,12 +58,14 @@ Synced automatically. Every tool now has a title and a read-only or destructive 
 
   What it does not do
   - It only touches the projects you connect. It does not read the rest of your account.
-  - It does not keep your documents. Files are read and written while a request runs.
+  - It does not keep a lasting copy of your documents. It works on a temporary copy that is cleared
+    whenever the service restarts or updates.
 
   Plans
-  Reads are always free and unlimited. The free plan includes 10 write commits per month. Pro is
-  unlimited. Subscribing happens on Stripe's own checkout page; the connector never charges or
-  handles card details. The source code is public under the AGPL license.
+  Reading files is always free. The free plan includes 10 write commits a month and up to 40
+  compiles or page previews an hour, on spare capacity. Pro is unlimited. Subscribing happens on
+  Stripe's own checkout page; the connector never charges or handles card details. The source code
+  is public under the AGPL license.
 
   Before you start
   Overleaf's Git integration is a paid Overleaf feature (many universities include it). GitHub,

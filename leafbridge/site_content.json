@@ -129,7 +129,7 @@
     "cta": "Get started",
     "availability": "Guaranteed · always on"
    },
-   "note": "Reads are always free and unlimited. Free access is best-effort, as capacity allows. You bring your own repository: Overleaf needs an account with Git integration (a paid Overleaf feature), while GitHub, GitLab, and Bitbucket just need a repo and a free access token.",
+   "note": "Reads are always free and unlimited. On the free plan, compiles and page previews are limited to 40 an hour. Free access is best-effort, as capacity allows. You bring your own repository: Overleaf needs an account with Git integration (a paid Overleaf feature), while GitHub, GitLab, and Bitbucket just need a repo and a free access token.",
    "capacity_note": "The free tier runs on spare capacity and may pause briefly when demand is high. Pro guarantees uninterrupted access, you are never turned away.",
    "lab": "Writing with a lab or research group? Ask about lab and department pricing:"
   },
@@ -228,7 +228,7 @@
     },
     {
      "heading": "What we do not keep",
-     "body": "We do not keep a copy of your documents, figures, compiled PDFs or project history. To read and edit your files, the server works on a temporary copy of each connected repository. It is a working cache, not a backup: it is never shared, and it is deleted whenever the server restarts or is updated. Figures you ask MiLatexAI to render run in an isolated sandbox that discards your files when the session ends."
+     "body": "We do not keep a lasting copy of your documents, figures, compiled PDFs or project history. To read, edit and compile your files, the server works on a temporary copy of each connected repository, and keeps the results of its most recent compiles next to it so an unchanged paper is not compiled twice. It is a working cache, not a backup: it is never shared, and it is deleted whenever the server restarts or is updated. When you ask for a download, such as an arXiv bundle, the file is held in our storage only so the link works, and it is deleted within a day. Figures you ask MiLatexAI to render run in an isolated sandbox that discards your files when the session ends."
     },
     {
      "heading": "How your token is secured",
@@ -477,7 +477,7 @@
     "cta": "开始使用",
     "availability": "保证可用 · 始终在线"
    },
-   "note": "读取始终免费且不限量。免费访问为尽力而为，视容量情况而定。仓库由你自备：Overleaf 需要一个开通了 Git 集成（Overleaf 的付费功能）的账户，而 GitHub、GitLab 和 Bitbucket 只需一个仓库和一个免费的访问令牌。",
+   "note": "读取始终免费且不限量。免费方案每小时最多可编译和预览页面 40 次。免费访问为尽力而为，视容量情况而定。仓库由你自备：Overleaf 需要一个开通了 Git 集成（Overleaf 的付费功能）的账户，而 GitHub、GitLab 和 Bitbucket 只需一个仓库和一个免费的访问令牌。",
    "capacity_note": "免费套餐依托闲置容量运行，在需求高峰期可能会短暂暂停。Pro 保证不间断访问，您永远不会被拒之门外。",
    "lab": "与实验室或课题组一起写作？欢迎咨询实验室与院系定价："
   },
@@ -796,7 +796,7 @@
     "cta": "Commencer",
     "availability": "Garanti · toujours actif"
    },
-   "note": "Les lectures sont toujours gratuites et illimitées. L'accès gratuit fonctionne au mieux, selon la capacité disponible. Vous apportez votre propre dépôt : Overleaf nécessite un compte avec l'intégration Git (une fonctionnalité payante d'Overleaf), tandis que GitHub, GitLab et Bitbucket ne demandent qu'un dépôt et un jeton d'accès gratuit.",
+   "note": "Les lectures sont toujours gratuites et illimitées. Avec l'offre gratuite, les compilations et les aperçus de pages sont limités à 40 par heure. L'accès gratuit fonctionne au mieux, selon la capacité disponible. Vous apportez votre propre dépôt : Overleaf nécessite un compte avec l'intégration Git (une fonctionnalité payante d'Overleaf), tandis que GitHub, GitLab et Bitbucket ne demandent qu'un dépôt et un jeton d'accès gratuit.",
    "capacity_note": "L'offre gratuite fonctionne sur les capacités disponibles et peut être suspendue brièvement en cas de forte demande. Pro garantit un accès ininterrompu, vous n'êtes jamais refusé.",
    "lab": "Vous rédigez avec un laboratoire ou un groupe de recherche ? Renseignez-vous sur nos tarifs laboratoires et départements :"
   },
@@ -1115,7 +1115,7 @@
     "cta": "Empieza ahora",
     "availability": "Garantizado · siempre activo"
    },
-   "note": "Las lecturas son siempre gratuitas e ilimitadas. El acceso gratuito funciona según la capacidad disponible (best-effort). Tú aportas tu propio repositorio: Overleaf requiere una cuenta con integración de Git (una función de pago de Overleaf), mientras que GitHub, GitLab y Bitbucket solo necesitan un repositorio y un token de acceso gratuito.",
+   "note": "Las lecturas son siempre gratuitas e ilimitadas. En el plan gratuito, las compilaciones y las vistas previas de páginas están limitadas a 40 por hora. El acceso gratuito funciona según la capacidad disponible (best-effort). Tú aportas tu propio repositorio: Overleaf requiere una cuenta con integración de Git (una función de pago de Overleaf), mientras que GitHub, GitLab y Bitbucket solo necesitan un repositorio y un token de acceso gratuito.",
    "capacity_note": "El plan gratuito funciona con capacidad sobrante y puede pausarse brevemente cuando la demanda es alta. Pro garantiza acceso ininterrumpido: nunca se te rechaza.",
    "lab": "¿Escribes con un laboratorio o grupo de investigación? Pregunta por nuestros precios para laboratorios y departamentos:"
   },
@@ -1434,7 +1434,7 @@
     "cta": "Loslegen",
     "availability": "Garantiert · immer verfügbar"
    },
-   "note": "Lesevorgänge sind immer kostenlos und unbegrenzt. Der kostenlose Zugriff erfolgt nach dem Best-Effort-Prinzip, je nach verfügbarer Kapazität. Du bringst dein eigenes Repository mit: Overleaf benötigt ein Konto mit Git-Integration (eine kostenpflichtige Overleaf-Funktion), während GitHub, GitLab und Bitbucket lediglich ein Repository und ein kostenloses Zugriffstoken erfordern.",
+   "note": "Lesevorgänge sind immer kostenlos und unbegrenzt. Im kostenlosen Tarif sind Kompilierungen und Seitenvorschauen auf 40 pro Stunde begrenzt. Der kostenlose Zugriff erfolgt nach dem Best-Effort-Prinzip, je nach verfügbarer Kapazität. Du bringst dein eigenes Repository mit: Overleaf benötigt ein Konto mit Git-Integration (eine kostenpflichtige Overleaf-Funktion), während GitHub, GitLab und Bitbucket lediglich ein Repository und ein kostenloses Zugriffstoken erfordern.",
    "capacity_note": "Der kostenlose Tarif nutzt freie Kapazitäten und kann bei hoher Nachfrage kurz pausieren. Pro garantiert ununterbrochenen Zugriff, Sie werden niemals abgewiesen.",
    "lab": "Sie schreiben mit einem Labor oder einer Forschungsgruppe? Fragen Sie nach unseren Preisen für Labore und Fachbereiche:"
   },
@@ -1753,7 +1753,7 @@
     "cta": "始める",
     "availability": "保証付き · 常時稼働"
    },
-   "note": "読み取りは常に無料かつ無制限です。無料アクセスは空き容量に応じたベストエフォート提供です。リポジトリはご自身でご用意ください。Overleaf には Git integration 付きのアカウント(Overleaf の有料機能)が必要ですが、GitHub、GitLab、Bitbucket はリポジトリと無料のアクセストークンさえあれば十分です。",
+   "note": "読み取りは常に無料かつ無制限です。無料プランでは、コンパイルとページのプレビューは1時間あたり40回までです。無料アクセスは空き容量に応じたベストエフォート提供です。リポジトリはご自身でご用意ください。Overleaf には Git integration 付きのアカウント(Overleaf の有料機能)が必要ですが、GitHub、GitLab、Bitbucket はリポジトリと無料のアクセストークンさえあれば十分です。",
    "capacity_note": "無料プランは余剰容量で稼働しているため、需要が高いときは短時間停止する場合があります。Pro なら中断のないアクセスが保証され、締め出されることは決してありません。",
    "lab": "研究室やグループで執筆されていますか?研究室・学科向けの料金プランについてお気軽にお問い合わせください:"
   },
@@ -2072,7 +2072,7 @@
     "cta": "Começar",
     "availability": "Garantido · sempre ativo"
    },
-   "note": "As leituras são sempre gratuitas e ilimitadas. O acesso gratuito opera conforme a capacidade disponível, sem garantias. Você traz o seu próprio repositório: o Overleaf precisa de uma conta com integração Git (um recurso pago do Overleaf), enquanto GitHub, GitLab e Bitbucket só precisam de um repositório e de um token de acesso gratuito.",
+   "note": "As leituras são sempre gratuitas e ilimitadas. No plano gratuito, compilações e pré-visualizações de páginas são limitadas a 40 por hora. O acesso gratuito opera conforme a capacidade disponível, sem garantias. Você traz o seu próprio repositório: o Overleaf precisa de uma conta com integração Git (um recurso pago do Overleaf), enquanto GitHub, GitLab e Bitbucket só precisam de um repositório e de um token de acesso gratuito.",
    "capacity_note": "O plano gratuito funciona com capacidade ociosa e pode pausar brevemente quando a demanda está alta. O Pro garante acesso ininterrupto, você nunca fica sem acesso.",
    "lab": "Escrevendo com um laboratório ou grupo de pesquisa? Pergunte sobre nossos preços para laboratórios e departamentos:"
   },
@@ -2391,7 +2391,7 @@
     "cta": "ابدأ الآن",
     "availability": "مضمون · متاح دائماً"
    },
-   "note": "عمليات القراءة مجانية وغير محدودة دائمًا. الوصول المجاني يعمل بأفضل جهد ممكن حسب توفر السعة. أنت تُحضِر مستودعك الخاص: يحتاج Overleaf إلى حساب مع تكامل Git (وهي ميزة مدفوعة في Overleaf)، بينما يحتاج GitHub وGitLab وBitbucket إلى مجرد مستودع ورمز وصول مجاني.",
+   "note": "عمليات القراءة مجانية وغير محدودة دائمًا. في الخطة المجانية، تقتصر عمليات التجميع ومعاينات الصفحات على 40 مرة في الساعة. الوصول المجاني يعمل بأفضل جهد ممكن حسب توفر السعة. أنت تُحضِر مستودعك الخاص: يحتاج Overleaf إلى حساب مع تكامل Git (وهي ميزة مدفوعة في Overleaf)، بينما يحتاج GitHub وGitLab وBitbucket إلى مجرد مستودع ورمز وصول مجاني.",
    "capacity_note": "تعمل الخطة المجانية على السعة الفائضة وقد تتوقف مؤقتاً لفترة وجيزة عند ارتفاع الطلب. تضمن Pro وصولاً متواصلاً دون انقطاع، فلن تُحرم من الوصول أبداً.",
    "lab": "هل تكتب مع مختبر أو مجموعة بحثية؟ اسأل عن أسعار المختبرات والأقسام:"
   },
@@ -2710,7 +2710,7 @@
     "cta": "शुरू करें",
     "availability": "सुनिश्चित · हमेशा उपलब्ध"
    },
-   "note": "रीड्स हमेशा मुफ्त और असीमित होते हैं। फ्री एक्सेस बेस्ट-एफर्ट आधार पर है, जैसी क्षमता उपलब्ध हो। आप अपनी खुद की रिपॉज़िटरी लाते हैं: Overleaf के लिए Git integration वाला एक खाता चाहिए (जो Overleaf की एक सशुल्क सुविधा है), जबकि GitHub, GitLab, और Bitbucket के लिए बस एक रिपॉज़िटरी और एक मुफ़्त एक्सेस टोकन चाहिए।",
+   "note": "रीड्स हमेशा मुफ्त और असीमित होते हैं। फ्री प्लान में कंपाइल और पेज प्रीव्यू प्रति घंटे 40 तक सीमित हैं। फ्री एक्सेस बेस्ट-एफर्ट आधार पर है, जैसी क्षमता उपलब्ध हो। आप अपनी खुद की रिपॉज़िटरी लाते हैं: Overleaf के लिए Git integration वाला एक खाता चाहिए (जो Overleaf की एक सशुल्क सुविधा है), जबकि GitHub, GitLab, और Bitbucket के लिए बस एक रिपॉज़िटरी और एक मुफ़्त एक्सेस टोकन चाहिए।",
    "capacity_note": "फ्री टियर अतिरिक्त क्षमता पर चलता है और मांग अधिक होने पर कुछ देर के लिए रुक सकता है। Pro निर्बाध पहुँच की गारंटी देता है, आपको कभी मना नहीं किया जाता।",
    "lab": "लैब या रिसर्च ग्रुप के साथ लिख रहे हैं? लैब और डिपार्टमेंट प्राइसिंग के बारे में पूछें:"
   },
@@ -3029,7 +3029,7 @@
     "cta": "시작하기",
     "availability": "보장 · 항상 이용 가능"
    },
-   "note": "읽기는 항상 무료이며 무제한입니다. 무료 액세스는 용량이 허용하는 범위에서 최선을 다해 제공됩니다(best-effort). 저장소는 직접 준비하셔야 합니다. Overleaf는 Git 연동이 포함된 계정(유료 Overleaf 기능)이 필요하고, GitHub, GitLab, Bitbucket은 저장소와 무료 액세스 토큰만 있으면 됩니다.",
+   "note": "읽기는 항상 무료이며 무제한입니다. 무료 플랜에서는 컴파일과 페이지 미리보기가 시간당 40회로 제한됩니다. 무료 액세스는 용량이 허용하는 범위에서 최선을 다해 제공됩니다(best-effort). 저장소는 직접 준비하셔야 합니다. Overleaf는 Git 연동이 포함된 계정(유료 Overleaf 기능)이 필요하고, GitHub, GitLab, Bitbucket은 저장소와 무료 액세스 토큰만 있으면 됩니다.",
    "capacity_note": "무료 요금제는 여유 용량으로 운영되며 수요가 많을 때 잠시 중단될 수 있습니다. Pro는 끊김 없는 이용을 보장하므로 언제든 이용이 거부되지 않습니다.",
    "lab": "연구실이나 연구 그룹과 함께 작업하시나요? 연구실 및 학과 단위 요금제를 문의해 주세요:"
   },
@@ -3348,7 +3348,7 @@
     "cta": "Начать",
     "availability": "Гарантированно · всегда доступно"
    },
-   "note": "Чтение всегда бесплатное и неограниченное. Бесплатный доступ предоставляется по мере наличия свободных мощностей, без гарантий. Репозиторий вы предоставляете сами: для Overleaf нужен аккаунт с интеграцией Git (платная функция Overleaf), тогда как для GitHub, GitLab и Bitbucket достаточно репозитория и бесплатного токена доступа.",
+   "note": "Чтение всегда бесплатное и неограниченное. На бесплатном тарифе компиляции и предпросмотр страниц ограничены 40 в час. Бесплатный доступ предоставляется по мере наличия свободных мощностей, без гарантий. Репозиторий вы предоставляете сами: для Overleaf нужен аккаунт с интеграцией Git (платная функция Overleaf), тогда как для GitHub, GitLab и Bitbucket достаточно репозитория и бесплатного токена доступа.",
    "capacity_note": "Бесплатный тариф работает на свободных ресурсах и может ненадолго приостанавливаться при высокой нагрузке. Pro гарантирует бесперебойный доступ, вам никогда не откажут.",
    "lab": "Пишете вместе с лабораторией или научной группой? Узнайте о тарифах для лабораторий и кафедр:"
   },
@@ -3667,7 +3667,7 @@
     "cta": "Inizia ora",
     "availability": "Garantito · sempre attivo"
    },
-   "note": "Le letture sono sempre gratuite e illimitate. L'accesso gratuito è best-effort, in base alla capacità disponibile. Porti il tuo repository: Overleaf richiede un account con integrazione Git (una funzionalità Overleaf a pagamento), mentre GitHub, GitLab e Bitbucket richiedono solo un repository e un token di accesso gratuito.",
+   "note": "Le letture sono sempre gratuite e illimitate. Con il piano gratuito, compilazioni e anteprime delle pagine sono limitate a 40 all'ora. L'accesso gratuito è best-effort, in base alla capacità disponibile. Porti il tuo repository: Overleaf richiede un account con integrazione Git (una funzionalità Overleaf a pagamento), mentre GitHub, GitLab e Bitbucket richiedono solo un repository e un token di accesso gratuito.",
    "capacity_note": "Il piano gratuito funziona sulla capacità in eccesso e può sospendersi brevemente nei momenti di forte domanda. Pro garantisce un accesso senza interruzioni: non ti viene mai negato l'accesso.",
    "lab": "Scrivi con un laboratorio o un gruppo di ricerca? Chiedici informazioni sui prezzi per laboratori e dipartimenti:"
   },

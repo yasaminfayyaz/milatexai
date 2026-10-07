@@ -1656,6 +1656,11 @@ def create_hosted_server(
     async def og_image(request: Request) -> Response:
         return Response(site.render_og_image(), media_type="image/svg+xml")
 
+    @mcp.custom_route("/favicon.ico", methods=["GET"])
+    async def favicon(request: Request) -> Response:
+        return Response(site.icon_png(), media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=86400"})
+
     @mcp.custom_route("/robots.txt", methods=["GET"])
     async def robots(request: Request) -> Response:
         return Response(site.robots_txt(), media_type="text/plain")

@@ -22,6 +22,7 @@ import json
 from pathlib import Path
 
 _CONTENT_PATH = Path(__file__).with_name("site_content.json")
+_ICON_PATH = Path(__file__).with_name("icon-64.png")
 
 # Endonyms for the language switcher (label shown in each language's own script).
 LANG_NAMES = {
@@ -591,6 +592,7 @@ function applyLang(lang) {{
     return f"""<!doctype html><html lang='en'><head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='icon' type='image/png' href='/favicon.ico'>
 {seo}
 <style>{_CSS}</style>
 </head><body>
@@ -694,6 +696,7 @@ def render_account(
 
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='icon' type='image/png' href='/favicon.ico'>
 <title>{html.escape(heading)} · MiLatexAI</title><style>{_CSS}</style></head>
 <body><main class='section' style='max-width:560px;margin:0 auto;text-align:center;min-height:72vh;display:flex;flex-direction:column;justify-content:center;gap:8px'>
 <a class='brand' href='/' style='margin-bottom:10px'>Mi<span>LaTeX</span>AI</a>
@@ -728,6 +731,7 @@ def render_tools_page() -> str:
     so the homepage stays short and new tools have a home to grow into."""
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='icon' type='image/png' href='/favicon.ico'>
 <title>Free Web Tools for LaTeX Researchers | MiLatexAI</title>
 <meta name='description' content='Free browser-based tools for LaTeX researchers: a BibTeX cleaner with DOI finder and duplicate remover, and a LaTeX error finder. No login, nothing uploaded.'>
 <link rel='canonical' href='https://milatexai.com/tools'>
@@ -773,6 +777,7 @@ def render_legal_page(kind: str, content: dict | None = None) -> str:
     )
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='icon' type='image/png' href='/favicon.ico'>
 <title>{title} · MiLatexAI</title>
 <link rel='canonical' href='https://milatexai.com/{kind}'>
 <meta name='robots' content='index,follow'>
@@ -837,6 +842,12 @@ def llms_txt() -> str:
         "- [GitHub (AGPL, open source)](https://github.com/yasaminfayyaz/milatexai)\n"
         "- [Support](mailto:support@milatexai.com)\n"
     )
+
+
+def icon_png() -> bytes:
+    """The site icon (64 px PNG), served as /favicon.ico for browsers and for the
+    connector list in Claude and ChatGPT."""
+    return _ICON_PATH.read_bytes()
 
 
 def robots_txt() -> str:
