@@ -84,34 +84,54 @@ def image_dpi(path: Path) -> tuple[float, float] | None:
     return None
 
 
-# Runs in a separate process: decoding a huge image takes hundreds of MB once, and if that
-# ever fails it must only cost that process, never the server. Argument order: path, k, the
-# resolution to record in pixels per metre (x, y).
+# Runs in a separate process, so a failure only costs that process, never the server. Pillow
+# decodes a PNG row by row into one buffer (about width x height x channels bytes, once), and a
+# JPEG straight at the reduced size. A damaged or truncated image raises: the original is kept.
+# Arguments: path, k (shrink by 2**k), the resolution to record in pixels per metre (x, y).
 _SHRINK = r"""
-import struct, sys, zlib
-import fitz
+import sys
+from PIL import Image
 path, k, px, py = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
-fitz.TOOLS.mupdf_warnings()
-pix = fitz.Pixmap(path)
-if fitz.TOOLS.mupdf_warnings():   # damaged or truncated: never turn it into a valid-looking image
-    sys.exit(3)
-pix.shrink(k)
-jpg = path.lower().endswith((".jpg", ".jpeg"))
-pix.set_dpi(max(1, round(px * 0.0254)), max(1, round(py * 0.0254)))
-pix.save(path, output="jpg" if jpg else "png")
-if not jpg:
-    data = open(path, "rb").read()
-    body = struct.pack(">IIB", px, py, 1)
-    chunk = struct.pack(">I", 9) + b"pHYs" + body + struct.pack(">I", zlib.crc32(b"pHYs" + body) & 0xFFFFFFFF)
-    i = data.find(b"pHYs")
-    data = data[:i - 4] + chunk + data[i + 17:] if i > 4 else data[:33] + chunk + data[33:]
-    open(path, "wb").write(data)
+Image.MAX_IMAGE_PIXELS = None            # the size was checked by the caller
+with Image.open(path) as im:
+    fmt, (w, h) = im.format, im.size
+    tw, th = max(1, w >> k), max(1, h >> k)
+    if fmt == "JPEG":
+        im.draft(im.mode, (tw, th))      # decode at (close to) the target size
+    im.load()
+    if im.mode not in ("1", "L", "LA", "RGB", "RGBA", "I", "F"):
+        im = im.convert("RGBA" if im.mode in ("P", "PA") and "transparency" in im.info else "RGB")
+    factor = max(1, round(im.size[0] / tw))
+    small = im.reduce(factor) if factor > 1 else im
+    dpi = (px * 0.0254, py * 0.0254)
+    if fmt == "JPEG":
+        small.save(path, format="JPEG", quality=92, dpi=(round(dpi[0]), round(dpi[1])))
+    else:
+        small.save(path, format="PNG", dpi=dpi)
 """
+# Never try to decode more than this (bytes): the server and the engine share the same memory.
+SHRINK_BUDGET = 700 * 1024 * 1024
+
+
+def _decode_bytes(path: Path, width: int, height: int) -> int:
+    """Memory Pillow needs to hold the decoded image (JPEGs decode small, so they are cheap)."""
+    try:
+        with open(path, "rb") as fh:
+            head = fh.read(32)
+    except OSError:
+        return 0
+    if head[:8] == b"\x89PNG\r\n\x1a\n":
+        depth, ctype = head[24], head[25]
+        channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(ctype, 4)
+        return width * height * channels * (2 if depth == 16 else 1)
+    return width * height * 3 // 16
 
 
 def _shrink(path: Path, width: int, height: int) -> bool:
     """Replace ``path`` with a copy at most PREVIEW_MAX_SIDE on its long side and the same
     printed size. False (file untouched) if it could not be done."""
+    if _decode_bytes(path, width, height) > SHRINK_BUDGET:
+        return False
     k = 0
     while max(width, height) / 2 ** k > PREVIEW_MAX_SIDE:
         k += 1

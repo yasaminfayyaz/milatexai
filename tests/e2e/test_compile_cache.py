@@ -240,3 +240,33 @@ def test_a_huge_image_is_previewed_from_a_smaller_copy_at_exactly_the_same_size(
 def texmemory_size(path: Path):
     from leafbridge import texmemory
     return texmemory.image_size(path)
+
+
+def test_shrinking_a_125_megapixel_image_stays_well_inside_one_server_copy(tmp_path):
+    """The real case: 14280 x 8759 with transparency (500 MB decoded). A server copy has 1 GB,
+    shared with the server itself (about 130 MB), so the shrinking must stay far below that."""
+    import struct
+    import sys
+    import zlib
+    if not sys.platform.startswith("linux"):
+        pytest.skip("measures memory with Linux process accounting")
+    w, h = 14280, 8759
+
+    def chunk(kind, data):
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+    row = b"\x00" + bytes([30, 60, 90, 255]) * w
+    comp = zlib.compressobj(1)
+    idat = b"".join(comp.compress(row) for _ in range(h)) + comp.flush()
+    img = tmp_path / "huge.png"
+    img.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 6, 0, 0, 0))
+                    + chunk(b"IDAT", idat) + chunk(b"IEND", b""))
+    probe = ("import resource, sys; from pathlib import Path; from leafbridge import texmemory; "
+             f"ok = texmemory._shrink(Path(sys.argv[1]), {w}, {h}); "
+             "print(ok, resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss // 1024)")
+    out = subprocess.run([sys.executable, "-c", probe, str(img)], capture_output=True, text=True, timeout=600)
+    ok, peak_mb = out.stdout.split()
+    assert ok == "True", out.stderr[-500:]
+    assert int(peak_mb) < 650, f"shrinking peaked at {peak_mb} MB"
+    from leafbridge import texmemory
+    assert texmemory.image_size(img) == (w >> 2, h >> 2)
+    assert texmemory.image_dpi(img) == pytest.approx((18, 18), rel=2e-3)     # 72 dpi / 4

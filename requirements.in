@@ -12,3 +12,4 @@ azure-storage-blob>=12.20  # short-lived download bundles shared by every runnin
 aiohttp>=3.10             # async transport for the Azure SDK
 stripe
 PyMuPDF>=1.24             # render PDF pages to PNG for show_table / show_figure
+pillow>=11                # shrink oversized images for previews without decoding them twice
