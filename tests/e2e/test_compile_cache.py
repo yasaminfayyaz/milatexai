@@ -158,3 +158,28 @@ def test_edits_made_on_the_website_and_through_milatexai_show_up_at_once(tmp_pat
     r, out, img = call(mcp, "show_page", {"page": 3, "project": "paper"})
     assert not r.is_error and img and "Page 3 of 3." in out, out
     assert counts["located"] == 3
+
+
+def _thesis_doc() -> str:
+    """A report with three chapters, one table each: Tables 1.1, 2.1 and 3.1."""
+    parts = [f"{BS}documentclass{{report}}", f"{BS}usepackage{{booktabs}}", f"{BS}begin{{document}}"]
+    for n, name in ((1, "one"), (2, "two"), (3, "three")):
+        parts += [f"{BS}chapter{{Chapter {name}}}", f"Text of chapter {name}.",
+                  f"{BS}begin{{table}}[h]{BS}centering{BS}caption{{Table of chapter {name}}}{BS}label{{tab:{name}}}",
+                  f"{BS}begin{{tabular}}{{lr}}{BS}toprule A & B {BS}{BS} {BS}midrule {n} & {n} {BS}{BS} {BS}bottomrule{BS}end{{tabular}}",
+                  f"{BS}end{{table}}"]
+    parts.append(f"{BS}end{{document}}")
+    return "\n".join(parts) + "\n"
+
+
+def test_a_thesis_numbered_by_chapter_resolves_every_table_and_label(tmp_path, monkeypatch):
+    _need_engine()
+    mcp, _, _, _, _ = _world(tmp_path, monkeypatch, _thesis_doc())
+    _, out, _ = call(mcp, "check_compile", {"project": "paper"})
+    assert "Table 1.1" in out and "Table 2.1" in out and "Table 3.1" in out, out
+    for ref in ("2.1", "Table 3.1", "tab:one", "tab:two", "tab:three"):
+        r, text, img = call(mcp, "show_table", {"table": ref, "project": "paper"})
+        assert not r.is_error and img, (ref, text)
+    # A bare "1" matches 1.1, 2.1 and 3.1: the tool lists them instead of guessing.
+    r, text, img = call(mcp, "show_table", {"table": "1", "project": "paper"})
+    assert not img and "Table 2.1" in text and "tab:two" in text, text

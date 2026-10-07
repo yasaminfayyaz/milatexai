@@ -106,6 +106,9 @@ should win instead of silently regenerating from stale code.
 """
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
+# Larger files are not passed through the chat as base64: download_file gives a link instead,
+# and copy_file copies between projects on the server.
+INLINE_DOWNLOAD_BYTES = 48 * 1024
 
 # Website sign-in cookies.
 SESSION_COOKIE = "mila_session"
@@ -150,7 +153,7 @@ def _float_map(res) -> str:
     if res is None or not res.floats:
         return ""
     lines = ["Where each table/figure landed (use show_table / show_figure to see one):"]
-    for kind, num in sorted(res.floats):
+    for kind, num in sorted(res.floats, key=lambda kn: (kn[0], texlocate.natural(kn[1]))):
         pg = res.floats[(kind, num)].pages
         if not pg:
             continue
@@ -158,7 +161,7 @@ def _float_map(res) -> str:
         lines.append(f"  {kind.title()} {num}: {loc}")
     labeled = sorted((n, p) for n, (_n, p) in res.labels.items() if n.startswith(("tab", "fig")))
     if labeled:
-        lines.append("  Labels: " + ", ".join(f"{n} p.{p}" for n, p in labeled))
+        lines.append("  Labels: " + ", ".join(f"{n} p.{p}" if p else n for n, p in labeled))
     return "\n".join(lines)
 
 
@@ -337,6 +340,18 @@ class HostedApp:
                 await asyncio.to_thread(self.builds.forget, key)
         except Exception:  # noqa: BLE001
             pass
+
+    async def publish_download(self, data: bytes, filename: str, media_type: str) -> str:
+        """Store a file for a short-lived download link and return the link. The stored copy
+        is encrypted with a fresh key that exists only inside the (also encrypted) link, so
+        it is unreadable without the link; links expire after 15 minutes and storage deletes
+        the file within a day."""
+        fname = secrets.token_urlsafe(10) + ".bin"
+        file_key = Fernet.generate_key()
+        await self.service.store.put_download(fname, Fernet(file_key).encrypt(data))
+        code = self.cipher.encrypt(json.dumps(
+            {"k": "dl", "f": fname, "x": file_key.decode(), "n": filename, "t": media_type}))
+        return f"{self.base_url}/dl?code={quote(code, safe='')}"
 
     async def forget_local(self, user_id: str, project_id: str) -> None:
         """Delete this copy's working copy and compile results for one account's project.
@@ -678,11 +693,21 @@ def create_hosted_server(
         try:
             user = await app.user()
             proj = await app.service.add_project(user.user_id, overleaf_url, name, token=token)
+            # Check now that the link and token really open it, instead of failing on first use.
+            reach = await app.worker.can_reach(await app.service.resolve_project(user.user_id, proj.project_id))
+            if reach == "denied":
+                await app.service.store.delete_project(user.user_id, proj.project_id)
+                whose = "the token you gave" if token else "your saved token"
+                raise ToolError(
+                    f"Couldn't open that repository with {whose}, so it was not added. It may not "
+                    "exist, or your account may not have access to it. Check the link and try again.")
         except AlreadyConnected as exc:
             return str(exc)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
-        return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it."
+        note = "" if reach == "ok" else (" (I couldn't confirm access right now; if the first read "
+                                         "fails, check the link and token.)")
+        return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it.{note}"
 
     @mcp.tool(title="Rename a project", annotations={"readOnlyHint": False, "destructiveHint": False})
     async def rename_project(project: str, new_name: str) -> str:
@@ -811,7 +836,7 @@ def create_hosted_server(
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                content = read_text(safe_join(repo, path))
+                content = read_text(safe_join(repo, path), name=path)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         return number_lines(content) if with_line_numbers else content
@@ -824,7 +849,7 @@ def create_hosted_server(
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                content = read_text(safe_join(repo, path))
+                content = read_text(safe_join(repo, path), name=path)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         return f"Sections in {path}:\n{latex.outline(latex.find_sections(content))}"
@@ -837,7 +862,7 @@ def create_hosted_server(
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                content = read_text(safe_join(repo, path))
+                content = read_text(safe_join(repo, path), name=path)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         found = latex.find_section(content, title)
@@ -922,7 +947,7 @@ def create_hosted_server(
                 res = await app.located(proj, repo, main, exe)
                 if not res.pdf_path and texmemory.is_transient(res.message):
                     raise ToolError(res.message)
-                number = texlocate.resolve_number(ref, res)
+                number = texlocate.resolve_number(ref, res, kind)
                 f = res.floats.get((kind, number)) if number is not None else None
                 if f is None or not f.pages:
                     # Can't pin it down. The server does NO semantic matching, so
@@ -1015,11 +1040,12 @@ def create_hosted_server(
     # -- tracked changes + arXiv export ---------------------------------------
 
     @mcp.tool(title="Build a tracked-changes PDF", annotations={"readOnlyHint": True})
-    async def tracked_changes_pdf(ref: str, project: str | None = None):
+    async def tracked_changes_pdf(ref: str, project: str | None = None, pages: list[int] | None = None):
         """A tracked-changes PDF (latexdiff): additions and deletions between a
         commit/checkpoint id (list_checkpoints / get_history) and the CURRENT
         document, rendered as page images, what journals ask for in a revised
-        submission. Nothing is committed."""
+        submission. Nothing is committed. Shows the pages that contain changes (up to 8)
+        and lists them all; pass pages (1-based page numbers) to see specific ones."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -1030,15 +1056,24 @@ def create_hosted_server(
                     raise ToolError("Could not find a root .tex to diff.")
                 old = await app.worker.show_file(proj, ref.strip(), main)
                 pdf = await texdiff.diff_pdf(repo, main, old)
-            pngs = texdiff.pdf_pages_to_pngs(pdf)
+            changed, total = await asyncio.to_thread(texdiff.changed_pages, pdf)
+            show = [p for p in (pages or changed or list(range(1, total + 1))) if 1 <= p <= total][:8]
+            pngs = await asyncio.to_thread(texdiff.pdf_pages_to_pngs, pdf, 8, 130, show)
         except texdiff.TexDiffError as exc:
             raise ToolError(str(exc))
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         from fastmcp.utilities.types import Image
 
-        note = (f"Tracked changes {ref} -> current ({len(pngs)} page(s) shown, "
-                "additions/deletions marked).")
+        if changed:
+            where = (f"Changes are marked on {len(changed)} of {total} page(s): "
+                     f"{texdiff.page_ranges(changed)}.")
+        else:
+            where = (f"No marked-up text was found in the {total} page(s) (changes may be only in "
+                     "figures, tables or math); showing the first pages.")
+        more = " Pass pages=[...] to see the others." if not pages and len(changed) > len(show) else ""
+        note = (f"Tracked changes {ref} -> current. {where} Showing page(s) "
+                f"{texdiff.page_ranges(show) or 'none'} (additions in blue, deletions in red).{more}")
         return [note, *[Image(data=p, format="png") for p in pngs]]
 
     @mcp.tool(title="Prepare an arXiv bundle", annotations={"readOnlyHint": True})
@@ -1064,13 +1099,7 @@ def create_hosted_server(
                 bbl = await arxivprep.compile_bbl(repo, main)
                 blob, manifest = arxivprep.build_zip(repo, main, bbl)
             # Shared storage, not this copy's disk: the link may be opened on another copy.
-            # Stored encrypted with a fresh key that exists only inside the link (which is
-            # itself encrypted), so the stored file is unreadable without the link.
-            fname = secrets.token_urlsafe(10) + ".zip"
-            file_key = Fernet.generate_key()
-            await app.service.store.put_download(fname, Fernet(file_key).encrypt(blob))
-            code = app.cipher.encrypt(json.dumps({"k": "dl", "f": fname, "x": file_key.decode()}))
-            url = f"{app.base_url}/dl?code={quote(code, safe='')}"
+            url = await app.publish_download(blob, "arxiv-submission.zip", "application/zip")
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         files = "\n".join(f"  - {m}" for m in manifest)
@@ -1420,6 +1449,12 @@ def create_hosted_server(
             async with app.worker.open_repo(proj) as repo:
                 found = figures.scan_figures(repo)
                 states = {f.slug: figures.sync_state(repo, f) for f in found}
+                for f in found:
+                    # No header (the normal case now): judge freshness from git history.
+                    if states[f.slug] == figures.UNTRACKED and f.out_exists:
+                        states[f.slug] = figures.history_state(
+                            await app.worker.last_change(proj, f.src),
+                            await app.worker.last_change(proj, f.out))
                 raw_log = await app.worker.log_deleted(proj, figures.SRC_DIR + "/")
             live = {f.slug for f in found}
             deleted = figures.parse_deleted(raw_log, live)
@@ -1433,15 +1468,15 @@ def create_hosted_server(
             lines.append(f"{len(found)} managed figure(s) in {proj.name!r}:")
             state_msgs = {
                 figures.IN_SYNC: "ok, in sync (the source code is ground truth)",
-                figures.CODE_EDITED: ("source was edited since the last render; the PDF is "
-                                      "STALE. Re-render and commit_figure to update it"),
-                figures.ARTIFACT_REPLACED: ("PDF was changed OUTSIDE Figure Studio; the stored "
-                                            "code is NOT ground truth anymore. Ask the user "
-                                            "which version wins before editing"),
-                figures.DIVERGED: ("both the code and the PDF changed independently; ask the "
+                figures.CODE_EDITED: ("source was edited since the last render; the output is "
+                                      "STALE. Re-render and commit again to update it"),
+                figures.ARTIFACT_REPLACED: ("output was changed after it was rendered from this "
+                                            "source; the stored code may NOT be ground truth. Ask "
+                                            "the user which version wins before editing"),
+                figures.DIVERGED: ("both the code and the output changed independently; ask the "
                                    "user which is authoritative before touching either"),
-                figures.OUTPUT_MISSING: "output missing (re-run commit_figure)",
-                figures.UNTRACKED: "no provenance record (hand-made or pre-tracking)",
+                figures.OUTPUT_MISSING: "output missing (re-run commit_figure or commit_tikz)",
+                figures.UNTRACKED: "history too old to tell whether the output matches the source",
             }
             for f in found:
                 state = states.get(f.slug, figures.UNTRACKED)
@@ -1473,7 +1508,7 @@ def create_hosted_server(
 
         def mutate(repo: Path) -> None:
             target = safe_join(repo, path)
-            content = read_text(target, strict=True)
+            content = read_text(target, strict=True, name=path)
             n = content.count(old_string)
             if n == 0:
                 raise PathError(f"old_string not found in {path}; re-read the file.")
@@ -1575,11 +1610,11 @@ def create_hosted_server(
 
     @mcp.tool(title="Download a file", annotations={"readOnlyHint": True})
     async def download_file(path: str, project: str | None = None) -> str:
-        """Read a BINARY file (image, PDF, etc.) as base64, so you can copy it into
-        a DIFFERENT project with upload_file: download_file here, then
-        upload_file(that base64, project=the other project). For text files
-        (.tex/.bib/.sty/...), use read_file instead, plain text, no base64 needed;
-        write_file writes it into the other project the same way.
+        """Get a BINARY file (image, PDF, etc.). Files up to 48 KB come back as base64;
+        larger ones as a download link for the user (valid about 15 minutes), so big
+        files never flood the chat. To copy a file into ANOTHER of the user's projects,
+        use copy_file instead (no base64 needed). For text files (.tex/.bib/.sty/...),
+        use read_file.
         """
         try:
             user = await app.user()
@@ -1595,9 +1630,60 @@ def create_hosted_server(
                         f"File too large to download ({size} bytes; limit {MAX_UPLOAD_BYTES})."
                     )
                 data = target.read_bytes()
+            if size > INLINE_DOWNLOAD_BYTES:
+                import mimetypes
+                media_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
+                url = await app.publish_download(data, Path(path).name, media_type)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
+        if size > INLINE_DOWNLOAD_BYTES:
+            return (f"{path} is {size:,} bytes, too large to pass through the chat. Download link "
+                    f"(valid about 15 minutes): {url}\nTo copy it into another of your projects, "
+                    "use copy_file.")
         return base64.b64encode(data).decode("ascii")
+
+    @mcp.tool(title="Copy a file to another project", annotations={"readOnlyHint": False, "destructiveHint": True})
+    async def copy_file(path: str, to_project: str, to_path: str | None = None,
+                        project: str | None = None) -> str:
+        """Copy a file (any type: image, PDF, .tex, .bib...) from one of the user's projects
+        into ANOTHER of their projects, directly on the server, as one commit in the
+        destination. Replaces a file already at the destination path.
+
+        Args:
+            path: the file in the source project.
+            to_project: the destination project's name or id (list_projects shows them).
+            to_path: where to put it in the destination; defaults to the same path.
+            project: the source project; defaults to the current one.
+        """
+        dest_path = to_path or path
+        try:
+            user = await app.user()
+            await app.ensure_capacity(user)
+            src = await app.resolve_or_onboard(user, project)
+            dest = await app.resolve_or_onboard(user, to_project)
+            if src.project_id == dest.project_id and dest_path.strip("/") == path.strip("/"):
+                raise ToolError("That is the same file in the same project; give a different to_path or to_project.")
+            async with app.worker.open_repo(src) as repo:
+                target = safe_join(repo, path)
+                if not target.is_file():
+                    raise PathError(f"File not found: {path} does not exist in the project. Use list_files to see the files.")
+                size = target.stat().st_size
+                if size > MAX_UPLOAD_BYTES:
+                    raise ToolError(f"File too large to copy ({size} bytes; limit {MAX_UPLOAD_BYTES}).")
+                data = target.read_bytes()
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+
+        def mutate(repo: Path) -> None:
+            out = safe_join(repo, dest_path)
+            out.parent.mkdir(parents=True, exist_ok=True)
+            write_bytes_exact(out, data)
+
+        try:
+            result = await app.apply_and_push(user, dest, mutate, f"Copy {dest_path} from {src.name}")
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        return f"{result}\nCopied {path} ({size:,} bytes) from {src.name!r} to {dest_path} in {dest.name!r}."
 
     # -- web surface: token-out-of-chat onboarding -------------------------
     # These routes live OUTSIDE the MCP bearer auth. They self-authenticate via
@@ -1865,6 +1951,8 @@ def create_hosted_server(
             assert data.get("k") == "dl"
             fname = os.path.basename(str(data["f"]))
             file_key = data.get("x")
+            shown = os.path.basename(str(data.get("n") or "arxiv-submission.zip")).replace('"', "")
+            media_type = str(data.get("t") or "application/zip")
         except Exception:  # noqa: BLE001
             return HTMLResponse(web.render_notice(
                 "Link expired", "This download link is invalid or has expired. "
@@ -1879,9 +1967,9 @@ def create_hosted_server(
             return HTMLResponse(web.render_notice(
                 "Bundle gone", "This bundle is no longer available. "
                 "Run arxiv_export again.", icon="⏰"), status_code=410)
-        return Response(data, media_type="application/zip", headers={
-            "content-disposition": 'attachment; filename="arxiv-submission.zip"',
-            "cache-control": "no-store"})
+        return Response(data, media_type=media_type, headers={
+            "content-disposition": f'attachment; filename="{shown}"',
+            "cache-control": "no-store", "x-content-type-options": "nosniff"})
 
     def _verified(request_code: str):
         """Return (user_id, email) for a valid capability code, else None. Codes

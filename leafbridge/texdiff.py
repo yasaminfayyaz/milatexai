@@ -78,12 +78,51 @@ async def diff_pdf(repo: Path, main_rel: str, old_text: str, timeout: int = 240)
     return await load.run_heavy(_run)
 
 
-def pdf_pages_to_pngs(pdf_bytes: bytes, max_pages: int = 8, dpi: int = 130) -> list[bytes]:
+def _is_markup(color: int) -> bool:
+    """latexdiff's default markup colours: additions blue, deletions red."""
+    r, g, b = (color >> 16) & 255, (color >> 8) & 255, color & 255
+    return (b > 150 and r < 90 and g < 90) or (r > 150 and g < 90 and b < 90)
+
+
+def changed_pages(pdf_bytes: bytes) -> tuple[list[int], int]:
+    """(1-based pages with marked-up text, total pages) of a latexdiff PDF."""
     import fitz
 
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
     try:
-        return [doc[i].get_pixmap(dpi=dpi).tobytes("png")
-                for i in range(min(doc.page_count, max_pages))]
+        found = []
+        for i in range(doc.page_count):
+            spans = (s for blk in doc[i].get_text("dict")["blocks"] for line in blk.get("lines", [])
+                     for s in line.get("spans", []))
+            if any(s.get("text", "").strip() and _is_markup(int(s.get("color", 0))) for s in spans):
+                found.append(i + 1)
+        return found, doc.page_count
     finally:
         doc.close()
+
+
+def pdf_pages_to_pngs(pdf_bytes: bytes, max_pages: int = 8, dpi: int = 130,
+                      pages: list[int] | None = None) -> list[bytes]:
+    """PNG images of ``pages`` (1-based; default the first ``max_pages``), at most max_pages."""
+    import fitz
+
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    try:
+        wanted = [p for p in (pages or range(1, doc.page_count + 1)) if 1 <= p <= doc.page_count]
+        return [doc[p - 1].get_pixmap(dpi=dpi).tobytes("png") for p in wanted[:max_pages]]
+    finally:
+        doc.close()
+
+
+def page_ranges(pages: list[int]) -> str:
+    """[3, 4, 5, 9] -> "3-5, 9"."""
+    out, start, prev = [], None, None
+    for p in pages + [None]:
+        if start is None:
+            start = prev = p
+        elif p == prev + 1:
+            prev = p
+        else:
+            out.append(f"{start}" if start == prev else f"{start}-{prev}")
+            start = prev = p
+    return ", ".join(out)

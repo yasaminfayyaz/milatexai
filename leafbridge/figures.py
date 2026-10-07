@@ -106,7 +106,11 @@ def scan_figures(repo: Path) -> list[FigureInfo]:
         except OSError:
             head = None
         slug = (head or {}).get("figure", p.stem)
-        declared_out = (head or {}).get("output", out_path(slug))
+        # commit_figure / commit_tikz write the user's code verbatim (no header), as .png or
+        # .pdf: without a header, the output is whichever of the two exists.
+        declared_out = (head or {}).get("output") or next(
+            (out_path(slug, ext) for ext in ("png", "pdf") if (repo / out_path(slug, ext)).is_file()),
+            out_path(slug))
         found.append(FigureInfo(
             slug=slug, src=f"{SRC_DIR}/{p.name}", out=declared_out,
             out_exists=(repo / declared_out).is_file(),
@@ -155,6 +159,17 @@ def sync_state(repo: Path, info: FigureInfo) -> str:
     if code_ok:
         return ARTIFACT_REPLACED
     return DIVERGED
+
+
+def history_state(src_commit: tuple[str, int] | None, out_commit: tuple[str, int] | None) -> str:
+    """Sync state of a figure WITHOUT a header, from git: (hash, time) of the last commit
+    that changed its source and its output. commit_figure / commit_tikz change both in one
+    commit, so the same commit means in sync; otherwise the later one says what changed."""
+    if not src_commit or not out_commit:
+        return UNTRACKED                       # older than the history this copy has
+    if src_commit[0] == out_commit[0]:
+        return IN_SYNC
+    return CODE_EDITED if src_commit[1] >= out_commit[1] else ARTIFACT_REPLACED
 
 
 def parse_deleted(git_log_output: str, live_slugs: set[str]) -> dict[str, str]:

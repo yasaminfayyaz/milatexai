@@ -387,3 +387,31 @@ def test_list_figures_lifecycle_including_deletion_memory(tmp_path):
     listing = _text(_call(mcp, "list_figures", {}))
     assert "recoverable from git history" in listing
     assert "git show" in listing and "speedup" in listing
+
+
+# --- list_figures agrees with what commit_figure / commit_tikz actually commit -----------------
+
+def test_a_png_figure_lists_its_real_output_and_is_in_sync(tmp_path):
+    mcp, _s, _t = _harness(tmp_path)
+    _call(mcp, "commit_figure", {"code": CODE, "name": "speedup"})           # PNG is the default
+    listing = _text(_call(mcp, "list_figures", {}))
+    assert "output figures/speedup.png" in listing and "figures/speedup.pdf" not in listing
+    assert "in sync" in listing and "history too old" not in listing
+
+
+def test_list_figures_notices_a_source_edited_after_rendering(tmp_path):
+    mcp, _s, _t = _harness(tmp_path)
+    _call(mcp, "commit_figure", {"code": CODE, "name": "speedup"})
+    _call(mcp, "edit_file", {"path": "figures/src/speedup.py", "old_string": "[3,4]", "new_string": "[3,5]"})
+    listing = _text(_call(mcp, "list_figures", {}))
+    assert "source was edited since the last render" in listing
+
+
+def test_list_figures_notices_an_output_replaced_after_rendering(tmp_path):
+    import base64
+    mcp, _s, _t = _harness(tmp_path)
+    _call(mcp, "commit_figure", {"code": CODE, "name": "speedup"})
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"0" * 64).decode()
+    _call(mcp, "upload_file", {"path": "figures/speedup.png", "content_base64": png})
+    listing = _text(_call(mcp, "list_figures", {}))
+    assert "output was changed after it was rendered" in listing

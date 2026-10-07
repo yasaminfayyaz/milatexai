@@ -37,7 +37,7 @@ INSTRUMENT = r"""
 \makeatletter
 \newcommand{\mila@begin}{\stepcounter{milainst}\zlabel{milaS\themilainst}}
 \newcommand{\mila@end}[1]{\zlabel{milaE\themilainst}%
-  \protected@write\@auxout{}{\string\milafloat{\themilainst}{#1}{\the\value{#1}}{}}}
+  \protected@write\@auxout{}{\string\milafloat{\themilainst}{#1}{\csname the#1\endcsname}{}}}
 \AtBeginEnvironment{table}{\mila@begin}\AtEndEnvironment{table}{\mila@end{table}}
 \AtBeginEnvironment{figure}{\mila@begin}\AtEndEnvironment{figure}{\mila@end{figure}}
 \AtBeginEnvironment{longtable}{\mila@begin}\AtEndEnvironment{longtable}{\mila@end{table}}
@@ -48,15 +48,15 @@ INSTRUMENT = r"""
 """
 
 _DOCSTART = re.compile(r"\\begin\{document\}")
-_MILAFLOAT = re.compile(r"\\milafloat\{(\d+)\}\{(\w+)\}\{(\d+)\}\{([^}]*)\}")
+_MILAFLOAT = re.compile(r"\\milafloat\{(\d+)\}\{(\w+)\}\{([^}]*)\}\{([^}]*)\}")
 _ZREF = re.compile(r"\\zref@newlabel\{mila([SE])(\d+)\}\{.*?\\abspage\{(\d+)\}")
-_NEWLABEL = re.compile(r"\\newlabel\{([^}]+)\}\{\{([^}]*)\}\{(\d+)\}")
+_NEWLABEL = re.compile(r"\\newlabel\{([^}]+)\}\{\{([^}]*)\}\{([^}]*)\}")
 
 
 @dataclass
 class Float:
     kind: str  # "table" or "figure"
-    number: int
+    number: str  # as printed: "4", or "2.1" when numbered within chapters
     start_page: int | None = None
     end_page: int | None = None
 
@@ -81,7 +81,7 @@ def instrument(source: str) -> str:
     return source[: m.start()] + INSTRUMENT + source[m.start() :]
 
 
-def parse_aux(aux: str) -> tuple[dict[tuple[str, int], Float], dict[str, tuple[str, int]]]:
+def parse_aux(aux: str) -> tuple[dict[tuple[str, str], Float], dict[str, tuple[str, int | None]]]:
     """Parse an instrumented ``.aux``.
 
     Returns ``(floats, labels)`` where ``floats`` maps ``(kind, number)`` to a
@@ -92,23 +92,28 @@ def parse_aux(aux: str) -> tuple[dict[tuple[str, int], Float], dict[str, tuple[s
     ends: dict[int, int] = {}
     for se, inst, page in _ZREF.findall(aux):
         (starts if se == "S" else ends)[int(inst)] = int(page)
-    floats: dict[tuple[str, int], Float] = {}
+    floats: dict[tuple[str, str], Float] = {}
     for inst, kind, number, _cap in _MILAFLOAT.findall(aux):
         i = int(inst)
-        f = Float(kind=kind, number=int(number), start_page=starts.get(i), end_page=ends.get(i))
-        floats[(kind, int(number))] = f
-    labels: dict[str, tuple[str, int]] = {}
+        number = number.strip()
+        floats[(kind, number)] = Float(kind=kind, number=number, start_page=starts.get(i), end_page=ends.get(i))
+    labels: dict[str, tuple[str, int | None]] = {}
     for name, num, page in _NEWLABEL.findall(aux):
-        if not name.startswith("mila"):
-            labels[name] = (num, int(page))
+        if not name.startswith("mila") and "@" not in name:     # skip cleveref's name@cref copies
+            labels[name] = (num.strip(), int(page) if page.strip().isdigit() else None)
     return floats, labels
+
+
+def natural(number: str) -> tuple:
+    """Sort key for printed numbers: 2.10 after 2.9, A.1 after the numbered chapters."""
+    return tuple((0, int(p), "") if p.isdigit() else (1, 0, p) for p in re.split(r"[.\-]", number))
 
 
 @dataclass
 class LocateResult:
     ok: bool
-    floats: dict[tuple[str, int], Float] = field(default_factory=dict)
-    labels: dict[str, tuple[str, int]] = field(default_factory=dict)
+    floats: dict[tuple[str, str], Float] = field(default_factory=dict)
+    labels: dict[str, tuple[str, int | None]] = field(default_factory=dict)
     pdf_path: str | None = None
     message: str = ""
     clean: bool = False         # the compile itself succeeded (exit 0 and a PDF), not just "floats found"
@@ -165,45 +170,53 @@ def compile_and_locate(
     )
 
 
-_REFNUM = re.compile(r"(?:table|figure|fig\.?|tab\.?)?\s*#?\s*(\d+)\s*$", re.I)
+_REFNUM = re.compile(r"(?:table|tab\.?|figure|fig\.?)?\s*#?\s*([A-Za-z]?[\w.\-]*\d[\w.\-]*)\s*$", re.I)
 
 
-def resolve_number(ref: str, res: "LocateResult") -> int | None:
-    """Turn a caller-supplied reference into a float number.
+def resolve_number(ref: str, res: "LocateResult", kind: str | None = None) -> str | None:
+    """Turn a caller-supplied reference into a float's printed number.
 
-    Accepts a bare number ("4"), a "Table 4" / "Fig 3" style string, or a user
-    ``\\label`` (looked up in the parsed .aux). Returns None if it can't resolve,
-    in which case the caller should list the available floats.
+    Accepts a user ``\\label`` (looked up in the parsed .aux), the printed number ("4",
+    "2.1"), or a "Table 2.1" / "Fig 3" style string. A bare "1" in a document numbered by
+    chapter is used only when exactly one float of ``kind`` ends in ".1". Returns None when
+    it can't resolve, or when it is ambiguous; the caller then lists the floats.
     """
     ref = (ref or "").strip()
     if not ref:
         return None
     lab = res.labels.get(ref)
     if lab:
-        try:
-            return int(lab[0])
-        except ValueError:
-            pass
-    if ref.isdigit():
-        return int(ref)
+        return lab[0]
     m = _REFNUM.match(ref)
-    return int(m.group(1)) if m else None
+    core = m.group(1) if m else None
+    if not core:
+        return None
+    kinds = [kind] if kind else sorted({k for k, _ in res.floats})
+    if any((k, core) in res.floats for k in kinds) or not res.floats:
+        return core
+    if core.isdigit():
+        tails = {n for (k, n) in res.floats if k in kinds and re.split(r"[.\-]", n)[-1] == core}
+        if len(tails) == 1:
+            return tails.pop()
+    return None
 
 
 def float_listing(res: "LocateResult", kind: str) -> str:
     """A human/LLM-readable list of the floats of ``kind`` with page + label."""
     labels_by_num: dict[str, str] = {}
     prefix = "tab" if kind == "table" else "fig"
-    for name, (num, _p) in res.labels.items():
+    for name, (num, _p) in sorted(res.labels.items()):
         if name.startswith(prefix):
             labels_by_num.setdefault(num, name)
     rows = []
-    for (k, n) in sorted(res.floats):
+    for (k, n) in sorted(res.floats, key=lambda kn: (kn[0], natural(kn[1]))):
         if k != kind:
             continue
         pg = res.floats[(k, n)].pages
+        if not pg:
+            continue
         loc = f"p.{pg[0]}" if len(pg) == 1 else f"p.{pg[0]}-{pg[-1]}"
-        lab = labels_by_num.get(str(n))
+        lab = labels_by_num.get(n)
         rows.append(f"  {kind.title()} {n}: {loc}" + (f"  (\\label {{{lab}}})" if lab else ""))
     if not rows:
         return f"No {kind}s were found in this document."
@@ -244,11 +257,11 @@ def _main() -> None:
     res = compile_and_locate(repo, os.path.basename(tex), tectonic,
                              cache_dir=os.environ.get("TECTONIC_CACHE_DIR"))
     print("ok:", res.ok, "|", res.message)
-    for (kind, num), f in sorted(res.floats.items()):
+    for (kind, num), f in sorted(res.floats.items(), key=lambda kv: (kv[0][0], natural(kv[0][1]))):
         span = f" (spans {f.pages[0]}-{f.pages[-1]})" if f.spans else ""
         print(f"  {kind.title()} {num}: page {f.pages[0] if f.pages else '?'}{span}")
     if len(sys.argv) > 3:
-        kind, num = sys.argv[2], int(sys.argv[3])
+        kind, num = sys.argv[2], sys.argv[3]
         f = res.floats.get((kind, num))
         print(f"\nLOCATE {kind} {num}: pages {f.pages if f else 'not found'}")
 

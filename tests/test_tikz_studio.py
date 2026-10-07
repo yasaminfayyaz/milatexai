@@ -140,3 +140,15 @@ def test_real_tikz_render():
     assert pdf.startswith(b"%PDF")
     png = figures.pdf_to_png(pdf)
     assert png[:8] == b"\x89PNG\r\n\x1a\n"
+
+
+def test_a_tikz_diagram_lists_as_in_sync_with_its_png(tmp_path, monkeypatch):
+    mcp = _harness(tmp_path)
+    pdf = _fake_pdf()
+
+    async def fake_render(code, timeout=150):
+        return pdf
+    monkeypatch.setattr(tikz, "render_pdf", fake_render)
+    _call(mcp, "commit_tikz", {"code": SNIPPET, "name": "flow chart"})
+    listing = _text(_call(mcp, "list_figures", {}))
+    assert "flow-chart" in listing and "output figures/flow-chart.png" in listing and "in sync" in listing

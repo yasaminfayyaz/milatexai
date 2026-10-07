@@ -84,7 +84,7 @@ def list_source_files(repo_root: Path, all_files: bool = False) -> list[FileEntr
     return entries
 
 
-def read_text(path: Path, *, strict: bool = False) -> str:
+def read_text(path: Path, *, strict: bool = False, name: str | None = None) -> str:
     """Read a text file, raising PathError for missing/binary/oversized files.
 
     With ``strict=True`` (used by the edit path) a non-UTF-8 file raises PathError
@@ -93,7 +93,9 @@ def read_text(path: Path, *, strict: bool = False) -> str:
     across the entire file (e.g. a Latin-1 .bib with accented names).
     """
     if not path.exists():
-        raise PathError("File not found: does not exist in the project.")
+        shown = name or path.name          # the project-relative path, never a server path
+        raise PathError(f"File not found: {shown} does not exist in the project. "
+                        "Use list_files to see the files.")
     if not path.is_file():
         raise PathError("Path is a directory, not a file.")
     try:

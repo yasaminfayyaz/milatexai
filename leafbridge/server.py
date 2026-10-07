@@ -177,7 +177,7 @@ async def read_file(
     try:
         proj, worker = STATE.resolve(project)
         async with worker.open_repo(proj) as repo:
-            content = read_text(safe_join(repo, path))
+            content = read_text(safe_join(repo, path), name=path)
     except Exception as exc:
         raise _wrap_fs_errors(exc)
     return number_lines(content) if with_line_numbers else content
@@ -194,7 +194,7 @@ async def get_sections(path: str, project: str | None = None) -> str:
     try:
         proj, worker = STATE.resolve(project)
         async with worker.open_repo(proj) as repo:
-            content = read_text(safe_join(repo, path))
+            content = read_text(safe_join(repo, path), name=path)
     except Exception as exc:
         raise _wrap_fs_errors(exc)
     sections = latex.find_sections(content)
@@ -213,7 +213,7 @@ async def read_section(path: str, title: str, project: str | None = None) -> str
     try:
         proj, worker = STATE.resolve(project)
         async with worker.open_repo(proj) as repo:
-            content = read_text(safe_join(repo, path))
+            content = read_text(safe_join(repo, path), name=path)
     except Exception as exc:
         raise _wrap_fs_errors(exc)
     found = latex.find_section(content, title)
@@ -361,7 +361,7 @@ async def edit_file(
 
     def mutate(repo: Path) -> None:
         target = safe_join(repo, path)
-        content = read_text(target, strict=True)
+        content = read_text(target, strict=True, name=path)
         count = content.count(old_string)
         if count == 0:
             raise PathError(

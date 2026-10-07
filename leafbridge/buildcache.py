@@ -28,7 +28,7 @@ from .texmemory import is_transient
 
 # Bump when the way results are produced changes (for example the float locator), so
 # results built the old way are never reused.
-CACHE_VERSION = "2"
+CACHE_VERSION = "3"
 KEEP_PER_PROJECT = 3
 
 
@@ -147,7 +147,7 @@ def to_locate(loc: Located):
     floats = {}
     for key, (start, end) in loc.floats.items():
         kind, num = key.split(":", 1)
-        floats[(kind, int(num))] = Float(kind=kind, number=int(num), start_page=start, end_page=end)
+        floats[(kind, num)] = Float(kind=kind, number=num, start_page=start, end_page=end)
     labels = {name: (num, page) for name, (num, page) in loc.labels.items()}
     return LocateResult(ok=bool(floats), floats=floats, labels=labels, pdf_path=loc.pdf_path,
                         message=loc.message, clean=loc.clean, pages=loc.pages)

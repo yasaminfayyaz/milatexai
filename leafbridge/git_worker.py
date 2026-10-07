@@ -313,6 +313,36 @@ class GitWorker:
         await self.ensure_repo(project)
         return await self._git(project, ["show", f"{ref}:{path}"])
 
+    async def can_reach(self, project: ProjectConfig) -> str:
+        """Whether the remote answers for this project with its token, in one light call that
+        only lists branch names: "ok", "denied" (it does not exist, or the token cannot open
+        it) or "unknown" (the host is busy or unreachable right now)."""
+        try:
+            await self._git(project, ["ls-remote", "--heads", project.authed_url()], cwd=self.data_dir)
+            return "ok"
+        except GitError as exc:
+            msg = str(exc).lower()
+        if any(m in msg for m in _RATE_LIMIT_MARKERS):
+            return "unknown"
+        if any(m in msg for m in (" 401", " 403", " 404", "error: 401", "error: 403", "error: 404")):
+            return "denied"
+        if any(m in msg for m in ("could not resolve", "timed out", "timeout", "connection", "network")):
+            return "unknown"
+        if any(m in msg for m in ("not found", "authentication failed", "could not read username",
+                                  "does not appear to be a git repository", "access denied", "permission")):
+            return "denied"
+        return "unknown"
+
+    async def last_change(self, project: ProjectConfig, path: str) -> tuple[str, int] | None:
+        """(commit hash, commit time) of the last commit that changed ``path``, within the
+        history this working copy has; None if there is none. Never fails a request."""
+        try:
+            out = (await self._git(project, ["log", "-1", "--format=%H %ct", "--", path])).strip()
+            sha, ts = out.split()
+            return sha, int(ts)
+        except (GitError, ValueError):
+            return None
+
     async def log_deleted(self, project: ProjectConfig, prefix: str) -> str:
         """Raw ``git log`` of deletions under ``prefix`` (within the shallow-clone
         window), used to remember figures whose source was deleted. Best-effort:
