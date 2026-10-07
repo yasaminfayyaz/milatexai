@@ -35,14 +35,31 @@ INSTRUMENT = r"""
 \providecommand{\milafloat}[4]{}
 \newcounter{milainst}
 \makeatletter
-\newcommand{\mila@begin}{\stepcounter{milainst}\zlabel{milaS\themilainst}}
+% Start: remember the float counter, so a float without a caption (which never steps it)
+% is written with an empty number instead of borrowing its neighbour's.
+\newcommand{\mila@begin}[1]{\stepcounter{milainst}\zlabel{milaS\themilainst}%
+  \edef\mila@start{\the\value{#1}}}
+% End: the PRINTED number (\thetable, e.g. 2.1 in a thesis), not the raw counter.
 \newcommand{\mila@end}[1]{\zlabel{milaE\themilainst}%
-  \protected@write\@auxout{}{\string\milafloat{\themilainst}{#1}{\csname the#1\endcsname}{}}}
-\AtBeginEnvironment{table}{\mila@begin}\AtEndEnvironment{table}{\mila@end{table}}
-\AtBeginEnvironment{figure}{\mila@begin}\AtEndEnvironment{figure}{\mila@end{figure}}
-\AtBeginEnvironment{longtable}{\mila@begin}\AtEndEnvironment{longtable}{\mila@end{table}}
-\AtBeginEnvironment{table*}{\mila@begin}\AtEndEnvironment{table*}{\mila@end{table}}
-\AtBeginEnvironment{figure*}{\mila@begin}\AtEndEnvironment{figure*}{\mila@end{figure}}
+  \ifnum\value{#1}=\mila@start\relax
+    \protected@write\@auxout{}{\string\milafloat{\themilainst}{#1}{}{}}%
+  \else
+    \protected@write\@auxout{}{\string\milafloat{\themilainst}{#1}{\csname the#1\endcsname}{}}%
+  \fi}
+\AtBeginEnvironment{table}{\mila@begin{table}}\AtEndEnvironment{table}{\mila@end{table}}
+\AtBeginEnvironment{table*}{\mila@begin{table}}\AtEndEnvironment{table*}{\mila@end{table}}
+\AtBeginEnvironment{longtable}{\mila@begin{table}}\AtEndEnvironment{longtable}{\mila@end{table}}
+\AtBeginEnvironment{xltabular}{\mila@begin{table}}\AtEndEnvironment{xltabular}{\mila@end{table}}
+\AtBeginEnvironment{sidewaystable}{\mila@begin{table}}\AtEndEnvironment{sidewaystable}{\mila@end{table}}
+\AtBeginEnvironment{sidewaystable*}{\mila@begin{table}}\AtEndEnvironment{sidewaystable*}{\mila@end{table}}
+\AtBeginEnvironment{wraptable}{\mila@begin{table}}\AtEndEnvironment{wraptable}{\mila@end{table}}
+\AtBeginEnvironment{SCtable}{\mila@begin{table}}\AtEndEnvironment{SCtable}{\mila@end{table}}
+\AtBeginEnvironment{figure}{\mila@begin{figure}}\AtEndEnvironment{figure}{\mila@end{figure}}
+\AtBeginEnvironment{figure*}{\mila@begin{figure}}\AtEndEnvironment{figure*}{\mila@end{figure}}
+\AtBeginEnvironment{sidewaysfigure}{\mila@begin{figure}}\AtEndEnvironment{sidewaysfigure}{\mila@end{figure}}
+\AtBeginEnvironment{sidewaysfigure*}{\mila@begin{figure}}\AtEndEnvironment{sidewaysfigure*}{\mila@end{figure}}
+\AtBeginEnvironment{wrapfigure}{\mila@begin{figure}}\AtEndEnvironment{wrapfigure}{\mila@end{figure}}
+\AtBeginEnvironment{SCfigure}{\mila@begin{figure}}\AtEndEnvironment{SCfigure}{\mila@end{figure}}
 \makeatother
 %% ---- end MiLatexAI float locator ----
 """
@@ -96,6 +113,8 @@ def parse_aux(aux: str) -> tuple[dict[tuple[str, str], Float], dict[str, tuple[s
     for inst, kind, number, _cap in _MILAFLOAT.findall(aux):
         i = int(inst)
         number = number.strip()
+        if not number:          # no caption, so no number of its own: not addressable by number
+            continue
         floats[(kind, number)] = Float(kind=kind, number=number, start_page=starts.get(i), end_page=ends.get(i))
     labels: dict[str, tuple[str, int | None]] = {}
     for name, num, page in _NEWLABEL.findall(aux):

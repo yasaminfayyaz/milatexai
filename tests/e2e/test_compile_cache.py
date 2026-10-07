@@ -162,12 +162,17 @@ def test_edits_made_on_the_website_and_through_milatexai_show_up_at_once(tmp_pat
 
 def _thesis_doc() -> str:
     """A report with three chapters, one table each: Tables 1.1, 2.1 and 3.1."""
-    parts = [f"{BS}documentclass{{report}}", f"{BS}usepackage{{booktabs}}", f"{BS}begin{{document}}"]
+    parts = [f"{BS}documentclass{{report}}", f"{BS}usepackage{{booktabs}}", f"{BS}usepackage{{xltabular}}",
+             f"{BS}begin{{document}}"]
     for n, name in ((1, "one"), (2, "two"), (3, "three")):
         parts += [f"{BS}chapter{{Chapter {name}}}", f"Text of chapter {name}.",
                   f"{BS}begin{{table}}[h]{BS}centering{BS}caption{{Table of chapter {name}}}{BS}label{{tab:{name}}}",
                   f"{BS}begin{{tabular}}{{lr}}{BS}toprule A & B {BS}{BS} {BS}midrule {n} & {n} {BS}{BS} {BS}bottomrule{BS}end{{tabular}}",
                   f"{BS}end{{table}}"]
+    # A long table of the xltabular kind (numbered 3.2) and a table with no caption (no number).
+    parts += [f"{BS}begin{{xltabular}}{{{BS}linewidth}}{{lX}}{BS}caption{{Long table}}{BS}label{{tab:long}}{BS}{BS}",
+              f"A & B {BS}{BS}", f"{BS}end{{xltabular}}",
+              f"{BS}begin{{table}}[h]{BS}centering{BS}begin{{tabular}}{{ll}}x & y{BS}end{{tabular}}{BS}end{{table}}"]
     parts.append(f"{BS}end{{document}}")
     return "\n".join(parts) + "\n"
 
@@ -176,8 +181,9 @@ def test_a_thesis_numbered_by_chapter_resolves_every_table_and_label(tmp_path, m
     _need_engine()
     mcp, _, _, _, _ = _world(tmp_path, monkeypatch, _thesis_doc())
     _, out, _ = call(mcp, "check_compile", {"project": "paper"})
-    assert "Table 1.1" in out and "Table 2.1" in out and "Table 3.1" in out, out
-    for ref in ("2.1", "Table 3.1", "tab:one", "tab:two", "tab:three"):
+    assert "Table 1.1" in out and "Table 2.1" in out and "Table 3.1" in out and "Table 3.2" in out, out
+    assert "Table 3.0" not in out and "Table 0" not in out, out           # the uncaptioned table
+    for ref in ("2.1", "Table 3.1", "tab:one", "tab:two", "tab:three", "tab:long", "3.2"):
         r, text, img = call(mcp, "show_table", {"table": ref, "project": "paper"})
         assert not r.is_error and img, (ref, text)
     # A bare "1" matches 1.1, 2.1 and 3.1: the tool lists them instead of guessing.

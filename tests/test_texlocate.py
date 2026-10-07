@@ -165,4 +165,21 @@ def test_a_thesis_listing_is_in_reading_order_with_labels():
 
 def test_the_instrument_records_the_printed_number():
     out = texlocate.instrument("\\documentclass{report}\n\\begin{document}\nx\n\\end{document}")
-    assert r"\csname the#1\endcsname" in out and r"\the\value{#1}" not in out
+    # The number written for each float is the printed one, not the raw counter.
+    assert r"\milafloat{\themilainst}{#1}{\csname the#1\endcsname}{}" in out
+    assert r"\milafloat{\themilainst}{#1}{\the\value{#1}}" not in out
+
+
+def test_floats_without_a_caption_have_no_number_and_are_skipped():
+    aux = (r"\milafloat{1}{table}{}{}" "\n" r"\milafloat{2}{table}{2.1}{}" "\n"
+           r"\zref@newlabel{milaS1}{\default{1}\page{3}\abspage{3}}" "\n"
+           r"\zref@newlabel{milaE1}{\default{1}\page{3}\abspage{3}}" "\n"
+           r"\zref@newlabel{milaS2}{\default{1}\page{4}\abspage{4}}" "\n"
+           r"\zref@newlabel{milaE2}{\default{1}\page{4}\abspage{4}}" "\n")
+    floats, _ = texlocate.parse_aux(aux)
+    assert list(floats) == [("table", "2.1")]
+
+
+def test_the_common_table_and_figure_environments_are_all_watched():
+    for env in ("table", "longtable", "xltabular", "sidewaystable", "wraptable", "figure", "sidewaysfigure", "wrapfigure"):
+        assert r"\AtBeginEnvironment{" + env + "}" in texlocate.INSTRUMENT, env
