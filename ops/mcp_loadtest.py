@@ -113,10 +113,10 @@ class User:
                           "tool": "initialize", "kind": f"http{status}", "s": 0, "note": ""})
             return False
         self.protocol = reply["result"]["protocolVersion"]
-        _, listed = await self.rpc("tools/call", {"name": "list_projects", "arguments": {}})
-        text = json.dumps(listed or {})
-        if "paper" not in text:
-            await self.tool("connect_project", {"overleaf_url": REPO_URL, "token": REPO_TOKEN, "name": "paper"})
+        # Always reconnect, so the CURRENT token is the one saved (a project left over from an
+        # earlier run would keep an older token, possibly read-only).
+        await self.rpc("tools/call", {"name": "disconnect_project", "arguments": {"project": "paper"}})
+        await self.tool("connect_project", {"overleaf_url": REPO_URL, "token": REPO_TOKEN, "name": "paper"})
         return True
 
     async def work(self, stop: asyncio.Event) -> None:
