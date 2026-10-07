@@ -35,6 +35,7 @@ REPO_TOKEN = os.environ["REPO_TOKEN"]
 APP = os.environ.get("APP", "milatexai-drill")
 STEPS = [int(x) for x in os.environ.get("STEPS", "2,4,8,12,16,20").split(",")]
 STEP_SECONDS = int(os.environ.get("STEP_SECONDS", "180"))
+EDITS = os.environ.get("EDITS", "1") == "1"     # authors edit their own note file (needs a write token)
 THINK = (3.0, 8.0)
 HEAVY = {"check_compile", "show_page", "show_table"}
 T0 = time.time()
@@ -97,7 +98,8 @@ class User:
                 if reply.get("error"):
                     kind, text = "rpc_error", str(reply["error"])[:200]
                 elif result.get("isError"):
-                    kind = "busy" if "busy right now" in text else "hourly" if "this hour" in text else "tool_error"
+                    kind = ("busy" if "busy right now" in text else "hourly" if "this hour" in text
+                            else "limit" if "free commits" in text else "tool_error")
         except Exception as exc:  # noqa: BLE001
             kind, text = type(exc).__name__, str(exc)[:200]
         calls.append({"t": time.time() - T0, "step": current_step["users"], "user": self.i, "tier": self.tier,
@@ -125,9 +127,22 @@ class User:
                    ("read_file", lambda: {"path": f"sections/s{random.randint(1, 8)}.tex"}, 20),
                    ("get_sections", lambda: {"path": "main.tex"}, 15)]
         names, makers, weights = zip(*[(a, m, w) for a, m, w in actions])
+        notes: list[str] = []
+        just_edited = False
         while not stop.is_set():
-            k = random.choices(range(len(names)), weights=weights)[0]
-            await self.tool(names[k], {**makers[k](), "project": "paper"})
+            if just_edited and random.random() < 0.7:
+                await self.tool("check_compile", {"project": "paper"})       # people check right after editing
+                just_edited = False
+            elif EDITS and random.random() < 0.2:
+                # A real commit and push: this author's own note file (included in the paper).
+                notes.append(f"Note {len(notes) + 1} from author {self.i}: the {random.choice(['method', 'result', 'table', 'proof'])} needs another look.")
+                body = "".join(n + chr(10) + chr(10) for n in notes)
+                await self.tool("write_file", {"path": f"notes/u{self.i}.tex", "content": body, "project": "paper",
+                                               "allow_shrink": True})
+                just_edited = True
+            else:
+                k = random.choices(range(len(names)), weights=weights)[0]
+                await self.tool(names[k], {**makers[k](), "project": "paper"})
             try:
                 await asyncio.wait_for(stop.wait(), random.uniform(*THINK))
             except asyncio.TimeoutError:
@@ -169,15 +184,18 @@ def summarize() -> dict:
         for tier in ("pro", "free"):
             rs = [c for c in rows if c["tier"] == tier]
             heavy = [c["s"] for c in rs if c["tool"] in HEAVY and c["kind"] == "ok"]
+            writes = [c["s"] for c in rs if c["tool"] == "write_file" and c["kind"] == "ok"]
             light = [c["s"] for c in rs if c["tool"] not in HEAVY and c["kind"] == "ok"]
             kinds = defaultdict(int)
             for c in rs:
                 kinds[c["kind"]] += 1
             tiers[tier] = {"calls": len(rs), "outcomes": dict(kinds), "compile_p50_s": pct(heavy, .5),
-                           "compile_p95_s": pct(heavy, .95), "compile_max_s": pct(heavy, 1.0), "light_p95_s": pct(light, .95)}
+                           "compile_p95_s": pct(heavy, .95), "compile_max_s": pct(heavy, 1.0), "light_p95_s": pct(light, .95),
+                           "edits_ok": len(writes), "edit_p95_s": pct(writes, .95),
+                           "instant_share": round(sum(1 for x in heavy if x < 5) / len(heavy), 2) if heavy else None}
         cps = [c for (_, u, c) in copies if u == n and c >= 0]
         steps.append({"users": n, "copies_min": min(cps) if cps else None, "copies_max": max(cps) if cps else None, **tiers})
-    errors = [c for c in calls if c["kind"] not in ("ok", "busy", "hourly")]
+    errors = [c for c in calls if c["kind"] not in ("ok", "busy", "hourly", "limit")]
     return {"summary": True, "steps": steps, "real_errors": len(errors),
             "error_examples": [{k: e[k] for k in ("tool", "tier", "kind", "note")} for e in errors[:8]],
             "pro_not_served": sum(1 for c in calls if c["tier"] == "pro" and c["kind"] != "ok")}
