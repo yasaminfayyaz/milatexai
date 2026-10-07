@@ -75,6 +75,28 @@ class AccountService:
             await self.store.upsert_user(user)
         return user
 
+    async def link_identity(self, external_id: str, email: str, email_verified: bool) -> str:
+        """The MiLatexAI account id for a sign-in from another WorkOS environment.
+
+        Remembered links win. Otherwise the existing account with the same VERIFIED email
+        is used (so projects, plan and Stripe subscription carry over), preferring the one
+        with a subscription, then Pro, then projects. With no match, or an unverified
+        email, the new id becomes the account. Either way the answer is remembered."""
+        linked = await self.store.get_link(external_id)
+        if linked:
+            return linked
+        target = external_id
+        if email and email_verified:
+            matches = await self.store.find_user_by_email(email)
+            if matches:
+                async def rank(u):
+                    has_projects = bool(await self.store.list_projects(u.user_id))
+                    return (bool(u.stripe_customer_id), u.plan == "pro", has_projects, u.user_id)
+                ranked = [(await rank(u), u) for u in matches]
+                target = max(ranked, key=lambda r: r[0])[1].user_id
+        await self.store.put_link(external_id, target)
+        return target
+
     # -- onboarding: connect a project -------------------------------------
 
     async def connect_project(

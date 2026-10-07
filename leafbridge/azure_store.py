@@ -49,7 +49,7 @@ class AzureTableStore(Store):
 
     async def _ensure(self) -> None:
         if not self._ready:
-            for base in ("users", "projects", "usage", "heads"):
+            for base in ("users", "projects", "usage", "heads", "links"):
                 await self._svc.create_table_if_not_exists(self._name(base))
             self._ready = True
 
@@ -225,6 +225,32 @@ class AzureTableStore(Store):
                 pass
             self._container = container
         return self._container
+
+    async def get_link(self, external_id: str) -> str | None:
+        await self._ensure()
+        try:
+            e = await self._table("links").get_entity("workos", external_id)
+        except ResourceNotFoundError:
+            return None
+        return e.get("user_id") or None
+
+    async def put_link(self, external_id: str, user_id: str) -> None:
+        await self._ensure()
+        await self._table("links").upsert_entity(
+            {"PartitionKey": "workos", "RowKey": external_id, "user_id": user_id}, mode=UpdateMode.REPLACE)
+
+    async def find_user_by_email(self, email: str) -> list[User]:
+        # Runs once per person (the link is remembered), so a scan of the users table is fine.
+        want = email.strip().lower()
+        if not want:
+            return []
+        await self._ensure()
+        ids = []
+        async for e in self._table("users").query_entities(
+                "PartitionKey eq 'user'", select=["RowKey", "email"]):
+            if (e.get("email") or "").strip().lower() == want:
+                ids.append(e["RowKey"])
+        return [u for u in [await self.get_user(i) for i in ids] if u is not None]
 
     async def put_download(self, name: str, data: bytes) -> None:
         container = await self._downloads()

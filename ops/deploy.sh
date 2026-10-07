@@ -99,13 +99,29 @@ if [ "$CUR_POLICY" != "$POLICY" ]; then
   echo "scale policy set: $POLICY"
 fi
 
+# Sign-in (WorkOS). Accounts were created in the WorkOS STAGING environment; the PRODUCTION
+# environment runs alongside it. SIGNIN picks the one new sign-ins use (Claude, ChatGPT and the
+# website); the other stays trusted, so existing connections keep working, and a production
+# sign-in is linked to the existing account by verified email (hosted.workos_environments).
+# Production's API key is the app secret workos-prod-key; an app without it (the drill copy)
+# gets none of these settings. Rolling back the switch = SIGNIN=staging and push.
+SIGNIN=staging
+WORKOS_PROD_DOMAIN=https://discerning-tranquility-74.authkit.app
+WORKOS_PROD_CLIENT=client_01KX9FBJGB3T5MG7EPYH59KTEA
+SIGNIN_VARS=()
+if [ "$(azq containerapp secret list -n "$APP" -g "$RG" --query "length([?name=='workos-prod-key'])" -o tsv || echo 0)" = "1" ]; then
+  SIGNIN_VARS=(WORKOS_PROD_AUTHKIT_DOMAIN="$WORKOS_PROD_DOMAIN" WORKOS_PROD_CLIENT_ID="$WORKOS_PROD_CLIENT"
+               WORKOS_PROD_API_KEY=secretref:workos-prod-key WORKOS_SIGNIN="$SIGNIN")
+  echo "sign-in: new sign-ins use $SIGNIN, both WorkOS environments trusted"
+fi
+
 # FREE_CAPACITY_STARTER: month-to-date Azure spend (CAD) at which the capacity
 # gate pauses the FREE tier (plus 80% of Pro revenue, see leafbridge/capacity.py).
 # Pro is never paused. Kept here so the limit is reviewable in git.
 azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" \
   --min-replicas "$MIN_REPLICAS" --max-replicas "$MAX_REPLICAS" \
   --termination-grace-period "$GRACE" \
-  --set-env-vars FREE_CAPACITY_STARTER=100 >/dev/null
+  --set-env-vars FREE_CAPACITY_STARTER=100 ${SIGNIN_VARS[@]+"${SIGNIN_VARS[@]}"} >/dev/null
 echo "new revision: $NEW (0% traffic)"
 
 rollback() {

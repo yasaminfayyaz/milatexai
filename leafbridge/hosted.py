@@ -162,8 +162,8 @@ def _float_map(res) -> str:
     return "\n".join(lines)
 
 
-def _identity_from_token() -> tuple[str, str]:
-    """Default identity provider: pull (user_id, email) from the WorkOS token."""
+def _identity_from_token() -> tuple[str, str, str]:
+    """Default identity provider: (user_id, email, issuer) from the WorkOS token."""
     token = get_access_token()
     if token is None:
         raise ToolError("Not authenticated.")
@@ -172,7 +172,31 @@ def _identity_from_token() -> tuple[str, str]:
     email = claims.get("email") or claims.get("email_address") or ""
     if not user_id:
         raise ToolError("Access token has no subject (sub) claim.")
-    return user_id, email
+    return user_id, email, str(claims.get("iss") or "").rstrip("/")
+
+
+def workos_user_lookup(api_key: str):
+    """An async ``(user_id) -> (email, email_verified)`` lookup in one WorkOS environment.
+    ("", False) on any problem: an unknown email never links two accounts."""
+
+    async def lookup(user_id: str) -> tuple[str, bool]:
+        if not api_key or not user_id.startswith("user_"):
+            return "", False
+        import aiohttp
+
+        try:
+            timeout = aiohttp.ClientTimeout(total=10)
+            async with aiohttp.ClientSession(timeout=timeout) as sess:
+                async with sess.get(f"https://api.workos.com/user_management/users/{user_id}",
+                                    headers={"Authorization": f"Bearer {api_key}"}) as resp:
+                    if resp.status != 200:
+                        return "", False
+                    data = await resp.json()
+            return data.get("email") or "", bool(data.get("email_verified"))
+        except Exception:  # noqa: BLE001
+            return "", False
+
+    return lookup
 
 
 def workos_email_resolver(api_key: str):
@@ -202,6 +226,30 @@ def workos_email_resolver(api_key: str):
     return resolve
 
 
+def workos_environments() -> dict:
+    """The WorkOS environments from the server's settings.
+
+    WORKOS_AUTHKIT_DOMAIN / WORKOS_API_KEY / WORKOS_CLIENT_ID are the original (staging)
+    environment; WORKOS_PROD_* the production one. WORKOS_SIGNIN=production makes
+    production the one new sign-ins use (advertised to Claude and ChatGPT, and used by the
+    website); the other stays trusted. Production ids are always linked to existing
+    accounts by verified email, because accounts were created with staging ids."""
+    def env(prefix):
+        return {"domain": _authkit_domain(os.environ.get(f"{prefix}AUTHKIT_DOMAIN", "")),
+                "api_key": os.environ.get(f"{prefix}API_KEY", ""),
+                "client_id": os.environ.get(f"{prefix}CLIENT_ID", "")}
+    staging, production = env("WORKOS_"), env("WORKOS_PROD_")
+    use_production = os.environ.get("WORKOS_SIGNIN", "").strip().lower() == "production" and production["domain"]
+    primary, other = (production, staging) if use_production else (staging, production)
+    linked = {production["domain"]: workos_user_lookup(production["api_key"])} if production["domain"] else {}
+    return {"primary": primary, "other": other, "linked": linked}
+
+
+def _authkit_domain(d: str) -> str:
+    d = (d or "").strip().rstrip("/")
+    return d if not d or d.startswith("http") else "https://" + d
+
+
 IDLE_SWEEP_EVERY = 600.0  # seconds between checks for working copies nobody has used for a day
 
 
@@ -223,8 +271,16 @@ class HostedApp:
         email_resolver=None,
         web_auth: WorkOSWebAuth | None = None,
         sessions: SessionsClient | None = None,
+        linked_issuers: dict | None = None,
+        web_issuer: str = "",
     ):
         self.service = AccountService(store, cipher)
+        # Sign-ins from these WorkOS environments (issuer -> user lookup) are mapped to the
+        # existing MiLatexAI account by verified email; see AccountService.link_identity.
+        self._linked_issuers = {k.rstrip("/"): v for k, v in (linked_issuers or {}).items()}
+        self._link_cache: dict[str, tuple[str, str]] = {}
+        # Which environment the website sign-in uses ("" or a linked issuer).
+        self.web_issuer = web_issuer.rstrip("/")
         self.cipher = cipher
         self.worker = GitWorker(data_dir, heads=store)
         # Compile results per exact version (commit id), so an unchanged paper is never
@@ -328,8 +384,28 @@ class HostedApp:
                 "uninterrupted access, upgrade to Pro (run `upgrade`)."
             )
 
+    async def account_for(self, issuer: str, external_id: str, email: str) -> tuple[str, str]:
+        """(account id, email) for a sign-in. Unlinked environments use the WorkOS id as is."""
+        lookup = self._linked_issuers.get((issuer or "").rstrip("/"))
+        if lookup is None:
+            return external_id, email
+        if external_id in self._link_cache:
+            return self._link_cache[external_id]
+        linked = await self.service.store.get_link(external_id)
+        found_email, verified = ("", False)
+        if not linked or not email:
+            found_email, verified = await lookup(external_id)
+        if not linked:
+            linked = await self.service.link_identity(external_id, found_email, verified)
+        result = (linked, email or found_email)
+        self._link_cache[external_id] = result
+        return result
+
     async def user(self) -> User:
-        user_id, email = self._identity()
+        ident = self._identity()
+        user_id, email = ident[0], ident[1]
+        if len(ident) > 2 and ident[2]:
+            user_id, email = await self.account_for(ident[2], user_id, email)
         user = await self.service.get_or_create_user(
             user_id, email, admin_emails=self.admin_emails
         )
@@ -467,12 +543,13 @@ def create_hosted_server(
     if cipher is None:
         cipher, _ = TokenCipher.from_env()
     resolved_base = base_url or os.environ.get("BASE_URL", "http://localhost:8000")
+    signin = workos_environments()
     if email_resolver is None and os.environ.get("WORKOS_API_KEY"):
         email_resolver = workos_email_resolver(os.environ["WORKOS_API_KEY"])
-    if web_auth is None and os.environ.get("WORKOS_API_KEY") and os.environ.get("WORKOS_CLIENT_ID"):
+    if web_auth is None and signin["primary"]["api_key"] and signin["primary"]["client_id"]:
         web_auth = WorkOSWebAuth(
-            api_key=os.environ["WORKOS_API_KEY"],
-            client_id=os.environ["WORKOS_CLIENT_ID"],
+            api_key=signin["primary"]["api_key"],
+            client_id=signin["primary"]["client_id"],
         )
     app = HostedApp(
         store=store,
@@ -486,16 +563,21 @@ def create_hosted_server(
         email_resolver=email_resolver,
         web_auth=web_auth,
         sessions=sessions if sessions is not None else SessionsClient.from_env(),
+        linked_issuers=signin["linked"],
+        web_issuer=signin["primary"]["domain"] if signin["primary"]["domain"] in signin["linked"] else "",
     )
 
     auth_provider = None
     if auth:
+        primary, other = signin["primary"], signin["other"]
         auth_provider = MiLatexAIAuthKit(
-            authkit_domain=os.environ["WORKOS_AUTHKIT_DOMAIN"],
+            authkit_domain=primary["domain"],
             base_url=resolved_base,
             # Connections authorized without naming this server get tokens addressed
             # to the WorkOS environment client id; accept those too (see authkit.py).
-            extra_audiences=[os.environ.get("WORKOS_CLIENT_ID", "")],
+            extra_audiences=[primary["client_id"]],
+            # Sign-ins made through the other WorkOS environment keep working.
+            also_trust=[(other["domain"], other["client_id"])] if other["domain"] else [],
         )
     mcp = FastMCP(
         name="MiLatexAI", instructions=INSTRUCTIONS, version=__version__, auth=auth_provider
@@ -1625,6 +1707,7 @@ def create_hosted_server(
                 icon="⚠️"), status_code=400)
         try:
             user_id, email = await app.web_auth.authenticate(code)
+            user_id, email = await app.account_for(app.web_issuer, user_id, email)
         except Exception:  # noqa: BLE001
             return HTMLResponse(web.render_notice(
                 "Sign-in failed",
@@ -1729,7 +1812,7 @@ def create_hosted_server(
         return Response(json.dumps(payload), media_type="application/json")
 
     deep_health = DeepHealth(
-        app.service.store, app.billing, os.environ.get("WORKOS_AUTHKIT_DOMAIN"),
+        app.service.store, app.billing, workos_environments()["primary"]["domain"] or None,
         texcompile.tectonic_path,
     )
 

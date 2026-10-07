@@ -155,6 +155,22 @@ class Store(ABC):
         """A short-lived download (an arXiv bundle) that any copy can serve."""
         raise NotImplementedError
 
+    # -- sign-in identities -------------------------------------------------------
+    # MiLatexAI's account id is the WorkOS user id from the environment the account
+    # was created in. A sign-in through another WorkOS environment (staging moved to
+    # production) has a different id; a link maps it to the existing account, found
+    # once by verified email, so projects, plan and Stripe subscription carry over.
+
+    async def get_link(self, external_id: str) -> str | None:
+        return None
+
+    async def put_link(self, external_id: str, user_id: str) -> None:
+        raise NotImplementedError
+
+    async def find_user_by_email(self, email: str) -> list[User]:
+        """Every account with this email (case-insensitive)."""
+        raise NotImplementedError
+
     async def get_download(self, name: str) -> bytes | None:
         raise NotImplementedError
 
@@ -168,6 +184,7 @@ class InMemoryStore(Store):
         self._usage: dict[tuple[str, str], int] = {}
         self._heads: dict[str, str] = {}
         self._downloads: dict[str, bytes] = {}
+        self._links: dict[str, str] = {}
 
     async def get_user(self, user_id: str) -> User | None:
         return self._users.get(user_id)
@@ -206,3 +223,13 @@ class InMemoryStore(Store):
 
     async def get_download(self, name: str) -> bytes | None:
         return self._downloads.get(name)
+
+    async def get_link(self, external_id: str) -> str | None:
+        return self._links.get(external_id)
+
+    async def put_link(self, external_id: str, user_id: str) -> None:
+        self._links[external_id] = user_id
+
+    async def find_user_by_email(self, email: str) -> list[User]:
+        e = email.strip().lower()
+        return [u for u in self._users.values() if e and (u.email or "").strip().lower() == e]
