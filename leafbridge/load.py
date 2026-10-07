@@ -29,8 +29,8 @@ import time
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
-HEAVY_SLOTS = max(1, int(os.environ.get("HEAVY_SLOTS", "2")))
-FREE_MAX_WAIT = float(os.environ.get("FREE_MAX_WAIT", "20"))
+HEAVY_SLOTS = max(1, int(os.environ.get("HEAVY_SLOTS", "1")))   # one compile at a time: each gets the whole CPU
+FREE_MAX_WAIT = float(os.environ.get("FREE_MAX_WAIT", "60"))   # about two compiles of waiting before "busy"
 PRO_MAX_WAIT = float(os.environ.get("PRO_MAX_WAIT", "120"))
 FREE_HEAVY_PER_HOUR = int(os.environ.get("FREE_HEAVY_PER_HOUR", "40"))
 

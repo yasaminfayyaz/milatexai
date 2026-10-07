@@ -190,3 +190,13 @@ def test_busy_reaches_the_user_as_a_plain_message():
     from leafbridge.hosted import _wrap
     err = _wrap(load.Busy("MiLatexAI is busy right now. Please try again in a minute."))
     assert "busy right now" in str(err) and "Unexpected" not in str(err)
+
+
+def test_only_compiles_take_a_turn_not_quick_page_rendering():
+    """Turning an already compiled page into an image takes well under a second. It must not wait
+    behind someone else's compile, nor count against a free user's hourly allowance."""
+    import re
+    from pathlib import Path
+    src = (Path(__file__).resolve().parents[1] / "leafbridge" / "hosted.py").read_text(encoding="utf-8")
+    assert not re.search(r"run_heavy\(texlocate\.(render_pages|page_count)", src)
+    assert "run_heavy(texlocate.compile_and_locate" in src

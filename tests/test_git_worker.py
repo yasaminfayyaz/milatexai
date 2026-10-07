@@ -12,6 +12,7 @@ call, no real network, no real repo.
 from __future__ import annotations
 
 import asyncio
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -116,3 +117,57 @@ def test_push_records_timestamp_and_throttles(tmp_path, monkeypatch):
     assert project.project_id not in worker._last_push
     asyncio.run(worker._push(project, "main"))
     assert project.project_id in worker._last_push
+
+
+# --- pushes when the remote keeps moving (co-authors, other copies, website edits) ----------------
+
+def _real_remote(tmp_path):
+    remote, seed = tmp_path / "remote.git", tmp_path / "seed"
+    remote.mkdir()
+    subprocess.run(["git", "init", "-q", "--bare", "-b", "main", "."], cwd=remote, check=True)
+    seed.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "main", "."], cwd=seed, check=True)
+    (seed / "main.tex").write_text("a\n")
+    subprocess.run(["git", "add", "-A"], cwd=seed, check=True)
+    subprocess.run(["git", "-c", "user.name=S", "-c", "user.email=s@t", "commit", "-qm", "init"], cwd=seed, check=True)
+    subprocess.run(["git", "push", "-q", str(remote), "main"], cwd=seed, check=True)
+    return ProjectConfig(name="p", project_id="0123456789abcdef01234567", token="t", git_url=remote.as_uri())
+
+
+def test_a_push_refused_several_times_in_a_row_still_lands(tmp_path, monkeypatch):
+    worker = GitWorker(tmp_path / "w")
+    cfg = _real_remote(tmp_path)
+    real_push = worker._push
+    refusals = {"n": 0}
+
+    async def flaky_push(project, branch):
+        if refusals["n"] < 3:                       # e.g. GitHub "cannot lock ref" under contention
+            refusals["n"] += 1
+            raise PushConflict("! [remote rejected] HEAD -> main (cannot lock ref 'refs/heads/main')")
+        return await real_push(project, branch)
+    monkeypatch.setattr(worker, "_push", flaky_push)
+
+    async def go():
+        async with worker.lock_for(cfg):
+            await worker.sync(cfg, force=True)
+            (worker.repo_path(cfg) / "x.tex").write_text("x\n")
+            return await worker.commit_and_push(cfg, "edit")
+    res = asyncio.run(go())
+    assert res.pushed and refusals["n"] == 3
+
+
+def test_a_push_that_never_lands_gives_up_after_the_retry_budget(tmp_path, monkeypatch):
+    worker = GitWorker(tmp_path / "w")
+    cfg = _real_remote(tmp_path)
+
+    async def always_refused(project, branch):
+        raise PushConflict("! [remote rejected] HEAD -> main (cannot lock ref)")
+    monkeypatch.setattr(worker, "_push", always_refused)
+
+    async def go():
+        async with worker.lock_for(cfg):
+            await worker.sync(cfg, force=True)
+            (worker.repo_path(cfg) / "x.tex").write_text("x\n")
+            await worker.commit_and_push(cfg, "edit")
+    with pytest.raises(PushConflict):
+        asyncio.run(go())

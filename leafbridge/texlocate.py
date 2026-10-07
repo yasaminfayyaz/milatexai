@@ -110,6 +110,8 @@ class LocateResult:
     labels: dict[str, tuple[str, int]] = field(default_factory=dict)
     pdf_path: str | None = None
     message: str = ""
+    clean: bool = False         # the compile itself succeeded (exit 0 and a PDF), not just "floats found"
+    pages: int | None = None
 
 
 def compile_and_locate(
@@ -143,10 +145,18 @@ def compile_and_locate(
         tail = (proc.stderr or proc.stdout or "")[-400:]
         return LocateResult(False, message=f"no .aux produced. {tail}")
     floats, labels = parse_aux(open(aux_path, encoding="utf-8", errors="replace").read())
+    has_pdf = os.path.isfile(pdf_path)
+    pages = None
+    if has_pdf:
+        try:
+            pages = page_count(pdf_path)
+        except Exception:  # noqa: BLE001
+            pages = None
     return LocateResult(
         ok=bool(floats), floats=floats, labels=labels,
-        pdf_path=pdf_path if os.path.isfile(pdf_path) else None,
+        pdf_path=pdf_path if has_pdf else None,
         message=f"{len(floats)} float(s) located",
+        clean=proc.returncode == 0 and has_pdf, pages=pages,
     )
 
 

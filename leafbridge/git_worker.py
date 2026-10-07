@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import random
 import subprocess
 import time
 from collections import defaultdict
@@ -49,6 +50,7 @@ _RATE_LIMIT_MARKERS = (
 )
 RETRY_DELAYS = (3.0, 8.0, 20.0)  # waits after successive rate-limited attempts
 MIN_PUSH_INTERVAL_SECONDS = 1.5  # minimum spacing between pushes to one project
+PUSH_ATTEMPTS = 4  # tries when the remote moved or briefly refused, before giving up
 
 
 class GitError(Exception):
@@ -90,27 +92,35 @@ class GitWorker:
     def repo_path(self, project: ProjectConfig) -> Path:
         return self.data_dir / project.project_id
 
-    async def ensure_repo(self, project: ProjectConfig, *, sync: bool = True) -> Path:
+    async def ensure_repo(self, project: ProjectConfig, *, sync: bool = True, fresh: bool = False) -> Path:
         """Return the local clone path, cloning if needed and optionally syncing.
 
         For reads, ``sync`` respects a short TTL to avoid hammering Overleaf; for
         writes the caller uses :meth:`sync` with ``force=True`` inside the lock.
+        ``fresh`` always checks the remote first (compiles and previews use it, so an
+        edit made directly in Overleaf, GitHub or GitLab is always included).
         """
         path = self.repo_path(project)
         if not (path / ".git").exists():
             await self._clone(project)
+        elif fresh:
+            await self.sync(project, force=True)
         elif sync:
             await self.sync(project, force=False)
         return path
 
+    async def head(self, project: ProjectConfig) -> str:
+        """The full commit id the working copy is at."""
+        return (await self._git(project, ["rev-parse", "HEAD"])).strip()
+
     @asynccontextmanager
-    async def open_repo(self, project: ProjectConfig, *, sync: bool = True):
+    async def open_repo(self, project: ProjectConfig, *, sync: bool = True, fresh: bool = False):
         """Acquire the per-project lock for the WHOLE duration of a read, then
         yield the clone path. This serializes reads with writes so a concurrent
         write's ``reset --hard`` / ``clean -fd`` can never wipe the working tree
         while a read is in progress (and two reads never collide on index.lock)."""
         async with self.lock_for(project):
-            yield await self.ensure_repo(project, sync=sync)
+            yield await self.ensure_repo(project, sync=sync, fresh=fresh)
 
     async def sync(self, project: ProjectConfig, *, force: bool) -> None:
         """Fast-forward the local clone to match the Overleaf remote.
@@ -157,28 +167,34 @@ class GitWorker:
         commit_hash = (await self._git(project, ["rev-parse", "--short", "HEAD"])).strip()
 
         branch = await self._get_branch(project)
-        try:
-            await self._push(project, branch)
-        except PushConflict:
-            # Remote moved between our sync and our push. Replay our single
-            # commit on top of the new remote tip, then push once more.
-            await self._fetch(project, branch)
+        for attempt in range(PUSH_ATTEMPTS):
             try:
-                await self._git(project, ["rebase", "FETCH_HEAD"])
-            except GitError as exc:
-                await self._git(project, ["rebase", "--abort"], check=False)
-                # Leave the local clone matching the remote so the next op is clean.
-                await self._git(project, ["reset", "--hard", "FETCH_HEAD"], check=False)
-                raise PushConflict(
-                    "Someone edited this project in Overleaf at the same time and "
-                    "the changes overlap, so the edit could not be applied "
-                    "automatically. Nothing was pushed. Please re-read the file "
-                    "and try again."
-                ) from exc
-            commit_hash = (
-                await self._git(project, ["rev-parse", "--short", "HEAD"])
-            ).strip()
-            await self._push(project, branch)
+                await self._push(project, branch)
+                break
+            except PushConflict:
+                if attempt == PUSH_ATTEMPTS - 1:
+                    raise
+                # The remote moved between our sync and our push (another copy of
+                # MiLatexAI, a co-author, or an edit made directly on the website), or a
+                # busy remote briefly refused the update ("cannot lock ref"). Wait a
+                # short random moment, replay our single commit on the new tip, retry.
+                await asyncio.sleep(random.uniform(0.2, 1.0) * (attempt + 1))
+                await self._fetch(project, branch)
+                try:
+                    await self._git(project, ["rebase", "FETCH_HEAD"])
+                except GitError as exc:
+                    await self._git(project, ["rebase", "--abort"], check=False)
+                    # Leave the local clone matching the remote so the next op is clean.
+                    await self._git(project, ["reset", "--hard", "FETCH_HEAD"], check=False)
+                    raise PushConflict(
+                        "Someone edited this project in Overleaf at the same time and "
+                        "the changes overlap, so the edit could not be applied "
+                        "automatically. Nothing was pushed. Please re-read the file "
+                        "and try again."
+                    ) from exc
+                commit_hash = (
+                    await self._git(project, ["rev-parse", "--short", "HEAD"])
+                ).strip()
 
         self._last_sync[project.project_id] = time.monotonic()
         await self._record_head(project)
