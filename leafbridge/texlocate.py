@@ -68,6 +68,11 @@ _DOCSTART = re.compile(r"\\begin\{document\}")
 _MILAFLOAT = re.compile(r"\\milafloat\{(\d+)\}\{(\w+)\}\{([^}]*)\}\{([^}]*)\}")
 _ZREF = re.compile(r"\\zref@newlabel\{mila([SE])(\d+)\}\{.*?\\abspage\{(\d+)\}")
 _NEWLABEL = re.compile(r"\\newlabel\{([^}]+)\}\{\{([^}]*)\}\{([^}]*)\}")
+# zref also records the PRINTED page of every float start/end: printed -> absolute page.
+_ZREF_PAGE = re.compile(r"\\zref@newlabel\{mila[SE]\d+\}\{.*?\\page\{([^}]*)\}\\abspage\{(\d+)\}")
+# hyperref adds the anchor after the caption: {table.caption.9} or {figure.2.1}; its first word is the kind.
+_ANCHOR = re.compile(r"\\newlabel\{([^}]+)\}\{\{[^}]*\}\{[^}]*\}\{[^{}]*\}\{(table|figure)\.")
+_FLOATNUM = re.compile(r"^[A-Za-z]?\d+(?:\.\d+)*$")
 
 
 @dataclass
@@ -117,10 +122,44 @@ def parse_aux(aux: str) -> tuple[dict[tuple[str, str], Float], dict[str, tuple[s
             continue
         floats[(kind, number)] = Float(kind=kind, number=number, start_page=starts.get(i), end_page=ends.get(i))
     labels: dict[str, tuple[str, int | None]] = {}
+    printed: dict[str, str] = {}
     for name, num, page in _NEWLABEL.findall(aux):
         if not name.startswith("mila") and "@" not in name:     # skip cleveref's name@cref copies
             labels[name] = (num.strip(), int(page) if page.strip().isdigit() else None)
+            printed[name] = page.strip()
+    _add_from_labels(aux, floats, labels, printed)
     return floats, labels
+
+
+def _label_kind(name: str, anchor: str | None) -> str | None:
+    if anchor:
+        return anchor
+    low = name.lower()
+    if low.startswith(("tab:", "tab-", "tab_", "table:", "tbl:")):
+        return "table"
+    if low.startswith(("fig:", "fig-", "fig_", "figure:")):
+        return "figure"
+    return None
+
+
+def _add_from_labels(aux: str, floats: dict, labels: dict, printed: dict) -> None:
+    """Tables and figures the hooks could not see (some packages, such as xltabular, never run
+    them) are still found through their \\label: placed on the label's page. The kind comes
+    from hyperref's anchor when there is one, otherwise from a tab:/fig: style label name."""
+    to_abs: dict[str, int] = {}
+    for page, absolute in _ZREF_PAGE.findall(aux):
+        to_abs.setdefault(page.strip(), int(absolute))
+    offsets = sorted(a - int(p) for p, a in to_abs.items() if p.isdigit())
+    offset = offsets[len(offsets) // 2] if offsets else 0       # front matter shifts arabic pages
+    anchors = dict(_ANCHOR.findall(aux))
+    for name, (num, _page) in labels.items():
+        kind = _label_kind(name, anchors.get(name))
+        if kind is None or not _FLOATNUM.match(num) or (kind, num) in floats:
+            continue
+        page = printed.get(name, "")
+        absolute = to_abs.get(page) or (int(page) + offset if page.isdigit() else None)
+        if absolute:
+            floats[(kind, num)] = Float(kind=kind, number=num, start_page=absolute, end_page=absolute)
 
 
 def natural(number: str) -> tuple:

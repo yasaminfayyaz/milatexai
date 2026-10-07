@@ -183,3 +183,30 @@ def test_floats_without_a_caption_have_no_number_and_are_skipped():
 def test_the_common_table_and_figure_environments_are_all_watched():
     for env in ("table", "longtable", "xltabular", "sidewaystable", "wraptable", "figure", "sidewaysfigure", "wrapfigure"):
         assert r"\AtBeginEnvironment{" + env + "}" in texlocate.INSTRUMENT, env
+
+
+# Some packages (xltabular) never run the environment hooks: such tables are found by label.
+FALLBACK_AUX = r"""
+\milafloat{1}{table}{3.1}{}
+\zref@newlabel{milaS1}{\default{1}\page{40}\abspage{47}}
+\zref@newlabel{milaE1}{\default{1}\page{40}\abspage{47}}
+\newlabel{tab:first}{{3.1}{40}{First}{table.caption.7}{}}
+\newlabel{tab:cash_ranges}{{3.2}{52}{Ranges}{table.caption.8}{}}
+\newlabel{longlist}{{5.10}{77}{Long list}{table.caption.15}{}}
+\newlabel{fig:noanchor}{{4.2}{60}}
+\newlabel{fig:sub-a}{{2.1a}{20}}
+\newlabel{sec:intro}{{1}{1}{Introduction}{section.1.1}{}}
+\newlabel{tab:roman}{{0.1}{iv}}
+"""
+
+
+def test_tables_the_hooks_missed_are_found_by_their_label():
+    floats, _ = texlocate.parse_aux(FALLBACK_AUX)
+    # Printed page 52 sits 7 pages after the front matter, like page 40 -> 47.
+    assert floats[("table", "3.2")].pages == [59]
+    assert floats[("table", "5.10")].pages == [84]          # kind from hyperref's anchor, any label name
+    assert floats[("figure", "4.2")].pages == [67]          # no hyperref: kind from the fig: prefix
+    assert ("figure", "2.1a") not in floats                 # a subfigure is not a float of its own
+    assert not any(n == "1" for _, n in floats)             # a section label is not a float
+    assert ("table", "0.1") not in floats                   # roman page with no known position: skipped
+    assert floats[("table", "3.1")].pages == [47]           # what the hooks saw is kept as is
