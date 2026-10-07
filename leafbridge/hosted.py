@@ -1452,9 +1452,11 @@ def create_hosted_server(
                 for f in found:
                     # No header (the normal case now): judge freshness from git history.
                     if states[f.slug] == figures.UNTRACKED and f.out_exists:
-                        states[f.slug] = figures.history_state(
-                            await app.worker.last_change(proj, f.src),
-                            await app.worker.last_change(proj, f.out))
+                        src_c = await app.worker.last_change(proj, f.src)
+                        out_c = await app.worker.last_change(proj, f.out)
+                        newer = (await app.worker.is_ancestor(proj, src_c, out_c)
+                                 if src_c and out_c and src_c != out_c else None)
+                        states[f.slug] = figures.history_state(src_c, out_c, newer)
                 raw_log = await app.worker.log_deleted(proj, figures.SRC_DIR + "/")
             live = {f.slug for f in found}
             deleted = figures.parse_deleted(raw_log, live)

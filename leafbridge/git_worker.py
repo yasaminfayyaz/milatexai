@@ -333,15 +333,21 @@ class GitWorker:
             return "denied"
         return "unknown"
 
-    async def last_change(self, project: ProjectConfig, path: str) -> tuple[str, int] | None:
-        """(commit hash, commit time) of the last commit that changed ``path``, within the
-        history this working copy has; None if there is none. Never fails a request."""
+    async def last_change(self, project: ProjectConfig, path: str) -> str | None:
+        """Hash of the last commit that changed ``path``, within the history this working
+        copy has; None if there is none. Never fails a request."""
         try:
-            out = (await self._git(project, ["log", "-1", "--format=%H %ct", "--", path])).strip()
-            sha, ts = out.split()
-            return sha, int(ts)
-        except (GitError, ValueError):
+            return (await self._git(project, ["log", "-1", "--format=%H", "--", path])).strip() or None
+        except GitError:
             return None
+
+    async def is_ancestor(self, project: ProjectConfig, older: str, newer: str) -> bool | None:
+        """True if commit ``older`` comes before ``newer`` in history; None if unknown."""
+        try:
+            base = (await self._git(project, ["merge-base", older, newer])).strip()
+        except GitError:
+            return None
+        return base == older if base else None
 
     async def log_deleted(self, project: ProjectConfig, prefix: str) -> str:
         """Raw ``git log`` of deletions under ``prefix`` (within the shallow-clone

@@ -415,3 +415,17 @@ def test_list_figures_notices_an_output_replaced_after_rendering(tmp_path):
     _call(mcp, "upload_file", {"path": "figures/speedup.png", "content_base64": png})
     listing = _text(_call(mcp, "list_figures", {}))
     assert "output was changed after it was rendered" in listing
+
+
+def test_list_figures_order_does_not_depend_on_the_clock(tmp_path, monkeypatch):
+    # Fast machines make several commits in one second; the order must come from git history.
+    import base64
+    monkeypatch.setenv("GIT_COMMITTER_DATE", "2026-10-07T12:00:00Z")
+    monkeypatch.setenv("GIT_AUTHOR_DATE", "2026-10-07T12:00:00Z")
+    mcp, _s, _t = _harness(tmp_path)
+    _call(mcp, "commit_figure", {"code": CODE, "name": "speedup"})
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"1" * 64).decode()
+    _call(mcp, "upload_file", {"path": "figures/speedup.png", "content_base64": png})
+    assert "output was changed after it was rendered" in _text(_call(mcp, "list_figures", {}))
+    _call(mcp, "edit_file", {"path": "figures/src/speedup.py", "old_string": "[3,4]", "new_string": "[3,6]"})
+    assert "source was edited since the last render" in _text(_call(mcp, "list_figures", {}))

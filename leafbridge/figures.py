@@ -161,15 +161,18 @@ def sync_state(repo: Path, info: FigureInfo) -> str:
     return DIVERGED
 
 
-def history_state(src_commit: tuple[str, int] | None, out_commit: tuple[str, int] | None) -> str:
-    """Sync state of a figure WITHOUT a header, from git: (hash, time) of the last commit
-    that changed its source and its output. commit_figure / commit_tikz change both in one
-    commit, so the same commit means in sync; otherwise the later one says what changed."""
+def history_state(src_commit: str | None, out_commit: str | None, out_is_newer: bool | None) -> str:
+    """Sync state of a figure WITHOUT a header, from git: the last commit that changed its
+    source and the last that changed its output. commit_figure / commit_tikz change both in
+    one commit, so the same commit means in sync; otherwise whichever came later (by git
+    ancestry, never by clock: two commits can share a second) says what changed."""
     if not src_commit or not out_commit:
         return UNTRACKED                       # older than the history this copy has
-    if src_commit[0] == out_commit[0]:
+    if src_commit == out_commit:
         return IN_SYNC
-    return CODE_EDITED if src_commit[1] >= out_commit[1] else ARTIFACT_REPLACED
+    if out_is_newer is None:
+        return UNTRACKED
+    return ARTIFACT_REPLACED if out_is_newer else CODE_EDITED
 
 
 def parse_deleted(git_log_output: str, live_slugs: set[str]) -> dict[str, str]:
