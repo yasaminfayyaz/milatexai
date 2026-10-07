@@ -39,6 +39,13 @@ async def compile_bbl(repo: Path, main_rel: str, timeout: int = 240) -> str | No
         return None
 
     def _run() -> str | None:
+        # Only the bibliography comes from this compile, so oversized images may be swapped for a
+        # smaller copy here (texmemory.preview_tree); the bundle itself keeps the originals.
+        from .texmemory import preview_tree
+        with preview_tree(repo) as (src, _note):
+            return _bbl_in(src)
+
+    def _bbl_in(repo: Path) -> str | None:
         with tempfile.TemporaryDirectory(prefix="mila_bbl_") as outdir:
             try:
                 subprocess.run(

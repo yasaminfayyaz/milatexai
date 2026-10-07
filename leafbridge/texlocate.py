@@ -176,13 +176,30 @@ class LocateResult:
     message: str = ""
     clean: bool = False         # the compile itself succeeded (exit 0 and a PDF), not just "floats found"
     pages: int | None = None
+    note: str = ""              # e.g. "built with a smaller copy of figures/x.png"
 
 
 def compile_and_locate(
     repo_dir: str, main_rel: str, tectonic: str, cache_dir: str | None = None
 ) -> LocateResult:
     """Instrument a copy of ``main_rel`` inside ``repo_dir``, compile it with
-    Tectonic (keeping the .aux), and return the float->page map + the PDF path."""
+    Tectonic (keeping the .aux), and return the float->page map + the PDF path.
+    Oversized images are compiled from a smaller copy (texmemory.preview_tree); the PDF is
+    then placed where it always is, next to the main file in ``repo_dir``."""
+    from .texmemory import preview_tree
+    with preview_tree(Path(repo_dir)) as (src, note):
+        res = _compile_and_locate(str(src), main_rel, tectonic, cache_dir)
+        if Path(src) != Path(repo_dir) and res.pdf_path:
+            dest = os.path.join(repo_dir, os.path.relpath(res.pdf_path, str(src)))
+            shutil.copy2(res.pdf_path, dest)
+            res.pdf_path = dest
+        res.note = note
+        return res
+
+
+def _compile_and_locate(
+    repo_dir: str, main_rel: str, tectonic: str, cache_dir: str | None = None
+) -> LocateResult:
     main_path = os.path.join(repo_dir, main_rel)
     if not os.path.isfile(main_path):
         return LocateResult(False, message=f"main file not found: {main_rel}")

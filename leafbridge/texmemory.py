@@ -6,11 +6,21 @@ mistake in the paper. The usual cause is one very large image: a 14000 x 9000 pi
 1 MB on disk but about 500 MB once decoded, and writing it into the PDF needs about twice that.
 These failures are about the server, not the paper version, so they are never remembered
 (see buildcache.py): the next try runs again.
+
+To avoid them, compiles for checking and previewing run from a temporary copy of the project
+in which only such images are replaced by smaller versions (``preview_tree``). The image keeps
+its printed size: its resolution is lowered by the same factor, so the layout is identical.
+The project itself is never changed, and arXiv bundles keep the original images.
 """
 
 from __future__ import annotations
 
+import shutil
 import struct
+import subprocess
+import sys
+import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 STOPPED = "Compile stopped"
@@ -40,6 +50,105 @@ def image_size(path: Path) -> tuple[int, int] | None:
                 return w, h
             i += 2 + struct.unpack(">H", head[i + 2:i + 4])[0]
     return None
+
+
+PREVIEW_MAX_SIDE = 4000          # pixels on the long side of the smaller copy: plenty for a page
+_INCH = 0.0254
+
+
+def image_dpi(path: Path) -> tuple[float, float] | None:
+    """The resolution an image file records (PNG pHYs in metres, JPEG JFIF density), or None
+    when it records none; LaTeX then assumes 72 dpi."""
+    try:
+        with open(path, "rb") as fh:
+            head = fh.read(256 * 1024)
+    except OSError:
+        return None
+    if head[:8] == b"\x89PNG\r\n\x1a\n":
+        i = 8
+        while i + 8 <= len(head):
+            length, kind = struct.unpack(">I4s", head[i:i + 8])
+            if kind == b"pHYs" and length == 9:
+                x, y, unit = struct.unpack(">IIB", head[i + 8:i + 17])
+                return (x * _INCH, y * _INCH) if unit == 1 and x and y else None
+            if kind in (b"IDAT", b"IEND"):
+                return None
+            i += 12 + length
+        return None
+    if head[:2] == b"\xff\xd8" and head[6:11] == b"JFIF\x00":
+        units, x, y = head[13], *struct.unpack(">HH", head[14:18])
+        if units == 1 and x and y:
+            return float(x), float(y)
+        if units == 2 and x and y:
+            return x * 2.54, y * 2.54
+    return None
+
+
+# Runs in a separate process: decoding a huge image takes hundreds of MB once, and if that
+# ever fails it must only cost that process, never the server. Argument order: path, k, the
+# resolution to record in pixels per metre (x, y).
+_SHRINK = r"""
+import struct, sys, zlib
+import fitz
+path, k, px, py = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
+fitz.TOOLS.mupdf_warnings()
+pix = fitz.Pixmap(path)
+if fitz.TOOLS.mupdf_warnings():   # damaged or truncated: never turn it into a valid-looking image
+    sys.exit(3)
+pix.shrink(k)
+jpg = path.lower().endswith((".jpg", ".jpeg"))
+pix.set_dpi(max(1, round(px * 0.0254)), max(1, round(py * 0.0254)))
+pix.save(path, output="jpg" if jpg else "png")
+if not jpg:
+    data = open(path, "rb").read()
+    body = struct.pack(">IIB", px, py, 1)
+    chunk = struct.pack(">I", 9) + b"pHYs" + body + struct.pack(">I", zlib.crc32(b"pHYs" + body) & 0xFFFFFFFF)
+    i = data.find(b"pHYs")
+    data = data[:i - 4] + chunk + data[i + 17:] if i > 4 else data[:33] + chunk + data[33:]
+    open(path, "wb").write(data)
+"""
+
+
+def _shrink(path: Path, width: int, height: int) -> bool:
+    """Replace ``path`` with a copy at most PREVIEW_MAX_SIDE on its long side and the same
+    printed size. False (file untouched) if it could not be done."""
+    k = 0
+    while max(width, height) / 2 ** k > PREVIEW_MAX_SIDE:
+        k += 1
+    dpi_x, dpi_y = image_dpi(path) or (72.0, 72.0)
+    ppm_x, ppm_y = (max(1, round(d / _INCH / 2 ** k)) for d in (dpi_x, dpi_y))
+    try:
+        done = subprocess.run([sys.executable, "-c", _SHRINK, str(path), str(k), str(ppm_x), str(ppm_y)],
+                              capture_output=True, timeout=180)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return done.returncode == 0
+
+
+@contextmanager
+def preview_tree(repo: Path):
+    """Yield (directory to compile in, note for the user). Without oversized images that is the
+    project itself and no note. Otherwise a temporary copy (no git history) where only those
+    images are smaller, removed afterwards; the project is never touched."""
+    repo = Path(repo)
+    big = oversized_images(repo)
+    if not big:
+        yield repo, ""
+        return
+    tmp = Path(tempfile.mkdtemp(prefix="mila_preview_"))
+    try:
+        src = tmp / "src"
+        shutil.copytree(repo, src, ignore=shutil.ignore_patterns(".git"), symlinks=True)
+        shrunk = [(rel, w, h) for rel, w, h in big if _shrink(src / rel, w, h)]
+        note = ""
+        if shrunk:
+            names = ", ".join(f"{rel} ({w:,} x {h:,} pixels)" for rel, w, h in shrunk)
+            note = (f"Note: {names} {'is' if len(shrunk) == 1 else 'are'} too large for the compile "
+                    "server, so this was built with a smaller copy at the same printed size. "
+                    "Your files are unchanged.")
+        yield src, note
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def oversized_images(repo: Path) -> list[tuple[str, int, int]]:

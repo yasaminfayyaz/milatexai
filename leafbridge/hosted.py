@@ -913,7 +913,7 @@ def create_hosted_server(
                 elif loc is not None and loc.clean:
                     # One compile answers everything when the paper builds cleanly.
                     pages = loc.pages
-                    res = buildcache.Plain(available=True, ok=True, pages=pages, message=(
+                    res = buildcache.Plain(available=True, ok=True, pages=pages, note=loc.note, message=(
                         f"Compiles cleanly ({pages} pages)." if pages else "Compiles cleanly."))
                 else:
                     # Errors always come from the ordinary compile of the real document,
@@ -930,6 +930,8 @@ def create_hosted_server(
             lines += ["Errors:"] + [f"  {e}" for e in res.errors]
         if float_map:
             lines += ["", float_map]
+        if res.note:
+            lines += ["", res.note]
         return "\n".join(lines)
 
     async def _show_float(kind: str, ref: str, project: str | None):
@@ -967,7 +969,7 @@ def create_hosted_server(
         from fastmcp.utilities.types import Image
 
         span = "" if len(pages) == 1 else f" (spans pages {pages[0]}-{pages[-1]})"
-        note = f"{kind.title()} {number}: page {pages[0]}{span}."
+        note = f"{kind.title()} {number}: page {pages[0]}{span}." + (f"\n{res.note}" if res.note else "")
         return [note, *[Image(data=b, format="png") for b in imgs]]
 
     @mcp.tool(title="Show a table as an image", annotations={"readOnlyHint": True})
@@ -1035,7 +1037,8 @@ def create_hosted_server(
             raise ToolError("That page rendered empty; nothing to show.")
         from fastmcp.utilities.types import Image
 
-        return [f"Page {page} of {total}.", *[Image(data=b, format="png") for b in imgs]]
+        text = f"Page {page} of {total}." + (f"\n{res.note}" if res.note else "")
+        return [text, *[Image(data=b, format="png") for b in imgs]]
 
     # -- tracked changes + arXiv export ---------------------------------------
 
@@ -1056,6 +1059,7 @@ def create_hosted_server(
                     raise ToolError("Could not find a root .tex to diff.")
                 old = await app.worker.show_file(proj, ref.strip(), main)
                 pdf = await texdiff.diff_pdf(repo, main, old)
+                big = texmemory.oversized_images(repo)
             changed, total = await asyncio.to_thread(texdiff.changed_pages, pdf)
             show = [p for p in (pages or changed or list(range(1, total + 1))) if 1 <= p <= total][:8]
             pngs = await asyncio.to_thread(texdiff.pdf_pages_to_pngs, pdf, 8, 130, show)
@@ -1072,6 +1076,9 @@ def create_hosted_server(
             where = (f"No marked-up text was found in the {total} page(s) (changes may be only in "
                      "figures, tables or math); showing the first pages.")
         more = " Pass pages=[...] to see the others." if not pages and len(changed) > len(show) else ""
+        if big:
+            where += (" Built with a smaller copy of " + ", ".join(rel for rel, _w, _h in big)
+                      + " (too large for the compile server); your files are unchanged.")
         note = (f"Tracked changes {ref} -> current. {where} Showing page(s) "
                 f"{texdiff.page_ranges(show) or 'none'} (additions in blue, deletions in red).{more}")
         return [note, *[Image(data=p, format="png") for p in pngs]]

@@ -68,6 +68,7 @@ class CompileResult:
     errors: list[str] = field(default_factory=list)
     warning_count: int = 0
     message: str = ""
+    note: str = ""          # e.g. "built with a smaller copy of figures/x.png"
 
 
 async def compile_project(repo: Path, main_tex: str, timeout: int = 240) -> CompileResult:
@@ -82,6 +83,14 @@ async def compile_project(repo: Path, main_tex: str, timeout: int = 240) -> Comp
 
 
 def _compile_sync(exe: str, repo: Path, main_tex: str, timeout: int) -> CompileResult:
+    # Oversized images are compiled from a smaller copy (texmemory.preview_tree).
+    with texmemory.preview_tree(repo) as (src, note):
+        res = _compile_in(exe, src, main_tex, timeout)
+        res.note = note
+        return res
+
+
+def _compile_in(exe: str, repo: Path, main_tex: str, timeout: int) -> CompileResult:
     with tempfile.TemporaryDirectory(prefix="lb_compile_") as outdir:
         try:
             proc = subprocess.run(

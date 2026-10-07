@@ -28,7 +28,7 @@ from .texmemory import is_transient
 
 # Bump when the way results are produced changes (for example the float locator), so
 # results built the old way are never reused.
-CACHE_VERSION = "3"
+CACHE_VERSION = "4"
 KEEP_PER_PROJECT = 3
 
 
@@ -41,6 +41,7 @@ class Located:
     labels: dict[str, list] = field(default_factory=dict)             # "tab:x" -> [number, page]
     pdf_path: str | None = None
     message: str = ""
+    note: str = ""                                                   # built with smaller image copies
 
 
 @dataclass
@@ -51,6 +52,7 @@ class Plain:
     pages: int | None = None
     errors: list[str] = field(default_factory=list)
     message: str = ""
+    note: str = ""
 
 
 def _safe(name: str) -> str:
@@ -137,7 +139,7 @@ def from_locate(res) -> Located:
     floats = {f"{k}:{n}": [f.start_page, f.end_page] for (k, n), f in res.floats.items()}
     labels = {name: [num, page] for name, (num, page) in res.labels.items()}
     return Located(clean=bool(getattr(res, "clean", False)), pages=getattr(res, "pages", None), floats=floats,
-                   labels=labels, pdf_path=res.pdf_path, message=res.message)
+                   labels=labels, pdf_path=res.pdf_path, message=res.message, note=getattr(res, "note", ""))
 
 
 def to_locate(loc: Located):
@@ -150,9 +152,10 @@ def to_locate(loc: Located):
         floats[(kind, num)] = Float(kind=kind, number=num, start_page=start, end_page=end)
     labels = {name: (num, page) for name, (num, page) in loc.labels.items()}
     return LocateResult(ok=bool(floats), floats=floats, labels=labels, pdf_path=loc.pdf_path,
-                        message=loc.message, clean=loc.clean, pages=loc.pages)
+                        message=loc.message, clean=loc.clean, pages=loc.pages, note=loc.note)
 
 
 def from_compile(res) -> Plain:
     """texcompile.CompileResult -> Plain."""
-    return Plain(available=res.available, ok=res.ok, pages=res.pages, errors=list(res.errors), message=res.message)
+    return Plain(available=res.available, ok=res.ok, pages=res.pages, errors=list(res.errors), message=res.message,
+                 note=getattr(res, "note", ""))

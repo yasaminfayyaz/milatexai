@@ -38,6 +38,11 @@ async def diff_pdf(repo: Path, main_rel: str, old_text: str, timeout: int = 240)
         raise TexDiffError("latexdiff is unavailable on this server.")
 
     def _run() -> bytes:
+        from .texmemory import preview_tree
+        with preview_tree(repo) as (src, _note):      # oversized images: a smaller copy
+            return _diff_in(Path(src))
+
+    def _diff_in(repo: Path) -> bytes:
         main = repo / main_rel
         old_f = repo / "__mila_old.tex"
         diff_f = repo / "__mila_diff.tex"

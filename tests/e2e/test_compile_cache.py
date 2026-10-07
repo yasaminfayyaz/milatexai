@@ -189,3 +189,54 @@ def test_a_thesis_numbered_by_chapter_resolves_every_table_and_label(tmp_path, m
     # A bare "1" matches 1.1, 2.1 and 3.1: the tool lists them instead of guessing.
     r, text, img = call(mcp, "show_table", {"table": "1", "project": "paper"})
     assert not img and "Table 2.1" in text and "tab:two" in text, text
+
+
+def _png(path: Path, w: int, h: int) -> None:
+    """A real RGB PNG, one colour (tiny on disk), with no recorded resolution (LaTeX assumes 72 dpi)."""
+    import struct
+    import zlib
+
+    def chunk(kind, data):
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+    raw = (b"\x00" + bytes([90]) * (w * 3)) * h
+    path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+                     + chunk(b"IDAT", zlib.compress(raw, 1)) + chunk(b"IEND", b""))
+
+
+def test_a_huge_image_is_previewed_from_a_smaller_copy_at_exactly_the_same_size(tmp_path):
+    _need_engine()
+    import shutil
+    import fitz
+
+    repo = tmp_path / "paper"
+    repo.mkdir()
+    _png(repo / "big.png", 9000, 5000)                    # 45 megapixels: above the limit
+    (repo / "main.tex").write_text("\n".join([
+        f"{BS}documentclass{{article}}", f"{BS}usepackage{{graphicx}}",
+        f"{BS}usepackage[paperwidth=140in,paperheight=90in,margin=1in]{{geometry}}",
+        f"{BS}begin{{document}}", f"{BS}noindent{BS}includegraphics{{big.png}}",          # natural size
+        f"{BS}newpage", f"{BS}noindent{BS}includegraphics[width=3in]{{big.png}}",         # set width
+        f"{BS}end{{document}}", ""]))
+    reference = tmp_path / "reference"                   # the original image, compiled directly
+    shutil.copytree(repo, reference)
+    done = subprocess.run([texcompile.tectonic_path(), "-X", "compile", "main.tex"], cwd=reference,
+                          capture_output=True, text=True, timeout=600)
+    assert done.returncode == 0, done.stderr[-800:]
+
+    res = texlocate.compile_and_locate(str(repo), "main.tex", texcompile.tectonic_path())
+    assert res.clean and "smaller copy" in res.note, res.message
+
+    def placed(pdf):
+        doc = fitz.open(str(pdf))
+        return [(i["width"], i["bbox"][2] - i["bbox"][0], i["bbox"][3] - i["bbox"][1])
+                for page in doc for i in page.get_image_info()]
+    original, preview = placed(reference / "main.pdf"), placed(res.pdf_path)
+    assert [o[0] for o in original] == [9000, 9000] and [p[0] for p in preview] == [2250, 2250]
+    for (_, ow, oh), (_, pw, ph) in zip(original, preview):
+        assert abs(pw - ow) / ow < 0.002 and abs(ph - oh) / oh < 0.002, (original, preview)
+    assert texmemory_size(repo / "big.png") == (9000, 5000)  # the project's own image is untouched
+
+
+def texmemory_size(path: Path):
+    from leafbridge import texmemory
+    return texmemory.image_size(path)
