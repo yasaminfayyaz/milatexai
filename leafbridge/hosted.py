@@ -1929,6 +1929,11 @@ def create_hosted_server(
         return Response(site.icon_png(), media_type="image/png",
                         headers={"Cache-Control": "public, max-age=86400"})
 
+    @mcp.custom_route("/icon.png", methods=["GET"])
+    async def logo(request: Request) -> Response:
+        return Response(site.logo_png(), media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=86400"})
+
     @mcp.custom_route("/robots.txt", methods=["GET"])
     async def robots(request: Request) -> Response:
         return Response(site.robots_txt(), media_type="text/plain")

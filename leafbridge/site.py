@@ -23,6 +23,7 @@ from pathlib import Path
 
 _CONTENT_PATH = Path(__file__).with_name("site_content.json")
 _ICON_PATH = Path(__file__).with_name("icon-64.png")
+_LOGO_PATH = Path(__file__).with_name("icon-512.png")
 
 # Endonyms for the language switcher (label shown in each language's own script).
 LANG_NAMES = {
@@ -848,6 +849,11 @@ def icon_png() -> bytes:
     """The site icon (64 px PNG), served as /favicon.ico for browsers and for the
     connector list in Claude and ChatGPT."""
     return _ICON_PATH.read_bytes()
+
+
+def logo_png() -> bytes:
+    """The 512 px logo (the wordmark in a box), served at /icon.png for directory listings."""
+    return _LOGO_PATH.read_bytes()
 
 
 def robots_txt() -> str:

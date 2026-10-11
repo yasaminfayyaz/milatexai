@@ -219,3 +219,11 @@ def test_the_site_has_an_icon():
         assert r.content.startswith(b"\x89PNG")
         for path in ("/", "/help", "/privacy", "/tools"):
             assert "rel='icon'" in client.get(path).text, path
+
+
+def test_the_logo_is_served_for_directory_listings():
+    from pathlib import Path
+    with TestClient(_server().http_app()) as client:
+        r = client.get("/icon.png")
+    assert r.status_code == 200 and r.headers["content-type"] == "image/png"
+    assert r.content == (Path(__file__).resolve().parents[1] / "docs" / "directory" / "icon-512.png").read_bytes()
