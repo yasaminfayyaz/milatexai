@@ -207,6 +207,8 @@ def test_every_hosted_tool_has_a_title_and_declares_read_or_destructive():
     for t in tools:
         a = t.annotations
         assert t.title and len(t.title) <= 60 and chr(0x2014) not in t.title, t.name
+        # The directory portal reads the title from the annotations, so it must be there too.
+        assert getattr(a, "title", None) == t.title, f"{t.name}: annotations.title missing"
         read_only = getattr(a, "read_only_hint", None)
         destructive = getattr(a, "destructive_hint", None)
         assert read_only is True or destructive is not None, f"{t.name} declares neither"
@@ -237,3 +239,16 @@ def test_billing_tools_for_a_pro_account_without_a_paid_subscription():
     up, manage = asyncio.run(run())
     assert "already on Pro" in up
     assert "nothing to manage" in manage and "upgrade" not in manage
+
+
+def test_the_file_tools_name_what_they_work_on_and_link_the_docs():
+    import asyncio
+    import os
+    os.environ.setdefault("WORKOS_AUTHKIT_DOMAIN", "https://placeholder.authkit.invalid")
+    from leafbridge.hosted import create_hosted_server
+
+    tools = asyncio.run(create_hosted_server(auth=False).list_tools())
+    tools = {t.name: t for t in (tools if isinstance(tools, list) else tools.values())}
+    for name in ("copy_file", "delete_file", "download_file", "edit_file", "get_sections", "read_file",
+                 "read_section", "restore_file", "upload_file", "write_file"):
+        assert "https://milatexai.com/help" in tools[name].description, name
