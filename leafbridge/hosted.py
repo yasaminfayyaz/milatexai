@@ -632,7 +632,7 @@ def create_hosted_server(
             "back here and ask me to list your files or edit your paper."
         )
 
-    @mcp.tool(title="Connect a project", annotations={"readOnlyHint": False, "destructiveHint": False})
+    @mcp.tool(title="Connect a project", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def connect_project(
         overleaf_url: str, token: str, name: str | None = None
     ) -> str:
@@ -721,7 +721,7 @@ def create_hosted_server(
                                          "fails, check the link and token.)")
         return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it.{note}"
 
-    @mcp.tool(title="Rename a project", annotations={"readOnlyHint": False, "destructiveHint": False})
+    @mcp.tool(title="Rename a project", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def rename_project(project: str, new_name: str) -> str:
         """Relabel an already-connected project. Same project, same token, just a
         new display name, no need to disconnect and re-add it.
@@ -1212,7 +1212,7 @@ def create_hosted_server(
 
     # -- citation toolkit -----------------------------------------------------
 
-    @mcp.tool(title="Add a verified citation", annotations={"readOnlyHint": False, "destructiveHint": False})
+    @mcp.tool(title="Add a verified citation", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def add_citation(
         reference: str, bib_file: str | None = None, project: str | None = None
     ) -> str:
@@ -1330,7 +1330,7 @@ def create_hosted_server(
         "_os.chdir('/mnt/data')\n"
     )
 
-    @mcp.tool(title="Save an approved figure", annotations={"readOnlyHint": False, "destructiveHint": False})
+    @mcp.tool(title="Save an approved figure", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def commit_figure(
         code: str, name: str, format: str = "png", project: str | None = None
     ):
@@ -1419,7 +1419,7 @@ def create_hosted_server(
             return note
         return [note, Image(data=png, format="png")]
 
-    @mcp.tool(title="Save an approved TikZ diagram", annotations={"readOnlyHint": False, "destructiveHint": False})
+    @mcp.tool(title="Save an approved TikZ diagram", annotations={"readOnlyHint": False, "destructiveHint": True})
     async def commit_tikz(
         code: str, name: str, format: str = "png", project: str | None = None
     ):

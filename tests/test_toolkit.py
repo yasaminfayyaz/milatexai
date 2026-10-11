@@ -202,7 +202,8 @@ def test_every_hosted_tool_has_a_title_and_declares_read_or_destructive():
     tools = asyncio.run(create_hosted_server(auth=False).list_tools())
     tools = tools if isinstance(tools, list) else list(tools.values())
     assert len(tools) >= 30
-    writes_content = {"edit_file", "write_file", "delete_file", "upload_file", "restore_file", "disconnect_project"}
+    writes_content = {"edit_file", "write_file", "delete_file", "upload_file", "restore_file", "disconnect_project",
+                      "copy_file", "connect_project", "rename_project", "add_citation", "commit_figure", "commit_tikz"}
     for t in tools:
         a = t.annotations
         assert t.title and len(t.title) <= 60 and chr(0x2014) not in t.title, t.name
