@@ -10,8 +10,17 @@ https://claude.com/docs/connectors/building/review-criteria
 
 ## Before you open the portal (one time, about 20 minutes)
 
-Status, 7 October 2026: all five steps are done. The reviewer account (reviewer@milatexai.com) is Pro, the
-sample paper is connected as "Review", and every tool passed on production.
+Status, 11 October 2026: the five steps below are done. The reviewer account (reviewer@milatexai.com) is Pro,
+the sample paper is connected as "Review", and all 37 tools passed on production.
+
+One step is left, because sign-in moved to the WorkOS production environment on 7 October: the reviewer login
+must exist there too. In a private browser window open https://milatexai.com/login, choose **Sign up**, and use
+reviewer@milatexai.com with the usual reviewer password. The verification code goes to reviewer@milatexai.com,
+which forwards to your Gmail. The new sign-in is matched to the existing Pro reviewer account (with the sample
+paper) by its verified email. Then tell Claude Code, which confirms the match before you submit.
+
+Reviews can take weeks: in GitHub (Settings, Developer settings, Fine-grained tokens) check when the
+reviewer's token for the sample paper expires, and renew it if that is before the review is likely to end.
 
 1. **Reviewer login.** In a private browser window, go to https://milatexai.com, choose Sign in, and create an
    account with a dedicated address (for example `yasaminfayyaz+review@gmail.com`) and a password. Reviewers need
