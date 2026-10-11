@@ -39,12 +39,14 @@ INSTRUMENT = r"""
 % is written with an empty number instead of borrowing its neighbour's.
 \newcommand{\mila@begin}[1]{\stepcounter{milainst}\zlabel{milaS\themilainst}%
   \edef\mila@start{\the\value{#1}}}
-% End: the PRINTED number (\thetable, e.g. 2.1 in a thesis), not the raw counter.
-\newcommand{\mila@end}[1]{\zlabel{milaE\themilainst}%
-  \ifnum\value{#1}=\mila@start\relax
-    \protected@write\@auxout{}{\string\milafloat{\themilainst}{#1}{}{}}%
+% End: the PRINTED number (\thetable, e.g. 2.1 in a thesis), not the raw counter. The
+% optional flag L marks a long table (which really can cross pages); for any other float the
+% start marker sits where the float is written in the source, not where it is placed.
+\newcommand{\mila@end}[2][]{\zlabel{milaE\themilainst}%
+  \ifnum\value{#2}=\mila@start\relax
+    \protected@write\@auxout{}{\string\milafloat{\themilainst}{#2}{}{#1}}%
   \else
-    \protected@write\@auxout{}{\string\milafloat{\themilainst}{#1}{\csname the#1\endcsname}{}}%
+    \protected@write\@auxout{}{\string\milafloat{\themilainst}{#2}{\csname the#2\endcsname}{#1}}%
   \fi}
 \AtBeginEnvironment{table}{\mila@begin{table}}\AtEndEnvironment{table}{\mila@end{table}}
 \AtBeginEnvironment{table*}{\mila@begin{table}}\AtEndEnvironment{table*}{\mila@end{table}}
@@ -62,7 +64,7 @@ INSTRUMENT = r"""
 % \longtable and \endlongtable, so hook those; if they cannot be patched, use the environment.
 \AtBeginDocument{\ifcsname longtable\endcsname
   \pretocmd{\longtable}{\mila@begin{table}}{}{\AtBeginEnvironment{longtable}{\mila@begin{table}}}%
-  \apptocmd{\endlongtable}{\mila@end{table}}{}{\AtEndEnvironment{longtable}{\mila@end{table}}}%
+  \apptocmd{\endlongtable}{\mila@end[L]{table}}{}{\AtEndEnvironment{longtable}{\mila@end[L]{table}}}%
 \fi}
 \makeatother
 %% ---- end MiLatexAI float locator ----
@@ -119,12 +121,17 @@ def parse_aux(aux: str) -> tuple[dict[tuple[str, str], Float], dict[str, tuple[s
     for se, inst, page in _ZREF.findall(aux):
         (starts if se == "S" else ends)[int(inst)] = int(page)
     floats: dict[tuple[str, str], Float] = {}
-    for inst, kind, number, _cap in _MILAFLOAT.findall(aux):
+    for inst, kind, number, flag in _MILAFLOAT.findall(aux):
         i = int(inst)
         number = number.strip()
         if not number:          # no caption, so no number of its own: not addressable by number
             continue
-        floats[(kind, number)] = Float(kind=kind, number=number, start_page=starts.get(i), end_page=ends.get(i))
+        start, end = starts.get(i), ends.get(i)
+        if flag.strip() != "L" and end is not None:
+            # An ordinary float sits on one page: the end marker is inside the placed float,
+            # the start marker where it is written in the source (often a page earlier).
+            start = end
+        floats[(kind, number)] = Float(kind=kind, number=number, start_page=start, end_page=end)
     labels: dict[str, tuple[str, int | None]] = {}
     printed: dict[str, str] = {}
     for name, num, page in _NEWLABEL.findall(aux):

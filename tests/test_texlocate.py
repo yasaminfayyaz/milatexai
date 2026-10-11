@@ -29,7 +29,7 @@ SAMPLE_AUX = r"""
 \milafloat{1}{table}{1}{}
 \milafloat{2}{figure}{1}{}
 \milafloat{3}{table}{2}{}
-\milafloat{4}{table}{3}{}
+\milafloat{4}{table}{3}{L}
 \zref@newlabel{milaS1}{\default{1}\page{1}\abspage{1}}
 \zref@newlabel{milaS2}{\default{1}\page{1}\abspage{1}}
 \zref@newlabel{milaE1}{\default{1}\page{1}\abspage{1}}
@@ -106,7 +106,7 @@ THESIS_AUX = r"""
 \milafloat{1}{table}{1.1}{}
 \milafloat{2}{table}{2.1}{}
 \milafloat{3}{table}{3.1}{}
-\milafloat{4}{table}{3.2}{}
+\milafloat{4}{table}{3.2}{L}
 \milafloat{5}{figure}{2.1}{}
 \milafloat{6}{table}{A.1}{}
 \milafloat{7}{table}{2.10}{}
@@ -166,8 +166,8 @@ def test_a_thesis_listing_is_in_reading_order_with_labels():
 def test_the_instrument_records_the_printed_number():
     out = texlocate.instrument("\\documentclass{report}\n\\begin{document}\nx\n\\end{document}")
     # The number written for each float is the printed one, not the raw counter.
-    assert r"\milafloat{\themilainst}{#1}{\csname the#1\endcsname}{}" in out
-    assert r"\milafloat{\themilainst}{#1}{\the\value{#1}}" not in out
+    assert r"\milafloat{\themilainst}{#2}{\csname the#2\endcsname}{#1}" in out
+    assert r"\the\value{#2}}{" not in out
 
 
 def test_floats_without_a_caption_have_no_number_and_are_skipped():
@@ -185,7 +185,7 @@ def test_the_common_table_and_figure_environments_are_all_watched():
         assert r"\AtBeginEnvironment{" + env + "}" in texlocate.INSTRUMENT, env
     # longtable and xltabular (which never runs environment hooks) both go through these.
     assert r"\pretocmd{\longtable}{\mila@begin{table}}" in texlocate.INSTRUMENT
-    assert r"\apptocmd{\endlongtable}{\mila@end{table}}" in texlocate.INSTRUMENT
+    assert r"\apptocmd{\endlongtable}{\mila@end[L]{table}}" in texlocate.INSTRUMENT
 
 
 # Some packages (xltabular) never run the environment hooks: such tables are found by label.
@@ -219,14 +219,27 @@ def test_a_long_table_moved_to_the_next_page_starts_where_its_caption_is():
     # The start marker stayed at the bottom of page 84 (printed 77) while LaTeX moved the table
     # on; its caption and label are on page 85 (printed 78), where the table really starts.
     aux = "\n".join([
-        r"\milafloat{1}{table}{4.1}{}",
+        r"\milafloat{1}{table}{4.1}{L}",
         r"\zref@newlabel{milaS1}{\default{4.1}\page{77}\abspage{84}}",
         r"\zref@newlabel{milaE1}{\default{4.1}\page{78}\abspage{85}}",
         r"\newlabel{tab:resources}{{4.1}{78}{Resources}{table.caption.30}{}}",
-        r"\milafloat{2}{table}{5.10}{}",
+        r"\milafloat{2}{table}{5.10}{L}",
         r"\zref@newlabel{milaS2}{\default{5.10}\page{105}\abspage{112}}",
         r"\zref@newlabel{milaE2}{\default{5.10}\page{106}\abspage{113}}",
         r"\newlabel{tab:long}{{5.10}{105}{Long}{table.caption.40}{}}", ""])
     floats, _ = texlocate.parse_aux(aux)
     assert floats[("table", "4.1")].pages == [85]
     assert floats[("table", "5.10")].pages == [112, 113]        # a genuine span is kept as is
+
+
+def test_an_ordinary_float_is_on_the_page_where_it_was_placed():
+    # Written at the bottom of page 38, placed by LaTeX at the top of page 39: one page, 39.
+    aux = "\n".join([
+        r"\milafloat{1}{table}{2.1}{}",
+        r"\zref@newlabel{milaS1}{\default{2.1}\page{31}\abspage{38}}",
+        r"\zref@newlabel{milaE1}{\default{2.1}\page{32}\abspage{39}}",
+        r"\milafloat{2}{figure}{5.2}{}",
+        r"\zref@newlabel{milaS2}{\default{5.2}\page{91}\abspage{98}}",
+        r"\zref@newlabel{milaE2}{\default{5.2}\page{92}\abspage{99}}", ""])
+    floats, _ = texlocate.parse_aux(aux)
+    assert floats[("table", "2.1")].pages == [39] and floats[("figure", "5.2")].pages == [99]

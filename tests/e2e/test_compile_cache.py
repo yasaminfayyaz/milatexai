@@ -318,3 +318,19 @@ def test_long_tables_are_located_on_every_page_they_cover(tmp_path):
     assert len(x_pages) > 1 and len(l_pages) > 1, (x_pages, l_pages)      # both really span pages
     assert res.floats[("table", "1.1")].pages == x_pages, (res.floats, x_pages)
     assert res.floats[("table", "1.2")].pages == l_pages, (res.floats, l_pages)
+
+
+def test_a_float_written_at_the_bottom_of_a_page_is_reported_where_it_is_printed(tmp_path):
+    _need_engine()
+    import fitz
+    filler = "\n\n".join("Filler paragraph text that takes up space on the page. " * 6 for _ in range(6))
+    doc = "\n".join([
+        f"{BS}documentclass{{article}}", f"{BS}begin{{document}}", filler,
+        f"{BS}begin{{table}}[t]{BS}centering{BS}caption{{Drifting table}}{BS}begin{{tabular}}{{ll}}a&b{BS}end{{tabular}}{BS}end{{table}}",
+        filler, f"{BS}end{{document}}", ""])
+    (tmp_path / "main.tex").write_text(doc)
+    res = texlocate.compile_and_locate(str(tmp_path), "main.tex", texcompile.tectonic_path())
+    assert res.clean, res.message
+    pdf = fitz.open(res.pdf_path)
+    printed = [i for i, page in enumerate(pdf, 1) if "Drifting table" in page.get_text()]
+    assert res.floats[("table", "1")].pages == printed, (res.floats, printed)
