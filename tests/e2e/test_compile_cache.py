@@ -289,3 +289,32 @@ def test_tracked_changes_marks_an_edit_inside_an_input_chapter(tmp_path):
     pdf = asyncio.run(texdiff.diff_pdf(new, "main.tex", arxivprep.flatten(old, "main.tex")))
     changed, total = texdiff.changed_pages(pdf)
     assert changed == [1] and total == 1, (changed, total)
+
+
+def test_long_tables_are_located_on_every_page_they_cover(tmp_path):
+    """xltabular never runs environment hooks and a long table can break across pages; the
+    reported pages must be exactly the pages where each table's rows are printed."""
+    _need_engine()
+    import fitz
+    x_rows = "\n".join(f"Xrow{i} & x {BS}{BS}" for i in range(1, 70))
+    l_rows = "\n".join(f"Lrow{i} & l {BS}{BS}" for i in range(1, 70))
+    filler = "\n\n".join("Filler paragraph text that takes up space on the page. " * 6 for _ in range(7))
+    doc = "\n".join([
+        f"{BS}documentclass{{report}}", f"{BS}usepackage{{xltabular}}", f"{BS}usepackage{{longtable}}",
+        f"{BS}begin{{document}}", f"{BS}chapter{{One}}", "Intro.",
+        f"{BS}begin{{xltabular}}{{{BS}linewidth}}{{lX}}{BS}caption{{Long X}}{BS}label{{tab:longx}}{BS}{BS}", x_rows,
+        f"{BS}end{{xltabular}}", filler,
+        f"{BS}begin{{longtable}}{{ll}}{BS}caption{{Long L}}{BS}label{{tab:longl}}{BS}{BS}", l_rows, f"{BS}end{{longtable}}",
+        f"{BS}end{{document}}", ""])
+    (tmp_path / "main.tex").write_text(doc)
+    res = texlocate.compile_and_locate(str(tmp_path), "main.tex", texcompile.tectonic_path())
+    assert res.clean, res.message
+    pdf = fitz.open(res.pdf_path)
+
+    def printed_on(prefix):
+        return [i for i, page in enumerate(pdf, 1) if any(f"{prefix}{n}" in page.get_text() for n in (1, 35, 69))
+                or f"{prefix}" in page.get_text()]
+    x_pages, l_pages = printed_on("Xrow"), printed_on("Lrow")
+    assert len(x_pages) > 1 and len(l_pages) > 1, (x_pages, l_pages)      # both really span pages
+    assert res.floats[("table", "1.1")].pages == x_pages, (res.floats, x_pages)
+    assert res.floats[("table", "1.2")].pages == l_pages, (res.floats, l_pages)

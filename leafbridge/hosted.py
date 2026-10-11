@@ -1819,7 +1819,7 @@ def create_hosted_server(
         url = app.web_auth.authorization_url(
             redirect_uri=f"{app.base_url}/callback", state=state)
         resp = RedirectResponse(url, status_code=303)
-        resp.set_cookie(STATE_COOKIE, state, max_age=600, httponly=True,
+        resp.set_cookie(STATE_COOKIE, state, max_age=1800, httponly=True,
                         secure=app.cookie_secure, samesite="lax", path="/")
         return resp
 
@@ -1839,9 +1839,9 @@ def create_hosted_server(
         if not (code and state and cookie_state
                 and secrets.compare_digest(state, cookie_state)):
             return HTMLResponse(web.render_notice(
-                "Sign-in failed",
-                "This sign-in attempt is invalid or expired. Please try again.",
-                icon="⚠️"), status_code=400)
+                "Sign-in expired",
+                "For your security, a sign-in has to be finished within 30 minutes of starting it. "
+                "Please start again.", icon="⚠️", action=("Sign in again", "/login")), status_code=400)
         try:
             user_id, email = await app.web_auth.authenticate(code)
             user_id, email = await app.account_for(app.web_issuer, user_id, email)

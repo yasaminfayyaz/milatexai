@@ -181,8 +181,11 @@ def test_floats_without_a_caption_have_no_number_and_are_skipped():
 
 
 def test_the_common_table_and_figure_environments_are_all_watched():
-    for env in ("table", "longtable", "xltabular", "sidewaystable", "wraptable", "figure", "sidewaysfigure", "wrapfigure"):
+    for env in ("table", "sidewaystable", "wraptable", "figure", "sidewaysfigure", "wrapfigure"):
         assert r"\AtBeginEnvironment{" + env + "}" in texlocate.INSTRUMENT, env
+    # longtable and xltabular (which never runs environment hooks) both go through these.
+    assert r"\pretocmd{\longtable}{\mila@begin{table}}" in texlocate.INSTRUMENT
+    assert r"\apptocmd{\endlongtable}{\mila@end{table}}" in texlocate.INSTRUMENT
 
 
 # Some packages (xltabular) never run the environment hooks: such tables are found by label.
@@ -210,3 +213,20 @@ def test_tables_the_hooks_missed_are_found_by_their_label():
     assert not any(n == "1" for _, n in floats)             # a section label is not a float
     assert ("table", "0.1") not in floats                   # roman page with no known position: skipped
     assert floats[("table", "3.1")].pages == [47]           # what the hooks saw is kept as is
+
+
+def test_a_long_table_moved_to_the_next_page_starts_where_its_caption_is():
+    # The start marker stayed at the bottom of page 84 (printed 77) while LaTeX moved the table
+    # on; its caption and label are on page 85 (printed 78), where the table really starts.
+    aux = "\n".join([
+        r"\milafloat{1}{table}{4.1}{}",
+        r"\zref@newlabel{milaS1}{\default{4.1}\page{77}\abspage{84}}",
+        r"\zref@newlabel{milaE1}{\default{4.1}\page{78}\abspage{85}}",
+        r"\newlabel{tab:resources}{{4.1}{78}{Resources}{table.caption.30}{}}",
+        r"\milafloat{2}{table}{5.10}{}",
+        r"\zref@newlabel{milaS2}{\default{5.10}\page{105}\abspage{112}}",
+        r"\zref@newlabel{milaE2}{\default{5.10}\page{106}\abspage{113}}",
+        r"\newlabel{tab:long}{{5.10}{105}{Long}{table.caption.40}{}}", ""])
+    floats, _ = texlocate.parse_aux(aux)
+    assert floats[("table", "4.1")].pages == [85]
+    assert floats[("table", "5.10")].pages == [112, 113]        # a genuine span is kept as is

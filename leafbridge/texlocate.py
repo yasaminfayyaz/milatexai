@@ -48,8 +48,6 @@ INSTRUMENT = r"""
   \fi}
 \AtBeginEnvironment{table}{\mila@begin{table}}\AtEndEnvironment{table}{\mila@end{table}}
 \AtBeginEnvironment{table*}{\mila@begin{table}}\AtEndEnvironment{table*}{\mila@end{table}}
-\AtBeginEnvironment{longtable}{\mila@begin{table}}\AtEndEnvironment{longtable}{\mila@end{table}}
-\AtBeginEnvironment{xltabular}{\mila@begin{table}}\AtEndEnvironment{xltabular}{\mila@end{table}}
 \AtBeginEnvironment{sidewaystable}{\mila@begin{table}}\AtEndEnvironment{sidewaystable}{\mila@end{table}}
 \AtBeginEnvironment{sidewaystable*}{\mila@begin{table}}\AtEndEnvironment{sidewaystable*}{\mila@end{table}}
 \AtBeginEnvironment{wraptable}{\mila@begin{table}}\AtEndEnvironment{wraptable}{\mila@end{table}}
@@ -60,6 +58,12 @@ INSTRUMENT = r"""
 \AtBeginEnvironment{sidewaysfigure*}{\mila@begin{figure}}\AtEndEnvironment{sidewaysfigure*}{\mila@end{figure}}
 \AtBeginEnvironment{wrapfigure}{\mila@begin{figure}}\AtEndEnvironment{wrapfigure}{\mila@end{figure}}
 \AtBeginEnvironment{SCfigure}{\mila@begin{figure}}\AtEndEnvironment{SCfigure}{\mila@end{figure}}
+% Long tables: longtable and xltabular (which never runs environment hooks) both go through
+% \longtable and \endlongtable, so hook those; if they cannot be patched, use the environment.
+\AtBeginDocument{\ifcsname longtable\endcsname
+  \pretocmd{\longtable}{\mila@begin{table}}{}{\AtBeginEnvironment{longtable}{\mila@begin{table}}}%
+  \apptocmd{\endlongtable}{\mila@end{table}}{}{\AtEndEnvironment{longtable}{\mila@end{table}}}%
+\fi}
 \makeatother
 %% ---- end MiLatexAI float locator ----
 """
@@ -143,9 +147,11 @@ def _label_kind(name: str, anchor: str | None) -> str | None:
 
 
 def _add_from_labels(aux: str, floats: dict, labels: dict, printed: dict) -> None:
-    """Tables and figures the hooks could not see (some packages, such as xltabular, never run
-    them) are still found through their \\label: placed on the label's page. The kind comes
-    from hyperref's anchor when there is one, otherwise from a tab:/fig: style label name."""
+    """Use each table/figure \\label (on the page where the caption is printed) twice:
+    - a float the hooks could not see is added, placed on the label's page;
+    - a long table whose start marker stayed on the previous page (LaTeX moved the table on
+      because its first rows did not fit) starts on the label's page instead.
+    The kind comes from hyperref's anchor when there is one, otherwise from a tab:/fig: label."""
     to_abs: dict[str, int] = {}
     for page, absolute in _ZREF_PAGE.findall(aux):
         to_abs.setdefault(page.strip(), int(absolute))
@@ -154,12 +160,17 @@ def _add_from_labels(aux: str, floats: dict, labels: dict, printed: dict) -> Non
     anchors = dict(_ANCHOR.findall(aux))
     for name, (num, _page) in labels.items():
         kind = _label_kind(name, anchors.get(name))
-        if kind is None or not _FLOATNUM.match(num) or (kind, num) in floats:
+        if kind is None or not _FLOATNUM.match(num):
             continue
         page = printed.get(name, "")
         absolute = to_abs.get(page) or (int(page) + offset if page.isdigit() else None)
-        if absolute:
+        if not absolute:
+            continue
+        found = floats.get((kind, num))
+        if found is None:
             floats[(kind, num)] = Float(kind=kind, number=num, start_page=absolute, end_page=absolute)
+        elif found.start_page is not None and found.end_page is not None and found.start_page < absolute <= found.end_page:
+            found.start_page = absolute
 
 
 def natural(number: str) -> tuple:

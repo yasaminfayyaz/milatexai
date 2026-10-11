@@ -69,6 +69,11 @@ button {
   color: #0b3b33; background: #00a693; border: 0; border-radius: 9px; cursor: pointer;
 }
 button:hover { background: #008779; }
+a.btn {
+  display: inline-block; margin-top: 18px; padding: 11px 22px; font-size: 15px; font-weight: 600;
+  color: #0b3b33; background: #00a693; border-radius: 9px; text-decoration: none;
+}
+a.btn:hover { background: #008779; }
 .btn-danger { width: auto; margin: 0; padding: 8px 14px; font-size: 13px; background: #e5484d; }
 .btn-danger:hover { background: #c93b40; }
 .proj-list { margin: 14px 0 4px; }
@@ -205,14 +210,19 @@ def render_success(project_name: str, project_id: str) -> str:
     )
 
 
-def render_notice(title: str, message: str, *, icon: str = "⚠️") -> str:
+def render_notice(title: str, message: str, *, icon: str = "⚠️",
+                  action: tuple[str, str] | None = None) -> str:
+    """A short notice page; ``action`` is an optional (label, local path) button."""
+    button = ""
+    if action and action[1].startswith("/") and not action[1].startswith("//"):
+        button = f"\n  <p><a class='btn' href='{html.escape(action[1])}'>{html.escape(action[0])}</a></p>"
     return _page(
         f"{title} · {BRAND}",
         f"""{_brand_header()}
 <div class='ok'>
   <div class='big'>{html.escape(icon)}</div>
   <h1>{html.escape(title)}</h1>
-  <p class='muted'>{html.escape(message)}</p>
+  <p class='muted'>{html.escape(message)}</p>{button}
 </div>""",
     )
 

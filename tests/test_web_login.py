@@ -323,3 +323,18 @@ def test_logout_clears_session_cookie():
     assert r.headers["location"] == "/"
     set_cookie = " ".join(r.headers.get_list("set-cookie")).lower()
     assert "mila_session=" in set_cookie  # cleared (expired) cookie
+
+
+def test_a_sign_in_that_took_too_long_offers_to_start_again():
+    _store, _cipher, mcp = _harness()
+    with _client(mcp) as client:
+        r = client.get("/callback", params={"code": "abc", "state": "stale"}, follow_redirects=False)
+    assert r.status_code == 400
+    assert "Sign-in expired" in r.text and "30 minutes" in r.text and "href='/login'" in r.text
+
+
+def test_the_sign_in_window_is_thirty_minutes():
+    _store, _cipher, mcp = _harness()
+    with _client(mcp) as client:
+        r = client.get("/login", follow_redirects=False)
+    assert "Max-Age=1800" in r.headers["set-cookie"]
