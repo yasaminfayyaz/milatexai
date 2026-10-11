@@ -80,8 +80,8 @@ check, view, change, update, rotate, or revoke their Overleaf token, use
 change_token (it returns a secure link; the token itself can't be shown in chat).
 To add or remove projects, use manage_projects, or add_project with just a project
 URL (no token needed). Every write (edit_file/write_file/delete_file/upload_file) commits and
-pushes immediately and counts toward the monthly limit; reads are free and
-unlimited. Before editing, read the file so edit_file's old_string matches exactly.
+pushes immediately and counts toward the monthly limit; reading files does not.
+Before editing, read the file so edit_file's old_string matches exactly.
 When the user asks why their paper won't compile or why they're getting errors,
 run check_compile to build it and get the exact LaTeX errors, then read the
 offending file, fix the errors with edit_file, and check_compile again.
@@ -92,17 +92,15 @@ does no semantic matching: if the user names the float in words rather than a
 number, first read the document (get_sections / read_section) to find its number
 or \\label, then pass that to show_table/show_figure. An unknown reference just
 returns the list of tables/figures to choose from.
-Figure Studio (Pro): to create or change a matplotlib chart, write the Python and
-RENDER IT YOURSELF in your own code-execution environment first, show the user
-the image, iterate until they approve, and only then call commit_figure with the
-exact approved code (it must save figure.pdf). The server re-renders it in an
-isolated sandbox and commits both the source and the PDF, so every figure stays
-editable later: list_figures shows them, read the figures/src/<name>.py, modify,
-and repeat. If you cannot execute Python yourself, commit first and verify with
-show_figure instead. BEFORE editing an existing figure, check list_figures: if it
-says the PDF was changed outside Figure Studio (or both diverged), the stored
-code no longer matches the artifact, so tell the user and ask which version
-should win instead of silently regenerating from stale code.
+Figure Studio (Pro): commit_figure saves a matplotlib chart the user has approved
+(its code must save figure.pdf). The server renders it in an isolated sandbox and
+commits both the source and the rendered file, so every figure stays editable:
+list_figures shows them; read figures/src/<name>.py, change it, and commit again.
+Commits are real, so show the user the figure before committing when you can, or
+right after with show_figure. Before editing an existing figure, check
+list_figures: if it says the output changed after it was rendered (or both
+diverged), the stored code no longer matches it, so ask the user which version
+should win instead of regenerating from stale code.
 """
 
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
@@ -1334,10 +1332,9 @@ def create_hosted_server(
     async def commit_figure(
         code: str, name: str, format: str = "png", project: str | None = None
     ):
-        """Save an APPROVED matplotlib figure into the user's Overleaf project (Pro).
-        FLOW: write the Python and render it YOURSELF in your own code-execution
-        environment first, show the user the image, and only call this after they
-        approve. The server re-runs the code in an isolated sandbox (matplotlib 3.8,
+        """Save a matplotlib figure the user has approved into their project (Pro).
+        Each call is a real commit, so it is meant for a figure the user has seen and
+        accepted. The server runs the code in an isolated sandbox (matplotlib 3.8,
         numpy 1.26; no network, no pip, no other libraries) and commits BOTH the
         source (figures/src/<name>.py, so the figure stays editable forever) and the
         rendered artifact (figures/<name>.pdf or .png) in one push. The code MUST
