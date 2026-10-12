@@ -71,17 +71,25 @@ from .web_session import SESSION_TTL_SECONDS, SessionError, mint_session, verify
 from .workos_web import WorkOSWebAuth
 
 INSTRUCTIONS = """\
-MiLatexAI edits the signed-in user's real Overleaf projects over Overleaf's Git
-bridge. If the user has no project connected yet, just proceed with their request:
-any file tool returns a secure link where they paste their Overleaf Git token
-(never in chat), relay that link and ask them to come back. Refer to a project
-by its name; list_projects shows the connected ones. Whenever the user wants to
+MiLatexAI edits the signed-in user's real LaTeX projects: Overleaf projects over
+Overleaf's Git integration, and GitHub, GitLab, Bitbucket or self-hosted Git
+repositories. If the user has no project connected yet, just proceed with their
+request: any file tool returns a secure link where they paste their Overleaf Git
+token (never in chat), relay that link and ask them to come back. start_connect
+gives the same link; prefer it over connect_project, which takes the token in
+chat. add_project adds more projects. Refer to a project by its name;
+list_projects shows the connected ones. Whenever the user wants to
 check, view, change, update, rotate, or revoke their Overleaf token, use
 change_token (it returns a secure link; the token itself can't be shown in chat).
 To add or remove projects, use manage_projects, or add_project with just a project
 URL (no token needed). Every write (edit_file/write_file/delete_file/upload_file) commits and
 pushes immediately and counts toward the monthly limit; reading files does not.
 Before editing, read the file so edit_file's old_string matches exactly.
+read_file is for text files (.tex, .bib, .sty); download_file is for images and
+PDFs; copy_file copies any file between projects on the server without base64.
+When a project holds more than one document, list_files shows the .tex files to
+pass as tex. list_checkpoints and get_history give the commit ids that
+project_diff, restore_file and tracked_changes_pdf take; checkpoint saves one.
 When the user asks why their paper won't compile or why they're getting errors,
 run check_compile to build it and get the exact LaTeX errors, then read the
 offending file, fix the errors with edit_file, and check_compile again.
@@ -91,13 +99,15 @@ get an IMAGE of the actual rendered float, then fix it with edit_file. The serve
 does no semantic matching: if the user names the float in words rather than a
 number, first read the document (get_sections / read_section) to find its number
 or \\label, then pass that to show_table/show_figure. An unknown reference just
-returns the list of tables/figures to choose from.
+returns the list of tables/figures to choose from. show_page compiles the whole
+project and returns a full page: use it only when the user asks how the document
+looks on the page or to diagnose a visual problem, not routinely after edits.
 Figure Studio (Pro): commit_figure saves a matplotlib chart the user has approved
 (its code must save figure.pdf). The server renders it in an isolated sandbox and
 commits both the source and the rendered file, so every figure stays editable:
 list_figures shows them; read figures/src/<name>.py, change it, and commit again.
 Commits are real, so show the user the figure before committing when you can, or
-right after with show_figure. Before editing an existing figure, check
+right after with show_figure; commit_tikz returns the rendered diagram, so show it. Before editing an existing figure, check
 list_figures: if it says the output changed after it was rendered (or both
 diverged), the stored code no longer matches it, so ask the user which version
 should win instead of regenerating from stale code.
@@ -612,10 +622,9 @@ def create_hosted_server(
 
     @mcp.tool(title="Get a secure connect link", annotations={"title": "Get a secure connect link", "readOnlyHint": False, "destructiveHint": False})
     async def start_connect() -> str:
-        """Get a secure link to connect an Overleaf project WITHOUT pasting your
-        Git token into this chat. Recommended over connect_project. Returns a
-        one-time link (valid 15 minutes) where you enter your token in a web form;
-        the token is encrypted and never appears in the conversation."""
+        """Get a one-time secure link (valid 15 minutes) where the user connects an
+        Overleaf project by entering their Overleaf Git token in a web form, so the
+        token never appears in the conversation. The token is stored encrypted."""
         try:
             user = await app.user()
             code = mint_connect_code(app.cipher, user.user_id, user.email)
@@ -634,9 +643,9 @@ def create_hosted_server(
     async def connect_project(
         overleaf_url: str, token: str, name: str | None = None
     ) -> str:
-        """Connect one of your LaTeX repositories (run once per repo). The Git
-        token is stored ENCRYPTED and never shown again. Prefer start_connect,
-        which keeps your token out of the chat.
+        """Connect one of your LaTeX repositories with its access token (once per
+        repository). The token is stored encrypted and never shown again; a token
+        passed here is part of the conversation.
 
         Args:
             overleaf_url: The repository URL, an Overleaf project
@@ -672,7 +681,7 @@ def create_hosted_server(
 
     @mcp.tool(title="List projects", annotations={"title": "List projects", "readOnlyHint": True})
     async def list_projects() -> str:
-        """List your connected Overleaf projects."""
+        """List your connected projects."""
         try:
             user = await app.user()
             projects = await app.service.store.list_projects(user.user_id)
@@ -687,11 +696,10 @@ def create_hosted_server(
     async def add_project(
         overleaf_url: str, name: str | None = None, token: str | None = None
     ) -> str:
-        """Give the AI access to ANOTHER of your LaTeX repositories. For an
-        Overleaf project this reuses the Overleaf token you already saved, just
-        the project link, no token needed. For a GitHub, GitLab, Bitbucket, or
-        self-hosted Git repo you must also pass that repo's access token. (Run
-        start_connect first if you've never connected one.)
+        """Connect another of your LaTeX repositories. For an Overleaf project only the
+        project link is needed: the Overleaf token you already saved is reused. A
+        GitHub, GitLab, Bitbucket, or self-hosted Git repository also needs that
+        repository's access token.
 
         Args:
             overleaf_url: The repository URL, an Overleaf project, or a GitHub,
@@ -721,11 +729,11 @@ def create_hosted_server(
 
     @mcp.tool(title="Rename a project", annotations={"title": "Rename a project", "readOnlyHint": False, "destructiveHint": True})
     async def rename_project(project: str, new_name: str) -> str:
-        """Relabel an already-connected project. Same project, same token, just a
-        new display name, no need to disconnect and re-add it.
+        """Relabel an already-connected project. Same project, same token, just a new
+        display name, with no need to disconnect and add it again.
 
         Args:
-            project: The project's current name or id (list_projects shows both).
+            project: The project's current name or id.
             new_name: The new label to give it.
         """
         try:
@@ -737,8 +745,9 @@ def create_hosted_server(
 
     @mcp.tool(title="Manage projects", annotations={"title": "Manage projects", "readOnlyHint": False, "destructiveHint": False})
     async def manage_projects() -> str:
-        """Get a secure link to view, add, or remove the Overleaf projects the AI
-        can access. No token needed. The AI only ever touches projects you list."""
+        """Get a secure link to a web page where the user can view, add, or remove the
+        projects MiLatexAI can access. No token needed. MiLatexAI only works on the
+        projects listed there."""
         try:
             user = await app.user()
             code = mint_connect_code(app.cipher, user.user_id, user.email)
@@ -752,10 +761,9 @@ def create_hosted_server(
 
     @mcp.tool(title="Manage your access token", annotations={"title": "Manage your access token", "readOnlyHint": False, "destructiveHint": False})
     async def change_token() -> str:
-        """Manage your stored Overleaf Git token. Use this whenever the user wants
-        to check, view, see, change, update, rotate, or revoke their token: it
-        returns a secure link to a web page for that. The token itself can't be
-        shown in chat (it's encrypted), but this is how they update or revoke it."""
+        """Get a secure link to a web page where the user can check, replace, or revoke
+        their stored Overleaf Git token. The token is stored encrypted and is never
+        shown in chat."""
         try:
             user = await app.user()
             code = mint_connect_code(app.cipher, user.user_id, user.email)
@@ -901,15 +909,12 @@ def create_hosted_server(
 
     @mcp.tool(title="Check that the paper compiles", annotations={"title": "Check that the paper compiles", "readOnlyHint": True})
     async def check_compile(project: str | None = None, tex: str | None = None) -> str:
-        """Compile a project with a local LaTeX engine and report whether it builds,
-        with the exact LaTeX errors and warnings. Use this whenever the user asks
-        why their paper won't compile, why they're getting errors, or wants to
-        verify a project builds. After it reports errors you can read the offending
-        file, fix them with edit_file, and run this again to confirm.
+        """Compile a project with a LaTeX engine and report whether it builds, with the
+        exact LaTeX errors and warnings.
 
         tex: project-relative path of the .tex to compile (e.g. "paper2/main.tex").
-        Omit to auto-detect the root document; pass it when the project has more
-        than one document and you need a specific one (list_files shows them)."""
+        Omit to auto-detect the root document; needed when the project has more than
+        one document."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -991,42 +996,35 @@ def create_hosted_server(
 
     @mcp.tool(title="Show a table as an image", annotations={"title": "Show a table as an image", "readOnlyHint": True})
     async def show_table(table: str, project: str | None = None, tex: str | None = None):
-        """Show a rendered IMAGE of a table so you can SEE how it actually looks
-        (layout, column widths, overfull or misaligned cells) and fix it, things the
-        LaTeX source alone can't tell you. Pass the table NUMBER (e.g. "4") or its
-        \\label (e.g. "tab:results"). If the user describes a table in words, first
-        read the document (get_sections / read_section) to find its number or label,
-        then call this. A table that spans multiple pages returns all of them; an
-        unknown reference returns the list of tables so you can pick. tex: the document's
-        .tex path when the project holds more than one (list_files shows them)."""
+        """Show a rendered image of a table, cropped from the compiled PDF, so its
+        layout, column widths, and overfull or misaligned cells can be seen, which the
+        LaTeX source alone does not show. Takes the table number (e.g. "4") or its
+        \\label (e.g. "tab:results"); the server does not match tables described in
+        words. A table that spans several pages returns every page; an unknown
+        reference returns the list of tables. tex: the document's .tex path when the
+        project holds more than one."""
         return await _show_float("table", table, project, tex)
 
     @mcp.tool(title="Show a figure", annotations={"title": "Show a figure", "readOnlyHint": True})
     async def show_figure(figure: str, project: str | None = None, tex: str | None = None):
-        """Show a rendered IMAGE of a figure so you can SEE how it renders. Pass the
-        figure NUMBER (e.g. "3") or its \\label. If the user describes it in words,
-        read the document first to find its number or label, then call this. Spanning
-        figures return all pages; an unknown reference returns the list of figures. tex: the
-        document's .tex path when the project holds more than one."""
+        """Show a rendered image of a figure, cropped from the compiled PDF. Takes the
+        figure number (e.g. "3") or its \\label; the server does not match figures
+        described in words. A figure that spans several pages returns every page; an
+        unknown reference returns the list of figures. tex: the document's .tex path
+        when the project holds more than one."""
         return await _show_float("figure", figure, project, tex)
 
     @mcp.tool(title="Show a page of the PDF", annotations={"title": "Show a page of the PDF", "readOnlyHint": True})
     async def show_page(page: int = 1, project: str | None = None, tex: str | None = None):
-        """Show a rendered IMAGE of a compiled PDF page so you can SEE the actual
-        layout, margins, spacing, line breaks, overfull/underfull boxes, float
-        placement, page breaks, and overall styling, none of which the LaTeX source
-        alone reveals.
-
-        Use this SPARINGLY, and ONLY when the user asks how the document LOOKS on the
-        page (margins, spacing, layout, overflow, "does this fit", styling), or when
-        you are diagnosing a visual problem you cannot judge from the source. Do NOT
-        call it routinely or after every edit, each call compiles the project and
-        returns a full-page image. To inspect a single table or figure, prefer
-        show_table / show_figure, which crop to just that float.
+        """Show a rendered image of one page of the compiled PDF: layout, margins,
+        spacing, line breaks, overfull boxes, float placement, and page breaks, none of
+        which the LaTeX source alone shows. Each call compiles the whole project and
+        returns a full-page image, so it is slower and larger than a cropped table or
+        figure.
 
         page: the 1-based page number to show (default 1).
         tex: project-relative path of the .tex to compile; omit to auto-detect the
-        root document, pass it when the project holds more than one document."""
+        root document, needed when the project holds more than one document."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -1064,12 +1062,12 @@ def create_hosted_server(
     @mcp.tool(title="Build a tracked-changes PDF", annotations={"title": "Build a tracked-changes PDF", "readOnlyHint": True})
     async def tracked_changes_pdf(ref: str, project: str | None = None, pages: list[int] | None = None,
                                   tex: str | None = None):
-        """A tracked-changes PDF (latexdiff): additions and deletions between a
-        commit/checkpoint id (list_checkpoints / get_history) and the CURRENT
-        document, rendered as page images, what journals ask for in a revised
-        submission. Nothing is committed. Shows the pages that contain changes (up to 8)
-        and lists them all; pass pages (1-based page numbers) to see specific ones. tex: the
-        document's .tex path when the project holds more than one."""
+        """Build a tracked-changes PDF (latexdiff) of the additions and deletions between
+        an earlier commit or checkpoint id and the current document, returned as page
+        images, as journals ask for with a revised submission. Nothing is committed.
+        Shows the pages that contain changes (up to 8) and lists them all; pages
+        (1-based page numbers) picks specific ones. tex: the document's .tex path when
+        the project holds more than one."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -1117,13 +1115,13 @@ def create_hosted_server(
         into one main.tex, strips comment lines, includes the precompiled
         bibliography (.bbl, which arXiv requires since it will not run bibtex),
         referenced graphics, and any custom .cls/.bst/.sty. Returns a download
-        link (valid ~15 minutes).
+        link (valid about 15 minutes).
 
         Args:
             tex: project-relative path of the root .tex to export (e.g.
-                "paper2/main.tex"). Pass this if the project has more than one
+                "paper2/main.tex"). Needed when the project has more than one
                 .tex file, otherwise auto-detection may flatten the wrong
-                document; list_files shows the available .tex files.
+                document.
         """
         try:
             user = await app.user()
@@ -1147,9 +1145,8 @@ def create_hosted_server(
 
     @mcp.tool(title="Save a checkpoint", annotations={"title": "Save a checkpoint", "readOnlyHint": False, "destructiveHint": False})
     async def checkpoint(name: str, project: str | None = None) -> str:
-        """Save a named restore point of the project RIGHT NOW (before a big
-        rewrite, before a deadline push). Cheap and instant; restore any file
-        later with restore_file. Counts as one commit."""
+        """Save a named restore point of the project as it is now, for example before a
+        big rewrite. Files can later be restored to it. Counts as one commit."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -1164,8 +1161,7 @@ def create_hosted_server(
 
     @mcp.tool(title="List checkpoints", annotations={"title": "List checkpoints", "readOnlyHint": True})
     async def list_checkpoints(project: str | None = None) -> str:
-        """List saved checkpoints (newest first) with their commit ids, for
-        project_diff / restore_file."""
+        """List saved checkpoints (newest first) with their commit ids."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -1178,8 +1174,7 @@ def create_hosted_server(
 
     @mcp.tool(title="Show changes between versions", annotations={"title": "Show changes between versions", "readOnlyHint": True})
     async def project_diff(ref: str, project: str | None = None) -> str:
-        """What changed since a commit/checkpoint id (from list_checkpoints or
-        get_history): per-file change summary."""
+        """Per-file summary of what changed since a commit or checkpoint id."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -1192,8 +1187,8 @@ def create_hosted_server(
 
     @mcp.tool(title="Restore a file", annotations={"title": "Restore a file", "readOnlyHint": False, "destructiveHint": True})
     async def restore_file(path: str, ref: str, project: str | None = None) -> str:
-        """Restore one file to its content at a commit/checkpoint id and commit
-        the restoration (undo for AI edits gone wrong). Counts as one commit.
+        """Restore one file to its content at a commit or checkpoint id and commit the
+        restoration (an undo for an edit gone wrong). Counts as one commit.
         Works on the project's Git repository (Overleaf's Git integration, GitHub, GitLab or Bitbucket); documentation: https://milatexai.com/help.
         """
         try:
@@ -1219,11 +1214,11 @@ def create_hosted_server(
     async def add_citation(
         reference: str, bib_file: str | None = None, project: str | None = None
     ) -> str:
-        """Add a VERIFIED citation to the bibliography. Give a DOI (10.xxxx/...)
-        or arXiv id (2301.01234); the server fetches the real BibTeX from
-        doi.org / arXiv (never trusting model memory, so no hallucinated
-        references), de-duplicates, appends to the .bib, and commits. Returns
-        the entry key to use in \\cite{...}. Counts as one commit."""
+        """Add a verified citation to the bibliography. Takes a DOI (10.xxxx/...) or an
+        arXiv id (2301.01234); the server fetches the real BibTeX from doi.org or
+        arXiv, rather than writing it from memory, so the reference is never invented.
+        It removes duplicates, appends the entry to the .bib, and commits. Returns the
+        entry key for \\cite{...}. Counts as one commit."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -1260,8 +1255,8 @@ def create_hosted_server(
 
     @mcp.tool(title="Check citations", annotations={"title": "Check citations", "readOnlyHint": True})
     async def check_citations(project: str | None = None) -> str:
-        """Bibliography integrity check: \\cite keys with no .bib entry
-        (broken/hallucinated) and .bib entries never cited."""
+        """Check the bibliography: \\cite keys with no .bib entry (broken or invented)
+        and .bib entries that are never cited."""
         try:
             user = await app.user()
             await app.ensure_capacity(user)
@@ -1293,7 +1288,7 @@ def create_hosted_server(
     async def project_stats(project: str | None = None, tex: str | None = None) -> str:
         """Word counts (approximate, comments/commands stripped), TODO/FIXME markers, and
         undefined or unused \\ref labels, for trimming to journal limits and pre-submission
-        checks. Counted per DOCUMENT (a root .tex and the files it \\input/\\includes), so a
+        checks. Counted per document (a root .tex and the files it \\input/\\includes), so a
         project with several papers gets one block per paper; tex: just that document."""
         try:
             user = await app.user()
@@ -1338,17 +1333,15 @@ def create_hosted_server(
         code: str, name: str, format: str = "png", project: str | None = None
     ):
         """Save a matplotlib figure the user has approved into their project (Pro).
-        Each call is a real commit, so it is meant for a figure the user has seen and
-        accepted. The server runs the code in an isolated sandbox (matplotlib 3.8,
-        numpy 1.26; no network, no pip, no other libraries) and commits BOTH the
-        source (figures/src/<name>.py, so the figure stays editable forever) and the
-        rendered artifact (figures/<name>.pdf or .png) in one push. The code MUST
+        Each call is a real commit. The server runs the code in an isolated sandbox
+        (matplotlib 3.8, numpy 1.26; no network, no pip, no other libraries) and
+        commits both the source (figures/src/<name>.py, so the figure stays editable)
+        and the rendered file (figures/<name>.pdf or .png) in one push. The code must
         save exactly one file named figure.pdf in the working directory, e.g.
-        fig.savefig('figure.pdf'); seed any randomness. format: "png" (default,
-        300 dpi, what most projects use) or "pdf" (vector) only when the user
-        asks for it or the project's \\includegraphics files are PDFs.
-        Overwrites an existing figure with the same name; counts as one commit
-        toward the monthly limit."""
+        fig.savefig('figure.pdf'), and seed any randomness. format: "png" (default,
+        300 dpi, what most projects use) or "pdf" (vector, for projects whose
+        \\includegraphics files are PDFs). Overwrites an existing figure with the same
+        name; counts as one commit toward the monthly limit."""
         try:
             user = await app.user()
             app.ensure_pro(user, "Figure Studio (creating and editing matplotlib figures)")
@@ -1425,13 +1418,12 @@ def create_hosted_server(
     async def commit_tikz(
         code: str, name: str, format: str = "png", project: str | None = None
     ):
-        """Save an APPROVED TikZ diagram into the user's Overleaf project (Pro).
-        Give the tikzpicture code (a bare snippet is fine; it is wrapped in a
-        standalone document with pgfplots available). The server compiles it,
-        commits BOTH the source (figures/src/<name>.tex, editable forever) and
-        the rendered artifact (figures/<name>.png at 300 dpi, or .pdf), and
-        returns the rendered image. Show the user the result; on a compile error
-        you get the exact LaTeX errors to fix. Counts as one commit."""
+        """Save an approved TikZ diagram into the user's project (Pro). Takes the
+        tikzpicture code (a bare snippet is fine; it is wrapped in a standalone
+        document with pgfplots available). The server compiles it, commits both the
+        source (figures/src/<name>.tex) and the rendered file (figures/<name>.png at
+        300 dpi, or .pdf), and returns the rendered image. A compile error returns the
+        exact LaTeX errors. Counts as one commit."""
         try:
             user = await app.user()
             app.ensure_pro(user, "TikZ Studio (creating and editing TikZ diagrams)")
@@ -1483,11 +1475,10 @@ def create_hosted_server(
 
     @mcp.tool(title="List figures", annotations={"title": "List figures", "readOnlyHint": True})
     async def list_figures(project: str | None = None) -> str:
-        """List the project's Figure Studio figures (Pro): each managed figure's
-        slug, source file, and whether its rendered output exists, plus recently
-        DELETED figures that can still be recovered from git history. To edit one,
-        read its figures/src/<slug>.py, change the code, re-render for the user,
-        and commit_figure again with the same name."""
+        """List the project's Figure Studio figures (Pro): each figure's slug, source
+        file, and whether its rendered output exists, plus recently deleted figures
+        that can still be recovered from Git history. A figure's code is in
+        figures/src/<slug>.py; saving a figure again under the same name replaces it."""
         try:
             user = await app.user()
             app.ensure_pro(user, "Figure Studio (creating and editing matplotlib figures)")
@@ -1583,10 +1574,9 @@ def create_hosted_server(
     async def write_file(
         path: str, content: str, project: str | None = None, allow_shrink: bool = False
     ) -> str:
-        """Create a BRAND-NEW file or overwrite an existing one, then commit+push.
-        The file does not need to exist first and parent folders are created
-        automatically, so use this freely for new .tex/.bib/.sty files (e.g. a new
-        section file or a preamble you found for the user).
+        """Create a new file or overwrite an existing one, then commit and push. The file
+        does not need to exist first and parent folders are created automatically
+        (e.g. a new section file, .bib, or .sty).
         Works on the project's Git repository (Overleaf's Git integration, GitHub, GitLab or Bitbucket); documentation: https://milatexai.com/help.
         """
         try:
@@ -1635,7 +1625,7 @@ def create_hosted_server(
 
     @mcp.tool(title="Upload a binary file", annotations={"title": "Upload a binary file", "readOnlyHint": False, "destructiveHint": True})
     async def upload_file(path: str, content_base64: str, project: str | None = None) -> str:
-        """Add or replace a BINARY file (image/PDF) from base64, then commit+push.
+        """Add or replace a binary file (image or PDF) from base64, then commit and push.
         Works on the project's Git repository (Overleaf's Git integration, GitHub, GitLab or Bitbucket); documentation: https://milatexai.com/help."""
         try:
             data = base64.b64decode(content_base64, validate=True)
@@ -1664,11 +1654,9 @@ def create_hosted_server(
 
     @mcp.tool(title="Download a file", annotations={"title": "Download a file", "readOnlyHint": True})
     async def download_file(path: str, project: str | None = None) -> str:
-        """Get a BINARY file (image, PDF, etc.). Files up to 48 KB come back as base64;
+        """Get a binary file (image, PDF, etc.). Files up to 48 KB come back as base64;
         larger ones as a download link for the user (valid about 15 minutes), so big
-        files never flood the chat. To copy a file into ANOTHER of the user's projects,
-        use copy_file instead (no base64 needed). For text files (.tex/.bib/.sty/...),
-        use read_file.
+        files never flood the chat.
         Works on the project's Git repository (Overleaf's Git integration, GitHub, GitLab or Bitbucket); documentation: https://milatexai.com/help.
         """
         try:
@@ -1700,14 +1688,14 @@ def create_hosted_server(
     @mcp.tool(title="Copy a file to another project", annotations={"title": "Copy a file to another project", "readOnlyHint": False, "destructiveHint": True})
     async def copy_file(path: str, to_project: str, to_path: str | None = None,
                         project: str | None = None) -> str:
-        """Copy a file (any type: image, PDF, .tex, .bib...) from one of the user's projects
-        into ANOTHER of their projects, directly on the server, as one commit in the
-        destination. Replaces a file already at the destination path.
+        """Copy a file (any type: image, PDF, .tex, .bib...) from one of the user's
+        projects into another of their projects, directly on the server, as one commit
+        in the destination. Replaces a file already at the destination path.
         Works on the project's Git repository (Overleaf's Git integration, GitHub, GitLab or Bitbucket); documentation: https://milatexai.com/help.
 
         Args:
             path: the file in the source project.
-            to_project: the destination project's name or id (list_projects shows them).
+            to_project: the destination project's name or id.
             to_path: where to put it in the destination; defaults to the same path.
             project: the source project; defaults to the current one.
         """

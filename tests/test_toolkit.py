@@ -252,3 +252,34 @@ def test_the_file_tools_name_what_they_work_on_and_link_the_docs():
     for name in ("copy_file", "delete_file", "download_file", "edit_file", "get_sections", "read_file",
                  "read_section", "restore_file", "upload_file", "write_file"):
         assert "https://milatexai.com/help" in tools[name].description, name
+
+
+def test_tool_descriptions_only_describe_the_tool():
+    """Directory policy: a tool description says what the tool does. Guidance on which
+    tool to use when, or how the model should behave, belongs in the server instructions."""
+    import asyncio
+    import os
+    import re
+    os.environ.setdefault("WORKOS_AUTHKIT_DOMAIN", "https://placeholder.authkit.invalid")
+    from leafbridge.hosted import INSTRUCTIONS, create_hosted_server
+
+    tools = asyncio.run(create_hosted_server(auth=False).list_tools())
+    tools = tools if isinstance(tools, list) else list(tools.values())
+    names = {t.name for t in tools if "_" in t.name}   # "checkpoint" and "upgrade" are plain words too
+    steer = re.compile(r"\b(prefer|recommended over|instead|then call|do not call|sparingly|"
+                       r"whenever the user|use this|run this|ask the user|show the user|relay)\b", re.I)
+    shout = re.compile(r"\b[A-Z]{4,}\b")
+    for t in tools:
+        texts = [t.description or ""] + [v.get("description", "") for v in
+                                         (t.parameters or {}).get("properties", {}).values()]
+        for text in texts:
+            others = [n for n in names if n != t.name and re.search(rf"\b{n}\b", text)]
+            assert not others, f"{t.name} names other tools: {others}"
+            assert not steer.search(text), f"{t.name}: {steer.search(text).group(0)!r}"
+            loud = set(shout.findall(text)) - {"HTTPS", "TODO", "FIXME"}
+            assert not loud, f"{t.name} shouts: {loud}"
+            assert not any(ord(c) in (0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF) or 0xE0000 <= ord(c) <= 0xE007F
+                           for c in text), f"{t.name} has hidden characters"
+    # The workflow tips now live in the server instructions.
+    for tip in ("start_connect", "copy_file", "show_page", "list_checkpoints"):
+        assert tip in INSTRUCTIONS, tip
