@@ -221,7 +221,7 @@ def _compile_and_locate(
     main_path = os.path.join(repo_dir, main_rel)
     if not os.path.isfile(main_path):
         return LocateResult(False, message=f"main file not found: {main_rel}")
-    source = open(main_path, encoding="utf-8", errors="replace").read()
+    source = Path(main_path).read_text(encoding="utf-8", errors="replace")
     stem = os.path.splitext(os.path.basename(main_rel))[0] + "__mila"
     inst_name = stem + ".tex"
     # Write the instrumented copy alongside the original so \input paths resolve.
@@ -247,7 +247,7 @@ def _compile_and_locate(
     if not os.path.isfile(aux_path):
         tail = (proc.stderr or proc.stdout or "")[-400:]
         return LocateResult(False, message=f"no .aux produced. {tail}")
-    floats, labels = parse_aux(open(aux_path, encoding="utf-8", errors="replace").read())
+    floats, labels = parse_aux(Path(aux_path).read_text(encoding="utf-8", errors="replace"))
     has_pdf = os.path.isfile(pdf_path)
     pages = None
     if has_pdf:
