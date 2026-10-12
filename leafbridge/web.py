@@ -56,6 +56,7 @@ body {
 }
 .brand { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
 .brand span { color: #00a693; }
+.ltx{font-family:Cambria,Georgia,'Times New Roman',serif;font-weight:700;font-size:1.1em;letter-spacing:0;white-space:nowrap}.ltx-a{font-size:.72em;position:relative;top:-.26em;margin:0 -.08em 0 -.34em}.ltx-e{position:relative;top:.21em;margin:0 -.03em 0 -.07em}
 h1 { font-size: 21px; margin: 18px 0 6px; letter-spacing: -.01em; }
 .muted { color: #6b7280; font-size: 14px; margin: 0 0 20px; }
 label { display: block; font-size: 13px; font-weight: 600; margin: 16px 0 6px; }
@@ -109,7 +110,7 @@ def _page(title: str, body: str) -> str:
 
 
 def _brand_header() -> str:
-    return f"<div class='brand'>Mi<span>LaTeX</span>AI</div>"
+    return f"<div class='brand'>Mi<span class='ltx'>L<span class='ltx-a'>A</span>T<span class='ltx-e'>E</span>X</span>AI</div>"
 
 
 def render_connect_form(

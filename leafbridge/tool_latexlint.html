@@ -58,6 +58,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,
 .topbar a{text-decoration:none;color:inherit}
 .toplink{color:var(--accent);font-weight:600;font-size:14px}
 .brand span{color:var(--accent)}
+.ltx{font-family:Cambria,Georgia,'Times New Roman',serif;font-weight:700;font-size:1.1em;letter-spacing:0;white-space:nowrap}.ltx-a{font-size:.72em;position:relative;top:-.26em;margin:0 -.08em 0 -.34em}.ltx-e{position:relative;top:.21em;margin:0 -.03em 0 -.07em}
 h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:18px 0 10px}
 .sub{color:var(--muted);max-width:720px;margin:0 0 22px}
 label.io{display:block;font-weight:600;font-size:13px;color:var(--muted);margin:0 0 6px}
@@ -94,7 +95,7 @@ code{background:var(--card);border:1px solid var(--line);border-radius:6px;paddi
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar"><a class="brand" href="/">Mi<span>LaTeX</span>AI</a><a class="toplink" href="/tools">&#8592; All free web tools</a></div>
+  <div class="topbar"><a class="brand" href="/">Mi<span class="ltx">L<span class="ltx-a">A</span>T<span class="ltx-e">E</span>X</span>AI</a><a class="toplink" href="/tools">&#8592; All free web tools</a></div>
   <h1>LaTeX Error Finder</h1>
   <p class="sub">Paste your <code>.tex</code> and hit Check. It finds the structural mistakes that make LaTeX fail with cryptic messages: an unmatched <code>{</code> or <code>}</code>, a <code>\begin</code> with no matching <code>\end</code>, a math delimiter left open, an unclosed <code>\verb</code>, or a stray <code>_</code>, <code>^</code>, or <code>&amp;</code> in ordinary text. It gives you the exact line and column, without compiling. It runs entirely in your browser, so nothing is uploaded and there is no sign-up. <b>Free to use.</b></p>
 

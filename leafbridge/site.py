@@ -317,7 +317,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     )
 
     header = f"""<header class='nav'>
-  <a class='brand' href='#top'>Mi<span>LaTeX</span>AI</a>
+  <a class='brand' href='#top'>Mi<span class='ltx'>L<span class='ltx-a'>A</span>T<span class='ltx-e'>E</span>X</span>AI</a>
   <nav class='links'>
     <a href='#features' data-i18n='nav.features'>{_t(en,'nav.features')}</a>
     <a href='#how' data-i18n='nav.how'>{_t(en,'nav.how')}</a>
@@ -490,7 +490,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
 </section>"""
 
     footer = f"""<footer class='site-footer'>
-  <div class='foot-brand'>Mi<span>LaTeX</span>AI</div>
+  <div class='foot-brand'>Mi<span class='ltx'>L<span class='ltx-a'>A</span>T<span class='ltx-e'>E</span>X</span>AI</div>
   {_node(en,'p','footer.blurb','muted')}
   <nav class='foot-links'>
     <a href='/privacy' data-i18n='nav.privacy'>{_t(en,'nav.privacy')}</a>
@@ -709,7 +709,7 @@ def render_account(
 <link rel='apple-touch-icon' href='/icon.png'>
 <title>{html.escape(heading)} · MiLatexAI</title><style>{_CSS}</style></head>
 <body><main class='section' style='max-width:560px;margin:0 auto;text-align:center;min-height:72vh;display:flex;flex-direction:column;justify-content:center;gap:8px'>
-<a class='brand' href='/' style='margin-bottom:10px'>Mi<span>LaTeX</span>AI</a>
+<a class='brand' href='/' style='margin-bottom:10px'>Mi<span class='ltx'>L<span class='ltx-a'>A</span>T<span class='ltx-e'>E</span>X</span>AI</a>
 {banner}
 <div style='font-size:44px'>{icon}</div>
 <h2 class='h2'>{html.escape(heading)}</h2>
@@ -755,7 +755,7 @@ def render_tools_page() -> str:
 <meta property='og:url' content='https://milatexai.com/tools'>
 <style>{_CSS}</style></head>
 <body>
-<header class='nav'><a class='brand' href='/'>Mi<span>LaTeX</span>AI</a>
+<header class='nav'><a class='brand' href='/'>Mi<span class='ltx'>L<span class='ltx-a'>A</span>T<span class='ltx-e'>E</span>X</span>AI</a>
   <nav class='links'><a href='/#features'>Features</a><a href='/#how'>How it works</a><a href='/#pricing'>Pricing</a><a href='/#faq'>FAQ</a></nav>
   <div class='navactions'><a class='btn btn-sm' href='/#get-started'>Get started</a></div>
 </header>
@@ -797,7 +797,7 @@ def render_legal_page(kind: str, content: dict | None = None) -> str:
 <meta name='robots' content='index,follow'>
 <style>{_CSS}</style></head>
 <body>
-<header class='nav'><a class='brand' href='/'>Mi<span>LaTeX</span>AI</a>
+<header class='nav'><a class='brand' href='/'>Mi<span class='ltx'>L<span class='ltx-a'>A</span>T<span class='ltx-e'>E</span>X</span>AI</a>
   <nav class='links'><a href='/#features'>Features</a><a href='/#pricing'>Pricing</a><a href='/#faq'>FAQ</a><a href='/tools'>Free web tools</a></nav>
   <div class='navactions'><a class='btn btn-sm' href='/#get-started'>Get started</a></div>
 </header>
@@ -816,7 +816,7 @@ def render_og_image() -> str:
     return """<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'>
 <rect width='1200' height='630' fill='#0b0d12'/>
 <rect x='0' y='0' width='1200' height='8' fill='#00a693'/>
-<text x='90' y='300' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='96' font-weight='800' fill='#ffffff'>Mi<tspan fill='#00a693'>LaTeX</tspan>AI</text>
+<text x='90' y='300' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='96' font-weight='800' fill='#ffffff'>Mi<tspan fill='#00a693' font-family='Cambria, Georgia, serif' font-weight='700'>L<tspan font-size='69' dx='-38' dy='-18'>A</tspan><tspan font-size='96' dx='-10' dy='18'>T</tspan><tspan dx='-10' dy='20'>E</tspan><tspan dx='-6' dy='-20'>X</tspan></tspan>AI</text>
 <text x='94' y='378' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='42' fill='#c7cdd8'>Edit your Overleaf papers by talking to your AI.</text>
 <text x='94' y='452' font-family='Segoe UI, Helvetica, Arial, sans-serif' font-size='30' fill='#7b8496'>Works with Claude &amp; ChatGPT  ·  milatexai.com</text>
 </svg>"""
@@ -933,6 +933,7 @@ a{color:inherit;text-decoration:none}
 .nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20px;padding:14px 24px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .brand{font-weight:800;font-size:19px;letter-spacing:-.02em}
 .brand span{color:var(--accent)}
+.ltx{font-family:Cambria,Georgia,'Times New Roman',serif;font-weight:700;font-size:1.1em;letter-spacing:0;white-space:nowrap}.ltx-a{font-size:.72em;position:relative;top:-.26em;margin:0 -.08em 0 -.34em}.ltx-e{position:relative;top:.21em;margin:0 -.03em 0 -.07em}
 .links{display:flex;gap:20px;margin-inline-start:auto;font-size:14.5px}
 .links a{color:var(--muted)}.links a:hover{color:var(--fg)}
 .navactions{display:flex;align-items:center;gap:12px}
