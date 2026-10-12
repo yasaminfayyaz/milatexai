@@ -939,7 +939,7 @@ a{color:inherit;text-decoration:none}
 .lang select{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:14px}
 .btn{display:inline-block;background:var(--accent);color:#0b3b33;padding:12px 20px;border-radius:10px;font-weight:600;border:0;cursor:pointer;font-size:15px}
 .btn:hover{background:#008779}
-.btn-sm{padding:8px 14px;font-size:14px}
+.btn-sm{padding:8px 14px;font-size:14px;white-space:nowrap}
 .btn-lg{padding:15px 30px;font-size:17px}
 .btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
 .btn-ghost:hover{background:var(--card)}
@@ -982,8 +982,8 @@ a.badge-link{text-decoration:none}a.badge-link:hover{text-decoration:underline}
 .add-rows{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px 14px;align-items:center;max-width:640px;margin:28px auto 0;text-align:start}
 .add-label{font-size:14px;font-weight:600;color:var(--muted)}
 .add-box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 14px;height:44px;line-height:42px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.add-btn{width:150px;height:44px;padding:0 16px;line-height:44px;text-align:center;font-size:15px}
-@media(max-width:600px){.add-rows{grid-template-columns:minmax(0,1fr) auto;gap:8px 10px}.add-label{grid-column:1/-1;margin-top:8px}.add-btn{width:110px}}
+.add-btn{min-width:150px;height:44px;padding:0 16px;line-height:44px;text-align:center;font-size:15px;white-space:nowrap;justify-self:stretch}
+@media(max-width:600px){.add-rows{grid-template-columns:minmax(0,1fr);gap:8px}.add-label{margin-top:10px}.add-box{white-space:normal;overflow-wrap:anywhere;height:auto;min-height:44px;line-height:1.4;padding:11px 14px}.add-btn{min-width:0;font-size:15px}}
 .hero-art{width:100%;max-width:560px;height:auto;margin:26px auto 8px;display:block}
 .spotlight{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center;max-width:1000px;margin-inline:auto}
 .spotlight-text{text-align:start}
