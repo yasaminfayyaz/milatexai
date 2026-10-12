@@ -310,7 +310,7 @@
   "setup": {
    "title": "Add MiLatexAI in two minutes",
    "subtitle": "The same connector works in Claude and ChatGPT.",
-   "url_label": "Or add it by URL (ChatGPT, Claude Code, other apps)",
+   "url_label": "ChatGPT and other apps",
    "docs_label": "Official setup guide →",
    "claude_title": "In Claude",
    "claude_steps": [
@@ -331,7 +331,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Open MiLatexAI in Claude →",
    "claude_button": "Add to Claude",
-   "claude_hint": "In Claude: + → Connectors → search MiLatexAI"
+   "claude_hint": "+ → Connectors → search MiLatexAI"
   },
   "help": {
    "title": "Help",
@@ -653,7 +653,7 @@
   "setup": {
    "title": "两分钟添加 MiLatexAI",
    "subtitle": "同一个连接器可在 Claude 和 ChatGPT 中使用。",
-   "url_label": "或通过 URL 添加（ChatGPT、Claude Code、其他应用）",
+   "url_label": "ChatGPT 及其他应用",
    "docs_label": "官方设置指南 →",
    "claude_title": "在 Claude 中",
    "claude_steps": [
@@ -674,7 +674,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "在 Claude 中打开 MiLatexAI →",
    "claude_button": "添加到 Claude",
-   "claude_hint": "在 Claude 中：+ → Connectors → 搜索 MiLatexAI"
+   "claude_hint": "+ → Connectors → 搜索 MiLatexAI"
   },
   "see": {
    "badge": "新",
@@ -975,7 +975,7 @@
   "setup": {
    "title": "Ajoutez MiLatexAI en deux minutes",
    "subtitle": "Le même connecteur fonctionne dans Claude et ChatGPT.",
-   "url_label": "Ou ajoutez-le par URL (ChatGPT, Claude Code, autres applis)",
+   "url_label": "ChatGPT et autres applis",
    "docs_label": "Guide de configuration officiel →",
    "claude_title": "Dans Claude",
    "claude_steps": [
@@ -996,7 +996,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Ouvrir MiLatexAI dans Claude →",
    "claude_button": "Ajouter à Claude",
-   "claude_hint": "Dans Claude : + → Connectors → cherchez MiLatexAI"
+   "claude_hint": "+ → Connectors → cherchez MiLatexAI"
   },
   "see": {
    "badge": "Nouveau",
@@ -1297,7 +1297,7 @@
   "setup": {
    "title": "Añade MiLatexAI en dos minutos",
    "subtitle": "El mismo conector funciona en Claude y ChatGPT.",
-   "url_label": "O añádelo por URL (ChatGPT, Claude Code, otras apps)",
+   "url_label": "ChatGPT y otras apps",
    "docs_label": "Guía de configuración oficial →",
    "claude_title": "En Claude",
    "claude_steps": [
@@ -1318,7 +1318,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Abrir MiLatexAI en Claude →",
    "claude_button": "Añadir a Claude",
-   "claude_hint": "En Claude: + → Connectors → busca MiLatexAI"
+   "claude_hint": "+ → Connectors → busca MiLatexAI"
   },
   "see": {
    "badge": "Nuevo",
@@ -1619,7 +1619,7 @@
   "setup": {
    "title": "MiLatexAI in zwei Minuten hinzufügen",
    "subtitle": "Derselbe Connector funktioniert in Claude und ChatGPT.",
-   "url_label": "Oder per URL hinzufügen (ChatGPT, Claude Code, andere Apps)",
+   "url_label": "ChatGPT und andere Apps",
    "docs_label": "Offizielle Einrichtungsanleitung →",
    "claude_title": "In Claude",
    "claude_steps": [
@@ -1640,7 +1640,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "MiLatexAI in Claude öffnen →",
    "claude_button": "Zu Claude hinzufügen",
-   "claude_hint": "In Claude: + → Connectors → nach MiLatexAI suchen"
+   "claude_hint": "+ → Connectors → nach MiLatexAI suchen"
   },
   "see": {
    "badge": "Neu",
@@ -1941,7 +1941,7 @@
   "setup": {
    "title": "MiLatexAIを2分で追加",
    "subtitle": "同じコネクターがClaudeとChatGPTの両方で使えます。",
-   "url_label": "または URL で追加（ChatGPT、Claude Code、その他のアプリ）",
+   "url_label": "ChatGPT・その他のアプリ",
    "docs_label": "公式セットアップガイド →",
    "claude_title": "Claudeの場合",
    "claude_steps": [
@@ -1962,7 +1962,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Claude で MiLatexAI を開く →",
    "claude_button": "Claude に追加",
-   "claude_hint": "Claude で：+ → Connectors → MiLatexAI を検索"
+   "claude_hint": "+ → Connectors → MiLatexAI を検索"
   },
   "see": {
    "badge": "新",
@@ -2263,7 +2263,7 @@
   "setup": {
    "title": "Adicione o MiLatexAI em dois minutos",
    "subtitle": "O mesmo conector funciona no Claude e no ChatGPT.",
-   "url_label": "Ou adicione pela URL (ChatGPT, Claude Code, outros apps)",
+   "url_label": "ChatGPT e outros apps",
    "docs_label": "Guia oficial de configuração →",
    "claude_title": "No Claude",
    "claude_steps": [
@@ -2284,7 +2284,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Abrir o MiLatexAI no Claude →",
    "claude_button": "Adicionar ao Claude",
-   "claude_hint": "No Claude: + → Connectors → pesquise MiLatexAI"
+   "claude_hint": "+ → Connectors → pesquise MiLatexAI"
   },
   "see": {
    "badge": "Novo",
@@ -2585,7 +2585,7 @@
   "setup": {
    "title": "أضف MiLatexAI في دقيقتين",
    "subtitle": "الموصّل نفسه يعمل في Claude و ChatGPT.",
-   "url_label": "أو أضِفه عبر الرابط (ChatGPT وClaude Code وتطبيقات أخرى)",
+   "url_label": "ChatGPT وتطبيقات أخرى",
    "docs_label": "دليل الإعداد الرسمي →",
    "claude_title": "في Claude",
    "claude_steps": [
@@ -2606,7 +2606,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "افتح MiLatexAI في Claude →",
    "claude_button": "أضِف إلى Claude",
-   "claude_hint": "في Claude: + → Connectors → ابحث عن MiLatexAI"
+   "claude_hint": "+ → Connectors → ابحث عن MiLatexAI"
   },
   "see": {
    "badge": "جديد",
@@ -2907,7 +2907,7 @@
   "setup": {
    "title": "MiLatexAI को दो मिनट में जोड़ें",
    "subtitle": "यही कनेक्टर Claude और ChatGPT दोनों में काम करता है।",
-   "url_label": "या URL से जोड़ें (ChatGPT, Claude Code, अन्य ऐप्स)",
+   "url_label": "ChatGPT और अन्य ऐप्स",
    "docs_label": "आधिकारिक सेटअप गाइड →",
    "claude_title": "Claude में",
    "claude_steps": [
@@ -2928,7 +2928,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Claude में MiLatexAI खोलें →",
    "claude_button": "Claude में जोड़ें",
-   "claude_hint": "Claude में: + → Connectors → MiLatexAI खोजें"
+   "claude_hint": "+ → Connectors → MiLatexAI खोजें"
   },
   "see": {
    "badge": "नया",
@@ -3229,7 +3229,7 @@
   "setup": {
    "title": "2분 만에 MiLatexAI 추가하기",
    "subtitle": "동일한 커넥터가 Claude와 ChatGPT에서 작동합니다.",
-   "url_label": "또는 URL로 추가 (ChatGPT, Claude Code, 기타 앱)",
+   "url_label": "ChatGPT 및 기타 앱",
    "docs_label": "공식 설정 가이드 →",
    "claude_title": "Claude에서",
    "claude_steps": [
@@ -3250,7 +3250,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Claude에서 MiLatexAI 열기 →",
    "claude_button": "Claude에 추가",
-   "claude_hint": "Claude에서: + → Connectors → MiLatexAI 검색"
+   "claude_hint": "+ → Connectors → MiLatexAI 검색"
   },
   "see": {
    "badge": "신규",
@@ -3551,7 +3551,7 @@
   "setup": {
    "title": "Добавьте MiLatexAI за две минуты",
    "subtitle": "Один и тот же коннектор работает в Claude и ChatGPT.",
-   "url_label": "Или добавьте по URL (ChatGPT, Claude Code, другие приложения)",
+   "url_label": "ChatGPT и другие приложения",
    "docs_label": "Официальное руководство по настройке →",
    "claude_title": "В Claude",
    "claude_steps": [
@@ -3572,7 +3572,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Открыть MiLatexAI в Claude →",
    "claude_button": "Добавить в Claude",
-   "claude_hint": "В Claude: + → Connectors → найдите MiLatexAI"
+   "claude_hint": "+ → Connectors → найдите MiLatexAI"
   },
   "see": {
    "badge": "Новое",
@@ -3873,7 +3873,7 @@
   "setup": {
    "title": "Aggiungi MiLatexAI in due minuti",
    "subtitle": "Lo stesso connettore funziona in Claude e ChatGPT.",
-   "url_label": "Oppure aggiungilo tramite URL (ChatGPT, Claude Code, altre app)",
+   "url_label": "ChatGPT e altre app",
    "docs_label": "Guida ufficiale alla configurazione →",
    "claude_title": "In Claude",
    "claude_steps": [
@@ -3894,7 +3894,7 @@
    "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
    "claude_link_label": "Apri MiLatexAI in Claude →",
    "claude_button": "Aggiungi a Claude",
-   "claude_hint": "In Claude: + → Connectors → cerca MiLatexAI"
+   "claude_hint": "+ → Connectors → cerca MiLatexAI"
   },
   "see": {
    "badge": "Novità",

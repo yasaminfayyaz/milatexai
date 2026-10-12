@@ -249,9 +249,14 @@ def test_claude_directory_comes_first_and_the_url_stays_visible():
     link = "https://claude.ai/directory/milatexai"
     home = site.render_site()
     assert f"<a class='badge badge-link' href='{link}'" in home                     # the hero badge links to the listing
-    button, url_box = home.index("data-i18n='setup.claude_button'"), home.index("<code>https://milatexai.com/mcp</code>")
+    button, url_box = home.index("data-i18n='setup.claude_button'"), home.index("https://milatexai.com/mcp</code>")
     assert button < url_box                                                         # Claude first, URL right under it
     for lang, c in site.load_content().items():
         s = c["setup"]
         assert s["claude_button"] and "MiLatexAI" in s["claude_hint"] and "ChatGPT" in s["url_label"], lang
         assert "Claude" in c["hero"]["badge"] and chr(0x2014) not in c["hero"]["badge"], lang
+
+
+def test_the_favicon_is_the_current_logo():
+    from pathlib import Path
+    assert site.icon_png() == (Path(__file__).resolve().parents[1] / "docs" / "directory" / "icon-64.png").read_bytes()

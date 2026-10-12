@@ -65,8 +65,8 @@ _FALLBACK_EN = {
                   "chatgpt": "Add as a custom connector in ChatGPT."},
     "setup": {"title": "Add MiLatexAI in two minutes",
               "subtitle": "The same connector works in Claude and ChatGPT.",
-              "url_label": "Or add it by URL (ChatGPT, Claude Code, other apps)", "docs_label": "Official setup guide →",
-              "claude_button": "Add to Claude", "claude_hint": "In Claude: + → Connectors → search MiLatexAI",
+              "url_label": "ChatGPT and other apps", "docs_label": "Official setup guide →",
+              "claude_button": "Add to Claude", "claude_hint": "+ → Connectors → search MiLatexAI",
               "claude_title": "In Claude",
               "claude_steps": [
                   "Click + in a chat, go to Connectors and search for MiLatexAI, or use the link below.",
@@ -413,14 +413,13 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     get_started = f"""<section class='section' id='get-started'>
   {_node(en,'h2','setup.title','h2')}
   {_node(en,'p','setup.subtitle','sub')}
-  <div class='claude-add'>
-    <a class='btn btn-lg' href='https://claude.ai/directory/milatexai' target='_blank' rel='noopener' data-i18n='setup.claude_button'>{_t(en,'setup.claude_button')}</a>
-    <span class='muted small' data-i18n='setup.claude_hint'>{_t(en,'setup.claude_hint')}</span>
-  </div>
-  <div class='connect-url'>
-    <span class='cu-label' data-i18n='setup.url_label'>{_t(en,'setup.url_label')}</span>
-    <code>https://milatexai.com/mcp</code>
-    <button class='btn btn-sm' onclick="navigator.clipboard&amp;&amp;navigator.clipboard.writeText('https://milatexai.com/mcp')">Copy</button>
+  <div class='add-rows'>
+    <span class='add-label' data-i18n='setup.claude_title'>{_t(en,'setup.claude_title')}</span>
+    <span class='add-box' data-i18n='setup.claude_hint'>{_t(en,'setup.claude_hint')}</span>
+    <a class='btn add-btn' href='https://claude.ai/directory/milatexai' target='_blank' rel='noopener' data-i18n='setup.claude_button'>{_t(en,'setup.claude_button')}</a>
+    <span class='add-label' data-i18n='setup.url_label'>{_t(en,'setup.url_label')}</span>
+    <code class='add-box'>https://milatexai.com/mcp</code>
+    <button class='btn add-btn' onclick="navigator.clipboard&amp;&amp;navigator.clipboard.writeText('https://milatexai.com/mcp')">Copy</button>
   </div>
   <div class='grid two setup-cols'>
     <div class='card setup-card'>
@@ -979,11 +978,12 @@ a{color:inherit;text-decoration:none}
 .step{display:flex;gap:16px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
 .num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--accent);color:#0b3b33;display:flex;align-items:center;justify-content:center;font-weight:700}
 .step h3{margin:0 0 4px;font-size:16px}
-.claude-add{display:flex;gap:10px 16px;align-items:center;justify-content:center;margin-top:26px;flex-wrap:wrap}
 a.badge-link{text-decoration:none}a.badge-link:hover{text-decoration:underline}
-.connect-url{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:22px;flex-wrap:wrap}
-.connect-url code{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:15px}
-.cu-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.add-rows{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px 14px;align-items:center;max-width:640px;margin:28px auto 0;text-align:start}
+.add-label{font-size:14px;font-weight:600;color:var(--muted)}
+.add-box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 14px;height:44px;line-height:42px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.add-btn{width:150px;height:44px;padding:0 16px;line-height:44px;text-align:center;font-size:15px}
+@media(max-width:600px){.add-rows{grid-template-columns:minmax(0,1fr) auto;gap:8px 10px}.add-label{grid-column:1/-1;margin-top:8px}.add-btn{width:110px}}
 .hero-art{width:100%;max-width:560px;height:auto;margin:26px auto 8px;display:block}
 .spotlight{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center;max-width:1000px;margin-inline:auto}
 .spotlight-text{text-align:start}
