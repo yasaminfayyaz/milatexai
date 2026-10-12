@@ -218,7 +218,10 @@ def test_the_site_has_an_icon():
         assert r.headers["content-type"] == "image/png"
         assert r.content.startswith(b"\x89PNG")
         for path in ("/", "/help", "/privacy", "/tools"):
-            assert "rel='icon'" in client.get(path).text, path
+            page = client.get(path).text
+            assert "rel='icon'" in page, path
+            # a large icon too, so favicon services (and the Claude directory) show the logo
+            assert "sizes='512x512' href='/icon.png'" in page and "rel='apple-touch-icon'" in page, path
 
 
 def test_the_logo_is_served_for_directory_listings():

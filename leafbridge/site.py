@@ -594,7 +594,9 @@ function applyLang(lang) {{
     return f"""<!doctype html><html lang='en'><head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='icon' type='image/png' href='/favicon.ico'>
+<link rel='icon' type='image/png' sizes='64x64' href='/favicon.ico'>
+<link rel='icon' type='image/png' sizes='512x512' href='/icon.png'>
+<link rel='apple-touch-icon' href='/icon.png'>
 {seo}
 <style>{_CSS}</style>
 </head><body>
@@ -698,7 +700,9 @@ def render_account(
 
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='icon' type='image/png' href='/favicon.ico'>
+<link rel='icon' type='image/png' sizes='64x64' href='/favicon.ico'>
+<link rel='icon' type='image/png' sizes='512x512' href='/icon.png'>
+<link rel='apple-touch-icon' href='/icon.png'>
 <title>{html.escape(heading)} · MiLatexAI</title><style>{_CSS}</style></head>
 <body><main class='section' style='max-width:560px;margin:0 auto;text-align:center;min-height:72vh;display:flex;flex-direction:column;justify-content:center;gap:8px'>
 <a class='brand' href='/' style='margin-bottom:10px'>Mi<span>LaTeX</span>AI</a>
@@ -733,7 +737,9 @@ def render_tools_page() -> str:
     so the homepage stays short and new tools have a home to grow into."""
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='icon' type='image/png' href='/favicon.ico'>
+<link rel='icon' type='image/png' sizes='64x64' href='/favicon.ico'>
+<link rel='icon' type='image/png' sizes='512x512' href='/icon.png'>
+<link rel='apple-touch-icon' href='/icon.png'>
 <title>Free Web Tools for LaTeX Researchers | MiLatexAI</title>
 <meta name='description' content='Free browser-based tools for LaTeX researchers: a BibTeX cleaner with DOI finder and duplicate remover, and a LaTeX error finder. No login, nothing uploaded.'>
 <link rel='canonical' href='https://milatexai.com/tools'>
@@ -779,7 +785,9 @@ def render_legal_page(kind: str, content: dict | None = None) -> str:
     )
     return f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='icon' type='image/png' href='/favicon.ico'>
+<link rel='icon' type='image/png' sizes='64x64' href='/favicon.ico'>
+<link rel='icon' type='image/png' sizes='512x512' href='/icon.png'>
+<link rel='apple-touch-icon' href='/icon.png'>
 <title>{title} · MiLatexAI</title>
 <link rel='canonical' href='https://milatexai.com/{kind}'>
 <meta name='robots' content='index,follow'>
