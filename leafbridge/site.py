@@ -65,7 +65,8 @@ _FALLBACK_EN = {
                   "chatgpt": "Add as a custom connector in ChatGPT."},
     "setup": {"title": "Add MiLatexAI in two minutes",
               "subtitle": "The same connector works in Claude and ChatGPT.",
-              "url_label": "Connector URL", "docs_label": "Official setup guide →",
+              "url_label": "Or add it by URL (ChatGPT, Claude Code, other apps)", "docs_label": "Official setup guide →",
+              "claude_button": "Add to Claude", "claude_hint": "In Claude: + → Connectors → search MiLatexAI",
               "claude_title": "In Claude",
               "claude_steps": [
                   "Click + in a chat, go to Connectors and search for MiLatexAI, or use the link below.",
@@ -331,7 +332,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
 </header>"""
 
     hero = f"""<section class='hero' id='top'>
-  <span class='badge' data-i18n='hero.badge'>{_t(en,'hero.badge')}</span>
+  <a class='badge badge-link' href='https://claude.ai/directory/milatexai' target='_blank' rel='noopener' data-i18n='hero.badge'>{_t(en,'hero.badge')}</a>
   {_node(en,'h1','hero.title','hero-title')}
   {_node(en,'p','hero.subtitle','hero-sub')}
 </section>"""
@@ -412,6 +413,10 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     get_started = f"""<section class='section' id='get-started'>
   {_node(en,'h2','setup.title','h2')}
   {_node(en,'p','setup.subtitle','sub')}
+  <div class='claude-add'>
+    <a class='btn btn-lg' href='https://claude.ai/directory/milatexai' target='_blank' rel='noopener' data-i18n='setup.claude_button'>{_t(en,'setup.claude_button')}</a>
+    <span class='muted small' data-i18n='setup.claude_hint'>{_t(en,'setup.claude_hint')}</span>
+  </div>
   <div class='connect-url'>
     <span class='cu-label' data-i18n='setup.url_label'>{_t(en,'setup.url_label')}</span>
     <code>https://milatexai.com/mcp</code>
@@ -974,7 +979,9 @@ a{color:inherit;text-decoration:none}
 .step{display:flex;gap:16px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
 .num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--accent);color:#0b3b33;display:flex;align-items:center;justify-content:center;font-weight:700}
 .step h3{margin:0 0 4px;font-size:16px}
-.connect-url{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.claude-add{display:flex;gap:10px 16px;align-items:center;justify-content:center;margin-top:26px;flex-wrap:wrap}
+a.badge-link{text-decoration:none}a.badge-link:hover{text-decoration:underline}
+.connect-url{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:22px;flex-wrap:wrap}
 .connect-url code{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:15px}
 .cu-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .hero-art{width:100%;max-width:560px;height:auto;margin:26px auto 8px;display:block}

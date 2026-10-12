@@ -243,3 +243,15 @@ def test_claude_setup_points_to_the_directory_listing_in_every_language():
     home = site.render_site()
     assert f"href='{link}'" in home and "setup.claude_link_label" in home
     assert link in site.render_legal_page("help") and link in site.llms_txt()
+
+
+def test_claude_directory_comes_first_and_the_url_stays_visible():
+    link = "https://claude.ai/directory/milatexai"
+    home = site.render_site()
+    assert f"<a class='badge badge-link' href='{link}'" in home                     # the hero badge links to the listing
+    button, url_box = home.index("data-i18n='setup.claude_button'"), home.index("<code>https://milatexai.com/mcp</code>")
+    assert button < url_box                                                         # Claude first, URL right under it
+    for lang, c in site.load_content().items():
+        s = c["setup"]
+        assert s["claude_button"] and "MiLatexAI" in s["claude_hint"] and "ChatGPT" in s["url_label"], lang
+        assert "Claude" in c["hero"]["badge"] and chr(0x2014) not in c["hero"]["badge"], lang
