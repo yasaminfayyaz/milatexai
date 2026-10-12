@@ -48,7 +48,7 @@ Synced automatically. Every tool now has a title and a read-only or destructive 
 ## Step: Listing
 
 - **Name**: MiLatexAI (keep Overleaf out of the name: it is another company's trademark; the one-liner and description say what it works with)
-- **One-liner**: Edit your Overleaf or Git LaTeX project from Claude. Every change is a real Git commit you can review and undo. No downloads, no copy-paste.
+- **One-liner**: Edit your Overleaf or Git LaTeX project from Claude. Fix compile errors, check pages and tables, add verified citations, make figures, prep arXiv and tracked-changes files. Every edit is undoable.
 - **Description**:
 
   MiLatexAI connects Claude to your LaTeX project so you can work on your paper by talking to it.
