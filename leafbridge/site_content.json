@@ -314,8 +314,8 @@
    "docs_label": "Official setup guide →",
    "claude_title": "In Claude",
    "claude_steps": [
-    "Open Settings → Connectors → Add custom connector.",
-    "Paste the connector URL above and sign in.",
+    "Click + in a chat, go to Connectors and search for MiLatexAI, or use the link below.",
+    "Connect it and sign in.",
     "Run start_connect and paste your repository URL and access token on the secure page.",
     "Ask Claude to read a section or edit your paper."
    ],
@@ -327,8 +327,9 @@
     "Ask ChatGPT to edit your paper."
    ],
    "chatgpt_note": "Works on ChatGPT, including its free plan. See the guide.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Open MiLatexAI in Claude →"
   },
   "help": {
    "title": "Help",
@@ -337,7 +338,7 @@
    "sections": [
     {
      "heading": "Set it up in Claude",
-     "body": "1. In Claude, open Settings, then Connectors, then Add custom connector.\n2. Paste https://milatexai.com/mcp and sign in.\n3. Ask Claude to connect your project. It gives you a secure link: paste your repository link and access token there, never in the chat.\n4. Ask Claude about your paper."
+     "body": "1. In Claude, click + in a chat, go to Connectors and search for MiLatexAI, or open https://claude.ai/directory/milatexai.\n2. Connect it and sign in.\n3. Ask Claude to connect your project. It gives you a secure link: paste your repository link and access token there, never in the chat.\n4. Ask Claude about your paper.\n\nYou can also add it by URL: in Settings, Connectors, Add custom connector, paste https://milatexai.com/mcp."
     },
     {
      "heading": "What you need",
@@ -654,8 +655,8 @@
    "docs_label": "官方设置指南 →",
    "claude_title": "在 Claude 中",
    "claude_steps": [
-    "打开 Settings → Connectors → Add custom connector。",
-    "粘贴上方的连接器 URL 并登录。",
+    "在对话中点击 +，进入 Connectors 并搜索 MiLatexAI，或使用下方链接。",
+    "连接并登录。",
     "运行 start_connect，并在安全页面粘贴你的仓库 URL 和访问令牌。",
     "让 Claude 阅读某个章节或编辑你的论文。"
    ],
@@ -667,8 +668,9 @@
     "让 ChatGPT 编辑你的论文。"
    ],
    "chatgpt_note": "支持 ChatGPT，含免费版。查看指南。",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "在 Claude 中打开 MiLatexAI →"
   },
   "see": {
    "badge": "新",
@@ -973,8 +975,8 @@
    "docs_label": "Guide de configuration officiel →",
    "claude_title": "Dans Claude",
    "claude_steps": [
-    "Ouvrez Settings → Connectors → Add custom connector.",
-    "Collez l'URL du connecteur ci-dessus et connectez-vous.",
+    "Cliquez sur + dans une conversation, allez dans Connectors et cherchez MiLatexAI, ou utilisez le lien ci-dessous.",
+    "Connectez-le et identifiez-vous.",
     "Lancez start_connect et collez l'URL de votre dépôt et votre jeton d'accès sur la page sécurisée.",
     "Demandez à Claude de lire une section ou de modifier votre article."
    ],
@@ -986,8 +988,9 @@
     "Demandez à ChatGPT de modifier votre article."
    ],
    "chatgpt_note": "Fonctionne sur ChatGPT, y compris son offre gratuite. Voir le guide.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Ouvrir MiLatexAI dans Claude →"
   },
   "see": {
    "badge": "Nouveau",
@@ -1292,8 +1295,8 @@
    "docs_label": "Guía de configuración oficial →",
    "claude_title": "En Claude",
    "claude_steps": [
-    "Abre Settings → Connectors → Add custom connector.",
-    "Pega la URL del conector de arriba e inicia sesión.",
+    "Haz clic en + en un chat, ve a Connectors y busca MiLatexAI, o usa el enlace de abajo.",
+    "Conéctalo e inicia sesión.",
     "Ejecuta start_connect y pega la URL de tu repositorio y tu token de acceso en la página segura.",
     "Pídele a Claude que lea una sección o edite tu artículo."
    ],
@@ -1305,8 +1308,9 @@
     "Pídele a ChatGPT que edite tu artículo."
    ],
    "chatgpt_note": "Funciona en ChatGPT, incluso en su plan gratuito. Consulta la guía.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Abrir MiLatexAI en Claude →"
   },
   "see": {
    "badge": "Nuevo",
@@ -1611,8 +1615,8 @@
    "docs_label": "Offizielle Einrichtungsanleitung →",
    "claude_title": "In Claude",
    "claude_steps": [
-    "Öffne Settings → Connectors → Add custom connector.",
-    "Füge die obige Connector-URL ein und melde dich an.",
+    "Klicke in einem Chat auf +, öffne Connectors und suche nach MiLatexAI, oder nutze den Link unten.",
+    "Verbinde ihn und melde dich an.",
     "Führe start_connect aus und füge deine Repository-URL und dein Zugriffstoken auf der sicheren Seite ein.",
     "Bitte Claude, einen Abschnitt zu lesen oder dein Paper zu bearbeiten."
    ],
@@ -1624,8 +1628,9 @@
     "Bitte ChatGPT, dein Paper zu bearbeiten."
    ],
    "chatgpt_note": "Funktioniert in ChatGPT, auch im kostenlosen Tarif. Zur Anleitung.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "MiLatexAI in Claude öffnen →"
   },
   "see": {
    "badge": "Neu",
@@ -1930,8 +1935,8 @@
    "docs_label": "公式セットアップガイド →",
    "claude_title": "Claudeの場合",
    "claude_steps": [
-    "Settings → Connectors → Add custom connector を開きます。",
-    "上記のコネクターURLを貼り付けてサインインします。",
+    "チャットで + をクリックし、Connectors で MiLatexAI を検索します。下のリンクからも開けます。",
+    "接続してサインインします。",
     "start_connect を実行し、安全なページでリポジトリ URL とアクセストークンを貼り付けます。",
     "Claudeにセクションの読み取りや論文の編集を依頼します。"
    ],
@@ -1943,8 +1948,9 @@
     "ChatGPTに論文の編集を依頼します。"
    ],
    "chatgpt_note": "ChatGPTで利用可能、無料プランにも対応。ガイドはこちら。",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Claude で MiLatexAI を開く →"
   },
   "see": {
    "badge": "新",
@@ -2249,8 +2255,8 @@
    "docs_label": "Guia oficial de configuração →",
    "claude_title": "No Claude",
    "claude_steps": [
-    "Abra Settings → Connectors → Add custom connector.",
-    "Cole a URL do conector acima e faça login.",
+    "Clique em + em um chat, vá em Connectors e pesquise MiLatexAI, ou use o link abaixo.",
+    "Conecte e faça login.",
     "Execute start_connect e cole a URL do seu repositório e o token de acesso na página segura.",
     "Peça ao Claude para ler uma seção ou editar seu artigo."
    ],
@@ -2262,8 +2268,9 @@
     "Peça ao ChatGPT para editar seu artigo."
    ],
    "chatgpt_note": "Funciona no ChatGPT, incluindo o plano gratuito. Veja o guia.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Abrir o MiLatexAI no Claude →"
   },
   "see": {
    "badge": "Novo",
@@ -2568,8 +2575,8 @@
    "docs_label": "دليل الإعداد الرسمي →",
    "claude_title": "في Claude",
    "claude_steps": [
-    "افتح Settings → Connectors → Add custom connector.",
-    "الصق رابط الموصّل أعلاه وسجّل الدخول.",
+    "انقر على + في محادثة، وانتقل إلى Connectors وابحث عن MiLatexAI، أو استخدم الرابط أدناه.",
+    "اربطه وسجّل الدخول.",
     "شغّل start_connect والصق رابط مستودعك ورمز الوصول في الصفحة الآمنة.",
     "اطلب من Claude قراءة قسم أو تحرير ورقتك البحثية."
    ],
@@ -2581,8 +2588,9 @@
     "اطلب من ChatGPT تحرير ورقتك البحثية."
    ],
    "chatgpt_note": "يعمل على ChatGPT، بما في ذلك خطته المجانية. اطّلع على الدليل.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "افتح MiLatexAI في Claude →"
   },
   "see": {
    "badge": "جديد",
@@ -2887,8 +2895,8 @@
    "docs_label": "आधिकारिक सेटअप गाइड →",
    "claude_title": "Claude में",
    "claude_steps": [
-    "Settings → Connectors → Add custom connector खोलें।",
-    "ऊपर दिया गया कनेक्टर URL पेस्ट करें और साइन इन करें।",
+    "किसी चैट में + पर क्लिक करें, Connectors में जाएँ और MiLatexAI खोजें, या नीचे दिए लिंक का उपयोग करें।",
+    "इसे कनेक्ट करें और साइन इन करें।",
     "start_connect चलाएँ और सुरक्षित पेज पर अपना रिपॉज़िटरी URL और एक्सेस टोकन पेस्ट करें।",
     "Claude से किसी सेक्शन को पढ़ने या अपने पेपर को संपादित करने के लिए कहें।"
    ],
@@ -2900,8 +2908,9 @@
     "ChatGPT से अपने पेपर को संपादित करने के लिए कहें।"
    ],
    "chatgpt_note": "ChatGPT पर काम करता है, इसके मुफ़्त प्लान पर भी। गाइड देखें।",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Claude में MiLatexAI खोलें →"
   },
   "see": {
    "badge": "नया",
@@ -3206,8 +3215,8 @@
    "docs_label": "공식 설정 가이드 →",
    "claude_title": "Claude에서",
    "claude_steps": [
-    "Settings → Connectors → Add custom connector를 엽니다.",
-    "위의 커넥터 URL을 붙여넣고 로그인합니다.",
+    "채팅에서 +를 클릭하고 Connectors에서 MiLatexAI를 검색합니다. 아래 링크로도 열 수 있습니다.",
+    "연결하고 로그인합니다.",
     "start_connect를 실행하고 보안 페이지에 저장소 URL과 액세스 토큰을 붙여넣습니다.",
     "Claude에게 섹션을 읽거나 논문을 편집하도록 요청합니다."
    ],
@@ -3219,8 +3228,9 @@
     "ChatGPT에게 논문을 편집하도록 요청합니다."
    ],
    "chatgpt_note": "무료 요금제를 포함해 ChatGPT에서 작동합니다. 가이드를 참고하세요.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Claude에서 MiLatexAI 열기 →"
   },
   "see": {
    "badge": "신규",
@@ -3525,8 +3535,8 @@
    "docs_label": "Официальное руководство по настройке →",
    "claude_title": "В Claude",
    "claude_steps": [
-    "Откройте Settings → Connectors → Add custom connector.",
-    "Вставьте указанный выше URL коннектора и войдите в систему.",
+    "Нажмите + в чате, откройте Connectors и найдите MiLatexAI, или воспользуйтесь ссылкой ниже.",
+    "Подключите его и войдите в систему.",
     "Запустите start_connect и вставьте URL репозитория и токен доступа на защищённой странице.",
     "Попросите Claude прочитать раздел или отредактировать вашу статью."
    ],
@@ -3538,8 +3548,9 @@
     "Попросите ChatGPT отредактировать вашу статью."
    ],
    "chatgpt_note": "Работает в ChatGPT, в том числе на бесплатном тарифе. Смотрите руководство.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Открыть MiLatexAI в Claude →"
   },
   "see": {
    "badge": "Новое",
@@ -3844,8 +3855,8 @@
    "docs_label": "Guida ufficiale alla configurazione →",
    "claude_title": "In Claude",
    "claude_steps": [
-    "Apri Settings → Connectors → Add custom connector.",
-    "Incolla l'URL del connettore qui sopra e accedi.",
+    "Fai clic su + in una chat, vai su Connectors e cerca MiLatexAI, oppure usa il link qui sotto.",
+    "Collegalo e accedi.",
     "Esegui start_connect e incolla l'URL del tuo repository e il token di accesso nella pagina sicura.",
     "Chiedi a Claude di leggere una sezione o modificare il tuo documento."
    ],
@@ -3857,8 +3868,9 @@
     "Chiedi a ChatGPT di modificare il tuo documento."
    ],
    "chatgpt_note": "Funziona su ChatGPT, incluso il piano gratuito. Consulta la guida.",
-   "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
-   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"
+   "claude_docs_url": "https://claude.ai/directory/milatexai",
+   "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt",
+   "claude_link_label": "Apri MiLatexAI in Claude →"
   },
   "see": {
    "badge": "Novità",

@@ -227,3 +227,16 @@ def test_the_logo_is_served_for_directory_listings():
         r = client.get("/icon.png")
     assert r.status_code == 200 and r.headers["content-type"] == "image/png"
     assert r.content == (Path(__file__).resolve().parents[1] / "docs" / "directory" / "icon-512.png").read_bytes()
+
+
+def test_claude_setup_points_to_the_directory_listing_in_every_language():
+    link = "https://claude.ai/directory/milatexai"
+    for lang, c in site.load_content().items():
+        setup = c["setup"]
+        assert setup["claude_docs_url"] == link, lang
+        assert "MiLatexAI" in setup["claude_steps"][0] and "Connectors" in setup["claude_steps"][0], lang
+        assert len(setup["claude_steps"]) == 4, lang          # the two-minute card stays short
+        assert setup["claude_link_label"] and chr(0x2014) not in setup["claude_link_label"], lang
+    home = site.render_site()
+    assert f"href='{link}'" in home and "setup.claude_link_label" in home
+    assert link in site.render_legal_page("help") and link in site.llms_txt()

@@ -68,8 +68,8 @@ _FALLBACK_EN = {
               "url_label": "Connector URL", "docs_label": "Official setup guide →",
               "claude_title": "In Claude",
               "claude_steps": [
-                  "Open Settings → Connectors → Add custom connector.",
-                  "Paste the connector URL above and sign in.",
+                  "Click + in a chat, go to Connectors and search for MiLatexAI, or use the link below.",
+                  "Connect it and sign in.",
                   "Run start_connect and paste your repository URL and access token on the secure page.",
                   "Ask Claude to read a section or edit your paper."],
               "chatgpt_title": "In ChatGPT",
@@ -79,7 +79,8 @@ _FALLBACK_EN = {
                   "Run start_connect and paste your repository URL and token on the secure page.",
                   "Ask ChatGPT to edit your paper."],
               "chatgpt_note": "Adding a custom connector needs ChatGPT Plus or higher; full editing works best on Business or Enterprise. See the guide.",
-              "claude_docs_url": "https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp",
+              "claude_link_label": "Open MiLatexAI in Claude →",
+              "claude_docs_url": "https://claude.ai/directory/milatexai",
               "chatgpt_docs_url": "https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt"},
     "pricing": {"title": "Simple pricing", "subtitle": "Start free. Upgrade when you need more.",
                 "free": {"name": "Free", "price": "$0", "period": "/mo",
@@ -420,7 +421,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
     <div class='card setup-card'>
       {_node(en,'h3','setup.claude_title')}
       <ol class='setup-steps'>{claude_steps}</ol>
-      <a class='doclink' href='{claude_docs}' target='_blank' rel='noopener' data-i18n='setup.docs_label'>{_t(en,'setup.docs_label')}</a>
+      <a class='doclink' href='{claude_docs}' target='_blank' rel='noopener' data-i18n='setup.claude_link_label'>{_t(en,'setup.claude_link_label')}</a>
     </div>
     <div class='card setup-card'>
       {_node(en,'h3','setup.chatgpt_title')}
@@ -821,7 +822,8 @@ def llms_txt() -> str:
         "allowlisted self-hosted Git repositories, by chatting with ChatGPT or Claude. "
         "A remote MCP (Model Context Protocol) connector: read, edit, and compile your "
         "paper; every change is a real Git commit on your repository's default branch.\n\n"
-        "Connector URL (add as a custom connector in Claude or ChatGPT): https://milatexai.com/mcp\n\n"
+        "In Claude: find MiLatexAI in the Connectors Directory (https://claude.ai/directory/milatexai).\n"
+        "Connector URL (to add it as a custom connector in ChatGPT or Claude): https://milatexai.com/mcp\n\n"
         "Requirements: a repository you can push to, plus Claude or ChatGPT (their free tiers "
         "work). For Overleaf, an account with Git integration (a paid Overleaf feature); for "
         "GitHub, GitLab, or Bitbucket, any repo and a free access token (GitHub fine-grained "
