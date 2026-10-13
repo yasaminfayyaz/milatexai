@@ -33,6 +33,9 @@ from cryptography.fernet import Fernet
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 from fastmcp.server.dependencies import get_access_token
+from fastmcp.server.middleware import Middleware
+from fastmcp.tools.base import ToolResult
+from mcp.types import TextContent
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
 
@@ -139,6 +142,61 @@ def _mini_diff(old: str, new: str, path: str, max_lines: int = 40) -> str:
     if len(diff) > max_lines:
         diff = diff[:max_lines] + [f"… ({len(diff) - max_lines} more diff lines)"]
     return "Change applied:\n" + "\n".join(diff)
+
+
+class ConnectFirst(ToolError):
+    """Not a failure: a new user's first call answers with the secure connect link."""
+
+
+class _ConnectFirstAsReply(Middleware):
+    """Send the connect link as an ordinary reply, not an error result, so the directory's
+    error rate counts only real failures (a new user's first list_files is not one)."""
+
+    async def on_call_tool(self, context, call_next):
+        try:
+            return await call_next(context)
+        except ConnectFirst as exc:
+            # Text tools declare an output schema of {"result": str}; image tools declare none.
+            return ToolResult(content=[TextContent(type="text", text=str(exc))],
+                              structured_content={"result": str(exc)})
+
+
+def _did_you_mean(repo: Path, path: str) -> str:
+    """Close matches for a file name that does not exist, so the next call gets it right."""
+    try:
+        names = [e.path for e in list_source_files(repo, all_files=True)]
+    except Exception:  # noqa: BLE001
+        return ""
+    base = Path(path).name.lower()
+    hits = [n for n in names if Path(n).name.lower() == base] or difflib.get_close_matches(path, names, n=3, cutoff=0.6)
+    return f" Did you mean: {', '.join(hits[:3])}?" if hits else ""
+
+
+def _read_project_text(repo: Path, path: str, *, strict: bool = False) -> str:
+    try:
+        return read_text(safe_join(repo, path), strict=strict, name=path)
+    except PathError as exc:
+        if str(exc).startswith("File not found"):
+            raise PathError(str(exc) + _did_you_mean(repo, path)) from None
+        raise
+
+
+def _near_miss(content: str, old: str) -> str:
+    """Why old_string did not match, when we can tell: line numbers copied from read_file,
+    different spacing, or the closest line."""
+    import re
+    bare = re.sub(r"(?m)^ *\d+\t", "", old)
+    if bare != old and content.count(bare) == 1:
+        return " It includes the line numbers from read_file; leave them out."
+    if " ".join(old.split()) and " ".join(old.split()) in " ".join(content.split()):
+        return " The words match but the spacing or line breaks differ; copy the exact text."
+    first = next((ln.strip() for ln in old.splitlines() if ln.strip()), "")
+    lines = content.splitlines()
+    close = difflib.get_close_matches(first, [ln.strip() for ln in lines], n=1, cutoff=0.6)
+    if close:
+        n = next(i for i, ln in enumerate(lines, 1) if ln.strip() == close[0])
+        return f" Closest line is {n}: {close[0][:160]}"
+    return ""
 
 
 def _wrap(exc: Exception) -> ToolError:
@@ -475,7 +533,7 @@ class HostedApp:
                 raise  # they have projects; this is an ambiguous/no-match message
             code = mint_connect_code(self.cipher, user.user_id, user.email)
             url = f"{self.base_url}/connect?code={quote(code, safe='')}"
-            raise ToolError(
+            raise ConnectFirst(
                 "You haven't connected an Overleaf project yet. Open this secure "
                 "link to connect one, you enter your Overleaf Git token there, "
                 f"never in this chat:\n\n{url}\n\nOnce it's connected, ask me again."
@@ -617,6 +675,7 @@ def create_hosted_server(
     mcp = FastMCP(
         name="MiLatexAI", instructions=INSTRUCTIONS, version=__version__, auth=auth_provider
     )
+    mcp.add_middleware(_ConnectFirstAsReply())
 
     # -- account management ------------------------------------------------
 
@@ -855,7 +914,7 @@ def create_hosted_server(
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                content = read_text(safe_join(repo, path), name=path)
+                content = _read_project_text(repo, path)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         return number_lines(content) if with_line_numbers else content
@@ -869,7 +928,7 @@ def create_hosted_server(
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                content = read_text(safe_join(repo, path), name=path)
+                content = _read_project_text(repo, path)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         return f"Sections in {path}:\n{latex.outline(latex.find_sections(content))}"
@@ -883,7 +942,7 @@ def create_hosted_server(
             await app.ensure_capacity(user)
             proj = await app.resolve_or_onboard(user, project)
             async with app.worker.open_repo(proj) as repo:
-                content = read_text(safe_join(repo, path), name=path)
+                content = _read_project_text(repo, path)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
         found = latex.find_section(content, title)
@@ -1549,10 +1608,11 @@ def create_hosted_server(
 
         def mutate(repo: Path) -> None:
             target = safe_join(repo, path)
-            content = read_text(target, strict=True, name=path)
+            content = _read_project_text(repo, path, strict=True)
             n = content.count(old_string)
             if n == 0:
-                raise PathError(f"old_string not found in {path}; re-read the file.")
+                raise PathError(f"old_string not found in {path}; re-read the file."
+                                + _near_miss(content, old_string))
             if n > 1:
                 raise PathError(f"old_string appears {n} times in {path}; make it unique.")
             write_text_exact(target, content.replace(old_string, new_string, 1))
