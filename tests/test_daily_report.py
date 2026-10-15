@@ -180,3 +180,54 @@ def test_title_counts_only_people_with_a_project_and_leaves_out_the_reviewer():
     assert (s["project_users"], s["project_pro"], s["project_new"], s["project_commit_delta"]) == (4, 1, 3, 10)
     assert du.subject_of(s) == "Project users: 4 total, 1 pro, 3 new, +10 commits"
     assert du.subject_of(du.compare(r, {})) == "Project users: 4 total, 1 pro (first report)"
+
+
+# --- free users' tool use ---------------------------------------------------------------------------
+
+ACT_USERS = [
+    {"RowKey": "u1", "email": "pro@example.com", "plan": "pro"},
+    {"RowKey": "u2", "email": "free@example.com", "plan": "free"},
+    {"RowKey": "u3", "email": "<b>evil</b>@example.com", "plan": "free"},
+    {"RowKey": "u4", "email": "quiet@example.com", "plan": "free"},
+    {"RowKey": "u5", "email": "owner@example.com", "plan": "free", "is_admin": True},
+]
+ACTIVITY = [
+    {"PartitionKey": "u2", "RowKey": "2026-10-14|read_file|aa", "calls": 6, "errors": 1},
+    {"PartitionKey": "u2", "RowKey": "2026-10-14|read_file|bb", "calls": 4, "errors": 0},     # another copy of the server
+    {"PartitionKey": "u2", "RowKey": "2026-10-14|check_compile|aa", "calls": 2, "errors": 0},
+    {"PartitionKey": "u2", "RowKey": "2026-10-14|edit_file|aa", "calls": 1, "errors": 0},
+    {"PartitionKey": "u2", "RowKey": "2026-10-14|start_connect|aa", "calls": 1, "errors": 0},
+    {"PartitionKey": "u2", "RowKey": "2026-10-10|read_file|aa", "calls": 3, "errors": 0},       # an earlier day: counts as active
+    {"PartitionKey": "u2", "RowKey": "2026-10-01|read_file|aa", "calls": 50, "errors": 0},      # outside the 7 days: ignored
+    {"PartitionKey": "u3", "RowKey": "2026-10-14|list_files|aa", "calls": 2, "errors": 0},
+    {"PartitionKey": "u1", "RowKey": "2026-10-14|read_file|aa", "calls": 30, "errors": 0},
+    {"PartitionKey": "u5", "RowKey": "2026-10-14|read_file|aa", "calls": 99, "errors": 0},     # the owner is not a "free user"
+    {"PartitionKey": "u4", "RowKey": "2026-10-13|read_file|aa", "calls": 5, "errors": 0},      # active the day before, not yesterday
+]
+
+
+def test_tool_use_is_added_up_across_copies_and_grouped():
+    a = du.activity_by_user(ACT_USERS, ACTIVITY, "2026-10-14")
+    assert [r["email"] for r in a["free"]] == ["free@example.com", "<b>evil</b>@example.com"]
+    f = a["free"][0]
+    assert (f["calls"], f["reads"], f["renders"], f["edits"], f["other"], f["errors"]) == (14, 10, 2, 1, 1, 1)
+    assert f["days_active"] == 2 and f["top"] == "read_file (10)"
+    assert a["free_quiet"] == 1 and a["pro_users"] == 1 and a["pro_calls"] == 30       # quiet@ made no calls yesterday
+
+
+def test_tool_groups_cover_every_tool_name_we_know():
+    assert du.group_of("read_file") == "reads" and du.group_of("show_page") == "renders"
+    assert du.group_of("write_file") == "edits" and du.group_of("upgrade") == "other"
+    assert du.group_of("a_tool_added_later") == "other"
+
+
+def test_report_with_and_without_tool_use():
+    r = rows()
+    s = du.compare(r, {})
+    plain = du.render_text(r, s)
+    assert "tool use" not in plain
+    act = du.activity_by_user(ACT_USERS, ACTIVITY, "2026-10-14")
+    text, page = du.render_text(r, s, None, None, act), du.render_html(r, s, None, None, act)
+    assert "Free users' tool use on 2026-10-14" in text and "read_file (10)" in text
+    assert "<b>evil</b>" not in page and "&lt;b&gt;evil&lt;/b&gt;@example.com" in page      # an address cannot inject HTML
+    assert du.render_html(r, s, None, None, {"day": "2026-10-14", "free": [], "free_quiet": 3, "pro_users": 0, "pro_calls": 0}).count("No free user made a tool call") == 1

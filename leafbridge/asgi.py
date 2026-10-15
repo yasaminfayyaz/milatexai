@@ -10,6 +10,7 @@ WORKOS_AUTHKIT_DOMAIN and LEAFBRIDGE_ENC_KEY in the environment.
 from __future__ import annotations
 
 import os
+from contextlib import asynccontextmanager
 
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
@@ -85,9 +86,22 @@ def build_app():
     # "Session terminated" (the single most common FastMCP<->ChatGPT failure).
     # This server holds no per-session memory, all state is per-user in the
     # store, so stateless mode is safe here and keeps Claude working too.
-    return mcp.http_app(
+    http = mcp.http_app(
         stateless_http=True, middleware=[_CORS, Middleware(_SecurityHeaders)]
     )
+    # Write the last tool-use counts when this copy shuts down (a scale-in or a deploy).
+    inner = http.router.lifespan_context
+
+    @asynccontextmanager
+    async def lifespan(app):
+        async with inner(app) as state:
+            try:
+                yield state
+            finally:
+                await mcp.activity.stop()
+
+    http.router.lifespan_context = lifespan
+    return http
 
 
 app = build_app()

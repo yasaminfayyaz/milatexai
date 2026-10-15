@@ -25,6 +25,7 @@ import os
 import secrets
 import tempfile
 import time
+from contextvars import ContextVar
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, quote
@@ -58,6 +59,7 @@ from .files import (
 )
 from .git_worker import GitError, GitWorker, PushConflict
 from .authkit import MiLatexAIAuthKit
+from .activity import ActivityTracker
 from .health import DeepHealth
 from . import buildcache, texmemory
 from . import load
@@ -159,6 +161,37 @@ class _ConnectFirstAsReply(Middleware):
             # Text tools declare an output schema of {"result": str}; image tools declare none.
             return ToolResult(content=[TextContent(type="text", text=str(exc))],
                               structured_content={"result": str(exc)})
+
+
+# Filled in for the length of one tool call: HostedApp.user() records which account is calling,
+# and _CountToolUse (below) counts the call for that account once it ends.
+_call_holder: ContextVar[dict | None] = ContextVar("milatexai_tool_call", default=None)
+
+
+class _CountToolUse(Middleware):
+    """Count each tool call per account and day (see activity.py). Counts only, in memory."""
+
+    def __init__(self, tracker: ActivityTracker) -> None:
+        self.tracker = tracker
+
+    async def on_call_tool(self, context, call_next):
+        holder: dict = {}
+        token = _call_holder.set(holder)
+        ok = False
+        try:
+            result = await call_next(context)
+            ok = True
+            return result
+        except ConnectFirst:
+            ok = True       # the first call of a new user answers with the connect link: not a failure
+            raise
+        finally:
+            try:        # counting must never change what the caller sees, not even by raising
+                _call_holder.reset(token)
+                if holder.get("uid"):
+                    self.tracker.note(holder["uid"], getattr(context.message, "name", "") or "", ok)
+            except Exception:  # noqa: BLE001
+                pass
 
 
 def _did_you_mean(repo: Path, path: str) -> str:
@@ -344,6 +377,7 @@ class HostedApp:
         web_issuer: str = "",
     ):
         self.service = AccountService(store, cipher)
+        self.activity = ActivityTracker(store)
         # Sign-ins from these WorkOS environments (issuer -> user lookup) are mapped to the
         # existing MiLatexAI account by verified email; see AccountService.link_identity.
         self._linked_issuers = {k.rstrip("/"): v for k, v in (linked_issuers or {}).items()}
@@ -499,6 +533,9 @@ class HostedApp:
                 user = await self.service.get_or_create_user(
                     user_id, resolved, admin_emails=self.admin_emails
                 )
+        holder = _call_holder.get()
+        if holder is not None:
+            holder["uid"] = user.user_id
         return user
 
     async def session_user(self, request: Request) -> User | None:
@@ -676,6 +713,8 @@ def create_hosted_server(
         name="MiLatexAI", instructions=INSTRUCTIONS, version=__version__, auth=auth_provider
     )
     mcp.add_middleware(_ConnectFirstAsReply())
+    mcp.add_middleware(_CountToolUse(app.activity))
+    mcp.activity = app.activity     # asgi.py writes the last counts when the server shuts down
 
     # -- account management ------------------------------------------------
 

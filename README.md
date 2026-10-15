@@ -68,7 +68,7 @@ Only **writes** count toward the monthly limit; reads are always free. Every wri
 
 - Your **Git access token** is entered on a secure web form, **encrypted at rest**, and **never written to the chat**.
 - MiLatexAI touches **only the projects you explicitly connect**, nothing else in your account.
-- We **do not store your document contents**. We keep only your account email, your encrypted token, and a monthly commit counter.
+- We **do not store your document contents**. We keep only your account email, your encrypted token, and usage counts (commits per month, tool uses per day; never what you asked).
 - The full connector is **open source** (AGPL-3.0), so you can audit exactly what it does.
 
 MiLatexAI is not affiliated with, endorsed by, or sponsored by Overleaf or Digital Science, GitHub, GitLab, Bitbucket, Anthropic, or OpenAI. Overleaf, GitHub, GitLab, Bitbucket, Claude, and ChatGPT are trademarks of their respective owners, used only to describe compatibility.

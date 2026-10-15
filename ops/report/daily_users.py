@@ -76,6 +76,100 @@ def source_counts(usage: list[dict], month: str) -> list[dict]:
     return sorted(out.values(), key=lambda r: (-r["month"], -r["total"], r["source"]))
 
 
+TOOL_GROUPS = {
+    "reads": {"list_projects", "list_files", "read_file", "get_sections", "read_section", "get_history",
+              "list_checkpoints", "project_diff", "check_citations", "project_stats", "list_figures", "download_file"},
+    "renders": {"check_compile", "show_table", "show_figure", "show_page", "tracked_changes_pdf", "arxiv_export"},
+    "edits": {"checkpoint", "restore_file", "add_citation", "commit_figure", "commit_tikz", "edit_file",
+              "write_file", "delete_file", "upload_file", "copy_file"},
+}
+
+
+def group_of(tool: str) -> str:
+    for name, tools in TOOL_GROUPS.items():
+        if tool in tools:
+            return name
+    return "other"      # account and project setup, billing, anything new
+
+
+def activity_by_user(users: list[dict], activity: list[dict], day: str, days: int = 7) -> dict:
+    """How accounts used the tools (leafbridge/activity.py keeps one row per copy of the server,
+    user, day and tool; they are added up here). ``day`` is the last full UTC day."""
+    from datetime import date, timedelta
+
+    first = (date.fromisoformat(day) - timedelta(days=days - 1)).isoformat()
+    emails = {u.get("RowKey", ""): (u.get("email") or "(none)", u.get("plan") or "free", bool(u.get("is_admin"))) for u in users}
+    per: dict[str, dict] = {}
+    for r in activity:
+        uid = r.get("PartitionKey", "")
+        parts = str(r.get("RowKey", "")).split("|")
+        if len(parts) < 2 or not (first <= parts[0] <= day):
+            continue
+        d, tool = parts[0], parts[1]
+        calls, errors = int(r.get("calls", 0) or 0), int(r.get("errors", 0) or 0)
+        u = per.setdefault(uid, {"days": set(), "yesterday": {"calls": 0, "errors": 0, "reads": 0, "renders": 0, "edits": 0, "other": 0},
+                                 "tools": {}})
+        u["days"].add(d)
+        if d == day:
+            y = u["yesterday"]
+            y["calls"] += calls
+            y["errors"] += errors
+            y[group_of(tool)] += calls
+            u["tools"][tool] = u["tools"].get(tool, 0) + calls
+    out = []
+    for uid, u in per.items():
+        if not u["yesterday"]["calls"]:
+            continue
+        email, plan, admin = emails.get(uid, ("(unknown)", "free", False))
+        top = max(u["tools"].items(), key=lambda kv: (kv[1], kv[0]))
+        out.append({"email": email, "plan": plan, "admin": admin, **u["yesterday"], "days_active": len(u["days"]),
+                    "top": f"{top[0]} ({top[1]})"})
+    out.sort(key=lambda r: (-r["calls"], r["email"]))
+    free = [r for r in out if r["plan"] != "pro" and not r["admin"]]
+    pro = [r for r in out if r["plan"] == "pro"]
+    free_total = sum(1 for u in users if (u.get("plan") or "free") != "pro" and not u.get("is_admin"))
+    return {"day": day, "free": free, "free_quiet": max(free_total - len(free), 0), "pro_users": len(pro),
+            "pro_calls": sum(r["calls"] for r in pro)}
+
+
+def activity_lines(act: dict | None) -> list[str]:
+    if not act:
+        return []
+    free = act["free"]
+    lines = ["", f"Free users' tool use on {act['day']} (UTC). Reads and renders are free; only edits count toward the 10 commits:"]
+    if not free:
+        lines.append("  No free user made a tool call.")
+    else:
+        lines.append(f"  {'email':<34} calls reads render edits other errors days7  most used")
+        for r in free:
+            lines.append(f"  {r['email']:<34} {r['calls']:<5} {r['reads']:<5} {r['renders']:<6} {r['edits']:<5} {r['other']:<5} "
+                         f"{r['errors']:<6} {r['days_active']:<5}  {r['top']}")
+    lines.append(f"  {len(free)} free users active, {act['free_quiet']} made no calls. "
+                 f"Pro: {act['pro_users']} active, {act['pro_calls']} calls.")
+    return lines
+
+
+def _activity_html(act: dict | None) -> str:
+    if not act:
+        return ""
+    e = html.escape
+    cell = "padding:4px 8px;border-bottom:1px solid #e5e7eb;"
+    heads = ("Email", "Calls", "Reads", "Renders", "Edits", "Other", "Errors", "Days (7d)", "Most used")
+    head = "".join(f'<th style="{cell}text-align:{"left" if i in (0, 8) else "right"};background:#f3f4f6">{h}</th>'
+                   for i, h in enumerate(heads))
+    body = "".join(
+        f'<tr><td style="{cell}">{e(r["email"])}</td>'
+        + "".join(f'<td style="{cell}text-align:right">{r[k]}</td>' for k in ("calls", "reads", "renders", "edits", "other", "errors", "days_active"))
+        + f'<td style="{cell}">{e(r["top"])}</td></tr>' for r in act["free"])
+    table = (f'<table style="border-collapse:collapse"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>'
+             if act["free"] else '<p style="margin:0">No free user made a tool call.</p>')
+    return (f'<p style="margin:18px 0 4px"><strong>Free users tool use on {e(act["day"])} (UTC)</strong> '
+            '<span style="color:#6b7280">(reads and renders are free; only edits count toward the 10 commits)</span></p>'
+            + table
+            + f'<p style="margin:6px 0 0;color:#6b7280">{len(act["free"])} free users active, {act["free_quiet"]} made no calls. '
+              f'Pro: {act["pro_users"]} active, {act["pro_calls"]} calls.</p>')
+
+
 def snapshot_of(rows: list[dict]) -> dict:
     return {r["email"]: {"commits": r["commits"], "projects": r["projects"], "plan": r["plan"]} for r in rows}
 
@@ -154,7 +248,8 @@ def service_line(service: dict | None) -> str:
     return ("Service: " + ", ".join(parts)) if parts else ""
 
 
-def render_text(rows: list[dict], summary: dict, sources: list[dict] | None = None, service: dict | None = None) -> str:
+def render_text(rows: list[dict], summary: dict, sources: list[dict] | None = None, service: dict | None = None,
+                activity: dict | None = None) -> str:
     lines = [subject_of(summary), ""]
     lines.append(f"{summary['users']} users | {summary['pro']} pro | {summary['with_project']} with a project | "
                  f"{summary['commits']} commits all-time")
@@ -177,10 +272,12 @@ def render_text(rows: list[dict], summary: dict, sources: list[dict] | None = No
     if sources:
         lines += ["", "How people said they found us (asked once, on the first connect form):"]
         lines += [f"  {r['source']}: {r['month']} this month, {r['total']} in total" for r in sources]
+    lines += activity_lines(activity)
     return "\n".join(lines) + "\n"
 
 
-def render_html(rows: list[dict], summary: dict, sources: list[dict] | None = None, service: dict | None = None) -> str:
+def render_html(rows: list[dict], summary: dict, sources: list[dict] | None = None, service: dict | None = None,
+                activity: dict | None = None) -> str:
     e = html.escape
     cell = "padding:6px 10px;border-bottom:1px solid #e5e7eb;"
     head = "".join(f'<th style="{cell}text-align:{a};background:#f3f4f6">{t}</th>'
@@ -211,7 +308,7 @@ def render_html(rows: list[dict], summary: dict, sources: list[dict] | None = No
         + ("" if summary["first"] else f' (<strong>{summary["commit_delta"]:+d}</strong> since yesterday)') + '</p>'
         + "".join(f'<p style="margin:0 0 4px">{n}</p>' for n in notes)
         + f'<table style="border-collapse:collapse;margin-top:12px"><thead><tr>{head}</tr></thead><tbody>{"".join(body)}</tbody></table>'
-        + _sources_html(sources) + '</div>')
+        + _sources_html(sources) + _activity_html(activity) + '</div>')
 
 
 def _sources_html(sources: list[dict] | None) -> str:
@@ -229,12 +326,14 @@ def _sources_html(sources: list[dict] | None) -> str:
 
 # --- I/O ------------------------------------------------------------------------------------------
 
-def entities(account: str, table: str) -> list[dict]:
+def entities(account: str, table: str, flt: str | None = None) -> list[dict]:
     az = shutil.which("az") or "az"
     out: list[dict] = []
     marker: dict | None = None
     while True:
         cmd = [az, "storage", "entity", "query", "--table-name", table, "--account-name", account, "-o", "json", "--only-show-errors"]
+        if flt:
+            cmd += ["--filter", flt]
         if os.environ.get("AZURE_STORAGE_CONNECTION_STRING"):
             cmd += ["--connection-string", os.environ["AZURE_STORAGE_CONNECTION_STRING"]]
         else:
@@ -305,11 +404,23 @@ def service_status() -> dict:
     return out
 
 
+def tool_activity(account: str, users: list[dict]) -> dict | None:
+    """Yesterday's tool use per account, or None if the table does not exist yet or cannot be read."""
+    day = time.strftime("%Y-%m-%d", time.gmtime(time.time() - 86400))
+    first = time.strftime("%Y-%m-%d", time.gmtime(time.time() - 7 * 86400))
+    try:
+        return activity_by_user(users, entities(account, "activity", f"RowKey ge '{first}'"), day)
+    except RuntimeError as exc:
+        print(f"tool activity unavailable: {str(exc)[:120]}")
+        return None
+
+
 def main() -> None:
     account = os.environ["AZURE_STORAGE_ACCOUNT"]
     month = time.strftime("%Y-%m", time.gmtime())
     usage = entities(account, "usage")
-    rows = build_rows(entities(account, "users"), entities(account, "projects"), usage, month)
+    users = entities(account, "users")
+    rows = build_rows(users, entities(account, "projects"), usage, month)
     sources = source_counts(usage, month)
     dry = os.environ.get("DRY_RUN") == "1"
     previous = {} if dry else worker("GET", "/api/digest-state")
@@ -320,8 +431,11 @@ def main() -> None:
         return
     service = service_status()
     print("service:", service_line(service) or "unavailable")
-    worker("POST", "/api/digest", {"subject": subject_of(summary), "text": render_text(rows, summary, sources, service),
-                                   "html": render_html(rows, summary, sources, service), "snapshot": snapshot_of(rows)})
+    act = tool_activity(account, users)
+    if act:
+        print(f"tool use: {len(act['free'])} free users active, {act['free_quiet']} quiet")
+    worker("POST", "/api/digest", {"subject": subject_of(summary), "text": render_text(rows, summary, sources, service, act),
+                                   "html": render_html(rows, summary, sources, service, act), "snapshot": snapshot_of(rows)})
     print("emailed")
 
 

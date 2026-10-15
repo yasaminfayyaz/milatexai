@@ -139,6 +139,14 @@ class Store(ABC):
     @abstractmethod
     async def increment_usage(self, user_id: str, month: str, by: int = 1) -> int: ...
 
+    # -- tool-use counts (see activity.py). Optional: a backend without them just drops the counts.
+
+    async def put_activity(self, user_id: str, copy_id: str, rows: list[tuple[str, str, int, int]]) -> None:
+        """Save one copy's running totals as (day, tool, calls, errors) rows. Safe to repeat."""
+
+    async def prune_activity(self, before_day: str) -> None:
+        """Delete rows for days before ``before_day`` (YYYY-MM-DD)."""
+
     # -- state shared by every running copy of the server ---------------------
     # With more than one copy, anything one copy keeps in its own memory or disk is
     # invisible to the others. These two live in shared storage instead.
@@ -182,6 +190,7 @@ class InMemoryStore(Store):
         self._users: dict[str, User] = {}
         self._projects: dict[tuple[str, str], Project] = {}
         self._usage: dict[tuple[str, str], int] = {}
+        self._activity: dict[tuple[str, str], tuple[int, int]] = {}   # (user_id, "day|tool|copy") -> (calls, errors)
         self._heads: dict[str, str] = {}
         self._downloads: dict[str, bytes] = {}
         self._links: dict[str, str] = {}
@@ -211,6 +220,14 @@ class InMemoryStore(Store):
         new = self._usage.get((user_id, month), 0) + by
         self._usage[(user_id, month)] = new
         return new
+
+    async def put_activity(self, user_id: str, copy_id: str, rows: list[tuple[str, str, int, int]]) -> None:
+        for day, tool, calls, errors in rows:
+            self._activity[(user_id, f"{day}|{tool}|{copy_id}")] = (calls, errors)
+
+    async def prune_activity(self, before_day: str) -> None:
+        for key in [k for k in self._activity if k[1] < before_day]:
+            del self._activity[key]
 
     async def get_head(self, project_id: str) -> str | None:
         return self._heads.get(project_id)

@@ -1,7 +1,8 @@
 """Azure Table Storage backend for the multi-tenant :class:`~leafbridge.store.Store`.
 
-Four tables (users, projects, usage, heads) holding only account metadata, the
-ENCRYPTED Overleaf token, counters, and the last pushed commit id per project.
+Tables (users, projects, usage, heads, links, activity) holding only account metadata, the
+ENCRYPTED Overleaf token, counters (commits per month, tool uses per day), and the last pushed
+commit id per project.
 Never any document content. One blob container holds short-lived download
 bundles (arXiv zips), so any running copy of the server can serve a link that
 another copy created.
@@ -49,7 +50,7 @@ class AzureTableStore(Store):
 
     async def _ensure(self) -> None:
         if not self._ready:
-            for base in ("users", "projects", "usage", "heads", "links"):
+            for base in ("users", "projects", "usage", "heads", "links", "activity"):
                 await self._svc.create_table_if_not_exists(self._name(base))
             self._ready = True
 
@@ -189,6 +190,31 @@ class AzureTableStore(Store):
             except ResourceModifiedError:
                 continue              # someone else counted in between; read again
         raise RuntimeError("Could not update the usage counter after repeated conflicts.")
+
+    # -- tool-use counts (see activity.py) ---------------------------------------
+
+    async def put_activity(self, user_id: str, copy_id: str, rows: list[tuple[str, str, int, int]]) -> None:
+        """Write one copy's running totals. Each row belongs to exactly one copy (its id ends the
+        row key), so there is nothing to collide with, and writing a row again is harmless."""
+        await self._ensure()
+        table = self._table("activity")
+        pk = self._key(user_id)
+        for i in range(0, len(rows), 100):          # one batch per user, 100 rows at most
+            ops = [("upsert", {"PartitionKey": pk, "RowKey": self._key(f"{day}|{tool}|{copy_id}"),
+                               "calls": int(calls), "errors": int(errors)}, {"mode": UpdateMode.REPLACE})
+                   for day, tool, calls, errors in rows[i:i + 100]]
+            await table.submit_transaction(ops)
+
+    async def prune_activity(self, before_day: str) -> None:
+        await self._ensure()
+        table = self._table("activity")
+        old = [(e["PartitionKey"], e["RowKey"]) async for e in table.query_entities(
+            f"RowKey lt '{before_day}'", select=["PartitionKey", "RowKey"])]
+        for pk, rk in old:
+            try:
+                await table.delete_entity(pk, rk)
+            except ResourceNotFoundError:
+                pass
 
     # -- shared state for several running copies --------------------------------
 

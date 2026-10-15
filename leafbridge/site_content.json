@@ -150,7 +150,7 @@
     },
     {
      "q": "Can you see my documents?",
-     "a": "We don't store your document contents. MiLatexAI reads and edits your files while it carries out a request. We keep your account email, your encrypted access token, the list of projects you connect, and a monthly commit counter. The privacy policy lists everything."
+     "a": "We don't store your document contents. MiLatexAI reads and edits your files while it carries out a request. We keep your account email, your encrypted access token, the list of projects you connect, and usage counts (your commits each month and how often you use each tool). The privacy policy lists everything."
     },
     {
      "q": "Which AI assistants does it work with?",
@@ -192,7 +192,7 @@
     },
     {
      "title": "We don't store your documents",
-     "desc": "MiLatexAI keeps only your account email, your encrypted token, and a monthly commit counter, never the contents of your LaTeX files."
+     "desc": "MiLatexAI keeps only your account email, your encrypted token, and usage counts, never the contents of your LaTeX files."
     },
     {
      "title": "Only the projects you connect",
@@ -224,7 +224,7 @@
    "sections": [
     {
      "heading": "What we keep",
-     "body": "Your account: the email address and account ID you sign in with, your plan, and, if you subscribe to Pro, the customer ID that Stripe gives us. Your Git access token, encrypted. The projects you connect: each repository link and the label you gave it. A count of your write-commits for each month. That is everything we keep about you.\n\nWhen you connect your first project, you can optionally tell us how you found MiLatexAI. We only add one to a running count for that answer. The answer is not linked to you."
+     "body": "Your account: the email address and account ID you sign in with, your plan, and, if you subscribe to Pro, the customer ID that Stripe gives us. Your Git access token, encrypted. The projects you connect: each repository link and the label you gave it. Usage counts: how many write-commits you make each month, and, for each day, how many times you use each tool (only the tool's name and a number, never what you asked or what was in your files). Daily tool counts are deleted after 90 days. That is everything we keep about you.\n\nWhen you connect your first project, you can optionally tell us how you found MiLatexAI. We only add one to a running count for that answer. The answer is not linked to you."
     },
     {
      "heading": "What we do not keep",
@@ -501,7 +501,7 @@
     },
     {
      "q": "你们能看到我的文档吗？",
-     "a": "我们不存储你的文档内容。MiLatexAI 只在执行请求时读取和编辑你的文件。我们保留的是你的账户邮箱、加密后的访问令牌、你连接的项目列表，以及一个每月提交计数器。完整清单见隐私政策。"
+     "a": "我们不存储你的文档内容。MiLatexAI 只在执行请求时读取和编辑你的文件。我们保留的是你的账户邮箱、加密后的访问令牌、你连接的项目列表，以及使用计数（你每月的提交次数和各工具的使用次数）。完整清单见隐私政策。"
     },
     {
      "q": "它支持哪些 AI 助手？",
@@ -543,7 +543,7 @@
     },
     {
      "title": "我们不存储你的文档",
-     "desc": "MiLatexAI 仅保留你的账户邮箱、加密令牌和一个每月提交计数器，绝不保留你 LaTeX 文件的内容。"
+     "desc": "MiLatexAI 仅保留你的账户邮箱、加密令牌和使用计数，绝不保留你 LaTeX 文件的内容。"
     },
     {
      "title": "只限你连接的项目",
@@ -570,12 +570,12 @@
   },
   "privacy": {
    "title": "隐私政策",
-   "updated_label": "最后更新：2026 年 7 月",
+   "updated_label": "最后更新：2026 年 10 月",
    "intro": "本政策以通俗的语言说明 MiLatexAI 收集哪些信息、刻意不收集哪些信息，以及你的 Git 访问令牌如何受到保护。MiLatexAI 是一款小型独立产品，我们尽力以最少的程度接触你的数据。",
    "sections": [
     {
      "heading": "我们收集什么",
-     "body": "我们只收集三样东西：你的账户邮箱地址（通过单点登录提供）、加密形式的 Git 访问令牌，以及你当月已完成的写入提交次数计数。这就是全部清单。"
+     "body": "你的账户：你用于登录的邮箱地址和账户 ID、你的套餐，以及（如果你订阅了 Pro）Stripe 提供给我们的客户 ID。加密后的 Git 访问令牌。你连接的项目：每个仓库链接和你为其设置的名称。使用计数：你每月的写入提交次数，以及每天各个工具的使用次数（只有工具名称和一个数字，绝不包含你的提问内容或文件内容）。每日的工具使用计数会在 90 天后删除。这就是我们保留的关于你的全部信息。\n\n连接第一个项目时，你可以选择告诉我们你是怎么找到 MiLatexAI 的。我们只会给该答案的累计数加一，这个答案不会与你关联。"
     },
     {
      "heading": "我们不收集什么",
@@ -823,7 +823,7 @@
     },
     {
      "q": "Pouvez-vous voir mes documents ?",
-     "a": "Nous ne stockons pas le contenu de vos documents. MiLatexAI lit et modifie vos fichiers le temps d'exécuter une demande. Nous conservons l'e-mail de votre compte, votre jeton d'accès chiffré, la liste des projets que vous connectez et un compteur mensuel de commits. La politique de confidentialité donne la liste complète."
+     "a": "Nous ne stockons pas le contenu de vos documents. MiLatexAI lit et modifie vos fichiers le temps d'exécuter une demande. Nous conservons l'e-mail de votre compte, votre jeton d'accès chiffré, la liste des projets que vous connectez et des compteurs d'utilisation (vos commits de chaque mois et la fréquence d'utilisation de chaque outil). La politique de confidentialité donne la liste complète."
     },
     {
      "q": "Avec quels assistants d'IA fonctionne-t-il ?",
@@ -865,7 +865,7 @@
     },
     {
      "title": "Nous ne stockons pas vos documents",
-     "desc": "MiLatexAI ne conserve que l'e-mail de votre compte, votre jeton chiffré et un compteur mensuel de commits, jamais le contenu de vos fichiers LaTeX."
+     "desc": "MiLatexAI ne conserve que l'e-mail de votre compte, votre jeton chiffré et des compteurs d'utilisation, jamais le contenu de vos fichiers LaTeX."
     },
     {
      "title": "Uniquement les projets que vous connectez",
@@ -892,12 +892,12 @@
   },
   "privacy": {
    "title": "Politique de confidentialité",
-   "updated_label": "Dernière mise à jour : juillet 2026",
+   "updated_label": "Dernière mise à jour : octobre 2026",
    "intro": "Cette politique explique, en langage clair, ce que MiLatexAI collecte, ce qu'il ne collecte délibérément pas et comment votre jeton d'accès Git est protégé. MiLatexAI est un produit modeste et indépendant, et nous nous efforçons de toucher le moins possible à vos données.",
    "sections": [
     {
      "heading": "Ce que nous collectons",
-     "body": "Nous ne collectons que trois choses : l'adresse e-mail de votre compte (fournie via l'authentification unique), votre jeton d'accès Git sous forme chiffrée, et un compteur du nombre de commits d'écriture que vous avez effectués au cours du mois en cours. C'est la liste complète."
+     "body": "Votre compte : l'adresse e-mail et l'identifiant de compte avec lesquels vous vous connectez, votre forfait et, si vous souscrivez à Pro, l'identifiant client que Stripe nous communique. Votre jeton d'accès Git, chiffré. Les projets que vous connectez : le lien de chaque dépôt et le nom que vous lui avez donné. Des compteurs d'utilisation : le nombre de commits d'écriture que vous faites chaque mois et, pour chaque jour, le nombre de fois où vous utilisez chaque outil (uniquement le nom de l'outil et un nombre, jamais ce que vous avez demandé ni le contenu de vos fichiers). Les compteurs quotidiens des outils sont supprimés après 90 jours. C'est tout ce que nous conservons à votre sujet.\n\nLorsque vous connectez votre premier projet, vous pouvez nous dire, si vous le souhaitez, comment vous avez découvert MiLatexAI. Nous ajoutons seulement un au total courant de cette réponse. La réponse n'est pas liée à vous."
     },
     {
      "heading": "Ce que nous NE collectons PAS",
@@ -1145,7 +1145,7 @@
     },
     {
      "q": "¿Podéis ver mis documentos?",
-     "a": "No almacenamos el contenido de tus documentos. MiLatexAI lee y edita tus archivos mientras lleva a cabo una petición. Conservamos el correo de tu cuenta, tu token de acceso cifrado, la lista de proyectos que conectas y un contador mensual de commits. La política de privacidad tiene la lista completa."
+     "a": "No almacenamos el contenido de tus documentos. MiLatexAI lee y edita tus archivos mientras lleva a cabo una petición. Conservamos el correo de tu cuenta, tu token de acceso cifrado, la lista de proyectos que conectas y contadores de uso (tus commits de cada mes y cuántas veces usas cada herramienta). La política de privacidad tiene la lista completa."
     },
     {
      "q": "¿Con qué asistentes de IA funciona?",
@@ -1187,7 +1187,7 @@
     },
     {
      "title": "No almacenamos tus documentos",
-     "desc": "MiLatexAI conserva únicamente el correo de tu cuenta, tu token cifrado y un contador mensual de commits, nunca el contenido de tus archivos LaTeX."
+     "desc": "MiLatexAI conserva únicamente el correo de tu cuenta, tu token cifrado y contadores de uso, nunca el contenido de tus archivos LaTeX."
     },
     {
      "title": "Solo los proyectos que conectas",
@@ -1214,12 +1214,12 @@
   },
   "privacy": {
    "title": "Política de Privacidad",
-   "updated_label": "Última actualización: julio de 2026",
+   "updated_label": "Última actualización: octubre de 2026",
    "intro": "Esta política explica, en lenguaje sencillo, qué recopila MiLatexAI, qué decide deliberadamente no recopilar y cómo se protege tu token de acceso de Git. MiLatexAI es un producto pequeño e independiente, y procuramos tocar la menor cantidad posible de tus datos.",
    "sections": [
     {
      "heading": "Qué recopilamos",
-     "body": "Recopilamos solo tres cosas: la dirección de correo de tu cuenta (proporcionada mediante inicio de sesión único), tu token de acceso de Git en forma cifrada y un contador de cuántos commits de escritura has realizado en el mes en curso. Esa es la lista completa."
+     "body": "Tu cuenta: la dirección de correo y el identificador de cuenta con los que inicias sesión, tu plan y, si te suscribes a Pro, el identificador de cliente que nos da Stripe. Tu token de acceso de Git, cifrado. Los proyectos que conectas: el enlace de cada repositorio y la etiqueta que le pusiste. Contadores de uso: cuántos commits de escritura haces cada mes y, para cada día, cuántas veces usas cada herramienta (solo el nombre de la herramienta y un número, nunca lo que pediste ni lo que había en tus archivos). Los contadores diarios de herramientas se borran a los 90 días. Eso es todo lo que guardamos sobre ti.\n\nCuando conectas tu primer proyecto, puedes decirnos, si quieres, cómo conociste MiLatexAI. Solo sumamos uno al recuento de esa respuesta. La respuesta no queda vinculada a ti."
     },
     {
      "heading": "Qué NO recopilamos",
@@ -1467,7 +1467,7 @@
     },
     {
      "q": "Könnt ihr meine Dokumente sehen?",
-     "a": "Wir speichern die Inhalte deiner Dokumente nicht. MiLatexAI liest und bearbeitet deine Dateien nur, während es eine Anfrage ausführt. Wir behalten deine Konto-E-Mail, dein verschlüsseltes Zugriffstoken, die Liste der Projekte, die du verbindest, und einen monatlichen Commit-Zähler. Die vollständige Liste steht in der Datenschutzerklärung."
+     "a": "Wir speichern die Inhalte deiner Dokumente nicht. MiLatexAI liest und bearbeitet deine Dateien nur, während es eine Anfrage ausführt. Wir behalten deine Konto-E-Mail, dein verschlüsseltes Zugriffstoken, die Liste der Projekte, die du verbindest, und Nutzungszähler (deine Commits pro Monat und wie oft du jedes Werkzeug benutzt). Die vollständige Liste steht in der Datenschutzerklärung."
     },
     {
      "q": "Mit welchen KI-Assistenten funktioniert es?",
@@ -1509,7 +1509,7 @@
     },
     {
      "title": "Wir speichern deine Dokumente nicht",
-     "desc": "MiLatexAI behält nur deine Konto-E-Mail, dein verschlüsseltes Token und einen monatlichen Commit-Zähler, niemals die Inhalte deiner LaTeX-Dateien."
+     "desc": "MiLatexAI behält nur deine Konto-E-Mail, dein verschlüsseltes Token und Nutzungszähler, niemals die Inhalte deiner LaTeX-Dateien."
     },
     {
      "title": "Nur die Projekte, die du verbindest",
@@ -1536,12 +1536,12 @@
   },
   "privacy": {
    "title": "Datenschutzerklärung",
-   "updated_label": "Zuletzt aktualisiert: Juli 2026",
+   "updated_label": "Zuletzt aktualisiert: Oktober 2026",
    "intro": "Diese Erklärung beschreibt in verständlicher Sprache, was MiLatexAI erhebt, was es bewusst nicht erhebt und wie dein Git-Zugriffstoken geschützt wird. MiLatexAI ist ein kleines, unabhängiges Produkt, und wir versuchen, so wenig wie möglich von deinen Daten zu berühren.",
    "sections": [
     {
      "heading": "Was wir erheben",
-     "body": "Wir erheben nur drei Dinge: deine Konto-E-Mail-Adresse (über Single Sign-on bereitgestellt), dein Git-Zugriffstoken in verschlüsselter Form und einen Zähler, wie viele Schreib-Commits du im aktuellen Monat vorgenommen hast. Das ist die vollständige Liste."
+     "body": "Dein Konto: die E-Mail-Adresse und die Konto-ID, mit denen du dich anmeldest, dein Tarif und, wenn du Pro abonnierst, die Kunden-ID, die uns Stripe gibt. Dein Git-Zugriffstoken, verschlüsselt. Die Projekte, die du verbindest: jeder Repository-Link und die Bezeichnung, die du ihm gegeben hast. Nutzungszähler: wie viele Schreib-Commits du pro Monat machst und, für jeden Tag, wie oft du jedes Werkzeug benutzt (nur der Name des Werkzeugs und eine Zahl, nie was du gefragt hast oder was in deinen Dateien stand). Die täglichen Werkzeugzähler werden nach 90 Tagen gelöscht. Das ist alles, was wir über dich speichern.\n\nWenn du dein erstes Projekt verbindest, kannst du uns freiwillig sagen, wie du MiLatexAI gefunden hast. Wir erhöhen dafür nur einen laufenden Zähler um eins. Die Antwort wird nicht mit dir verknüpft."
     },
     {
      "heading": "Was wir NICHT erheben",
@@ -1789,7 +1789,7 @@
     },
     {
      "q": "私のドキュメントは見えるのですか？",
-     "a": "ドキュメントの内容は保存しません。MiLatexAI はリクエストを実行している間だけファイルを読み書きします。保持するのは、アカウントのメールアドレス、暗号化されたアクセストークン、接続したプロジェクトの一覧、月間コミット数のカウンターです。全項目はプライバシーポリシーに記載しています。"
+     "a": "ドキュメントの内容は保存しません。MiLatexAI はリクエストを実行している間だけファイルを読み書きします。保持するのは、アカウントのメールアドレス、暗号化されたアクセストークン、接続したプロジェクトの一覧、利用回数のカウンター（毎月のコミット数と、各ツールの利用回数）です。全項目はプライバシーポリシーに記載しています。"
     },
     {
      "q": "どのAIアシスタントに対応していますか？",
@@ -1831,7 +1831,7 @@
     },
     {
      "title": "ドキュメントは保存しません",
-     "desc": "MiLatexAIが保持するのはアカウントのメールアドレス、暗号化されたトークン、月間コミット数のカウンターのみで、LaTeXファイルの内容は一切保存しません。"
+     "desc": "MiLatexAIが保持するのはアカウントのメールアドレス、暗号化されたトークン、利用回数のカウンターのみで、LaTeXファイルの内容は一切保存しません。"
     },
     {
      "title": "接続したプロジェクトのみ",
@@ -1858,12 +1858,12 @@
   },
   "privacy": {
    "title": "プライバシーポリシー",
-   "updated_label": "最終更新：2026年7月",
+   "updated_label": "最終更新：2026年10月",
    "intro": "このポリシーは、MiLatexAI が何を収集し、何を意図的に収集しないか、そしてあなたの Git アクセストークンがどのように保護されるかを、平易な言葉で説明します。MiLatexAI は小規模で独立したプロダクトであり、あなたのデータにできるだけ触れないよう努めています。",
    "sections": [
     {
      "heading": "収集する情報",
-     "body": "収集するのは次の3つだけです：アカウントのメールアドレス（シングルサインオンを通じて提供）、暗号化された形式の Git アクセストークン、そして当月に行った書き込みコミット数のカウンター。これがすべてのリストです。"
+     "body": "アカウント：サインインに使うメールアドレスとアカウント ID、プラン、Pro を購読している場合は Stripe から受け取る顧客 ID。暗号化された Git アクセストークン。接続したプロジェクト：各リポジトリのリンクと、付けた名前。利用回数のカウンター：毎月の書き込みコミット数と、日ごとの各ツールの利用回数（保存するのはツール名と数字だけで、依頼の内容やファイルの中身は含みません）。日ごとのツール利用回数は 90 日後に削除します。保持するあなたの情報はこれがすべてです。\n\n最初のプロジェクトを接続するとき、MiLatexAI をどうやって知ったかを任意で教えていただけます。その回答の累計に 1 を加えるだけで、回答があなたと結び付けられることはありません。"
     },
     {
      "heading": "収集しない情報",
@@ -2111,7 +2111,7 @@
     },
     {
      "q": "Vocês conseguem ver meus documentos?",
-     "a": "Não armazenamos o conteúdo dos seus documentos. O MiLatexAI lê e edita seus arquivos enquanto atende a uma solicitação. Guardamos o e-mail da sua conta, seu token de acesso criptografado, a lista de projetos que você conecta e um contador mensal de commits. A política de privacidade traz a lista completa."
+     "a": "Não armazenamos o conteúdo dos seus documentos. O MiLatexAI lê e edita seus arquivos enquanto atende a uma solicitação. Guardamos o e-mail da sua conta, seu token de acesso criptografado, a lista de projetos que você conecta e contadores de uso (seus commits de cada mês e quantas vezes você usa cada ferramenta). A política de privacidade traz a lista completa."
     },
     {
      "q": "Com quais assistentes de IA ele funciona?",
@@ -2153,7 +2153,7 @@
     },
     {
      "title": "Não armazenamos seus documentos",
-     "desc": "O MiLatexAI guarda apenas o e-mail da sua conta, seu token criptografado e um contador mensal de commits, nunca o conteúdo dos seus arquivos LaTeX."
+     "desc": "O MiLatexAI guarda apenas o e-mail da sua conta, seu token criptografado e contadores de uso, nunca o conteúdo dos seus arquivos LaTeX."
     },
     {
      "title": "Apenas os projetos que você conecta",
@@ -2180,12 +2180,12 @@
   },
   "privacy": {
    "title": "Política de Privacidade",
-   "updated_label": "Última atualização: julho de 2026",
+   "updated_label": "Última atualização: outubro de 2026",
    "intro": "Esta política explica, em linguagem simples, o que o MiLatexAI coleta, o que ele deliberadamente não coleta e como seu token de acesso Git é protegido. O MiLatexAI é um produto pequeno e independente, e procuramos acessar o mínimo possível dos seus dados.",
    "sections": [
     {
      "heading": "O que coletamos",
-     "body": "Coletamos apenas três coisas: o endereço de e-mail da sua conta (fornecido via single sign-on), seu token de acesso Git de forma criptografada e um contador de quantos commits de escrita você fez no mês atual. Essa é a lista completa."
+     "body": "Sua conta: o endereço de e-mail e o ID de conta com os quais você entra, seu plano e, se você assinar o Pro, o ID de cliente que a Stripe nos fornece. Seu token de acesso Git, criptografado. Os projetos que você conecta: o link de cada repositório e o rótulo que você deu a ele. Contadores de uso: quantos commits de escrita você faz a cada mês e, para cada dia, quantas vezes você usa cada ferramenta (apenas o nome da ferramenta e um número, nunca o que você pediu nem o que havia nos seus arquivos). Os contadores diários de ferramentas são apagados após 90 dias. Isso é tudo o que guardamos sobre você.\n\nQuando você conecta seu primeiro projeto, pode nos dizer, se quiser, como conheceu o MiLatexAI. Apenas somamos um à contagem dessa resposta. A resposta não é vinculada a você."
     },
     {
      "heading": "O que NÃO coletamos",
@@ -2433,7 +2433,7 @@
     },
     {
      "q": "هل يمكنكم الاطلاع على مستنداتي؟",
-     "a": "نحن لا نخزّن محتويات مستنداتك. يقرأ MiLatexAI ملفاتك ويحرّرها أثناء تنفيذ الطلب فقط. نحتفظ ببريد حسابك الإلكتروني، ورمز الوصول المشفّر، وقائمة المشاريع التي تربطها، وعدّاد شهري للالتزامات. تجد القائمة الكاملة في سياسة الخصوصية."
+     "a": "نحن لا نخزّن محتويات مستنداتك. يقرأ MiLatexAI ملفاتك ويحرّرها أثناء تنفيذ الطلب فقط. نحتفظ ببريد حسابك الإلكتروني، ورمز الوصول المشفّر، وقائمة المشاريع التي تربطها، وعدّادات الاستخدام (التزاماتك في كل شهر وعدد مرات استخدامك لكل أداة). تجد القائمة الكاملة في سياسة الخصوصية."
     },
     {
      "q": "مع أي مساعدات الذكاء الاصطناعي يعمل؟",
@@ -2475,7 +2475,7 @@
     },
     {
      "title": "نحن لا نخزّن مستنداتك",
-     "desc": "يحتفظ MiLatexAI فقط ببريد حسابك الإلكتروني، ورمزك المشفّر، وعدّاد الالتزامات الشهري، وليس محتويات ملفات LaTeX الخاصة بك أبداً."
+     "desc": "يحتفظ MiLatexAI فقط ببريد حسابك الإلكتروني، ورمزك المشفّر، وعدّادات الاستخدام، وليس محتويات ملفات LaTeX الخاصة بك أبداً."
     },
     {
      "title": "المشاريع التي توصّلها فقط",
@@ -2502,12 +2502,12 @@
   },
   "privacy": {
    "title": "سياسة الخصوصية",
-   "updated_label": "آخر تحديث: يوليو 2026",
+   "updated_label": "آخر تحديث: أكتوبر 2026",
    "intro": "توضّح هذه السياسة، بلغة بسيطة، ما يجمعه MiLatexAI، وما يتعمّد عدم جمعه، وكيف يُحمى رمز وصول Git الخاص بك. MiLatexAI منتج صغير ومستقل، ونحاول أن نمسّ أقل قدر ممكن من بياناتك.",
    "sections": [
     {
      "heading": "ما الذي نجمعه",
-     "body": "نجمع ثلاثة أشياء فقط: عنوان بريد حسابك الإلكتروني (المقدَّم عبر الدخول الموحّد)، ورمز وصول Git الخاص بك في صورة مشفّرة، وعدّاداً لعدد التزامات الكتابة التي قمت بها في الشهر الحالي. هذه هي القائمة الكاملة."
+     "body": "حسابك: عنوان البريد الإلكتروني ومعرّف الحساب اللذان تسجّل بهما الدخول، وخطتك، ومعرّف العميل الذي تعطينا إياه Stripe إذا اشتركت في Pro. رمز وصول Git الخاص بك، مشفّراً. المشاريع التي تربطها: رابط كل مستودع والاسم الذي أعطيته له. عدّادات الاستخدام: عدد التزامات الكتابة التي تجريها كل شهر، وفي كل يوم عدد مرات استخدامك لكل أداة (اسم الأداة ورقم فقط، ولا نحتفظ أبداً بما طلبته ولا بما كان في ملفاتك). تُحذف عدّادات الأدوات اليومية بعد 90 يوماً. هذا كل ما نحتفظ به عنك.\n\nعند ربط مشروعك الأول يمكنك، إن شئت، أن تخبرنا كيف عرفت MiLatexAI. نضيف واحداً فقط إلى العدّاد التراكمي لتلك الإجابة، ولا تُربط الإجابة بك."
     },
     {
      "heading": "ما الذي لا نجمعه",
@@ -2755,7 +2755,7 @@
     },
     {
      "q": "क्या आप मेरे दस्तावेज़ देख सकते हैं?",
-     "a": "हम आपके दस्तावेज़ों की सामग्री संग्रहीत नहीं करते। MiLatexAI किसी अनुरोध को पूरा करते समय ही आपकी फ़ाइलें पढ़ता और एडिट करता है। हम आपका खाता ईमेल, आपका एन्क्रिप्टेड एक्सेस टोकन, आपके जोड़े गए प्रोजेक्ट्स की सूची, और एक मासिक commit काउंटर रखते हैं। पूरी सूची गोपनीयता नीति में है।"
+     "a": "हम आपके दस्तावेज़ों की सामग्री संग्रहीत नहीं करते। MiLatexAI किसी अनुरोध को पूरा करते समय ही आपकी फ़ाइलें पढ़ता और एडिट करता है। हम आपका खाता ईमेल, आपका एन्क्रिप्टेड एक्सेस टोकन, आपके जोड़े गए प्रोजेक्ट्स की सूची, और उपयोग के काउंटर (हर महीने के आपके commits और हर टूल के इस्तेमाल की संख्या) रखते हैं। पूरी सूची गोपनीयता नीति में है।"
     },
     {
      "q": "यह किन AI असिस्टेंट्स के साथ काम करता है?",
@@ -2797,7 +2797,7 @@
     },
     {
      "title": "हम आपके दस्तावेज़ संग्रहीत नहीं करते",
-     "desc": "MiLatexAI केवल आपका खाता ईमेल, आपका एन्क्रिप्टेड टोकन, और एक मासिक commit काउंटर रखता है, आपकी LaTeX फ़ाइलों की सामग्री कभी नहीं।"
+     "desc": "MiLatexAI केवल आपका खाता ईमेल, आपका एन्क्रिप्टेड टोकन, और उपयोग के काउंटर रखता है, आपकी LaTeX फ़ाइलों की सामग्री कभी नहीं।"
     },
     {
      "title": "केवल वही प्रोजेक्ट्स जिन्हें आप कनेक्ट करते हैं",
@@ -2824,12 +2824,12 @@
   },
   "privacy": {
    "title": "गोपनीयता नीति",
-   "updated_label": "अंतिम बार अपडेट किया गया: जुलाई 2026",
+   "updated_label": "अंतिम बार अपडेट किया गया: अक्टूबर 2026",
    "intro": "यह नीति सरल भाषा में बताती है कि MiLatexAI क्या एकत्र करता है, जानबूझकर क्या एकत्र नहीं करता, और आपका Git एक्सेस टोकन कैसे सुरक्षित रखा जाता है। MiLatexAI एक छोटा, स्वतंत्र उत्पाद है, और हम आपके डेटा को जितना कम संभव हो उतना ही छूने की कोशिश करते हैं।",
    "sections": [
     {
      "heading": "हम क्या एकत्र करते हैं",
-     "body": "हम केवल तीन चीज़ें एकत्र करते हैं: आपका खाता ईमेल पता (सिंगल साइन-ऑन के ज़रिए प्रदान किया गया), एन्क्रिप्टेड रूप में आपका Git एक्सेस टोकन, और इस बात का काउंटर कि आपने चालू महीने में कितने write-commits किए हैं। बस इतनी ही पूरी सूची है।"
+     "body": "आपका खाता: वह ईमेल पता और खाता ID जिससे आप साइन इन करते हैं, आपका प्लान, और अगर आप Pro लेते हैं तो Stripe से मिली ग्राहक ID। एन्क्रिप्टेड रूप में आपका Git एक्सेस टोकन। आपके जोड़े गए प्रोजेक्ट: हर रिपॉज़िटरी का लिंक और वह नाम जो आपने उसे दिया। उपयोग के काउंटर: आप हर महीने कितने write-commits करते हैं, और हर दिन हर टूल को कितनी बार इस्तेमाल करते हैं (सिर्फ़ टूल का नाम और एक संख्या, आपने क्या माँगा या आपकी फ़ाइलों में क्या था, यह कभी नहीं)। रोज़ के टूल काउंटर 90 दिन बाद हटा दिए जाते हैं। आपके बारे में हम बस इतना ही रखते हैं।\n\nजब आप अपना पहला प्रोजेक्ट जोड़ते हैं, तो आप चाहें तो बता सकते हैं कि आपको MiLatexAI कैसे मिला। हम उस जवाब की चालू गिनती में सिर्फ़ एक जोड़ते हैं। जवाब आपसे जुड़ा नहीं होता।"
     },
     {
      "heading": "हम क्या एकत्र नहीं करते",
@@ -3077,7 +3077,7 @@
     },
     {
      "q": "제 문서를 볼 수 있나요?",
-     "a": "저희는 문서 내용을 저장하지 않습니다. MiLatexAI는 요청을 처리하는 동안에만 파일을 읽고 편집합니다. 저희가 보관하는 것은 계정 이메일, 암호화된 액세스 토큰, 연결한 프로젝트 목록, 월별 커밋 카운터입니다. 전체 목록은 개인정보 처리방침에 있습니다."
+     "a": "저희는 문서 내용을 저장하지 않습니다. MiLatexAI는 요청을 처리하는 동안에만 파일을 읽고 편집합니다. 저희가 보관하는 것은 계정 이메일, 암호화된 액세스 토큰, 연결한 프로젝트 목록, 사용 횟수 카운터(매달의 커밋 수와 도구별 사용 횟수)입니다. 전체 목록은 개인정보 처리방침에 있습니다."
     },
     {
      "q": "어떤 AI 어시스턴트와 함께 작동하나요?",
@@ -3119,7 +3119,7 @@
     },
     {
      "title": "문서를 저장하지 않습니다",
-     "desc": "MiLatexAI는 계정 이메일, 암호화된 토큰, 월별 커밋 카운터만 보관하며, LaTeX 파일의 내용은 절대 보관하지 않습니다."
+     "desc": "MiLatexAI는 계정 이메일, 암호화된 토큰, 사용 횟수 카운터만 보관하며, LaTeX 파일의 내용은 절대 보관하지 않습니다."
     },
     {
      "title": "연결한 프로젝트에만 접근",
@@ -3146,12 +3146,12 @@
   },
   "privacy": {
    "title": "개인정보처리방침",
-   "updated_label": "최종 업데이트: 2026년 7월",
+   "updated_label": "최종 업데이트: 2026년 10월",
    "intro": "본 방침은 MiLatexAI가 무엇을 수집하고, 무엇을 의도적으로 수집하지 않으며, Git 액세스 토큰을 어떻게 보호하는지를 쉬운 언어로 설명합니다. MiLatexAI는 작고 독립적인 제품이며, 저희는 여러분의 데이터를 최소한으로만 다루려고 합니다.",
    "sections": [
     {
      "heading": "수집하는 정보",
-     "body": "저희는 단 세 가지만 수집합니다. 싱글 사인온을 통해 제공되는 계정 이메일 주소, 암호화된 형태의 Git 액세스 토큰, 그리고 이번 달에 만든 쓰기 커밋 수를 세는 카운터입니다. 이것이 전체 목록입니다."
+     "body": "계정: 로그인에 사용하는 이메일 주소와 계정 ID, 요금제, 그리고 Pro를 구독하는 경우 Stripe가 알려주는 고객 ID. 암호화된 Git 액세스 토큰. 연결한 프로젝트: 각 저장소 링크와 직접 붙인 이름. 사용 횟수 카운터: 매달의 쓰기 커밋 수와, 매일 각 도구를 사용한 횟수(도구 이름과 숫자만 저장하며, 요청한 내용이나 파일 내용은 저장하지 않습니다). 일별 도구 사용 횟수는 90일 후 삭제됩니다. 저희가 보관하는 회원님에 관한 정보는 이것이 전부입니다.\n\n첫 프로젝트를 연결할 때 MiLatexAI를 어떻게 알게 되었는지 선택적으로 알려주실 수 있습니다. 그 답변의 누적 횟수에 1을 더할 뿐이며, 답변은 회원님과 연결되지 않습니다."
     },
     {
      "heading": "수집하지 않는 정보",
@@ -3399,7 +3399,7 @@
     },
     {
      "q": "Видите ли вы мои документы?",
-     "a": "Мы не храним содержимое ваших документов. MiLatexAI читает и редактирует ваши файлы только во время выполнения запроса. Мы храним email вашей учётной записи, ваш зашифрованный токен доступа, список подключённых проектов и месячный счётчик коммитов. Полный список приведён в политике конфиденциальности."
+     "a": "Мы не храним содержимое ваших документов. MiLatexAI читает и редактирует ваши файлы только во время выполнения запроса. Мы храним email вашей учётной записи, ваш зашифрованный токен доступа, список подключённых проектов и счётчики использования (ваши коммиты за каждый месяц и то, как часто вы пользуетесь каждым инструментом). Полный список приведён в политике конфиденциальности."
     },
     {
      "q": "С какими ИИ-ассистентами это работает?",
@@ -3441,7 +3441,7 @@
     },
     {
      "title": "Мы не храним ваши документы",
-     "desc": "MiLatexAI хранит только email вашей учётной записи, зашифрованный токен и месячный счётчик коммитов, никогда содержимое ваших файлов LaTeX."
+     "desc": "MiLatexAI хранит только email вашей учётной записи, зашифрованный токен и счётчики использования, никогда содержимое ваших файлов LaTeX."
     },
     {
      "title": "Только подключённые вами проекты",
@@ -3468,12 +3468,12 @@
   },
   "privacy": {
    "title": "Политика конфиденциальности",
-   "updated_label": "Последнее обновление: июль 2026",
+   "updated_label": "Последнее обновление: октябрь 2026",
    "intro": "Эта политика простыми словами объясняет, что собирает MiLatexAI, что он намеренно не собирает и как защищается ваш Git-токен доступа. MiLatexAI, небольшой независимый продукт, и мы стараемся затрагивать как можно меньше ваших данных.",
    "sections": [
     {
      "heading": "Что мы собираем",
-     "body": "Мы собираем всего три вещи: email вашей учётной записи (предоставленный через единый вход), ваш Git-токен доступа в зашифрованном виде и счётчик того, сколько коммитов с изменениями вы сделали в текущем месяце. Это полный список."
+     "body": "Ваша учётная запись: адрес email и идентификатор учётной записи, с которыми вы входите, ваш тариф и, если вы оформляете Pro, идентификатор клиента, который нам передаёт Stripe. Ваш Git-токен доступа в зашифрованном виде. Подключённые вами проекты: ссылка на каждый репозиторий и название, которое вы ему дали. Счётчики использования: сколько коммитов с изменениями вы делаете каждый месяц и, по дням, сколько раз вы пользуетесь каждым инструментом (только название инструмента и число, никогда то, о чём вы просили, и то, что было в ваших файлах). Ежедневные счётчики инструментов удаляются через 90 дней. Это всё, что мы храним о вас.\n\nПри подключении первого проекта вы можете по желанию сообщить, как узнали о MiLatexAI. Мы лишь прибавляем единицу к общему счёту этого ответа. Ответ не связан с вами."
     },
     {
      "heading": "Что мы НЕ собираем",
@@ -3721,7 +3721,7 @@
     },
     {
      "q": "Potete vedere i miei documenti?",
-     "a": "Non memorizziamo i contenuti dei tuoi documenti. MiLatexAI legge e modifica i tuoi file solo mentre esegue una richiesta. Conserviamo l'email del tuo account, il tuo token di accesso cifrato, l'elenco dei progetti che colleghi e un contatore mensile dei commit. L'informativa sulla privacy riporta l'elenco completo."
+     "a": "Non memorizziamo i contenuti dei tuoi documenti. MiLatexAI legge e modifica i tuoi file solo mentre esegue una richiesta. Conserviamo l'email del tuo account, il tuo token di accesso cifrato, l'elenco dei progetti che colleghi e contatori di utilizzo (i tuoi commit di ogni mese e quante volte usi ciascuno strumento). L'informativa sulla privacy riporta l'elenco completo."
     },
     {
      "q": "Con quali assistenti AI funziona?",
@@ -3763,7 +3763,7 @@
     },
     {
      "title": "Non memorizziamo i tuoi documenti",
-     "desc": "MiLatexAI conserva solo l'email del tuo account, il tuo token cifrato e un contatore mensile dei commit, mai i contenuti dei tuoi file LaTeX."
+     "desc": "MiLatexAI conserva solo l'email del tuo account, il tuo token cifrato e contatori di utilizzo, mai i contenuti dei tuoi file LaTeX."
     },
     {
      "title": "Solo i progetti che colleghi",
@@ -3790,12 +3790,12 @@
   },
   "privacy": {
    "title": "Informativa sulla privacy",
-   "updated_label": "Ultimo aggiornamento: luglio 2026",
+   "updated_label": "Ultimo aggiornamento: ottobre 2026",
    "intro": "Questa informativa spiega, in linguaggio semplice, cosa raccoglie MiLatexAI, cosa deliberatamente non raccoglie e come viene protetto il tuo token di accesso Git. MiLatexAI è un prodotto piccolo e indipendente, e cerchiamo di toccare il meno possibile dei tuoi dati.",
    "sections": [
     {
      "heading": "Cosa raccogliamo",
-     "body": "Raccogliamo solo tre cose: l'indirizzo email del tuo account (fornito tramite single sign-on), il tuo token di accesso Git in forma cifrata e un contatore di quanti commit di scrittura hai effettuato nel mese in corso. Questo è l'elenco completo."
+     "body": "Il tuo account: l'indirizzo email e l'ID account con cui accedi, il tuo piano e, se ti abboni a Pro, l'ID cliente che ci fornisce Stripe. Il tuo token di accesso Git, cifrato. I progetti che colleghi: il link di ogni repository e l'etichetta che gli hai dato. Contatori di utilizzo: quanti commit di scrittura fai ogni mese e, per ogni giorno, quante volte usi ciascuno strumento (solo il nome dello strumento e un numero, mai ciò che hai chiesto né il contenuto dei tuoi file). I contatori giornalieri degli strumenti vengono eliminati dopo 90 giorni. Questo è tutto ciò che conserviamo su di te.\n\nQuando colleghi il tuo primo progetto, puoi dirci facoltativamente come hai conosciuto MiLatexAI. Aggiungiamo soltanto uno al conteggio di quella risposta. La risposta non è collegata a te."
     },
     {
      "heading": "Cosa NON raccogliamo",
