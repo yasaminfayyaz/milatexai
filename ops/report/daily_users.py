@@ -116,10 +116,9 @@ def compare(rows: list[dict], previous: dict) -> dict:
 
 
 def subject_of(summary: dict) -> str:
-    if summary["first"]:
-        return f"Daily users: {summary['users']} total, {summary['commits']} commits (first report)"
-    return (f"Daily users: {summary['users']} total, {len(summary['new_users'])} new, "
-            f"{summary['commit_delta']:+d} commits")
+    """The email title is only the number of users who have connected a project."""
+    n = summary["with_project"]
+    return f"{n} user{'' if n == 1 else 's'} with projects connected"
 
 
 def _delta(r: dict) -> str:

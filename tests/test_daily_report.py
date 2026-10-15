@@ -43,7 +43,7 @@ def test_first_report_has_nothing_to_compare():
     r = rows()
     s = du.compare(r, {})
     assert s["first"] is True and s["commit_delta"] is None and r[0]["delta"] is None
-    assert "first report" in du.subject_of(s)
+    assert du.subject_of(s) == "2 users with projects connected"
 
 
 def test_changes_since_the_previous_report():
@@ -57,7 +57,8 @@ def test_changes_since_the_previous_report():
     assert by["free@example.com"]["delta"] == 0
     assert by["(none)"]["note"] == "new"
     assert s["new_users"] == ["(none)"] and s["commit_delta"] == 6
-    assert du.subject_of(s) == "Daily users: 4 total, 1 new, +6 commits"
+    assert du.subject_of(s) == "2 users with projects connected"      # the title is only this number
+    assert du.subject_of({"with_project": 1}) == "1 user with projects connected"
 
 
 def test_an_upgrade_is_called_out():
