@@ -31,6 +31,22 @@ def load(name: str) -> dict:
         return {}
 
 
+def healthy_now(healthy_env: str, firstaid: dict) -> bool:
+    """Is the service healthy as the repair ends? A later step's own check wins. Otherwise the
+    watchdog's view, except right after first aid found the app answering: the watchdog only
+    closes an incident after three good minutes, so its view still says "down" then, and a blip
+    that healed itself would be reported as needing the owner. In that case the app itself is
+    asked, with a few minutes of patience to ride out a deploy that is swapping copies."""
+    if healthy_env in ("true", "false"):
+        return healthy_env == "true"
+    view = c.site_view()
+    if view.get("known") and view.get("level") == "ok" and (view.get("age_seconds") or 9999) < 150:
+        return True
+    if firstaid.get("recovered") and c.effective_kind() != "edge":
+        return bool(c.probe_origin(c.app_base(c.target_app()), patience=180).get("healthy"))
+    return False
+
+
 def md_safe(text: str) -> str:
     """Log-derived text goes into a code fence, with nothing that could close it or ping someone."""
     return text.replace("`", "'").replace("@", "@" + chr(0x200B))
@@ -103,12 +119,7 @@ def main() -> None:
     broken = [f"{job} ({info.get('result')})" for job, info in needs.items()
               if isinstance(info, dict) and info.get("result") in ("failure", "cancelled")]
 
-    healthy_env = os.environ.get("HEALTHY_NOW", "")
-    if healthy_env in ("true", "false"):
-        healthy = healthy_env == "true"
-    else:
-        view = c.site_view()
-        healthy = bool(view.get("known") and view.get("level") == "ok" and (view.get("age_seconds") or 9999) < 150)
+    healthy = healthy_now(os.environ.get("HEALTHY_NOW", ""), load("FIRSTAID"))
 
     ctx = {"incident_id": incident_id, "kind": os.environ.get("INCIDENT_KIND", ""), "healthy_now": healthy,
            "armed": c.armed(), "drill": c.is_drill(), "firstaid": load("FIRSTAID"), "decision": decision,
