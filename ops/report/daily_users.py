@@ -80,6 +80,9 @@ def snapshot_of(rows: list[dict]) -> dict:
     return {r["email"]: {"commits": r["commits"], "projects": r["projects"], "plan": r["plan"]} for r in rows}
 
 
+REVIEWER_EMAIL = "reviewer@milatexai.com"   # the connector directory's review account, never counted as a Pro customer
+
+
 def compare(rows: list[dict], previous: dict) -> dict:
     """Annotate rows with what changed since the previous report and summarise."""
     first = not previous
@@ -103,8 +106,16 @@ def compare(rows: list[dict], previous: dict) -> dict:
             if r["plan"] == "pro":
                 upgraded.append(r["email"])
         r["note"] = ", ".join(notes)
+    # "Project users": only people who have connected a project count in the title numbers.
+    proj = [r for r in rows if r["projects"] > 0]
+    new_project = [] if first else [
+        r["email"] for r in proj if not int((previous.get(r["email"]) or {}).get("projects", 0) or 0)]
     return {
         "first": first,
+        "project_users": len(proj),
+        "project_pro": sum(1 for r in proj if r["plan"] == "pro" and r["email"] != REVIEWER_EMAIL),
+        "project_new": len(new_project),
+        "project_commit_delta": None if first else sum(r["delta"] or 0 for r in proj),
         "users": len(rows),
         "pro": sum(1 for r in rows if r["plan"] == "pro"),
         "with_project": sum(1 for r in rows if r["projects"] > 0),
@@ -116,9 +127,11 @@ def compare(rows: list[dict], previous: dict) -> dict:
 
 
 def subject_of(summary: dict) -> str:
-    """The email title is only the number of users who have connected a project."""
-    n = summary["with_project"]
-    return f"{n} user{'' if n == 1 else 's'} with projects connected"
+    """The email title counts only users who have connected a project ("project users")."""
+    head = f"Project users: {summary['project_users']} total, {summary['project_pro']} pro"
+    if summary["first"]:
+        return head + " (first report)"
+    return f"{head}, {summary['project_new']} new, {summary['project_commit_delta']:+d} commits"
 
 
 def _delta(r: dict) -> str:

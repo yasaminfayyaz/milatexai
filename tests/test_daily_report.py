@@ -43,7 +43,7 @@ def test_first_report_has_nothing_to_compare():
     r = rows()
     s = du.compare(r, {})
     assert s["first"] is True and s["commit_delta"] is None and r[0]["delta"] is None
-    assert du.subject_of(s) == "2 users with projects connected"
+    assert du.subject_of(s) == "Project users: 2 total, 1 pro (first report)"
 
 
 def test_changes_since_the_previous_report():
@@ -57,8 +57,8 @@ def test_changes_since_the_previous_report():
     assert by["free@example.com"]["delta"] == 0
     assert by["(none)"]["note"] == "new"
     assert s["new_users"] == ["(none)"] and s["commit_delta"] == 6
-    assert du.subject_of(s) == "2 users with projects connected"      # the title is only this number
-    assert du.subject_of({"with_project": 1}) == "1 user with projects connected"
+    # title: only people with a project count; "new" = got their first project since the last report
+    assert du.subject_of(s) == "Project users: 2 total, 1 pro, 0 new, +6 commits"
 
 
 def test_an_upgrade_is_called_out():
@@ -162,3 +162,21 @@ def test_report_cap_matches_the_deploy_script():
     import re
     deploy = (Path(__file__).resolve().parents[1] / "ops" / "deploy.sh").read_text(encoding="utf-8")
     assert re.search(r'MAX_REPLICAS="\$\{DEPLOY_MAX_REPLICAS:-(\d+)\}"', deploy).group(1) == str(du.MAX_COPIES)
+
+
+def test_title_counts_only_people_with_a_project_and_leaves_out_the_reviewer():
+    users = [{"RowKey": f"u{i}", "email": e, "plan": p} for i, (e, p) in enumerate([
+        ("a@example.com", "pro"), ("reviewer@milatexai.com", "pro"), ("b@example.com", "free"),
+        ("c@example.com", "free"), ("d@example.com", "free")])]
+    projects = [{"PartitionKey": "u0"}, {"PartitionKey": "u1"}, {"PartitionKey": "u2"}, {"PartitionKey": "u3"}]
+    usage = [{"PartitionKey": "u0", "RowKey": "2026-10", "count": 50}, {"PartitionKey": "u2", "RowKey": "2026-10", "count": 8},
+             {"PartitionKey": "u4", "RowKey": "2026-10", "count": 99}]      # u4 has commits but no project: not counted
+    r = du.build_rows(users, projects, usage, "2026-10")
+    previous = {"a@example.com": {"commits": 40, "projects": 1, "plan": "pro"},
+                "b@example.com": {"commits": 8, "projects": 0, "plan": "free"},     # connected their first project since
+                "c@example.com": {"commits": 0, "projects": 0, "plan": "free"},
+                "d@example.com": {"commits": 0, "projects": 0, "plan": "free"}}
+    s = du.compare(r, previous)
+    assert (s["project_users"], s["project_pro"], s["project_new"], s["project_commit_delta"]) == (4, 1, 3, 10)
+    assert du.subject_of(s) == "Project users: 4 total, 1 pro, 3 new, +10 commits"
+    assert du.subject_of(du.compare(r, {})) == "Project users: 4 total, 1 pro (first report)"
