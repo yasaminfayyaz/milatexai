@@ -69,6 +69,7 @@ from .service import (
     LimitExceeded,
     ProjectNotConnected,
     ServiceError,
+    PlanChoice,
 )
 from .sessions import SessionsClient, SessionsError
 from .store import InMemoryStore, Store, TokenCipher, User
@@ -83,7 +84,9 @@ request: any file tool returns a secure link where they paste their Overleaf Git
 token (never in chat), relay that link and ask them to come back. start_connect
 gives the same link; prefer it over connect_project, which takes the token in
 chat. add_project adds more projects. Refer to a project by its name;
-list_projects shows the connected ones. Whenever the user wants to
+list_projects shows the connected ones. On the free plan only one project is active at a
+time: if a reply asks which project to keep, ask the user and pass their answer to
+switch_project; it also switches to a paused project when the user asks. Whenever the user wants to
 check, view, change, update, rotate, or revoke their Overleaf token, use
 change_token (it returns a secure link; the token itself can't be shown in chat).
 To add or remove projects, use manage_projects, or add_project with just a project
@@ -146,18 +149,22 @@ def _mini_diff(old: str, new: str, path: str, max_lines: int = 40) -> str:
     return "Change applied:\n" + "\n".join(diff)
 
 
-class ConnectFirst(ToolError):
-    """Not a failure: a new user's first call answers with the secure connect link."""
+class PlainReply(ToolError):
+    """Not a failure: an answer that stops the call (a connect link, a plan choice)."""
+
+
+class ConnectFirst(PlainReply):
+    """A new user's first call answers with the secure connect link."""
 
 
 class _ConnectFirstAsReply(Middleware):
-    """Send the connect link as an ordinary reply, not an error result, so the directory's
-    error rate counts only real failures (a new user's first list_files is not one)."""
+    """Send plain replies as ordinary results, not error results, so the directory's error
+    rate counts only real failures (a new user's first list_files is not one)."""
 
     async def on_call_tool(self, context, call_next):
         try:
             return await call_next(context)
-        except ConnectFirst as exc:
+        except PlainReply as exc:
             # Text tools declare an output schema of {"result": str}; image tools declare none.
             return ToolResult(content=[TextContent(type="text", text=str(exc))],
                               structured_content={"result": str(exc)})
@@ -237,6 +244,8 @@ def _wrap(exc: Exception) -> ToolError:
         return exc
     if isinstance(exc, load.Busy):
         return ToolError(str(exc))
+    if isinstance(exc, PlanChoice):
+        return PlainReply(str(exc))
     if isinstance(exc, (LimitExceeded, ProjectNotConnected, ServiceError, PathError)):
         return ToolError(str(exc))
     if isinstance(exc, PushConflict):
@@ -788,7 +797,30 @@ def create_hosted_server(
         if not projects:
             return ("No projects connected yet. Use connect_project with your "
                     "Overleaf, GitHub, or GitLab repo link + its access token.")
-        return "\n".join(f"- {p.name}  (id {p.project_id})" for p in projects)
+        states = await app.service.project_states(user.user_id)
+        lines = [f"- {p.name}  (id {p.project_id})" + (f"  [{states[p.project_id]}]" if states else "")
+                 for p in projects]
+        if states:
+            lines.append("The free plan works on one project at a time; paused projects stay saved.")
+        return "\n".join(lines)
+
+    @mcp.tool(title="Choose the active project", annotations={"title": "Choose the active project", "readOnlyHint": False, "destructiveHint": False})
+    async def switch_project(project: str) -> str:
+        """Choose which connected project is active. On the free plan one project is active at a
+        time and the others stay saved but paused; on Pro every project is active.
+
+        Args:
+            project: The project's name or id.
+        """
+        try:
+            user = await app.user()
+            proj = await app.service.set_active_project(user.user_id, project)
+            states = await app.service.project_states(user.user_id)
+        except Exception as exc:  # noqa: BLE001
+            raise _wrap(exc)
+        paused = [pid for pid, s in states.items() if s == "paused"]
+        tail = f" Your other {len(paused)} project(s) are paused and stay saved." if paused else ""
+        return f"{proj.name!r} is now your active project.{tail}"
 
     @mcp.tool(title="Add another project", annotations={"title": "Add another project", "readOnlyHint": False, "destructiveHint": False})
     async def add_project(
@@ -2212,7 +2244,9 @@ def create_hosted_server(
         user_id, email = ident
         await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
         projects = await app.service.store.list_projects(user_id)
-        return HTMLResponse(web.render_manage_projects(request.query_params["code"], projects, email=email))
+        states = await app.service.project_states(user_id)
+        return HTMLResponse(web.render_manage_projects(request.query_params["code"], projects,
+                                                       email=email, states=states))
 
     @mcp.custom_route("/projects", methods=["POST"])
     async def projects_submit(request: Request) -> Response:
@@ -2226,8 +2260,9 @@ def create_hosted_server(
 
         async def show(error: str | None = None, status: int = 200) -> Response:
             projects = await app.service.store.list_projects(user_id)
+            states = await app.service.project_states(user_id)
             return HTMLResponse(
-                web.render_manage_projects(code, projects, email=email, error=error),
+                web.render_manage_projects(code, projects, email=email, error=error, states=states),
                 status_code=status,
             )
 
@@ -2242,6 +2277,8 @@ def create_hosted_server(
             elif action == "remove":
                 await app.service.store.delete_project(user_id, field("project_id"))
                 await app.forget_local(user_id, field("project_id"))
+            elif action == "activate":
+                await app.service.set_active_project(user_id, field("project_id"))
             elif action == "set_token":
                 await app.service.update_project_token(user_id, field("project_id"), field("token"))
             else:

@@ -41,6 +41,11 @@ class ProjectNotConnected(ServiceError):
     pass
 
 
+class PlanChoice(ServiceError):
+    """Not a failure: on the free plan, more projects are connected than the plan allows at
+    once (usually after Pro ended), so the user picks or switches the active one."""
+
+
 class AlreadyConnected(ServiceError):
     """The project the user tried to add is already one of their connected projects."""
 
@@ -356,7 +361,7 @@ class AccountService:
                 "No Overleaf project is connected to your account yet. "
                 "Add one at https://milatexai.com."
             )
-        chosen = self._select(projects, project_ref)
+        chosen = await self._select_for_plan(user_id, projects, project_ref)
         enc = chosen.token_encrypted
         if not enc:
             user = await self.store.get_user(user_id)
@@ -410,6 +415,56 @@ class AccountService:
             await self.store.increment_usage(f"signup-source:{source}", month)
         except Exception:  # noqa: BLE001
             pass
+
+    # -- the active project on the free plan --------------------------------
+
+    async def project_states(self, user_id: str) -> dict[str, str]:
+        """project_id -> "active" or "paused" when the plan allows fewer projects than are
+        connected; empty when every project can be used (Pro, or within the free limit)."""
+        user = await self.store.get_user(user_id)
+        projects = await self.store.list_projects(user_id)
+        limit = project_limit(user) if user else None
+        if limit is None or len(projects) <= limit:
+            return {}
+        return {p.project_id: ("active" if p.project_id == user.active_project_id else "paused")
+                for p in projects}
+
+    async def set_active_project(self, user_id: str, ref: str) -> Project:
+        """Make one connected project the active one (the others pause on the free plan)."""
+        user = await self.store.get_user(user_id)
+        if user is None:
+            raise ServiceError("Unknown user; sign in first.")
+        projects = await self.store.list_projects(user_id)
+        if not projects:
+            raise ProjectNotConnected("No project is connected yet.")
+        chosen = self._select(projects, ref)
+        user.active_project_id = chosen.project_id
+        await self.store.upsert_user(user)
+        return chosen
+
+    async def _select_for_plan(self, user_id: str, projects: list[Project], ref: str | None) -> Project:
+        user = await self.store.get_user(user_id)
+        limit = project_limit(user) if user else None
+        if limit is None or len(projects) <= limit:
+            return self._select(projects, ref)
+        active = next((p for p in projects if p.project_id == user.active_project_id), None)
+        if active is None:
+            names = "\n".join(f"- {p.name}" for p in projects)
+            raise PlanChoice(
+                f"You're on the free plan, which works on one project at a time. Your "
+                f"{len(projects)} projects are all still saved:\n{names}\n\n"
+                "Which one do you want to keep working on? The others stay saved and paused, "
+                "and you can switch any time. Or upgrade to Pro to use all of them again: "
+                f"{UPGRADE_URL}"
+            )
+        chosen = active if ref is None else self._select(projects, ref)
+        if chosen.project_id != active.project_id:
+            raise PlanChoice(
+                f"{chosen.name!r} is paused on the free plan; {active.name!r} is your active "
+                f"project. You can switch to {chosen.name!r} (then {active.name!r} pauses "
+                f"instead), or upgrade to Pro to use all your projects: {UPGRADE_URL}"
+            )
+        return chosen
 
     # -- helpers ------------------------------------------------------------
 

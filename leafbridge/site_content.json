@@ -347,6 +347,10 @@
      "body": "A repository you can push to and an access token for it.\n\nOverleaf: Git integration is a paid Overleaf feature (many universities include it). Create a Git token in Overleaf under Account settings, then Git integration.\n\nGitHub: a fine-grained personal access token limited to that repository, with Contents set to read and write. GitLab and Bitbucket work the same way with their own access tokens."
     },
     {
+     "heading": "If your Pro plan ends",
+     "body": "Nothing is deleted. All your projects and saved tokens stay. The free plan works on one project at a time, so the first time you use MiLatexAI afterwards, Claude asks which project to keep working on. The others are paused, not removed, and you can switch any time, in the chat or on your projects page. Subscribe again and every project works straight away."
+    },
+    {
      "heading": "Things to ask",
      "body": "\"Show me the outline of main.tex.\"\n\"Tighten the abstract and keep it under 200 words.\"\n\"Why won't my paper compile? Fix it.\"\n\"Add the citation 10.48550/arXiv.1706.03762.\"\n\"Show me how table 2 looks and fix the column that runs off the page.\"\n\"Save a checkpoint, then rewrite the introduction.\"\n\"Undo your last change to intro.tex.\"\n\"Make a tracked-changes PDF against my last checkpoint.\""
     },

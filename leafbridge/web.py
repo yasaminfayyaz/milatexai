@@ -228,17 +228,33 @@ def render_notice(title: str, message: str, *, icon: str = "⚠️",
     )
 
 
-def render_manage_projects(code: str, projects, *, email: str = "", error: str | None = None) -> str:
-    """The 'update the list of projects' form: add by URL / remove. No token."""
+def render_manage_projects(code: str, projects, *, email: str = "", error: str | None = None,
+                           states: dict[str, str] | None = None) -> str:
+    """The 'update the list of projects' form: add by URL / remove. No token. With ``states``
+    (free plan, more projects than it allows at once) each row shows Active or Paused, and a
+    paused one can be made active."""
+    states = states or {}
     err_html = f"<div class='error'>{html.escape(error)}</div>" if error else ""
+    plan_note = ("<div class='note'>The free plan works on one project at a time. Paused projects "
+                 "stay saved; make one active to switch, or <a href='/upgrade'>upgrade to Pro</a> "
+                 "to use all of them.</div>") if states else ""
     rows = ""
     for p in projects:
         codeh = html.escape(code, quote=True)
         pidh = html.escape(p.project_id, quote=True)
+        state = states.get(p.project_id, "")
+        badge = f" <small class='muted'>· {'Active' if state == 'active' else 'Paused'}</small>" if state else ""
+        activate = (
+            "<form method='post' action='/projects' style='margin:0'>"
+            f"<input type='hidden' name='code' value='{codeh}'>"
+            "<input type='hidden' name='action' value='activate'>"
+            f"<input type='hidden' name='project_id' value='{pidh}'>"
+            "<button type='submit'>Make active</button></form>"
+        ) if state == "paused" else ""
         rows += (
             "<div class='proj-row'><span><b>"
-            f"{html.escape(p.name)}</b><br><small class='muted'>{html.escape(p.project_id)}</small></span>"
-            "<div class='proj-actions'>"
+            f"{html.escape(p.name)}</b>{badge}<br><small class='muted'>{html.escape(p.project_id)}</small></span>"
+            "<div class='proj-actions'>" + activate +
             "<details class='tok-update'><summary>Update token</summary>"
             "<form method='post' action='/projects' autocomplete='off' style='margin:8px 0 0'>"
             f"<input type='hidden' name='code' value='{codeh}'>"
@@ -264,7 +280,7 @@ def render_manage_projects(code: str, projects, *, email: str = "", error: str |
   reuses your saved token; GitHub, GitLab, and Bitbucket need that repo's token.
   Got a repo's token wrong? Use “Update token” on its row to fix it in place. No
   need to re-add the project.</p>
-{err_html}
+{err_html}{plan_note}
 <div class='proj-list'>{rows}</div>
 <form method='post' action='/projects' autocomplete='off'>
   <input type='hidden' name='code' value='{codeq}'>

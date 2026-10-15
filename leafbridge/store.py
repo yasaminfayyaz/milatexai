@@ -79,6 +79,9 @@ class User:
     # projects), so it lives on the user. Projects added later reuse it, no need
     # to paste the token again. Encrypted with TokenCipher.
     overleaf_token_encrypted: str = ""
+    # On the free plan only one project is active at a time; the others stay saved but
+    # paused (for example after a Pro plan ends). "" until the user picks one.
+    active_project_id: str = ""
 
 
 @dataclass
