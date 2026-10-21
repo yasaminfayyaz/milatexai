@@ -61,7 +61,7 @@ from .git_worker import GitError, GitWorker, PushConflict
 from .authkit import MiLatexAIAuthKit
 from .activity import ActivityTracker
 from .health import DeepHealth
-from . import buildcache, texmemory
+from . import buildcache, pricing, texmemory
 from . import load
 from .service import (
     AccountService,
@@ -925,15 +925,21 @@ def create_hosted_server(
             return "You're already on Pro. Use manage_subscription to view or cancel."
         if not app.billing.enabled:
             raise ToolError("Billing isn't configured yet. Please try again later.")
+        offer = 0
         try:
+            if hasattr(app.billing, "first_month_percent"):
+                offer = int(await app.billing.first_month_percent(user.stripe_customer_id))
             url, cid = await app.billing.create_checkout(user, user.stripe_customer_id)
             await app.service.set_stripe_customer(user.user_id, cid)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
+        deal = (f"Your first month is {offer}% off (about {pricing.first_month_price(offer)}), "
+                "taken off automatically at checkout.\n\n") if offer else ""
         return (
             "Complete your upgrade to Pro here (secure Stripe checkout, your card "
             "never touches this chat):\n\n"
             f"{url}\n\n"
+            f"{deal}"
             "Your plan switches to Pro automatically once payment goes through."
         )
 
@@ -1932,7 +1938,14 @@ def create_hosted_server(
         }
         return HTMLResponse(site.render_account(
             status=status, signed_in=True, account=view,
-            billing_enabled=app.billing.enabled, has_projects=bool(projects)))
+            billing_enabled=app.billing.enabled, has_projects=bool(projects),
+            first_month_percent=0 if user.stripe_customer_id else pricing.FIRST_MONTH_PERCENT))
+
+    @mcp.custom_route("/upgrade", methods=["GET"])
+    async def upgrade_page(request: Request) -> Response:
+        # The address the chat messages point to. The account page has the upgrade button
+        # (and asks the visitor to sign in first if needed).
+        return RedirectResponse("/account", status_code=303)
 
     # -- website sign-in (WorkOS AuthKit) so a user can manage billing on the web
     # with the SAME account as the connector. The session cookie is signed,

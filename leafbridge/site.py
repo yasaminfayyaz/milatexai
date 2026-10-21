@@ -21,6 +21,8 @@ import html
 import json
 from pathlib import Path
 
+from . import pricing
+
 _CONTENT_PATH = Path(__file__).with_name("site_content.json")
 _ICON_PATH = Path(__file__).with_name("icon-64.png")
 _LOGO_PATH = Path(__file__).with_name("icon-512.png")
@@ -89,6 +91,7 @@ _FALLBACK_EN = {
                          "cta": "Get started",
                          "availability": "Best-effort · subject to capacity"},
                 "pro": {"name": "Pro", "price": "$8.99", "period": "/mo", "badge": "Unlimited",
+                        "offer": "50% off your first month",
                         "features": ["Unlimited projects", "Unlimited commits", "Priority support"],
                         "cta": "Get started",
                         "availability": "Guaranteed · always on"},
@@ -438,7 +441,8 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
 
     free_feats = "".join(f"<li data-i18n='pricing.free.features.{i}'>{_t(en,f'pricing.free.features.{i}')}</li>" for i in range(n_free))
     pro_feats = "".join(f"<li data-i18n='pricing.pro.features.{i}'>{_t(en,f'pricing.pro.features.{i}')}</li>" for i in range(n_pro))
-    pricing = f"""<section class='section alt' id='pricing'>
+    offer_line = _node(en, "p", "pricing.pro.offer", "offer") if pricing.FIRST_MONTH_PERCENT else ""
+    pricing_html = f"""<section class='section alt' id='pricing'>
   {_node(en,'h2','pricing.title','h2')}
   {_node(en,'p','pricing.subtitle','sub')}
   <div class='grid two plans'>
@@ -454,6 +458,7 @@ def render_site(content: dict | None = None, default_lang: str = "en") -> str:
       {_node(en,'h3','pricing.pro.name')}
       {_node(en,'p','pricing.pro.availability','avail pro')}
       <div class='price'><span data-i18n='pricing.pro.price'>{_t(en,'pricing.pro.price')}</span><small data-i18n='pricing.pro.period'>{_t(en,'pricing.pro.period')}</small></div>
+      {offer_line}
       <ul>{pro_feats}</ul>
       <a class='btn' href='/account' data-i18n='pricing.pro.cta'>{_t(en,'pricing.pro.cta')}</a>
     </div>
@@ -614,7 +619,7 @@ function applyLang(lang) {{
 {see}
 {prompts}
 {security}
-{pricing}
+{pricing_html}
 {faq}
 {cta}
 </main>
@@ -630,6 +635,7 @@ def render_account(
     account: dict | None = None,
     billing_enabled: bool = True,
     has_projects: bool = False,
+    first_month_percent: int = 0,
 ) -> str:
     """The /account page.
 
@@ -679,8 +685,10 @@ def render_account(
         actions = f"{manage}{signout}"
     else:
         icon, heading = "💳", "You're on the Free plan"
+        deal = (f" New subscribers get {first_month_percent}% off their first month "
+                f"({pricing.first_month_price(first_month_percent)})." if first_month_percent else "")
         body = ("Upgrade to Pro for unlimited projects and unlimited write-commits, "
-                "$8.99/mo. Reads stay free and unlimited either way.")
+                f"$8.99/mo.{deal} Reads stay free and unlimited either way.")
         upgrade = (_form("/account/upgrade", "Upgrade to Pro · $8.99/mo")
                    if billing_enabled else
                    "<p class='muted'>Upgrades are briefly unavailable, please try again soon.</p>")
@@ -842,7 +850,9 @@ def llms_txt() -> str:
         "PAT with Contents read/write, GitLab project or personal access token, or Bitbucket "
         "app password). You paste a repository URL and access token on a secure web form.\n"
         "Pricing: Free tier (1 project, 10 write-commits/month, unlimited reads, best-effort); "
-        "Pro $8.99/month (unlimited, guaranteed). Overleaf's Git integration is billed "
+        "Pro $8.99/month (unlimited, guaranteed)"
+        + (f"; new subscribers get {pricing.FIRST_MONTH_PERCENT}% off the first month" if pricing.FIRST_MONTH_PERCENT else "")
+        + ". Overleaf's Git integration is billed "
         "separately by Overleaf; GitHub/GitLab/Bitbucket need only a free access token.\n\n"
         "Features: conversational LaTeX editing committed and pushed straight to the default "
         "branch on Overleaf, GitHub, GitLab, or Bitbucket; every write is a Git commit; "
@@ -1008,6 +1018,7 @@ a.badge-link{text-decoration:none}a.badge-link:hover{text-decoration:underline}
 .plan h3{font-size:18px;margin:0 0 6px}
 .avail{font-size:12px;font-weight:600;color:var(--muted);margin:0 0 10px;letter-spacing:.01em}
 .avail.pro{color:var(--accent)}
+.offer{margin:-6px 0 12px;font-size:14px;font-weight:700;color:var(--accent)}
 .price{font-size:30px;font-weight:800;margin:6px 0 14px}
 .price small{font-size:14px;font-weight:500;color:var(--muted)}
 .plan ul{list-style:none;padding:0;margin:0 0 20px;display:grid;gap:9px;flex:1}

@@ -14,9 +14,13 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import os
 
+from . import pricing
 from .store import User
+
+log = logging.getLogger("milatexai.billing")
 
 
 class BillingError(Exception):
@@ -60,11 +64,52 @@ class Billing:
         stripe.api_key = self._api_key
         return stripe
 
+    async def first_month_percent(self, customer_id: str | None) -> int:
+        """The first-month discount this person gets: the offer's percentage if they have never
+        had a subscription, otherwise 0. Any doubt (Stripe unreachable) means no discount."""
+        percent = pricing.FIRST_MONTH_PERCENT
+        if not self.enabled or not percent:
+            return 0
+        if not customer_id:
+            return percent          # no Stripe customer yet, so never subscribed
+        s = self._stripe()
+
+        def _never_subscribed() -> bool:
+            return not s.Subscription.list(customer=customer_id, status="all", limit=1).data
+
+        try:
+            return percent if await asyncio.to_thread(_never_subscribed) else 0
+        except Exception as exc:  # noqa: BLE001
+            log.warning("could not check past subscriptions (%s); no first-month discount", type(exc).__name__)
+            return 0
+
+    @staticmethod
+    def _first_month_coupon(s, percent: int) -> str:
+        """The id of the offer's Stripe coupon, creating it the first time it is needed."""
+        coupon_id = pricing.first_month_coupon_id(percent)
+        try:
+            found = s.Coupon.retrieve(coupon_id)
+        except Exception as exc:  # noqa: BLE001
+            if getattr(exc, "code", None) != "resource_missing":
+                raise
+            try:
+                found = s.Coupon.create(id=coupon_id, percent_off=percent, duration="once",
+                                        name=f"{percent}% off your first month")
+            except Exception:  # noqa: BLE001  (another copy of the server made it a moment ago)
+                found = s.Coupon.retrieve(coupon_id)
+        if getattr(found, "valid", True) is False:
+            raise BillingError("The first-month coupon is no longer valid.")
+        return coupon_id
+
     async def create_checkout(self, user: User, customer_id: str | None = None) -> tuple[str, str]:
-        """Create a subscription Checkout session. Returns (checkout_url, customer_id)."""
+        """Create a subscription Checkout session. Returns (checkout_url, customer_id).
+
+        A new subscriber gets the first-month discount applied automatically. If it cannot be
+        applied for any reason the checkout still works at full price, with the promo-code box."""
         if not self.enabled:
             raise BillingError("Billing is not configured.")
         s = self._stripe()
+        percent = await self.first_month_percent(customer_id)
 
         def _work() -> tuple[str, str]:
             cid = customer_id
@@ -74,7 +119,7 @@ class Billing:
                     metadata={"user_id": user.user_id},
                 )
                 cid = cust.id
-            session = s.checkout.Session.create(
+            params = dict(
                 mode="subscription",
                 customer=cid,
                 line_items=[{"price": self.price_id, "quantity": 1}],
@@ -82,8 +127,19 @@ class Billing:
                 subscription_data={"metadata": {"user_id": user.user_id}},
                 success_url=self.success_url,
                 cancel_url=self.cancel_url,
-                allow_promotion_codes=True,
             )
+            discount = None
+            if percent:
+                try:
+                    discount = [{"coupon": self._first_month_coupon(s, percent)}]
+                except Exception as exc:  # noqa: BLE001
+                    log.warning("first-month discount unavailable (%s); checkout continues without it",
+                                type(exc).__name__)
+            if discount:
+                params["discounts"] = discount          # Stripe does not allow this together with the promo-code box
+            else:
+                params["allow_promotion_codes"] = True
+            session = s.checkout.Session.create(**params)
             return session.url, cid
 
         return await asyncio.to_thread(_work)
