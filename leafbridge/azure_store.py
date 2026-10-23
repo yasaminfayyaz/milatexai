@@ -50,7 +50,7 @@ class AzureTableStore(Store):
 
     async def _ensure(self) -> None:
         if not self._ready:
-            for base in ("users", "projects", "usage", "heads", "links", "activity"):
+            for base in ("users", "projects", "usage", "heads", "links", "activity", "jobs"):
                 await self._svc.create_table_if_not_exists(self._name(base))
             self._ready = True
 
@@ -78,7 +78,29 @@ class AzureTableStore(Store):
             stripe_customer_id=(e.get("stripe_customer_id") or None),
             overleaf_token_encrypted=(e.get("overleaf_token_encrypted") or ""),
             active_project_id=(e.get("active_project_id") or ""),
+            past_due_since=float(e.get("past_due_since") or 0.0),
+            dunning_stage=int(e.get("dunning_stage") or 0),
         )
+
+    async def list_users(self) -> list[User]:
+        await self._ensure()
+        out: list[User] = []
+        async for e in self._table("users").list_entities():
+            out.append(User(
+                user_id=e["RowKey"], email=e.get("email", ""), plan=e.get("plan", "free"),
+                is_admin=bool(e.get("is_admin", False)), stripe_customer_id=(e.get("stripe_customer_id") or None),
+                overleaf_token_encrypted=(e.get("overleaf_token_encrypted") or ""),
+                active_project_id=(e.get("active_project_id") or ""),
+                past_due_since=float(e.get("past_due_since") or 0.0), dunning_stage=int(e.get("dunning_stage") or 0)))
+        return out
+
+    async def claim_job(self, name: str, key: str) -> bool:
+        await self._ensure()
+        try:
+            await self._table("jobs").create_entity({"PartitionKey": self._key(name), "RowKey": self._key(key)})
+            return True
+        except ResourceExistsError:
+            return False
 
     async def upsert_user(self, user: User) -> None:
         await self._ensure()
@@ -92,6 +114,8 @@ class AzureTableStore(Store):
                 "stripe_customer_id": user.stripe_customer_id or "",
                 "overleaf_token_encrypted": user.overleaf_token_encrypted or "",
                 "active_project_id": user.active_project_id or "",
+                "past_due_since": float(user.past_due_since or 0.0),
+                "dunning_stage": int(user.dunning_stage or 0),
             },
             mode=UpdateMode.REPLACE,
         )

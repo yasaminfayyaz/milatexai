@@ -44,7 +44,7 @@ from . import (
     __version__, arxivprep, citations, figures, latex, paperstats, site,
     texcompile, texdiff, texlocate, tikz, web,
 )
-from .billing import Billing, plan_change_from_event
+from .billing import Billing, dunning_change_from_event, plan_change_from_event
 from .capacity import CapacityGate
 from .config import ProjectConfig, default_data_dir
 from .connect_link import ConnectCodeError, mint_connect_code, verify_connect_code
@@ -60,6 +60,9 @@ from .files import (
 from .git_worker import GitError, GitWorker, PushConflict
 from .authkit import MiLatexAIAuthKit
 from .activity import ActivityTracker
+from .dunning import DunningLoop
+from . import dunning as _dunning
+from .mailer import CustomerMailer
 from .health import DeepHealth
 from . import buildcache, pricing, texmemory
 from . import load
@@ -384,6 +387,7 @@ class HostedApp:
         sessions: SessionsClient | None = None,
         linked_issuers: dict | None = None,
         web_issuer: str = "",
+        mailer: CustomerMailer | None = None,
     ):
         self.service = AccountService(store, cipher)
         self.activity = ActivityTracker(store)
@@ -414,6 +418,9 @@ class HostedApp:
             api_key="", price_id="", webhook_secret="",
             success_url="", cancel_url="", portal_return_url="",
         )
+        # Payment reminders (see dunning.py): emails go out through the Cloudflare Worker.
+        self.mailer = mailer if mailer is not None else CustomerMailer.from_env()
+        self.dunning = DunningLoop(store, self.billing, self.mailer)
         # No capacity gate given (e.g. tests) -> a disabled gate (free always ok).
         self.capacity = capacity if capacity is not None else CapacityGate(
             subscription_id="", resource_group="", stripe_api_key="",
@@ -675,6 +682,7 @@ def create_hosted_server(
     email_resolver=None,
     web_auth: WorkOSWebAuth | None = None,
     sessions: SessionsClient | None = None,
+    mailer: CustomerMailer | None = None,
 ) -> FastMCP:
     """Build the hosted server. Tests pass ``auth=False`` + a fake
     ``identity_provider`` + an ``InMemoryStore`` to drive it without WorkOS."""
@@ -704,6 +712,7 @@ def create_hosted_server(
         sessions=sessions if sessions is not None else SessionsClient.from_env(),
         linked_issuers=signin["linked"],
         web_issuer=signin["primary"]["domain"] if signin["primary"]["domain"] in signin["linked"] else "",
+        mailer=mailer,
     )
 
     auth_provider = None
@@ -724,6 +733,7 @@ def create_hosted_server(
     mcp.add_middleware(_ConnectFirstAsReply())
     mcp.add_middleware(_CountToolUse(app.activity))
     mcp.activity = app.activity     # asgi.py writes the last counts when the server shuts down
+    mcp.dunning = app.dunning       # asgi.py runs the payment sweep in the background
 
     # -- account management ------------------------------------------------
 
@@ -1935,6 +1945,8 @@ def create_hosted_server(
             "plan": "pro" if (user.is_admin or user.plan == "pro") else "free",
             "is_admin": user.is_admin,
             "has_customer": bool(user.stripe_customer_id),
+            "past_due_until": (_dunning.month_day(_dunning.grace_end(user.past_due_since))
+                               if user.plan == "pro" and not user.is_admin and user.past_due_since else ""),
         }
         return HTMLResponse(site.render_account(
             status=status, signed_in=True, account=view,
@@ -2061,6 +2073,12 @@ def create_hosted_server(
         return Response(site.icon_png(), media_type="image/png",
                         headers={"Cache-Control": "public, max-age=86400"})
 
+    @mcp.custom_route("/email-signature-logo.png", methods=["GET"])
+    async def email_signature_logo(request: Request) -> Response:
+        # The wordmark in the signature of our emails (Gmail and the payment reminders).
+        return Response(site.signature_logo_png(), media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=86400"})
+
     @mcp.custom_route("/icon.png", methods=["GET"])
     async def logo(request: Request) -> Response:
         return Response(site.logo_png(), media_type="image/png",
@@ -2134,6 +2152,18 @@ def create_hosted_server(
             except Exception:  # noqa: BLE001
                 # 500 tells Stripe to retry the delivery later.
                 return Response("apply failed", status_code=500)
+        # A payment that failed starts the grace period and the first email; paying clears it.
+        change = dunning_change_from_event(event)
+        if change:
+            try:
+                store = app.service.store
+                if change["action"] == "start":
+                    await _dunning.on_payment_problem(store, app.mailer, change["customer"], change.get("invoice_url"),
+                                                      change.get("at"), time.time())
+                else:
+                    await _dunning.on_paid_up(store, change["customer"])
+            except Exception:  # noqa: BLE001
+                return Response("dunning failed", status_code=500)
         return Response("ok", status_code=200)
 
     @mcp.custom_route("/dl", methods=["GET"])

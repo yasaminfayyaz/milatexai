@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import os
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from cryptography.fernet import Fernet, InvalidToken
 
@@ -82,6 +82,11 @@ class User:
     # On the free plan only one project is active at a time; the others stay saved but
     # paused (for example after a Pro plan ends). "" until the user picks one.
     active_project_id: str = ""
+    # A Pro payment that did not go through: when it first failed (epoch seconds, 0 = all paid up)
+    # and how many reminder emails have gone out (0 none, 1 first notice, 2 final reminder).
+    # Pro stays on for a grace period after the first failure; see dunning.py.
+    past_due_since: float = 0.0
+    dunning_stage: int = 0
 
 
 @dataclass
@@ -142,6 +147,22 @@ class Store(ABC):
     @abstractmethod
     async def increment_usage(self, user_id: str, month: str, by: int = 1) -> int: ...
 
+    # -- accounts: listing, lookup by Stripe customer, and once-only job claims (see dunning.py).
+    # Optional: a backend without them reports nothing and claims nothing.
+
+    async def list_users(self) -> list[User]:
+        return []
+
+    async def find_user_by_customer(self, customer_id: str) -> User | None:
+        for u in await self.list_users():
+            if u.stripe_customer_id == customer_id:
+                return u
+        return None
+
+    async def claim_job(self, name: str, key: str) -> bool:
+        """True for exactly one caller per (name, key), however many copies of the server ask."""
+        return False
+
     # -- tool-use counts (see activity.py). Optional: a backend without them just drops the counts.
 
     async def put_activity(self, user_id: str, copy_id: str, rows: list[tuple[str, str, int, int]]) -> None:
@@ -193,6 +214,7 @@ class InMemoryStore(Store):
         self._users: dict[str, User] = {}
         self._projects: dict[tuple[str, str], Project] = {}
         self._usage: dict[tuple[str, str], int] = {}
+        self._jobs: set[tuple[str, str]] = set()
         self._activity: dict[tuple[str, str], tuple[int, int]] = {}   # (user_id, "day|tool|copy") -> (calls, errors)
         self._heads: dict[str, str] = {}
         self._downloads: dict[str, bytes] = {}
@@ -223,6 +245,15 @@ class InMemoryStore(Store):
         new = self._usage.get((user_id, month), 0) + by
         self._usage[(user_id, month)] = new
         return new
+
+    async def list_users(self) -> list[User]:
+        return [replace(u) for u in self._users.values()]
+
+    async def claim_job(self, name: str, key: str) -> bool:
+        if (name, key) in self._jobs:
+            return False
+        self._jobs.add((name, key))
+        return True
 
     async def put_activity(self, user_id: str, copy_id: str, rows: list[tuple[str, str, int, int]]) -> None:
         for day, tool, calls, errors in rows:

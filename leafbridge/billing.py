@@ -158,6 +158,38 @@ class Billing:
 
         return await asyncio.to_thread(_work)
 
+    async def subscription_state(self, customer_id: str) -> dict:
+        """Where this customer's subscription stands, straight from Stripe:
+        {"state": "active" | "past_due" | "ended" | "unknown", "invoice_url", "since"}.
+
+        "past_due" carries the unpaid invoice's payment page and when it was issued. Anything odd
+        (Stripe unreachable, no subscription at all) is "unknown", which callers treat as no change."""
+        s = self._stripe()
+
+        def _work() -> dict:
+            subs = s.Subscription.list(customer=customer_id, status="all", limit=20).data
+            if not subs:
+                return {"state": "unknown"}
+            if any(x.status in ("active", "trialing") for x in subs):
+                return {"state": "active"}
+            late = [x for x in subs if x.status == "past_due"]
+            if not late:
+                return {"state": "ended"}
+            sub = max(late, key=lambda x: x.created)
+            inv_id = sub.latest_invoice if isinstance(sub.latest_invoice, str) else getattr(sub.latest_invoice, "id", None)
+            url, since = None, None
+            if inv_id:
+                inv = s.Invoice.retrieve(inv_id)
+                url = getattr(inv, "hosted_invoice_url", None)
+                since = getattr(inv.status_transitions, "finalized_at", None) or inv.created
+            return {"state": "past_due", "invoice_url": url, "since": since}
+
+        try:
+            return await asyncio.to_thread(_work)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("could not read the subscription state (%s)", type(exc).__name__)
+            return {"state": "unknown"}
+
     def parse_event(self, payload: bytes, sig_header: str) -> dict:
         """Verify the webhook signature and return the event as a plain dict."""
         s = self._stripe()
@@ -167,7 +199,9 @@ class Billing:
 
 
 # Subscription lifecycle -> plan. Kept as a pure function for easy testing.
-_ACTIVE_STATUSES = {"active", "trialing", "past_due"}
+# "past_due" is deliberately NOT here: a payment that failed keeps Pro on for a grace period (see
+# dunning.py), and a late retry event must not undo the downgrade that follows if it stays unpaid.
+_ACTIVE_STATUSES = {"active", "trialing"}
 _ENDED_STATUSES = {"canceled", "unpaid", "incomplete_expired"}
 
 
@@ -193,3 +227,33 @@ def plan_change_from_event(event: dict) -> tuple[str | None, str | None, str | N
         return user_id, None, customer_id
 
     return None, None, None
+
+
+def dunning_change_from_event(event: dict) -> dict | None:
+    """Map a Stripe webhook event to a payment-problem change, or None.
+
+    {"action": "start", "customer", "invoice_url", "at"}  a renewal payment did not go through
+    {"action": "clear", "customer"}                        the customer is paid up (or is gone)
+    """
+    etype = event.get("type")
+    obj = (event.get("data") or {}).get("object") or {}
+    customer = obj.get("customer")
+    if not isinstance(customer, str) or not customer:
+        return None
+    if etype in ("invoice.payment_failed", "invoice.payment_action_required"):
+        parent = ((obj.get("parent") or {}).get("subscription_details") or {})
+        if not (obj.get("subscription") or parent.get("subscription")):
+            return None                                     # not a subscription invoice
+        if obj.get("billing_reason") == "subscription_create":
+            return None                                     # the very first payment: they never became Pro
+        return {"action": "start", "customer": customer, "invoice_url": obj.get("hosted_invoice_url") or None,
+                "at": float(event.get("created") or 0) or None}
+    if etype in ("invoice.paid", "invoice.payment_succeeded", "customer.subscription.deleted"):
+        return {"action": "clear", "customer": customer}
+    if etype == "customer.subscription.updated":
+        status = obj.get("status")
+        if status in _ACTIVE_STATUSES:
+            return {"action": "clear", "customer": customer}
+        if status == "past_due":
+            return {"action": "start", "customer": customer, "invoice_url": None, "at": float(event.get("created") or 0) or None}
+    return None

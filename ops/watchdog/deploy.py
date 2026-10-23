@@ -10,6 +10,7 @@ It makes sure that, in this order:
 
 Reads these from the environment (the GitHub environment "watchdog-deploy" provides them):
   CLOUDFLARE_API_TOKEN, WATCHDOG_GITHUB_TOKEN, WATCHDOG_REPORT_SECRET, WATCHDOG_DIGEST_SECRET
+  (optional: WATCHDOG_CUSTOMER_EMAIL_SECRET; see keep_bindings below)
 Nothing secret is ever printed.
 """
 
@@ -101,7 +102,13 @@ def upload(kv_id: str) -> None:
             {"type": "secret_text", "name": "REPORT_SECRET", "text": need("WATCHDOG_REPORT_SECRET")},
             {"type": "secret_text", "name": "DIGEST_SECRET", "text": need("WATCHDOG_DIGEST_SECRET")},
         ],
+        # Secrets this script does not list keep their value across a redeploy. The customer-email secret
+        # is one of them: it is set once with set_secret.py and never passes through CI.
+        "keep_bindings": ["secret_text"],
     }
+    extra = os.environ.get("WATCHDOG_CUSTOMER_EMAIL_SECRET", "").strip()
+    if extra:      # when CI is given it, it wins; otherwise the stored one is kept
+        metadata["bindings"].append({"type": "secret_text", "name": "CUSTOMER_EMAIL_SECRET", "text": extra})
     boundary = uuid.uuid4().hex
     parts = [
         (f'form-data; name="metadata"', "application/json", json.dumps(metadata).encode()),

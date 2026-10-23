@@ -115,13 +115,20 @@ if [ "$(azq containerapp secret list -n "$APP" -g "$RG" --query "length([?name==
   echo "sign-in: new sign-ins use $SIGNIN, both WorkOS environments trusted"
 fi
 
+# Payment reminder emails (leafbridge/dunning.py) go out through the Cloudflare Worker, which needs this
+# secret. An app without it (the drill copy) simply does not send them.
+MAIL_VARS=()
+if [ "$(azq containerapp secret list -n "$APP" -g "$RG" --query "length([?name=='customer-email-secret'])" -o tsv || echo 0)" = "1" ]; then
+  MAIL_VARS=(CUSTOMER_EMAIL_SECRET=secretref:customer-email-secret)
+fi
+
 # FREE_CAPACITY_STARTER: month-to-date Azure spend (CAD) at which the capacity
 # gate pauses the FREE tier (plus 80% of Pro revenue, see leafbridge/capacity.py).
 # Pro is never paused. Kept here so the limit is reviewable in git.
 azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" \
   --min-replicas "$MIN_REPLICAS" --max-replicas "$MAX_REPLICAS" \
   --termination-grace-period "$GRACE" \
-  --set-env-vars FREE_CAPACITY_STARTER=100 ${SIGNIN_VARS[@]+"${SIGNIN_VARS[@]}"} >/dev/null
+  --set-env-vars FREE_CAPACITY_STARTER=100 ${SIGNIN_VARS[@]+"${SIGNIN_VARS[@]}"} ${MAIL_VARS[@]+"${MAIL_VARS[@]}"} >/dev/null
 echo "new revision: $NEW (0% traffic)"
 
 rollback() {

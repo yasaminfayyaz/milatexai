@@ -331,6 +331,60 @@ function cleanReport(body) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Customer emails: payment reminders sent on behalf of the app (POST /api/customer-email)
+// ---------------------------------------------------------------------------
+// Only two fixed templates can be sent, to one address, with a payment link that must be a
+// Stripe page. So even a leaked secret cannot turn this into a general mail relay for our domain.
+
+const CUSTOMER_KINDS = ["payment_failed", "payment_reminder"];
+const CUSTOMER_FROM = { email: "support@milatexai.com", name: "MiLatexAI Support" };
+const SIGNATURE_LOGO = "https://milatexai.com/email-signature-logo.png";
+const STRIPE_PAGE = /^https:\/\/(invoice|billing)\.stripe\.com\/[A-Za-z0-9_\-\/.?=&%]{1,600}$/;
+const EMAIL_ADDR = /^[A-Za-z0-9._%+\-]{1,64}@[A-Za-z0-9.\-]{1,190}\.[A-Za-z]{2,24}$/;
+const DATE_TEXT = /^[A-Z][a-z]{2,8} \d{1,2}$/;     // "October 26"
+const AMOUNT_TEXT = /^\$\d{1,4}\.\d{2}$/;           // "$8.99"
+const CUSTOMER_MAX_PER_WEEK = 4;
+
+function cleanCustomerEmail(body) {
+  const b = body && typeof body === "object" ? body : {};
+  const kind = String(b.kind || "");
+  const to = String(b.to || "").trim();
+  const link = String(b.pay_url || "").trim();
+  const ends = String(b.ends_on || "").trim();
+  const amount = String(b.amount || "$8.99").trim();
+  if (!CUSTOMER_KINDS.includes(kind)) return { ok: false, error: "unknown kind" };
+  if (!EMAIL_ADDR.test(to)) return { ok: false, error: "bad address" };
+  if (!STRIPE_PAGE.test(link)) return { ok: false, error: "bad link" };
+  if (!DATE_TEXT.test(ends)) return { ok: false, error: "bad date" };
+  if (!AMOUNT_TEXT.test(amount)) return { ok: false, error: "bad amount" };
+  return { ok: true, value: { kind, to, link, ends, amount } };
+}
+
+function composeCustomerEmail(v) {
+  const free = "the free plan (10 commits a month, one active project at a time)";
+  const paras = v.kind === "payment_failed"
+    ? ["Your MiLatexAI Pro renewal of " + v.amount + " didn't go through. This can happen when a card expires, a bank asks for a confirmation, or a payment method needs updating.",
+       "Your Pro access stays on for now. If the payment isn't done by " + v.ends + ", your account moves to " + free + ". Your projects stay saved either way."]
+    : ["A quick reminder: your MiLatexAI Pro renewal of " + v.amount + " is still unpaid.",
+       "Your Pro access ends on " + v.ends + ", after which your account moves to " + free + ". Your projects stay saved, and you can come back to Pro any time."];
+  const subject = v.kind === "payment_failed"
+    ? "Your MiLatexAI Pro payment didn't go through"
+    : "Reminder: your MiLatexAI Pro payment is still open (Pro ends " + v.ends + ")";
+  const ask = "If something looks wrong, or you'd rather cancel, just reply to this email.";
+  const text = "Hi,\n\n" + paras[0] + "\n\nYou can finish the payment here:\n" + v.link + "\n\n" + paras[1] + "\n\n" + ask +
+    "\n\nBest,\n\nSupport\nmilatexai.com\n";
+  const p = (t) => '<p style="margin:0 0 14px">' + esc(t) + "</p>";
+  const html = '<div style="font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111827">' +
+    p("Hi,") + p(paras[0]) +
+    '<p style="margin:0 0 14px">You can finish the payment <a href="' + esc(v.link) + '">on this Stripe page</a>.</p>' +
+    p(paras[1]) + p(ask) +
+    '<p style="margin:22px 0 0">Best,</p><p style="margin:14px 0 0;font-weight:700">Support</p>' +
+    '<p style="margin:6px 0 0"><img src="' + SIGNATURE_LOGO + '" width="96" height="22" alt="MiLatexAI" style="display:block;border:0"></p>' +
+    '<p style="margin:6px 0 0"><a href="https://milatexai.com">milatexai.com</a></p></div>';
+  return { subject, text, html };
+}
+
 // The daily digest comes from our own workflow, but it is still bounded before it is emailed or stored.
 function cleanDigest(body) {
   const clean = (v, n) => String(v == null ? "" : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").slice(0, n);
@@ -511,6 +565,21 @@ async function handleFetch(request, env) {
     await env.STATE.put("digest:last", JSON.stringify(d.snapshot));   // only after the email was accepted
     return J({ ok: true });
   }
+  // Payment reminders for customers. Its own secret, held by the app and by nothing else.
+  if (request.method === "POST" && url.pathname === "/api/customer-email") {
+    const ok = constantTimeEqual((request.headers.get("authorization") || "").replace(/^Bearer /, ""), env.CUSTOMER_EMAIL_SECRET || "");
+    if (!ok) return J({ error: "unauthorized" }, 401);
+    const c = cleanCustomerEmail(await request.json().catch(() => ({})));
+    if (!c.ok) return J({ error: c.error }, 400);
+    const key = "ce:" + c.value.to.toLowerCase();
+    const sentBefore = parseInt((await env.STATE.get(key)) || "0", 10) || 0;
+    if (sentBefore >= CUSTOMER_MAX_PER_WEEK) return J({ error: "too many emails to this address this week" }, 429);
+    const m = composeCustomerEmail(c.value);
+    // The owner is copied (bcc) so every customer email that goes out is also in the owner's inbox.
+    const sent = await env.EMAIL.send({ to: c.value.to, bcc: cfg.ALERT_TO, from: CUSTOMER_FROM, subject: m.subject, text: m.text, html: m.html });
+    await env.STATE.put(key, String(sentBefore + 1), { expirationTtl: 7 * 86400 });
+    return J({ ok: true, sent: sent || null });
+  }
   if (request.method === "POST" && url.pathname === "/api/test-dispatch") {
     if (!authed()) return J({ error: "unauthorized" }, 401);
     const body = await request.json().catch(() => ({}));
@@ -540,4 +609,4 @@ export default {
   },
 };
 
-export const __test = { classify, step, parseDeep, updateBar, updateDays, uptimePercent, renderStatus, composeEmail, cleanReport, cleanDigest, constantTimeEqual, initialState, fmtDuration, components, overall };
+export const __test = { classify, step, parseDeep, updateBar, updateDays, uptimePercent, renderStatus, composeEmail, cleanReport, cleanDigest, cleanCustomerEmail, composeCustomerEmail, constantTimeEqual, initialState, fmtDuration, components, overall };

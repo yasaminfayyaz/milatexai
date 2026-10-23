@@ -26,6 +26,7 @@ from . import pricing
 _CONTENT_PATH = Path(__file__).with_name("site_content.json")
 _ICON_PATH = Path(__file__).with_name("icon-64.png")
 _LOGO_PATH = Path(__file__).with_name("icon-512.png")
+_SIGNATURE_LOGO_PATH = Path(__file__).with_name("email-signature-logo.png")
 
 # Endonyms for the language switcher (label shown in each language's own script).
 LANG_NAMES = {
@@ -650,6 +651,7 @@ def render_account(
     plan = acct.get("plan") or "free"
     is_admin = bool(acct.get("is_admin"))
     has_customer = bool(acct.get("has_customer"))
+    past_due_until = str(acct.get("past_due_until") or "")
 
     # A checkout return is shown as a small banner above the main state.
     banner = ""
@@ -659,6 +661,11 @@ def render_account(
     elif status == "cancelled":
         banner = ("<div class='acct-banner'>↩️ Checkout cancelled, no charge was made. "
                   "You can upgrade any time.</div>")
+
+    if plan == "pro" and past_due_until and not is_admin:
+        banner += ("<div class='acct-banner'>⚠️ <b>Your last payment didn't go through.</b> Pro stays on until "
+                   f"{html.escape(past_due_until)}. Use \"Manage or cancel subscription\" below to update your "
+                   "payment method and keep it.</div>")
 
     def _form(action: str, label: str, cls: str = "btn") -> str:
         return (f"<form method='post' action='{action}' style='margin:0'>"
@@ -873,6 +880,11 @@ def icon_png() -> bytes:
     """The site icon (64 px PNG), served as /favicon.ico for browsers and for the
     connector list in Claude and ChatGPT."""
     return _ICON_PATH.read_bytes()
+
+
+def signature_logo_png() -> bytes:
+    """The wordmark used in the signature of our emails."""
+    return _SIGNATURE_LOGO_PATH.read_bytes()
 
 
 def logo_png() -> bytes:

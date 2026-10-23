@@ -318,3 +318,48 @@ def test_daily_digest_is_bounded_and_composed(js):
     assert huge["snapshot"] == {}                      # an oversized snapshot is dropped, not stored
     mail = js(f"__test.composeEmail('digest', {jsv({'subject': 'Daily users: 21', 'text': 'body', 'html': '<p>body</p>'})}, {{}})")
     assert mail["subject"] == "[MiLatexAI] Daily users: 21" and mail["text"] == "body" and mail["html"] == "<p>body</p>"
+
+
+# --- customer payment emails -----------------------------------------------------------------
+
+GOOD_LINK = "https://invoice.stripe.com/i/acct_1TsBEtIGNWPfjBGV/live_abc123?s=ap"
+
+
+def customer(js, **kw):
+    body = {"kind": "payment_failed", "to": "someone@example.com", "pay_url": GOOD_LINK, "ends_on": "October 26", "amount": "$8.99"}
+    body.update(kw)
+    return js(f"__test.cleanCustomerEmail({jsv(body)})")
+
+
+def test_customer_email_accepts_only_the_two_templates_and_stripe_links(js):
+    assert customer(js)["ok"] is True
+    assert customer(js, kind="payment_reminder")["ok"] is True
+    for bad in ({"kind": "anything_else"}, {"kind": "digest"}, {"to": "not an address"}, {"to": "a@b.c,evil@x.com"},
+                {"to": "evil@x.com\nbcc: other@x.com"}, {"pay_url": "https://evil.example/i/abc"},
+                {"pay_url": "http://invoice.stripe.com/i/abc"}, {"pay_url": "https://invoice.stripe.com.evil.example/i/abc"},
+                {"pay_url": "javascript:alert(1)"}, {"ends_on": "next week"}, {"ends_on": "October 26<script>"},
+                {"amount": "8.99 USD"}, {"amount": "$8.99<b>"}):
+        assert customer(js, **bad)["ok"] is False, bad
+    assert js("__test.cleanCustomerEmail(null)")["ok"] is False
+
+
+def test_customer_email_texts_are_clean_and_signed(js):
+    for kind in ("payment_failed", "payment_reminder"):
+        v = customer(js, kind=kind)["value"]
+        m = js(f"__test.composeCustomerEmail({jsv(v)})")
+        text, html = m["text"], m["html"]
+        assert GOOD_LINK in text and GOOD_LINK.replace("&", "&amp;") in html
+        assert "October 26" in text and "$8.99" in text and "reply to this email" in text
+        assert text.rstrip().endswith("Best,\n\nSupport\nmilatexai.com")           # the signature, same wording as the Gmail one
+        assert "https://milatexai.com/email-signature-logo.png" in html and 'width="96" height="22"' in html
+        assert chr(0x2014) not in m["subject"] + text + html
+        assert m["subject"].startswith(("Your MiLatexAI Pro", "Reminder: your MiLatexAI Pro"))
+    assert "stays on for now" in js(f"__test.composeCustomerEmail({jsv(customer(js)['value'])})")["text"]
+    assert "ends on October 26" in js(f"__test.composeCustomerEmail({jsv(customer(js, kind='payment_reminder')['value'])})")["text"]
+
+
+def test_customer_email_html_cannot_be_injected(js):
+    v = customer(js)["value"]
+    v["link"] = 'https://invoice.stripe.com/i/x?a=1&b="><script>alert(1)</script>'     # even a bad value that slipped past is escaped
+    html = js(f"__test.composeCustomerEmail({jsv(v)})")["html"]
+    assert "<script>" not in html

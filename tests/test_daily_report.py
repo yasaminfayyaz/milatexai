@@ -231,3 +231,18 @@ def test_report_with_and_without_tool_use():
     assert "Free users' tool use on 2026-10-14" in text and "read_file (10)" in text
     assert "<b>evil</b>" not in page and "&lt;b&gt;evil&lt;/b&gt;@example.com" in page      # an address cannot inject HTML
     assert du.render_html(r, s, None, None, {"day": "2026-10-14", "free": [], "free_quiet": 3, "pro_users": 0, "pro_calls": 0}).count("No free user made a tool call") == 1
+
+
+# --- unpaid renewals ------------------------------------------------------------------------------
+
+def test_the_owner_is_told_about_unpaid_renewals():
+    users = [{"RowKey": "u1", "email": "late@example.com", "plan": "pro", "past_due_since": 1_760_000_000.0, "dunning_stage": 1},
+             {"RowKey": "u2", "email": "fine@example.com", "plan": "pro"},
+             {"RowKey": "u3", "email": "gone@example.com", "plan": "free", "past_due_since": 1_760_000_000.0}]   # already downgraded
+    r = du.build_rows(users, [], [], "2026-10")
+    assert du.past_due_lines(r) == ["late@example.com: unpaid since October 9, 1 of 2 emails sent, Pro ends October 16 if still unpaid"]
+    s = du.compare(r, {})
+    assert "Payment problem: late@example.com" in du.render_text(r, s)
+    assert "Payment problem:</strong> late@example.com" in du.render_html(r, s)
+    fine = du.build_rows(users[1:2], [], [], "2026-10")
+    assert "Payment problem" not in du.render_text(fine, du.compare(fine, {}))

@@ -48,7 +48,8 @@ def build_rows(users: list[dict], projects: list[dict], usage: list[dict], month
         uid = u.get("RowKey", "")
         rows.append({"email": u.get("email") or "(none)", "plan": u.get("plan") or "free",
                      "admin": bool(u.get("is_admin")), "projects": per_projects.get(uid, 0),
-                     "commits": total.get(uid, 0), "month": this_month.get(uid, 0)})
+                     "commits": total.get(uid, 0), "month": this_month.get(uid, 0),
+                     "past_due_since": float(u.get("past_due_since") or 0), "notices": int(u.get("dunning_stage") or 0)})
     rows.sort(key=lambda r: (r["plan"] != "pro", -r["commits"], r["email"]))
     return rows
 
@@ -170,6 +171,27 @@ def _activity_html(act: dict | None) -> str:
               f'Pro: {act["pro_users"]} active, {act["pro_calls"]} calls.</p>')
 
 
+GRACE_DAYS = 7          # keep in step with leafbridge/dunning.py
+_MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+           "November", "December")
+
+
+def _day(ts: float) -> str:
+    t = time.gmtime(ts)
+    return f"{_MONTHS[t.tm_mon - 1]} {t.tm_mday}"
+
+
+def past_due_lines(rows: list[dict]) -> list[str]:
+    """Pro accounts whose renewal payment is unpaid: since when, how many reminders went out, when Pro ends."""
+    out = []
+    for r in rows:
+        if r.get("past_due_since") and r["plan"] == "pro":
+            end = r["past_due_since"] + GRACE_DAYS * 86400
+            out.append(f"{r['email']}: unpaid since {_day(r['past_due_since'])}, {r['notices']} of 2 emails sent, "
+                       f"Pro ends {_day(end)} if still unpaid")
+    return out
+
+
 def snapshot_of(rows: list[dict]) -> dict:
     return {r["email"]: {"commits": r["commits"], "projects": r["projects"], "plan": r["plan"]} for r in rows}
 
@@ -255,6 +277,8 @@ def render_text(rows: list[dict], summary: dict, sources: list[dict] | None = No
                  f"{summary['commits']} commits all-time")
     if service_line(service):
         lines.append(service_line(service))
+    for pd in past_due_lines(rows):
+        lines.append("Payment problem: " + pd)
     if summary["first"]:
         lines.append("First report, so there is nothing to compare with yet.")
     else:
@@ -301,6 +325,7 @@ def render_html(rows: list[dict], summary: dict, sources: list[dict] | None = No
         notes.append("Upgraded to pro: " + e(", ".join(summary["upgraded"])))
     if service_line(service):
         notes.insert(0, e(service_line(service)))
+    notes[:0] = ["<strong>Payment problem:</strong> " + e(pd) for pd in past_due_lines(rows)]
     return (
         '<div style="font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111827">'
         f'<p style="margin:0 0 4px"><strong>{summary["users"]}</strong> users, <strong>{summary["pro"]}</strong> pro, '

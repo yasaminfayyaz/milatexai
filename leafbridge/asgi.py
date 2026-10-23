@@ -45,7 +45,7 @@ class _SecurityHeaders:
 
     # Static, per-process-identical pages: cache hard at the Cloudflare edge so
     # crawler/visitor hits are served without waking this scale-to-zero app.
-    _EDGE_CACHED = {"/", "/llms.txt", "/robots.txt", "/sitemap.xml", "/og.svg", "/tools", "/tools/bibtex", "/tools/latex-error-finder", "/privacy", "/terms", "/help"}
+    _EDGE_CACHED = {"/", "/llms.txt", "/robots.txt", "/sitemap.xml", "/og.svg", "/tools", "/tools/bibtex", "/tools/latex-error-finder", "/privacy", "/terms", "/help", "/email-signature-logo.png"}
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
@@ -95,9 +95,11 @@ def build_app():
     @asynccontextmanager
     async def lifespan(app):
         async with inner(app) as state:
+            mcp.dunning.start()          # the payment sweep (see dunning.py)
             try:
                 yield state
             finally:
+                await mcp.dunning.stop()
                 await mcp.activity.stop()
 
     http.router.lifespan_context = lifespan
