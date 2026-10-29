@@ -1,5 +1,4 @@
-"""Tests for the Pro pricing: a flat USD $8.99 (Stripe converts to local currency
-at checkout, so there are no per-currency overrides)."""
+"""Tests for the Pro pricing: USD $8.99, and the same number in CAD and AUD."""
 
 from __future__ import annotations
 
@@ -12,9 +11,12 @@ def test_base_is_usd_899_monthly():
     assert pricing.PRO_INTERVAL == "month"
 
 
-def test_no_currency_options_so_stripe_converts():
-    # Empty currency_options => Stripe Adaptive Pricing converts from USD.
-    assert pricing.currency_options() == {}
+def test_canada_and_australia_pay_the_same_number_in_their_own_currency():
+    assert pricing.currency_options() == {"cad": {"unit_amount": 899}, "aud": {"unit_amount": 899}}
+
+
+def test_local_amounts_follow_whatever_the_base_price_is():
+    assert pricing.currency_options(699) == {"cad": {"unit_amount": 699}, "aud": {"unit_amount": 699}}
 
 
 def test_display_price():

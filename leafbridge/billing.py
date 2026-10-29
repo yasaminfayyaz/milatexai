@@ -16,6 +16,7 @@ import asyncio
 import json
 import logging
 import os
+import time
 
 from . import pricing
 from .store import User
@@ -54,6 +55,7 @@ class Billing:
         self.cancel_url = cancel_url
         self.portal_return_url = portal_return_url
         self.enabled = bool(api_key and price_id)
+        self._local_prices_check_after = 0.0       # monotonic time before which the price is not re-checked
 
     @classmethod
     def from_env(cls, base_url: str) -> "Billing":
@@ -93,6 +95,29 @@ class Billing:
             log.warning("could not check past subscriptions (%s); no first-month discount", type(exc).__name__)
             return 0
 
+    def _sync_local_prices(self, s) -> None:
+        """Make the live Stripe price carry the local-currency amounts (see pricing.currency_options),
+        copied from the price's own amount so a changed price needs no second edit. Checked at most
+        once an hour per server; any failure is logged and checkout carries on in USD."""
+        now = time.monotonic()
+        if now < self._local_prices_check_after:
+            return
+        self._local_prices_check_after = now + 600           # retry soon if this fails
+        try:
+            price = s.Price.retrieve(self.price_id, expand=["currency_options"])
+            base = int(_dig(price, "unit_amount") or 0)
+            have = _dig(price, "currency_options") or {}
+            want = pricing.currency_options(base) if base else {}
+            stale = {code: opt for code, opt in want.items()
+                     if _dig(have, code, "unit_amount") != opt["unit_amount"]}
+            if stale:
+                s.Price.modify(self.price_id, currency_options=stale)
+                log.info("local currency prices set on the Pro price: %s",
+                         {code: o["unit_amount"] for code, o in stale.items()})
+            self._local_prices_check_after = now + 3600
+        except Exception as exc:  # noqa: BLE001
+            log.warning("could not set the local currency prices (%s); checkout continues in USD", type(exc).__name__)
+
     @staticmethod
     def _first_month_coupon(s, percent: int) -> str:
         """The id of the offer's Stripe coupon, creating it the first time it is needed."""
@@ -122,6 +147,7 @@ class Billing:
         percent = await self.first_month_percent(customer_id, bool(user.referred_by))
 
         def _work() -> tuple[str, str]:
+            self._sync_local_prices(s)
             cid = customer_id
             if not cid:
                 cust = s.Customer.create(
@@ -255,12 +281,15 @@ class Billing:
 
     async def add_credit(self, customer_id: str, cents: int, key: str, note: str) -> bool:
         """Put ``cents`` of credit on the customer's Stripe balance; it comes off their next invoice.
-        ``key`` makes a repeat of the same call a no-op. False if it could not be done."""
+        A balance is held in one currency, the customer's own (CAD for someone billed in CAD), and the
+        same number is credited there. ``key`` makes a repeat of the same call a no-op. False if it
+        could not be done."""
         s = self._stripe()
 
         def _work() -> None:
+            currency = _dig(s.Customer.retrieve(customer_id), "currency") or pricing.PRO_BASE_CURRENCY
             s.Customer.create_balance_transaction(
-                customer_id, amount=-int(cents), currency=pricing.PRO_BASE_CURRENCY,
+                customer_id, amount=-int(cents), currency=currency,
                 description=note, idempotency_key=key)
 
         try:

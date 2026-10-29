@@ -1,9 +1,10 @@
 """Pro-plan pricing.
 
-The Pro plan is one simple price of **USD $8.99 / month** everywhere. Stripe's
-Adaptive Pricing presents the equivalent in the customer's local currency at
-checkout (automatic FX), so researchers around the world see a familiar amount
-while the plan stays a flat USD price with no per-currency bookkeeping.
+The Pro plan is **USD $8.99 / month**. In Canada and Australia the same number is
+charged in the local currency (CAD 8.99, AUD 8.99): Stripe Checkout picks the
+currency from where the customer is, using the amounts added to the Stripe price
+by ``billing.Billing`` (they always follow the live price, nothing is typed in
+twice). Everyone else pays USD.
 """
 
 from __future__ import annotations
@@ -12,11 +13,14 @@ PRO_BASE_CURRENCY = "usd"
 PRO_UNIT_AMOUNT = 899  # 8.99 in minor units (cents)
 PRO_INTERVAL = "month"
 
+# Currencies charged at the same number as the base price. Add a code here to give another country its own currency.
+LOCAL_PRICE_CURRENCIES = ("cad", "aud")
 
-def currency_options() -> dict[str, dict[str, int]]:
-    """No fixed per-currency amounts: an empty map lets Stripe Adaptive Pricing
-    convert the USD price into the customer's local currency at checkout."""
-    return {}
+
+def currency_options(base_amount: int = PRO_UNIT_AMOUNT) -> dict[str, dict[str, int]]:
+    """The per-currency amounts for the Stripe price: the base amount again, in each local currency.
+    ``base_amount`` is the live price's amount, so a new base price carries over by itself."""
+    return {code: {"unit_amount": int(base_amount)} for code in LOCAL_PRICE_CURRENCIES}
 
 
 # Offer for new subscribers: this much off the FIRST month, taken off automatically at checkout

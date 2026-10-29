@@ -402,6 +402,12 @@ def test_the_stripe_calls_for_the_credit(monkeypatch):
     calls = []
 
     class Customer:
+        currency = "usd"
+
+        @classmethod
+        def retrieve(cls, cid):
+            return types.SimpleNamespace(currency=cls.currency)
+
         @staticmethod
         def create_balance_transaction(cid, **kw):
             calls.append((cid, kw))
@@ -410,6 +416,14 @@ def test_the_stripe_calls_for_the_credit(monkeypatch):
     assert run(stripe_billing(fake).add_credit("cus_1", 450, "key-1", "Invite a friend"))
     assert calls == [("cus_1", {"amount": -450, "currency": "usd", "description": "Invite a friend",
                                 "idempotency_key": "key-1"})]
+    calls.clear()
+    Customer.currency = "cad"                                   # billed in CAD: the credit is in CAD too
+    assert run(stripe_billing(fake).add_credit("cus_2", 450, "key-2", "Invite a friend"))
+    assert calls[0][1]["currency"] == "cad" and calls[0][1]["amount"] == -450
+    calls.clear()
+    Customer.currency = None                                    # no invoice yet: fall back to USD
+    assert run(stripe_billing(fake).add_credit("cus_3", 450, "key-3", "Invite a friend"))
+    assert calls[0][1]["currency"] == "usd"
 
     class Broken:
         @staticmethod
