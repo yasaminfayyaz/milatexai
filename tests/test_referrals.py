@@ -40,7 +40,16 @@ class FakeBilling:
         self.state, self.fingerprints, self.saved_cards = state, list(fingerprints), list(saved_cards)
         self.credits: list[tuple[str, int, str]] = []
         self.credit_ok = True
+        self.open_credit = 0                                    # credit on the balance that an invoice has not used yet
+        self.balance_known = True
         self.checked = 0
+
+    def use_up(self):
+        """The next invoice took the credit."""
+        self.open_credit = 0
+
+    async def unused_credit_cents(self, customer_id):
+        return self.open_credit if self.balance_known else None
 
     async def first_payment_check(self, customer_id):
         self.checked += 1
@@ -54,6 +63,7 @@ class FakeBilling:
             return False
         if all(k != key for _, _, k in self.credits):           # Stripe ignores a repeated idempotency key
             self.credits.append((customer_id, cents, key))
+            self.open_credit += cents
         return True
 
     async def subscription_state(self, customer_id):
@@ -225,11 +235,37 @@ def test_the_twelfth_reward_is_paid_and_the_thirteenth_is_not():
         friend = make(store, f"f{i}", f"friend{i}@example.com", plan="pro", stripe_customer_id=f"cus_f{i}")
         assert run(referrals.attach(store, friend, code))
         run(referrals.on_first_payment(store, f"cus_f{i}", now))
-    run(referrals.sweep(store, f, now + 9 * DAY))
+    for month in range(14):                                # one credit per sweep; each invoice uses it up
+        run(referrals.sweep(store, f, now + (9 + month) * DAY))
+        f.use_up()
     assert len(f.credits) == 12
     assert sorted(k for _, _, k in f.credits) == sorted(f"referral-credit-inv-{n}" for n in range(1, 13))
     inv = run(store.get_user("inv"))
     assert (inv.referral_rewards, inv.referral_pending) == (12, 0)
+
+
+def test_only_one_discounted_month_at_a_time():
+    store, _ = world(inviter_plan="pro", referral_rewards=3, referral_pending=3)
+    f = FakeBilling()
+    assert run(referrals.apply_pending(store, f, "inv")) == 1
+    assert run(referrals.apply_pending(store, f, "inv")) == 0           # the first credit is still unused
+    assert run(referrals.sweep(store, f, time.time()))["applied"] == 0
+    assert len(f.credits) == 1 and f.open_credit == 450                 # never more than 50% of one month
+    assert run(store.get_user("inv")).referral_pending == 2
+    f.use_up()                                                          # the invoice took it
+    assert run(referrals.sweep(store, f, time.time()))["applied"] == 1
+    assert len(f.credits) == 2 and f.open_credit == 450
+    assert run(store.get_user("inv")).referral_pending == 1
+
+
+def test_when_stripe_cannot_say_whether_a_credit_is_open_the_reward_waits():
+    store, _ = world(inviter_plan="pro", referral_rewards=1, referral_pending=1)
+    f = FakeBilling()
+    f.balance_known = False
+    assert run(referrals.apply_pending(store, f, "inv")) == 0 and f.credits == []
+    assert run(store.get_user("inv")).referral_pending == 1
+    f.balance_known = True
+    assert run(referrals.apply_pending(store, f, "inv")) == 1
 
 
 def test_a_free_inviter_keeps_the_reward_until_they_are_pro():
@@ -269,7 +305,9 @@ def test_several_waiting_rewards_get_distinct_numbers():
     inv.plan = "pro"
     run(store.upsert_user(inv))
     f = FakeBilling()
-    assert run(referrals.apply_pending(store, f, "inv")) == 3
+    for _ in range(3):
+        assert run(referrals.apply_pending(store, f, "inv")) == 1
+        f.use_up()
     assert [k for _, _, k in f.credits] == [f"referral-credit-inv-{n}" for n in (1, 2, 3)]
 
 
@@ -379,6 +417,22 @@ def test_the_stripe_calls_for_the_credit(monkeypatch):
             raise ConnectionError("down")
 
     assert not run(stripe_billing(types.SimpleNamespace(Customer=Broken)).add_credit("cus_1", 450, "k", "n"))
+
+
+def test_the_stripe_balance_read_for_open_credit():
+    def billing_with(balance=None, boom=False):
+        class Customer:
+            @staticmethod
+            def retrieve(cid):
+                if boom:
+                    raise ConnectionError("down")
+                return types.SimpleNamespace(balance=balance)
+        return stripe_billing(types.SimpleNamespace(Customer=Customer))
+
+    assert run(billing_with(-450).unused_credit_cents("c")) == 450       # a credit is a negative balance
+    assert run(billing_with(0).unused_credit_cents("c")) == 0
+    assert run(billing_with(300).unused_credit_cents("c")) == 0          # money owed is not a credit
+    assert run(billing_with(boom=True).unused_credit_cents("c")) is None
 
 
 def test_the_first_payment_check_reads_refunds_and_card_fingerprints():

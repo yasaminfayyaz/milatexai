@@ -239,6 +239,20 @@ class Billing:
             log.warning("could not list saved cards (%s)", type(exc).__name__)
             return []
 
+    async def unused_credit_cents(self, customer_id: str) -> int | None:
+        """Credit still sitting on the customer's Stripe balance (0 when none). None if Stripe cannot say."""
+        s = self._stripe()
+
+        def _work() -> int:
+            balance = getattr(s.Customer.retrieve(customer_id), "balance", 0) or 0
+            return max(0, -int(balance))                  # Stripe stores a credit as a negative balance
+
+        try:
+            return await asyncio.to_thread(_work)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("could not read the balance (%s)", type(exc).__name__)
+            return None
+
     async def add_credit(self, customer_id: str, cents: int, key: str, note: str) -> bool:
         """Put ``cents`` of credit on the customer's Stripe balance; it comes off their next invoice.
         ``key`` makes a repeat of the same call a no-op. False if it could not be done."""

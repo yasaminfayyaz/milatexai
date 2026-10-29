@@ -98,23 +98,25 @@ async def on_first_payment(store, customer_id: str, at: float | None, now: float
 
 
 async def apply_pending(store, billing, user_id: str) -> int:
-    """Move rewards that are waiting onto the inviter's Stripe balance. Only a Pro subscriber with a
-    Stripe customer is credited; for anyone else the reward waits. Returns how many were applied."""
-    applied = 0
-    while True:
-        user = await store.get_user(user_id)       # fresh each round: never write back a stale copy
-        if (user is None or user.referral_pending <= 0 or not user.stripe_customer_id
-                or user.is_admin or user.plan != "pro"):
-            return applied
-        number = user.referral_rewards - user.referral_pending + 1     # which reward this is, 1 to the cap
-        ok = await billing.add_credit(
-            user.stripe_customer_id, pricing.referral_credit_cents(), f"referral-credit-{user.user_id}-{number}",
-            f"Invite a friend: {pricing.REFERRAL_REWARD_PERCENT}% off one month")
-        if not ok:
-            return applied
-        user.referral_pending -= 1
-        await store.upsert_user(user)
-        applied += 1
+    """Move one waiting reward onto the inviter's Stripe balance. Only a Pro subscriber with a Stripe
+    customer is credited; for anyone else the reward waits. Only one discounted month at a time: while
+    an earlier credit is still unused (or Stripe cannot say), the next reward waits for a later sweep,
+    so two rewards never add up to a free month. Returns how many were applied (0 or 1)."""
+    user = await store.get_user(user_id)
+    if (user is None or user.referral_pending <= 0 or not user.stripe_customer_id
+            or user.is_admin or user.plan != "pro"):
+        return 0
+    if await billing.unused_credit_cents(user.stripe_customer_id) != 0:
+        return 0
+    number = user.referral_rewards - user.referral_pending + 1         # which reward this is, 1 to the cap
+    ok = await billing.add_credit(
+        user.stripe_customer_id, pricing.referral_credit_cents(), f"referral-credit-{user.user_id}-{number}",
+        f"Invite a friend: {pricing.REFERRAL_REWARD_PERCENT}% off one month")
+    if not ok:
+        return 0
+    user.referral_pending -= 1
+    await store.upsert_user(user)
+    return 1
 
 
 async def _settle(store, billing, friend, now: float) -> str:
