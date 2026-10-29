@@ -27,6 +27,15 @@ class BillingError(Exception):
     pass
 
 
+def _dig(obj, *path):
+    """obj.a.b.c for a Stripe object or a plain dict, None if any step is missing."""
+    for key in path:
+        if obj is None:
+            return None
+        obj = obj.get(key) if isinstance(obj, dict) else getattr(obj, key, None)
+    return obj
+
+
 class Billing:
     def __init__(
         self,
@@ -64,10 +73,11 @@ class Billing:
         stripe.api_key = self._api_key
         return stripe
 
-    async def first_month_percent(self, customer_id: str | None) -> int:
+    async def first_month_percent(self, customer_id: str | None, referred: bool = False) -> int:
         """The first-month discount this person gets: the offer's percentage if they have never
-        had a subscription, otherwise 0. Any doubt (Stripe unreachable) means no discount."""
-        percent = pricing.FIRST_MONTH_PERCENT
+        had a subscription (the friend rate when they came through an invite link), otherwise 0.
+        Any doubt (Stripe unreachable) means no discount."""
+        percent = pricing.offer_percent(referred)
         if not self.enabled or not percent:
             return 0
         if not customer_id:
@@ -109,7 +119,7 @@ class Billing:
         if not self.enabled:
             raise BillingError("Billing is not configured.")
         s = self._stripe()
-        percent = await self.first_month_percent(customer_id)
+        percent = await self.first_month_percent(customer_id, bool(user.referred_by))
 
         def _work() -> tuple[str, str]:
             cid = customer_id
@@ -190,6 +200,62 @@ class Billing:
             log.warning("could not read the subscription state (%s)", type(exc).__name__)
             return {"state": "unknown"}
 
+    async def first_payment_check(self, customer_id: str) -> dict:
+        """How this customer's first payment stands: {"state": "ok" | "refunded" | "unknown",
+        "fingerprints": [card fingerprints used]}. Used before an inviter is rewarded."""
+        s = self._stripe()
+
+        def _work() -> dict:
+            paid = [c for c in s.Charge.list(customer=customer_id, limit=20).data if getattr(c, "paid", False)]
+            if not paid:
+                return {"state": "unknown", "fingerprints": []}
+            first = min(paid, key=lambda c: c.created)
+            fp = _dig(first, "payment_method_details", "card", "fingerprint")
+            bad = (getattr(first, "refunded", False) or (getattr(first, "amount_refunded", 0) or 0) > 0
+                   or getattr(first, "disputed", False))
+            return {"state": "refunded" if bad else "ok", "fingerprints": [fp] if fp else []}
+
+        try:
+            return await asyncio.to_thread(_work)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("could not check the first payment (%s)", type(exc).__name__)
+            return {"state": "unknown", "fingerprints": []}
+
+    async def card_fingerprints(self, customer_id: str) -> list[str]:
+        """Fingerprints of the cards saved on a customer (empty when none or on any error)."""
+        s = self._stripe()
+
+        def _work() -> list[str]:
+            out = []
+            for pm in s.PaymentMethod.list(customer=customer_id, type="card", limit=20).data:
+                fp = _dig(pm, "card", "fingerprint")
+                if fp:
+                    out.append(fp)
+            return out
+
+        try:
+            return await asyncio.to_thread(_work)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("could not list saved cards (%s)", type(exc).__name__)
+            return []
+
+    async def add_credit(self, customer_id: str, cents: int, key: str, note: str) -> bool:
+        """Put ``cents`` of credit on the customer's Stripe balance; it comes off their next invoice.
+        ``key`` makes a repeat of the same call a no-op. False if it could not be done."""
+        s = self._stripe()
+
+        def _work() -> None:
+            s.Customer.create_balance_transaction(
+                customer_id, amount=-int(cents), currency=pricing.PRO_BASE_CURRENCY,
+                description=note, idempotency_key=key)
+
+        try:
+            await asyncio.to_thread(_work)
+            return True
+        except Exception as exc:  # noqa: BLE001
+            log.warning("could not add the credit (%s)", type(exc).__name__)
+            return False
+
     def parse_event(self, payload: bytes, sig_header: str) -> dict:
         """Verify the webhook signature and return the event as a plain dict."""
         s = self._stripe()
@@ -257,3 +323,17 @@ def dunning_change_from_event(event: dict) -> dict | None:
         if status == "past_due":
             return {"action": "start", "customer": customer, "invoice_url": None, "at": float(event.get("created") or 0) or None}
     return None
+
+
+def first_payment_from_event(event: dict) -> dict | None:
+    """A subscription's first real payment went through: {"customer", "at"}, else None.
+    Zero-amount invoices (a fully discounted start) do not count."""
+    if event.get("type") not in ("invoice.paid", "invoice.payment_succeeded"):
+        return None
+    obj = (event.get("data") or {}).get("object") or {}
+    customer = obj.get("customer")
+    if not isinstance(customer, str) or not customer:
+        return None
+    if obj.get("billing_reason") != "subscription_create" or not (obj.get("amount_paid") or 0) > 0:
+        return None
+    return {"customer": customer, "at": float(event.get("created") or 0) or None}

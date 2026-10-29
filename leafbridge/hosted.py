@@ -44,7 +44,7 @@ from . import (
     __version__, arxivprep, citations, figures, latex, paperstats, site,
     texcompile, texdiff, texlocate, tikz, web,
 )
-from .billing import Billing, dunning_change_from_event, plan_change_from_event
+from .billing import Billing, dunning_change_from_event, first_payment_from_event, plan_change_from_event
 from .capacity import CapacityGate
 from .config import ProjectConfig, default_data_dir
 from .connect_link import ConnectCodeError, mint_connect_code, verify_connect_code
@@ -64,7 +64,7 @@ from .dunning import DunningLoop
 from . import dunning as _dunning
 from .mailer import CustomerMailer
 from .health import DeepHealth
-from . import buildcache, pricing, texmemory
+from . import buildcache, pricing, referrals, texmemory
 from . import load
 from .service import (
     AccountService,
@@ -75,7 +75,7 @@ from .service import (
     PlanChoice,
 )
 from .sessions import SessionsClient, SessionsError
-from .store import InMemoryStore, Store, TokenCipher, User
+from .store import FREE_MONTHLY_COMMITS, InMemoryStore, Store, TokenCipher, User
 from .web_session import SESSION_TTL_SECONDS, SessionError, mint_session, verify_session
 from .workos_web import WorkOSWebAuth
 
@@ -140,7 +140,11 @@ Note for the assistant: this is the first time this person has used MiLatexAI on
 - Safety net: save a checkpoint before a big edit, show what changed since an earlier version, or restore a file.
 - Submission: prepare an arXiv bundle, or give the word count per section.
 - Extras: add an image or PDF to the project, or switch between their projects.
-Keep the offer short and ask which one they want to start with."""
+Keep the offer short and ask which one they want to start with.{offer_line}"""
+
+_OFFER_LINE = ("\nAfter the ideas, add one relaxed sentence about the plans: the free plan covers {limit} edits a "
+               "month, and if they want to do more, Pro is unlimited and their first month is {percent}% off "
+               "(the upgrade tool gives the link). Mention it once, plainly, and do not push it.")
 
 _FIGURE_LINE_PRO = ("draw a matplotlib figure for a section, for example a flowchart of the methodology in IEEE "
                     "style: show it in the chat first, and once they approve it commit it to the project and "
@@ -155,6 +159,8 @@ INLINE_DOWNLOAD_BYTES = 48 * 1024
 # Website sign-in cookies.
 SESSION_COOKIE = "mila_session"
 STATE_COOKIE = "mila_oauth_state"
+REF_COOKIE = "mila_ref"          # the invite code of the link someone arrived through (see referrals.py)
+REF_COOKIE_DAYS = 30
 
 
 def _month() -> str:
@@ -607,7 +613,33 @@ class HostedApp:
         except Exception:  # noqa: BLE001
             return ""
         pro = user.is_admin or user.plan == "pro"
-        return FIRST_STEPS_HINT.format(figure_line=_FIGURE_LINE_PRO if pro else _FIGURE_LINE_FREE)
+        percent = pricing.offer_percent(bool(user.referred_by))
+        offer_line = (_OFFER_LINE.format(limit=FREE_MONTHLY_COMMITS, percent=percent)
+                      if (not pro and percent and not user.stripe_customer_id) else "")
+        return FIRST_STEPS_HINT.format(figure_line=_FIGURE_LINE_PRO if pro else _FIGURE_LINE_FREE,
+                                       offer_line=offer_line)
+
+    async def note_referral(self, request: Request, user: User) -> None:
+        """If this visitor arrived through an invite link, remember who invited them. Never raises."""
+        try:
+            code = request.cookies.get(REF_COOKIE, "")
+            if code and not user.referred_by:
+                await referrals.attach(self.service.store, user, code)
+        except Exception:  # noqa: BLE001
+            pass
+
+    async def invite_note(self, user: User) -> str:
+        """The invite link and what it gives, for a paying subscriber. Empty for everyone else."""
+        if user.is_admin or user.plan != "pro" or not pricing.referral_enabled():
+            return ""
+        try:
+            code = await referrals.ensure_code(self.service.store, user)
+        except Exception:  # noqa: BLE001
+            return ""
+        return (f"\n\nKnow someone who would use this? Share {referrals.link(self.base_url, code)} . They get "
+                f"{pricing.REFERRAL_FRIEND_PERCENT}% off their first month ({pricing.first_month_price(pricing.REFERRAL_FRIEND_PERCENT)}), "
+                f"and you get {pricing.REFERRAL_REWARD_PERCENT}% off a month for each friend who subscribes, "
+                f"up to {pricing.REFERRAL_MAX_REWARDS}.")
 
     async def resolve_or_onboard(self, user: User, project: str | None) -> ProjectConfig:
         """Resolve the caller's project. If they have NONE connected yet, don't
@@ -968,13 +1000,14 @@ def create_hosted_server(
         if user.is_admin:
             return "You're an admin. You already have unlimited access."
         if user.plan == "pro":
-            return "You're already on Pro. Use manage_subscription to view or cancel."
+            return "You're already on Pro. Use manage_subscription to view or cancel." + await app.invite_note(user)
         if not app.billing.enabled:
             raise ToolError("Billing isn't configured yet. Please try again later.")
         offer = 0
         try:
             if hasattr(app.billing, "first_month_percent"):
-                offer = int(await app.billing.first_month_percent(user.stripe_customer_id))
+                offer = int(await app.billing.first_month_percent(user.stripe_customer_id, True)
+                            if user.referred_by else await app.billing.first_month_percent(user.stripe_customer_id))
             url, cid = await app.billing.create_checkout(user, user.stripe_customer_id)
             await app.service.set_stripe_customer(user.user_id, cid)
         except Exception as exc:  # noqa: BLE001
@@ -1008,7 +1041,7 @@ def create_hosted_server(
             url = await app.billing.create_portal(user.stripe_customer_id)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
-        return f"Manage your subscription (view invoices, update card, or cancel):\n\n{url}"
+        return f"Manage your subscription (view invoices, update card, or cancel):\n\n{url}" + await app.invite_note(user)
 
     # -- reads (unmetered) -------------------------------------------------
 
@@ -1968,6 +2001,25 @@ def create_hosted_server(
             _pages["latexlint_tool"] = tool_latexlint.render_latexlint_tool()
         return HTMLResponse(_pages["latexlint_tool"])
 
+    @mcp.custom_route("/r/{code}", methods=["GET"])
+    async def invite_link(request: Request) -> Response:
+        # An invite link: remember the code for 30 days, then explain the offer. A code that does not
+        # exist just goes to the home page, so a typo or a made-up one gives nothing away.
+        owner = None
+        if pricing.referral_enabled():
+            try:
+                owner = await referrals.find_by_code(app.service.store, request.path_params.get("code", ""))
+            except Exception:  # noqa: BLE001
+                owner = None
+        if owner is None:
+            return RedirectResponse("/", status_code=303)
+        resp = HTMLResponse(web.render_invite(pricing.REFERRAL_FRIEND_PERCENT,
+                                              pricing.first_month_price(pricing.REFERRAL_FRIEND_PERCENT)))
+        resp.set_cookie(REF_COOKIE, request.path_params["code"].lower(), max_age=REF_COOKIE_DAYS * 86400,
+                        httponly=True, secure=app.cookie_secure, samesite="lax", path="/")
+        resp.headers["cache-control"] = "no-store"
+        return resp
+
     @mcp.custom_route("/account", methods=["GET"])
     async def account(request: Request) -> Response:
         status = request.query_params.get("status")
@@ -1975,7 +2027,15 @@ def create_hosted_server(
         if user is None:
             return HTMLResponse(site.render_account(
                 status=status, signed_in=False, billing_enabled=app.billing.enabled))
+        await app.note_referral(request, user)
         projects = await app.service.store.list_projects(user.user_id)
+        invite = None
+        if not user.is_admin and user.plan == "pro" and pricing.referral_enabled():
+            try:
+                invite = {"link": referrals.link(app.base_url, await referrals.ensure_code(app.service.store, user)),
+                          "earned": user.referral_rewards, "waiting": user.referral_pending}
+            except Exception:  # noqa: BLE001
+                invite = None
         view = {
             "email": user.email,
             "plan": "pro" if (user.is_admin or user.plan == "pro") else "free",
@@ -1986,8 +2046,8 @@ def create_hosted_server(
         }
         return HTMLResponse(site.render_account(
             status=status, signed_in=True, account=view,
-            billing_enabled=app.billing.enabled, has_projects=bool(projects),
-            first_month_percent=0 if user.stripe_customer_id else pricing.FIRST_MONTH_PERCENT))
+            billing_enabled=app.billing.enabled, has_projects=bool(projects), invite=invite,
+            first_month_percent=0 if user.stripe_customer_id else pricing.offer_percent(bool(user.referred_by))))
 
     @mcp.custom_route("/upgrade", methods=["GET"])
     async def upgrade_page(request: Request) -> Response:
@@ -2042,8 +2102,9 @@ def create_hosted_server(
                 "Sign-in failed",
                 "We couldn't complete sign-in. Please try again.", icon="⚠️"),
                 status_code=502)
-        await app.service.get_or_create_user(
+        signed_in = await app.service.get_or_create_user(
             user_id, email, admin_emails=app.admin_emails)
+        await app.note_referral(request, signed_in)
         resp = RedirectResponse("/account", status_code=303)
         resp.set_cookie(SESSION_COOKIE, mint_session(app.cipher, user_id, email),
                         max_age=SESSION_TTL_SECONDS, httponly=True,
@@ -2188,6 +2249,18 @@ def create_hosted_server(
             except Exception:  # noqa: BLE001
                 # 500 tells Stripe to retry the delivery later.
                 return Response("apply failed", status_code=500)
+        # A friend's first real payment starts the hold on the inviter's reward (see referrals.py).
+        first = first_payment_from_event(event)
+        if first:
+            try:
+                await referrals.on_first_payment(app.service.store, first["customer"], first["at"])
+            except Exception:  # noqa: BLE001
+                return Response("referral failed", status_code=500)
+        if user_id and plan == "pro":
+            try:
+                await referrals.apply_pending(app.service.store, app.billing, user_id)
+            except Exception:  # noqa: BLE001
+                pass            # the six-hourly sweep applies it
         # A payment that failed starts the grace period and the first email; paying clears it.
         change = dunning_change_from_event(event)
         if change:
@@ -2264,7 +2337,8 @@ def create_hosted_server(
         user_id, email = ident
         # If the account already has a saved token, this is an "add another
         # project" case, render the form WITHOUT the token field.
-        await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        who = await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        await app.note_referral(request, who)
         has = await app.service.has_token(user_id)
         return HTMLResponse(
             web.render_connect_form(request.query_params["code"], email=email, has_token=has,
@@ -2281,7 +2355,8 @@ def create_hosted_server(
         if ident is None:
             return _expired()
         user_id, email = ident
-        await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        who = await app.service.get_or_create_user(user_id, email, admin_emails=app.admin_emails)
+        await app.note_referral(request, who)
         has = await app.service.has_token(user_id)
 
         def form_error(msg: str, status: int = 400) -> Response:
@@ -2311,7 +2386,9 @@ def create_hosted_server(
             return form_error("Something went wrong connecting the project. Please try again.", status=500)
         if not has:   # the first connection is the only time the question is asked
             await app.service.record_signup_source(source, time.strftime("%Y-%m", time.gmtime()))
-        return HTMLResponse(web.render_success(proj.name, proj.project_id))
+        offer = (0 if (who.plan == "pro" or who.is_admin or who.stripe_customer_id)
+                 else pricing.offer_percent(bool(who.referred_by)))
+        return HTMLResponse(web.render_success(proj.name, proj.project_id, offer_percent=offer))
 
     # -- manage the list of projects (add / remove, no token) --------------
 

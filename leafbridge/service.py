@@ -293,7 +293,7 @@ class AccountService:
                 f"The free plan includes {limit} connected {plural} at a time. To "
                 "work on a different project, remove the current one first (ask to "
                 '"manage my projects"), or upgrade to Pro for unlimited projects at '
-                f"once{pricing.offer_suffix(bool(user.stripe_customer_id))}: {UPGRADE_URL}"
+                f"once{pricing.offer_suffix(bool(user.stripe_customer_id), bool(user.referred_by))}: {UPGRADE_URL}"
             )
 
     async def _account_token_enc(self, user: User) -> str:
@@ -398,7 +398,7 @@ class AccountService:
             raise LimitExceeded(
                 f"You've used all {limit} free commits this month. Reads stay free; "
                 f"new edits resume next month, or upgrade to Pro for unlimited"
-                f"{pricing.offer_suffix(bool(user.stripe_customer_id))}: {UPGRADE_URL}"
+                f"{pricing.offer_suffix(bool(user.stripe_customer_id), bool(user.referred_by))}: {UPGRADE_URL}"
             )
 
     async def record_commit(self, user_id: str, month: str) -> int:
@@ -457,7 +457,7 @@ class AccountService:
                 f"{len(projects)} projects are all still saved:\n{names}\n\n"
                 "Which one do you want to keep working on? The others stay saved and paused, "
                 "and you can switch any time. Or upgrade to Pro to use all of them again"
-                f"{pricing.offer_suffix(bool(user.stripe_customer_id))}: {UPGRADE_URL}"
+                f"{pricing.offer_suffix(bool(user.stripe_customer_id), bool(user.referred_by))}: {UPGRADE_URL}"
             )
         chosen = active if ref is None else self._select(projects, ref)
         if chosen.project_id != active.project_id:
@@ -465,7 +465,7 @@ class AccountService:
                 f"{chosen.name!r} is paused on the free plan; {active.name!r} is your active "
                 f"project. You can switch to {chosen.name!r} (then {active.name!r} pauses "
                 f"instead), or upgrade to Pro to use all your projects"
-                f"{pricing.offer_suffix(bool(user.stripe_customer_id))}: {UPGRADE_URL}"
+                f"{pricing.offer_suffix(bool(user.stripe_customer_id), bool(user.referred_by))}: {UPGRADE_URL}"
             )
         return chosen
 

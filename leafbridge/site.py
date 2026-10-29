@@ -637,6 +637,7 @@ def render_account(
     billing_enabled: bool = True,
     has_projects: bool = False,
     first_month_percent: int = 0,
+    invite: dict | None = None,
 ) -> str:
     """The /account page.
 
@@ -701,6 +702,21 @@ def render_account(
                    "<p class='muted'>Upgrades are briefly unavailable, please try again soon.</p>")
         actions = f"{upgrade}{signout}"
 
+    invite_html = ""
+    if invite and plan == "pro" and not is_admin:
+        earned, waiting = int(invite.get("earned") or 0), int(invite.get("waiting") or 0)
+        cap = pricing.REFERRAL_MAX_REWARDS
+        tally = (f"<br>Rewards earned so far: {earned} of {cap}." + (f" {waiting} will come off your next invoice." if waiting else "")
+                 if earned else "")
+        invite_html = (
+            "<div class='acct-nudge'><b>Invite a friend</b><br>"
+            f"Your friend gets {pricing.REFERRAL_FRIEND_PERCENT}% off their first month "
+            f"({pricing.first_month_price(pricing.REFERRAL_FRIEND_PERCENT)}). When they subscribe, you get "
+            f"{pricing.REFERRAL_REWARD_PERCENT}% off a month, for up to {cap} friends."
+            f"<br><input readonly value='{html.escape(str(invite.get('link') or ''), quote=True)}' "
+            "style='width:100%;margin-top:8px;padding:8px;box-sizing:border-box' onclick='this.select()'>"
+            f"{tally}</div>")
+
     whoami = (f"<p class='muted' style='margin-top:2px'>Signed in as {html.escape(email)}</p>"
               if signed_in and email else "")
 
@@ -731,6 +747,7 @@ def render_account(
 <p class='muted'>{html.escape(body)}</p>
 {whoami}
 {nudge}
+{invite_html}
 <div class='acct-actions'>{actions}</div>
 <p class='muted' style='margin-top:14px'>Questions? <a href='mailto:support@milatexai.com'>support@milatexai.com</a></p>
 <p style='margin-top:2px'><a class='muted' href='/'>Back to home</a></p>

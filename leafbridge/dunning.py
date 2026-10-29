@@ -21,7 +21,7 @@ import logging
 import time
 from datetime import datetime, timezone
 
-from . import pricing
+from . import pricing, referrals
 
 log = logging.getLogger("milatexai.dunning")
 
@@ -187,6 +187,12 @@ class DunningLoop:
         if not self.billing.enabled or not await self.store.claim_job("dunning-sweep", window):
             return None
         report = await sweep(self.store, self.billing, self.mailer, now)
-        if any(report[k] for k in ("started", "cleared", "first", "reminder", "ended", "held")):
+        try:
+            # Invite-a-friend rewards ride along: same window, same single copy.
+            report["referrals"] = await referrals.sweep(self.store, self.billing, now)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("the referral sweep failed (%s)", type(exc).__name__)
+        if any(report[k] for k in ("started", "cleared", "first", "reminder", "ended", "held")) or any(
+                (report.get("referrals") or {}).values()):
             log.info("payment sweep: %s", report)
         return report

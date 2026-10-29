@@ -38,12 +38,40 @@ def first_month_price(percent: int | None = None) -> str:
     return f"${cents / 100:.2f}"
 
 
-def offer_suffix(has_customer: bool) -> str:
+# Invite a friend. The friend, arriving through a Pro subscriber's link, gets a bigger first-month
+# discount than the standard one (that is the reason to use the link). The inviter gets this much off
+# one month, as credit on their Stripe balance, for each friend who pays, up to the cap. The reward
+# is held a few days after the friend's first payment so a refund cancels it. 0 on any of the first
+# three switches the program off everywhere.
+REFERRAL_FRIEND_PERCENT = 75
+REFERRAL_REWARD_PERCENT = 50
+REFERRAL_MAX_REWARDS = 12
+REFERRAL_HOLD_DAYS = 7
+
+
+def referral_enabled() -> bool:
+    return bool(FIRST_MONTH_PERCENT and REFERRAL_FRIEND_PERCENT and REFERRAL_REWARD_PERCENT and REFERRAL_MAX_REWARDS)
+
+
+def referral_credit_cents() -> int:
+    """What one reward is worth: the reward percentage of a month, in cents ($4.50)."""
+    return (PRO_UNIT_AMOUNT * REFERRAL_REWARD_PERCENT + 50) // 100
+
+
+def offer_percent(referred: bool) -> int:
+    """The first-month discount for someone who never subscribed: the friend rate when they came
+    through an invite link, otherwise the standard one."""
+    if referred and referral_enabled():
+        return REFERRAL_FRIEND_PERCENT
+    return FIRST_MONTH_PERCENT
+
+
+def offer_suffix(has_customer: bool, referred: bool = False) -> str:
     """" (50% off your first month)" for someone who has never subscribed (no Stripe customer
     yet), otherwise nothing. Used in the messages that point people to the upgrade page."""
     if not FIRST_MONTH_PERCENT or has_customer:
         return ""
-    return f" ({FIRST_MONTH_PERCENT}% off your first month)"
+    return f" ({offer_percent(referred)}% off your first month)"
 
 
 def display_price() -> str:

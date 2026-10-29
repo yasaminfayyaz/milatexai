@@ -70,6 +70,10 @@ class AzureTableStore(Store):
             e = await self._table("users").get_entity("user", user_id)
         except ResourceNotFoundError:
             return None
+        return self._to_user(e)
+
+    @staticmethod
+    def _to_user(e) -> User:
         return User(
             user_id=e["RowKey"],
             email=e.get("email", ""),
@@ -80,18 +84,19 @@ class AzureTableStore(Store):
             active_project_id=(e.get("active_project_id") or ""),
             past_due_since=float(e.get("past_due_since") or 0.0),
             dunning_stage=int(e.get("dunning_stage") or 0),
+            referral_code=(e.get("referral_code") or ""),
+            referred_by=(e.get("referred_by") or ""),
+            referral_paid_at=float(e.get("referral_paid_at") or 0.0),
+            referral_done=bool(e.get("referral_done", False)),
+            referral_rewards=int(e.get("referral_rewards") or 0),
+            referral_pending=int(e.get("referral_pending") or 0),
         )
 
     async def list_users(self) -> list[User]:
         await self._ensure()
         out: list[User] = []
         async for e in self._table("users").list_entities():
-            out.append(User(
-                user_id=e["RowKey"], email=e.get("email", ""), plan=e.get("plan", "free"),
-                is_admin=bool(e.get("is_admin", False)), stripe_customer_id=(e.get("stripe_customer_id") or None),
-                overleaf_token_encrypted=(e.get("overleaf_token_encrypted") or ""),
-                active_project_id=(e.get("active_project_id") or ""),
-                past_due_since=float(e.get("past_due_since") or 0.0), dunning_stage=int(e.get("dunning_stage") or 0)))
+            out.append(self._to_user(e))
         return out
 
     async def claim_job(self, name: str, key: str) -> bool:
@@ -116,6 +121,12 @@ class AzureTableStore(Store):
                 "active_project_id": user.active_project_id or "",
                 "past_due_since": float(user.past_due_since or 0.0),
                 "dunning_stage": int(user.dunning_stage or 0),
+                "referral_code": user.referral_code or "",
+                "referred_by": user.referred_by or "",
+                "referral_paid_at": float(user.referral_paid_at or 0.0),
+                "referral_done": bool(user.referral_done),
+                "referral_rewards": int(user.referral_rewards or 0),
+                "referral_pending": int(user.referral_pending or 0),
             },
             mode=UpdateMode.REPLACE,
         )

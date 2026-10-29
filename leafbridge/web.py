@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import html
 
+from .store import FREE_MONTHLY_COMMITS
+
 BRAND = "MiLatexAI"
 TAGLINE = "Edit your Overleaf, GitHub, or GitLab LaTeX projects from your AI assistant."
 
@@ -206,8 +208,12 @@ FIRST_PROMPTS = (
 )
 
 
-def render_success(project_name: str, project_id: str) -> str:
+def render_success(project_name: str, project_id: str, offer_percent: int = 0) -> str:
     ideas = "\n".join(f"    <li style='margin:.4rem 0'>{html.escape(p)}</li>" for p in FIRST_PROMPTS)
+    plans = ""
+    if offer_percent:
+        plans = (f"<p class='muted'>The free plan includes {FREE_MONTHLY_COMMITS} edits a month. For more, Pro is "
+                 f"unlimited, and your first month is <b>{offer_percent}% off</b>.</p>")
     return _page(
         f"Connected · {BRAND}",
         f"""{_brand_header()}
@@ -219,6 +225,7 @@ def render_success(project_name: str, project_id: str) -> str:
   <p class='muted'>Go back to your AI assistant and ask for something. A few ideas to paste:</p>
   <ul class='muted' style='text-align:left;max-width:30rem;margin:0 auto 1rem;padding-left:1.2rem'>
 {ideas}</ul>
+  {plans}
 </div>""",
     )
 
@@ -357,4 +364,20 @@ def render_landing() -> str:
 <div class='note'>To get started, add {BRAND} as a connector in Claude or ChatGPT, then run
    <b>start_connect</b> to link a project. There's nothing to configure on this
    page directly.</div>""",
+    )
+
+
+def render_invite(percent: int, price: str) -> str:
+    """Where an invite link lands: say what the friend gets and point them to the setup guide."""
+    return _page(
+        f"You're invited · {BRAND}",
+        f"""{_brand_header()}
+<div class='ok'>
+  <div class='big'>🎁</div>
+  <h1>A friend invited you</h1>
+  <p class='muted'>{BRAND} lets Claude or ChatGPT edit your LaTeX projects. Add it to your assistant,
+     connect a project, and when you go Pro your first month is <b>{percent}% off</b> ({html.escape(price)}).
+     The offer is applied automatically at checkout.</p>
+  <p><a class='btn' href='/#get-started'>See how to set it up</a></p>
+</div>""",
     )

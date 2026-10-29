@@ -87,6 +87,16 @@ class User:
     # Pro stays on for a grace period after the first failure; see dunning.py.
     past_due_since: float = 0.0
     dunning_stage: int = 0
+    # Invite a friend (see referrals.py). ``referral_code`` is this person's own link code.
+    # On the invited friend: who invited them, when their first payment went through, and whether the
+    # inviter's reward has been settled. On the inviter: rewards earned so far, and how many of them
+    # are still waiting to be applied to their Stripe balance (they are not Pro yet, or have no customer).
+    referral_code: str = ""
+    referred_by: str = ""
+    referral_paid_at: float = 0.0
+    referral_done: bool = False
+    referral_rewards: int = 0
+    referral_pending: int = 0
 
 
 @dataclass
