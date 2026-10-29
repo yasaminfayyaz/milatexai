@@ -7,6 +7,7 @@ reply it rides on.
 from __future__ import annotations
 
 import asyncio
+import html
 import warnings
 
 from fastmcp import Client
@@ -59,4 +60,4 @@ def test_someone_who_already_commits_is_left_alone():
 
 def test_the_web_page_shows_the_ideas():
     page = web.render_success("thesis", GOOD)
-    assert all(p.split(" (Pro)")[0][:30] in page for p in web.FIRST_PROMPTS)
+    assert all(html.escape(p) in page for p in web.FIRST_PROMPTS)

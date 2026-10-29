@@ -197,6 +197,8 @@ def render_connect_form(
 
 
 FIRST_PROMPTS = (
+    "Look at my related work section. I don't like how it sounds, so please edit it and check its citations so the text matches those papers.",
+    "My paper won't compile. Find out why, fix it and build it again.",
     "Look at the citations in my introduction and make them consistent.",
     "Check the references in my .bib file that point to arXiv and tell me which have a journal version.",
     "One of my tables runs off the page. Find it, show it to me and fix it.",

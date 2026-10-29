@@ -128,14 +128,21 @@ should win instead of regenerating from stale code.
 # things to ask for. Many people connect a project and then never send a request.
 FIRST_STEPS_HINT = """
 
-Note for the assistant: this is the first time this person has used MiLatexAI on a project, and many people stop here because they do not know what to ask for. After you answer, offer 3 or 4 ideas as short prompts they can send as they are, using real file names, sections, tables and citations from their project (read the outline or the .bib first if you need real names). Kinds of requests that work well:
-- Reformat the citations in one section, or tidy one entry in the .bib.
-- Take a reference that points to arXiv and look for a published journal version of it, then update the entry if there is one.
-- Find a table that overflows the page, look at it with show_table, and fix it.
-- {figure_line}
+Note for the assistant: this is the first time this person has used MiLatexAI on a project, and many people stop here because they do not know what to ask for. After you answer, offer 3 or 4 ideas as short prompts they can send as they are. Make them specific to this project: use real file names, sections, tables and citations (read the outline or the .bib first if you need real names), and pick the ones that fit what you see. Always include an editing idea first. Things this tool can do:
+- Edit: take a section they are unhappy with, rewrite it so it reads better, and check its citations so the text matches what those papers say.
+- Compile: find out why the paper does not compile, fix the errors and build it again.
+- Citations: make the citations in a section consistent, tidy a .bib entry, add a verified citation for a missing one, or look for undefined and duplicate references.
+- arXiv references: find which ones have a published journal version and update the entry.
+- Tables: find a table that overflows the page, look at it with show_table, and fix it.
+- Figures: {figure_line}
+- Diagrams: draw a pipeline or architecture as a TikZ diagram, show it, then save it.
+- Review: rewrite a paragraph or the abstract and give a tracked-changes PDF of what changed.
+- Safety net: save a checkpoint before a big edit, show what changed since an earlier version, or restore a file.
+- Submission: prepare an arXiv bundle, or give the word count per section.
+- Extras: add an image or PDF to the project, or switch between their projects.
 Keep the offer short and ask which one they want to start with."""
 
-_FIGURE_LINE_PRO = ("Draw a matplotlib figure for a section, for example a flowchart of the methodology in IEEE "
+_FIGURE_LINE_PRO = ("draw a matplotlib figure for a section, for example a flowchart of the methodology in IEEE "
                     "style: show it in the chat first, and once they approve it commit it to the project and "
                     "reference it in the text.")
 _FIGURE_LINE_FREE = _FIGURE_LINE_PRO + " Figure Studio is a Pro feature, so say that when you offer it."
