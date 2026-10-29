@@ -124,6 +124,22 @@ diverged), the stored code no longer matches it, so ask the user which version
 should win instead of regenerating from stale code.
 """
 
+# Appended once to the first project reply a person gets, so the assistant ends it with concrete
+# things to ask for. Many people connect a project and then never send a request.
+FIRST_STEPS_HINT = """
+
+Note for the assistant: this is the first time this person has used MiLatexAI on a project, and many people stop here because they do not know what to ask for. After you answer, offer 3 or 4 ideas as short prompts they can send as they are, using real file names, sections, tables and citations from their project (read the outline or the .bib first if you need real names). Kinds of requests that work well:
+- Reformat the citations in one section, or tidy one entry in the .bib.
+- Take a reference that points to arXiv and look for a published journal version of it, then update the entry if there is one.
+- Find a table that overflows the page, look at it with show_table, and fix it.
+- {figure_line}
+Keep the offer short and ask which one they want to start with."""
+
+_FIGURE_LINE_PRO = ("Draw a matplotlib figure for a section, for example a flowchart of the methodology in IEEE "
+                    "style: show it in the chat first, and once they approve it commit it to the project and "
+                    "reference it in the text.")
+_FIGURE_LINE_FREE = _FIGURE_LINE_PRO + " Figure Studio is a Pro feature, so say that when you offer it."
+
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 # Larger files are not passed through the chat as base64: download_file gives a link instead,
 # and copy_file copies between projects on the server.
@@ -573,6 +589,19 @@ class HostedApp:
         except Exception:  # noqa: BLE001
             return None
 
+    async def first_steps(self, user: User) -> str:
+        """The hint above, once per account, and only for someone who has not made a commit this
+        month. Never raises: a failure here must not get in the way of the reply it is added to."""
+        try:
+            if await self.service.store.get_usage(user.user_id, _month()) > 0:
+                return ""
+            if not await self.service.store.claim_job("first-steps", user.user_id):
+                return ""
+        except Exception:  # noqa: BLE001
+            return ""
+        pro = user.is_admin or user.plan == "pro"
+        return FIRST_STEPS_HINT.format(figure_line=_FIGURE_LINE_PRO if pro else _FIGURE_LINE_FREE)
+
     async def resolve_or_onboard(self, user: User, project: str | None) -> ProjectConfig:
         """Resolve the caller's project. If they have NONE connected yet, don't
         just error, hand back a secure connect link so onboarding happens on the
@@ -778,7 +807,7 @@ def create_hosted_server(
             proj = await app.service.connect_project(user.user_id, overleaf_url, token, name)
         except Exception as exc:  # noqa: BLE001
             raise _wrap(exc)
-        return f"Connected project {proj.name!r} ({proj.project_id}). You can now edit it."
+        return f"Connected project {proj.name!r} ({proj.project_id}). You can now edit it." + await app.first_steps(user)
 
     @mcp.tool(title="Disconnect a project", annotations={"title": "Disconnect a project", "readOnlyHint": False, "destructiveHint": True})
     async def disconnect_project(project: str) -> str:
@@ -812,7 +841,7 @@ def create_hosted_server(
                  for p in projects]
         if states:
             lines.append("The free plan works on one project at a time; paused projects stay saved.")
-        return "\n".join(lines)
+        return "\n".join(lines) + await app.first_steps(user)
 
     @mcp.tool(title="Choose the active project", annotations={"title": "Choose the active project", "readOnlyHint": False, "destructiveHint": False})
     async def switch_project(project: str) -> str:
@@ -865,7 +894,7 @@ def create_hosted_server(
             raise _wrap(exc)
         note = "" if reach == "ok" else (" (I couldn't confirm access right now; if the first read "
                                          "fails, check the link and token.)")
-        return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it.{note}"
+        return f"Added project {proj.name!r} ({proj.project_id}). You can now edit it.{note}" + await app.first_steps(user)
 
     @mcp.tool(title="Rename a project", annotations={"title": "Rename a project", "readOnlyHint": False, "destructiveHint": True})
     async def rename_project(project: str, new_name: str) -> str:
@@ -990,7 +1019,7 @@ def create_hosted_server(
         if not entries:
             return f"No files in {proj.name!r}."
         return "\n".join([f"{len(entries)} file(s) in {proj.name!r}:"]
-                         + [f"- {e.path}  ({e.size} bytes)" for e in entries])
+                         + [f"- {e.path}  ({e.size} bytes)" for e in entries]) + await app.first_steps(user)
 
     @mcp.tool(title="Read a file", annotations={"title": "Read a file", "readOnlyHint": True})
     async def read_file(path: str, project: str | None = None, with_line_numbers: bool = True) -> str:

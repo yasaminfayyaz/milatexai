@@ -196,7 +196,16 @@ def render_connect_form(
     )
 
 
+FIRST_PROMPTS = (
+    "Look at the citations in my introduction and make them consistent.",
+    "Check the references in my .bib file that point to arXiv and tell me which have a journal version.",
+    "One of my tables runs off the page. Find it, show it to me and fix it.",
+    "Draw a flowchart of my methodology section with matplotlib in IEEE style. Show it to me here first, then add it to the project. (Pro)",
+)
+
+
 def render_success(project_name: str, project_id: str) -> str:
+    ideas = "\n".join(f"    <li style='margin:.4rem 0'>{html.escape(p)}</li>" for p in FIRST_PROMPTS)
     return _page(
         f"Connected · {BRAND}",
         f"""{_brand_header()}
@@ -205,8 +214,9 @@ def render_success(project_name: str, project_id: str) -> str:
   <h1>Connected</h1>
   <p class='muted'>Project <b>{html.escape(project_name)}</b>
      (<code>{html.escape(project_id)}</code>) is now linked to your account.</p>
-  <p class='muted'>You can close this tab and go back to your AI assistant, try
-     <b>“list my files”</b> or ask it to edit your paper.</p>
+  <p class='muted'>Go back to your AI assistant and ask for something. A few ideas to paste:</p>
+  <ul class='muted' style='text-align:left;max-width:30rem;margin:0 auto 1rem;padding-left:1.2rem'>
+{ideas}</ul>
 </div>""",
     )
 
