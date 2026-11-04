@@ -1841,7 +1841,8 @@ def create_hosted_server(
 
     @mcp.tool(title="Upload a binary file", annotations={"title": "Upload a binary file", "readOnlyHint": False, "destructiveHint": True})
     async def upload_file(path: str, content_base64: str, project: str | None = None) -> str:
-        """Add or replace a binary file (image or PDF) from base64, then commit and push.
+        """Add or replace a binary file (an image such as PNG, JPG or SVG, or a PDF) from base64, then
+        commit and push.
         Works on the project's Git repository (Overleaf's Git integration, GitHub, GitLab or Bitbucket); documentation: https://milatexai.com/help."""
         try:
             data = base64.b64decode(content_base64, validate=True)

@@ -23,6 +23,8 @@ import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 
+from . import svgsupport
+
 STOPPED = "Compile stopped"
 BIG_PIXELS = 40_000_000          # above this an image is worth pointing out
 _TRANSIENT = (STOPPED, "Compile timed out", "Could not run", "compile failed to run")
@@ -160,7 +162,8 @@ def preview_tree(repo: Path):
     images are smaller, removed afterwards; the project is never touched."""
     repo = Path(repo)
     big = oversized_images(repo)
-    if not big:
+    svg = svgsupport.needed(repo)
+    if not big and not svg:
         yield repo, ""
         return
     tmp = Path(tempfile.mkdtemp(prefix="mila_preview_"))
@@ -168,12 +171,15 @@ def preview_tree(repo: Path):
         src = tmp / "src"
         shutil.copytree(repo, src, ignore=shutil.ignore_patterns(".git"), symlinks=True)
         shrunk = [(rel, w, h) for rel, w, h in big if _shrink(src / rel, w, h)]
-        note = ""
+        notes = []
         if shrunk:
             names = ", ".join(f"{rel} ({w:,} x {h:,} pixels)" for rel, w, h in shrunk)
-            note = (f"Note: {names} {'is' if len(shrunk) == 1 else 'are'} too large for the compile "
-                    "server, so this was built with a smaller copy at the same printed size. "
-                    "Your files are unchanged.")
+            notes.append(f"Note: {names} {'is' if len(shrunk) == 1 else 'are'} too large for the compile "
+                         "server, so this was built with a smaller copy at the same printed size. "
+                         "Your files are unchanged.")
+        if svg:
+            notes.append(svgsupport.prepare(src))       # the engine cannot read SVG: PDF copies, in this copy only
+        note = " ".join(n for n in notes if n)
         yield src, note
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

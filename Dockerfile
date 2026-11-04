@@ -33,6 +33,18 @@ COPY docker/prime.tex /tmp/prime/main.tex
 COPY docker/prime.bib /tmp/prime/prime.bib
 RUN cd /tmp/prime && tectonic -X compile main.tex && rm -rf /tmp/prime
 
+# SVG figures: Tectonic cannot read SVG, so compile checks convert them to PDF first
+# (leafbridge/svgsupport.py). rsvg-convert is a separate process with no network access; the fonts
+# are what text inside an SVG falls back to. Verified at build with the exact command the server runs,
+# so an image where it does not work never ships.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends librsvg2-bin fonts-dejavu-core fonts-liberation \
+    && rm -rf /var/lib/apt/lists/* \
+    && printf '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="30"><rect width="80" height="30" fill="#ccc"/><text x="4" y="20">Hi</text></svg>' > /tmp/t.svg \
+    && rsvg-convert -f pdf -d 96 -p 96 -o /tmp/t.pdf /tmp/t.svg \
+    && test -s /tmp/t.pdf && head -c 5 /tmp/t.pdf | grep -q '%PDF' \
+    && rm -f /tmp/t.svg /tmp/t.pdf
+
 WORKDIR /app
 
 COPY requirements.txt ./
