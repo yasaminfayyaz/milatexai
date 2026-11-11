@@ -122,13 +122,19 @@ if [ "$(azq containerapp secret list -n "$APP" -g "$RG" --query "length([?name==
   MAIL_VARS=(CUSTOMER_EMAIL_SECRET=secretref:customer-email-secret)
 fi
 
+# Self-hosted Overleaf / Git servers we have agreed to connect to, on top of GitHub, GitLab, Bitbucket and
+# Overleaf (leafbridge/config.py, LEAFBRIDGE_GIT_HOST_ALLOWLIST). Comma-separated, one host name each.
+# Add a host when a user asks (support@milatexai.com) and the host is a real institution; remove it to undo.
+#   sharelatex.gwdg.de  GWDG, University of Goettingen computing centre (requested 2026-11-11)
+GIT_HOSTS="sharelatex.gwdg.de"
+
 # FREE_CAPACITY_STARTER: month-to-date Azure spend (CAD) at which the capacity
 # gate pauses the FREE tier (plus 80% of Pro revenue, see leafbridge/capacity.py).
 # Pro is never paused. Kept here so the limit is reviewable in git.
 azq containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" \
   --min-replicas "$MIN_REPLICAS" --max-replicas "$MAX_REPLICAS" \
   --termination-grace-period "$GRACE" \
-  --set-env-vars FREE_CAPACITY_STARTER=100 ${SIGNIN_VARS[@]+"${SIGNIN_VARS[@]}"} ${MAIL_VARS[@]+"${MAIL_VARS[@]}"} >/dev/null
+  --set-env-vars FREE_CAPACITY_STARTER=100 LEAFBRIDGE_GIT_HOST_ALLOWLIST="$GIT_HOSTS" ${SIGNIN_VARS[@]+"${SIGNIN_VARS[@]}"} ${MAIL_VARS[@]+"${MAIL_VARS[@]}"} >/dev/null
 echo "new revision: $NEW (0% traffic)"
 
 rollback() {

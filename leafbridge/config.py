@@ -182,9 +182,11 @@ def validate_remote_git_url(url: str) -> None:
         raise ConfigError(f"Refusing bare IP host {host!r}; use a domain name.")
     if not _host_allowed(host):
         raise ConfigError(
-            f"Host {host!r} is not on the allowed Git host list. Allowed: "
-            "github.com, gitlab.com, bitbucket.org, and *.overleaf.com, add "
-            "more via the LEAFBRIDGE_GIT_HOST_ALLOWLIST env var."
+            f"Host {host!r} is not one of the Git hosts we support yet. Supported: "
+            "github.com, gitlab.com, bitbucket.org and Overleaf. If your university or lab "
+            "runs its own Overleaf or Git server, email support@milatexai.com with the host "
+            "name and we will add it. (Running your own copy of MiLatexAI? Set "
+            "LEAFBRIDGE_GIT_HOST_ALLOWLIST.)"
         )
 
 
