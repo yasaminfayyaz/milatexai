@@ -648,13 +648,13 @@ exceptiongroup==1.3.2 \
     --hash=sha256:41c6a70dfec22050d3d8b43386b059a4dc0bca3f3d40a40971cb206fff1785af \
     --hash=sha256:ca82e69f0cb535fbde934885744b67669a3efddd50fe7bc00d3398839fcaddec
     # via fastmcp-slim
-fastmcp==4.2.5 \
-    --hash=sha256:733f6a59705c4141ad74b1aa889561fbccd2790a74e18c4c72d4b08611746107 \
-    --hash=sha256:f6703db40224101f90732f1a41e4a1e3c72811422a53764e093509b97f24454d
+fastmcp==4.2.0 \
+    --hash=sha256:441351551edac39eed248f0ea0f1d87fd95f44812ffee8b72fa05a5053db903d \
+    --hash=sha256:833508360b9a5db6ae3524cf12471b31716c210feee0c726a867e38c43a9287f
     # via -r requirements.in
-fastmcp-slim==4.2.5 \
-    --hash=sha256:5d4992bccf2b8215229a0afa608e81670e09874ec353f4bb0aceb03ce27fb8ab \
-    --hash=sha256:bcb07c8f81c223c102da1e6c74dcc547fa1e753b90d5441ead8161cd2d25bd97
+fastmcp-slim==4.2.0 \
+    --hash=sha256:01578f6d1a1423ca073e9d2ea4a193eed3ed9a5330e121fbcd9415511cfd1c0f \
+    --hash=sha256:174239bed3ac47275afa7fe82941a65f86ad0314205195766c92b138c6dcfebe
     # via fastmcp
 flatbuffers==25.12.19 \
     --hash=sha256:7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4
@@ -1429,10 +1429,12 @@ psutil==7.2.2 \
     --hash=sha256:eed63d3b4d62449571547b60578c5b2c4bcccc5387148db46e0c2313dad0ee00 \
     --hash=sha256:fd04ef36b4a6d599bbdb225dd1d3f51e00105f6d48a28f006da7f9822f2606d8
     # via pymupdf
-py-key-value-aio==0.5.0 \
-    --hash=sha256:14268b72d1e2b94268c5b457a9bb065e9ee031c6617fa9c5adac795a776ccbfa \
-    --hash=sha256:20808520093cf8ae005a0ecb89a0cf1875859b48f1087f4ba262b3adc1f80c5b
-    # via fastmcp-slim
+py-key-value-aio==0.4.6 \
+    --hash=sha256:267c03c3e24cb99d3097612f8a5cfd8e11785c6a2975e272db0e303ea1850bfd \
+    --hash=sha256:820b30c7959fc738ea3d00160cdb10cd258f51e38737b2add530defeea1ded77
+    # via
+    #   -r requirements.in
+    #   fastmcp-slim
 pycparser==3.12 \
     --hash=sha256:a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e \
     --hash=sha256:f03387877eab82ce01bbdfd0ba7252ee55a90b1c708d5129e2ce915475cf1db6
@@ -1912,10 +1914,12 @@ rpds-py==2026.9.1 \
     # via
     #   jsonschema
     #   referencing
-sse-starlette==3.7.1 \
-    --hash=sha256:9a8256e3e80a0fdc8d1dec14f2bb0b3f304c99f23a6d4d26c61ff50145761597 \
-    --hash=sha256:c1bb3af0508c6c24cd4ab6257047654bbec01456a424bed36b36e8020cd7a37f
-    # via mcp
+sse-starlette==3.7.0 \
+    --hash=sha256:326416da2ab52e9a41b3f409d3ff897eda45aa68c9f3b7b17d0913aab8d219c3 \
+    --hash=sha256:f1d3136caa12d129284fca3d2ded79bc9af943320b6472712955fea52a6d3eea
+    # via
+    #   -r requirements.in
+    #   mcp
 starlette==1.10.0 \
     --hash=sha256:478c0ab3b4ced6e82719849c118fa406f0278a3499c1a898cd15cd31bdc38ce4 \
     --hash=sha256:b8399098d4c1e3522734f7235dc79b1fc967f96cf139c81e0fa30479e0685f9b

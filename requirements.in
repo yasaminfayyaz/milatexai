@@ -3,7 +3,13 @@
 #   uv pip compile requirements.in --python-version 3.12
 #     --python-platform x86_64-manylinux_2_28 --generate-hashes -o requirements.txt
 # Pin the FastMCP major line; uvicorn/starlette come in as FastMCP deps.
-fastmcp>=4.0.9,<5
+# Held back on 2026-11-27: the 2026-11-23 refresh (fastmcp 4.2.5, sse-starlette 3.7.1,
+# py-key-value-aio 0.5.0) made the server burn CPU (daily average under 1% before, 14 to 23%
+# after) and caused the outages of Nov 24 to 27. Keep these at the 2026-11-16 versions; lift a
+# cap only after the newer release has run a day with normal CPU (Azure CpuPercentage).
+fastmcp>=4.0.9,<4.2.1
+sse-starlette<3.7.1
+py-key-value-aio<0.5
 python-dotenv>=1.0
 cryptography>=42          # Phase 2: encrypt stored Overleaf tokens at rest
 azure-data-tables>=12.5   # Phase 2: persistent multi-tenant store
